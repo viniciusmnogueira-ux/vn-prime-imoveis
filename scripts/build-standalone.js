@@ -2,6 +2,9 @@ const fs = require("fs");
 const path = require("path");
 
 const root = path.join(__dirname, "..");
+const logoPath = path.join(root, "assets", "logo-vn-prime.png");
+const logoDataUrl =
+  "data:image/png;base64," + fs.readFileSync(logoPath).toString("base64");
 const css = fs.readFileSync(path.join(root, "style.css"), "utf8");
 const core = fs.readFileSync(path.join(root, "js", "core.js"), "utf8");
 const catalog = fs.readFileSync(path.join(root, "js", "catalog-data.js"), "utf8");
@@ -9,6 +12,8 @@ const nav = fs.readFileSync(path.join(root, "js", "nav.js"), "utf8");
 const idx = fs.readFileSync(path.join(root, "js", "index.js"), "utf8");
 const planosHome = fs.readFileSync(path.join(root, "js", "planos-stripe-home.js"), "utf8");
 let html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+
+html = html.replace(/src="assets\/logo-vn-prime\.png"/g, `src="${logoDataUrl}"`);
 
 html = html.replace(/<!-- CSS:[\s\S]*?<\/noscript>\s*/m, "");
 html = html.replace(/<div\s+id="vnprime-css-alert"[\s\S]*?<\/div>\s*/m, "");

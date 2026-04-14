@@ -243,13 +243,27 @@ p {
   }
 }
 
-/* Logo institucional — Versão 1 (Original) do guia de marca */
+/* Logo institucional — PNG marca (escudo + VN PRIME + IMÓVEIS) */
 .brand-logo {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
   text-decoration: none;
   color: inherit;
+}
+
+.brand-logo__img {
+  display: block;
+  height: clamp(46px, 7.5vw, 62px);
+  width: auto;
+  max-width: min(260px, 48vw);
+  object-fit: contain;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+}
+
+.site-header .brand-logo:hover .brand-logo__img {
+  opacity: 0.9;
 }
 
 .brand-logo__shield {
