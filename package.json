@@ -1,5 +1,9 @@
 {
   "name": "vn-prime-imoveis",
   "private": true,
-  "description": "Site estático HTML/CSS/JS — sem Next.js"
+  "description": "Site estático HTML/CSS/JS — sem Next.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/viniciusmnogueira-ux/vn-prime-imoveis.git"
+  }
 }
