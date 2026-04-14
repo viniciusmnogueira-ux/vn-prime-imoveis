@@ -16,7 +16,7 @@
   function getPublicListings() {
     var byId = new Map();
     getCatalog().forEach(function (c) {
-      if (c.status === "Aprovado") byId.set(c.id, c);
+      if (c.status === "Aprovado") byId.set(c.id, enrichStored(c));
     });
     getProperties().forEach(function (p) {
       if (p.status !== "Aprovado") return;
@@ -28,9 +28,18 @@
   function enrichStored(p) {
     var planStr = String(p.plan || "");
     var comm = p.commissionPlan || "";
-    var profile =
-      p.listingProfile ||
-      (comm === "3%" || planStr.indexOf("3%") !== -1 ? "autonomia" : "consultoria");
+    var profile = p.listingProfile;
+    if (!profile) {
+      if (comm === "Taxa" || /venda direta/i.test(planStr)) profile = "venda_direta";
+      else if (comm === "3%" || /assistida/i.test(planStr) || planStr.indexOf("3%") !== -1) profile = "autonomia";
+      else profile = "consultoria";
+    }
+    var hideOwnerContact =
+      profile === "autonomia" ||
+      profile === "venda_direta" ||
+      comm === "3%" ||
+      comm === "Taxa" ||
+      planStr.indexOf("3%") !== -1;
     return {
       id: p.id,
       codigo: p.codigo || String(p.id).replace(/^P-/, "VN-"),
@@ -48,10 +57,7 @@
       listingProfile: profile,
       planLabel: p.planLabel || p.plan || "—",
       commissionPlan: comm,
-      hideOwnerContact:
-        profile === "autonomia" ||
-        comm === "3%" ||
-        String(p.plan || "").indexOf("3%") !== -1,
+      hideOwnerContact: hideOwnerContact,
       description: p.description || "Descrição em elaboração pela curadoria VN Prime.",
       photos: p.photos && p.photos.length ? p.photos : [],
     };
@@ -63,6 +69,7 @@
     if (b) list = list.filter(function (x) { return x.neighborhood.toLowerCase().indexOf(b) !== -1; });
     if (tipo) list = list.filter(function (x) { return x.type === tipo; });
     if (maxValor && Number(maxValor) > 0) list = list.filter(function (x) { return x.price <= Number(maxValor); });
+    if (transacao === "venda_direta") list = list.filter(function (x) { return x.listingProfile === "venda_direta"; });
     if (transacao === "autonomia") list = list.filter(function (x) { return x.listingProfile === "autonomia"; });
     if (transacao === "consultoria") list = list.filter(function (x) { return x.listingProfile === "consultoria"; });
     return list;
@@ -85,6 +92,17 @@
     items.forEach(function (item) {
       var el = document.createElement("article");
       el.className = "card listing-card";
+      var tagClass = "";
+      var tagText = "Venda completa · 6%";
+      if (item.listingProfile === "venda_direta") {
+        tagClass = " listing-card__tag--direta";
+        tagText = "Venda direta · taxa";
+      } else if (item.listingProfile === "autonomia") {
+        tagClass = " listing-card__tag--direta";
+        tagText = "Venda assistida · 3%";
+      } else if (item.listingProfile === "consultoria" && item.commissionPlan === "4%") {
+        tagText = "Venda premium · 4%";
+      }
       var specs =
         (item.areaM2 ? item.areaM2 + " m² · " : "") +
         (item.quartos ? item.quartos + " qts" : "") +
@@ -117,9 +135,9 @@
         formatBRL(item.price) +
         "</p>" +
         '<span class="listing-card__tag' +
-        (item.listingProfile === "autonomia" ? " listing-card__tag--direta" : "") +
+        tagClass +
         '">' +
-        (item.listingProfile === "autonomia" ? "Venda direta · plano 3%" : "Intermediação VN Prime (4% ou 6%)") +
+        tagText +
         "</span>" +
         '<a class="btn btn--ghost btn--sm" style="margin-top:0.75rem" href="imovel.html?id=' +
         encodeURIComponent(item.id) +

@@ -231,9 +231,8 @@
             <div class="card">
               <h3>4 · Mídia</h3>
               <p class="muted">
-                Envie fotos para análise. Nos planos <strong>4%</strong> e <strong>6%</strong>, ao menos
-                <strong>3 fotos de celular</strong> para conferência interna; no <strong>3%</strong>, prefira um kit mais
-                completo. Valores de pacotes com fotógrafos credenciados e o fluxo de contratação estão descritos na
+                Envie fotos para análise.                 Na <strong>venda assistida</strong> e na <strong>venda direta</strong>, suas fotos são a base do anúncio. Nos planos
+                <strong>premium</strong> e <strong>completa</strong>, ao menos <strong>3 fotos de celular</strong> para conferência até a produção profissional. Valores de pacotes com fotógrafos credenciados e o fluxo de contratação estão descritos na
                 <a href="index.html#planos-fotografo">página inicial (seção fotógrafos)</a> — aqui o foco é o seu upload.
               </p>
               <div class="field">
@@ -252,24 +251,30 @@
             <div class="card">
               <h3>5 · Modelo de venda e BOOSTER!</h3>
               <p class="muted">
-                Escolha a comissão na venda. O plano <strong>4%</strong> abre checkout do pacote de mídia (Stripe). O
-                <strong>6%</strong> segue para triagem com consultor. BOOSTER! é opcional em qualquer modelo.
+                <strong>Venda direta</strong> cobra só taxa (simulado: checkout). <strong>Venda assistida</strong>: 3% se a venda for pela
+                plataforma. <strong>Venda premium</strong> (4%): pacote de mídia no Stripe. <strong>Venda completa</strong> (6%): processo
+                convencional VN Prime. BOOSTER! é opcional.
               </p>
               <div class="plan-grid" style="grid-template-columns: 1fr">
+                <label class="plan-option" data-comm="direta">
+                  <input type="radio" name="commission-plan" value="direta" />
+                  <strong>Venda direta · taxa</strong>
+                  <span class="muted">Sem comissão sobre o valor da venda · paga apenas taxa de publicação (valores na home)</span>
+                </label>
                 <label class="plan-option is-selected" data-comm="3">
                   <input type="radio" name="commission-plan" value="3" checked />
-                  <strong>3% — Venda por conta própria</strong>
-                  <span class="muted">Sem custo inicial · você faz a mídia · comissão 3% na venda</span>
+                  <strong>Venda assistida · 3%</strong>
+                  <span class="muted">Você cadastra as fotos · 3% de comissão se a venda ocorrer pela plataforma</span>
                 </label>
                 <label class="plan-option" data-comm="4">
                   <input type="radio" name="commission-plan" value="4" />
-                  <strong>4% — Mídia Pro</strong>
-                  <span class="muted">Paga pacote foto/vídeo (faixa por quartos) · comissão 4%</span>
+                  <strong>Venda premium VN Prime · 4%</strong>
+                  <span class="muted">Mídia profissional credenciada · comissão 4% na venda (checkout do pacote)</span>
                 </label>
                 <label class="plan-option" data-comm="6">
                   <input type="radio" name="commission-plan" value="6" />
-                  <strong>6% — VN Prime Tradicional</strong>
-                  <span class="muted">Full service · placa exclusiva · consultor em até 2h (produção)</span>
+                  <strong>Venda completa · 6%</strong>
+                  <span class="muted">A VN Prime Imóveis conduz o processo convencional de venda · consultor em até 2h (produção)</span>
                 </label>
               </div>
               <p class="muted" style="margin-top: 1rem"><strong>BOOSTER! opcional</strong> (adicional ao plano)</p>

@@ -1467,6 +1467,11 @@ th {
   padding: 0.25rem 0 0;
 }
 
+.plan-tier--direta {
+  background: linear-gradient(145deg, #eef8f5 0%, #f5faf7 50%, #faf8f4 100%);
+  border: 1px solid rgba(5, 122, 85, 0.22);
+}
+
 .plan-tier--3 {
   background: linear-gradient(145deg, #e9edf5 0%, #f7f4ee 55%, #faf8f4 100%);
   border: 1px solid rgba(15, 34, 68, 0.14);

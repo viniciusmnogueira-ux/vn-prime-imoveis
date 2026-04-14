@@ -1,6 +1,6 @@
 /**
  * Catálogo público demo (fotos via placeholder — trocar por CDN real em produção).
- * listingProfile: "autonomia" (3% / conta própria) | "consultoria" (4% ou 6% / VN)
+ * listingProfile: "venda_direta" | "autonomia" (assistida 3%) | "consultoria" (premium 4% / completa 6%)
  */
 (function (global) {
   global.VNPrimeCatalog = [
@@ -19,7 +19,8 @@
       banheiros: 4,
       vagas: 3,
       listingProfile: "consultoria",
-      planLabel: "6% · VN Prime Tradicional",
+      commissionPlan: "6%",
+      planLabel: "Venda completa · 6%",
       description:
         "Referência de alto padrão no Vale do Sereno: planta inteligente, living integrado à varanda envidraçada e enquadramento da Serra para dentro do apartamento. Acabamentos importados, automação de iluminação, ar condicionado em todos os ambientes e cozinha com ilha em quartzo. Condomínio com lazer completo — piscina aquecida, fitness, spa, quadra e salão de festas com copa profissional — no perfil de empreendimentos boutique da região de Nova Lima.",
       photos: [
@@ -44,7 +45,8 @@
       banheiros: 6,
       vagas: 6,
       listingProfile: "consultoria",
-      planLabel: "6% · VN Prime Tradicional",
+      commissionPlan: "6%",
+      planLabel: "Venda completa · 6%",
       description:
         "Residência térrea em condomínio de altíssimo padrão, com pé-direito duplo no hall, escritório, home theater e espaço gourmet com churrasqueira e adega climatizada. Piscina com borda infinita, deck em ipê e jardim paisagístico. Suíte master com closet duplo e banheiro com hidro. Segurança 24h, heliponto no condomínio e área de lazer coletiva com quadras e lago ornamental. Documentação em ordem, aceita permuta em imóvel de menor valor.",
       photos: [
@@ -68,7 +70,8 @@
       banheiros: 7,
       vagas: 8,
       listingProfile: "autonomia",
-      planLabel: "3% · Venda por conta própria",
+      commissionPlan: "3%",
+      planLabel: "Venda assistida · 3%",
       description:
         "Cobertura linear em dois pavimentos, com elevador privativo e terraço amplo com piscina privativa, ofurô e vista para a serra. Ambientes sociais generosos, adega, espaço fitness e sauna seca. Cozinha com equipamentos de alto padrão e despensa. Projeto de iluminação cênica e automação. Vagas cobertas. Oportunidade rara no segmento ultra-luxo da região metropolitana.",
       photos: [
@@ -93,7 +96,8 @@
       banheiros: 1,
       vagas: 1,
       listingProfile: "autonomia",
-      planLabel: "3% · Venda por conta própria",
+      commissionPlan: "3%",
+      planLabel: "Venda assistida · 3%",
       description:
         "Studio de alto padrão, mobiliado com marcenaria sob medida e eletros embutidos. Ideal para investidor ou uso próximo ao trabalho. Prédio boutique com rooftop, coworking e lavanderia compartilhada. Metragem otimizada com cama retrátil e painel multiuso. Documentação livre de ônus.",
       photos: [
@@ -116,7 +120,8 @@
       banheiros: 5,
       vagas: 4,
       listingProfile: "consultoria",
-      planLabel: "4% · Mídia Pro (pacote fotográfico)",
+      commissionPlan: "4%",
+      planLabel: "Venda premium VN Prime · 4%",
       description:
         "Projeto arquitetônico contemporâneo com grandes vãos envidraçados, integração total entre sala e jardim, e piscina com deck úmido. Suítes com piso radiante nos banheiros, closet e persianas automatizadas. Lavabo com pedra natural e iluminação indireta. Produção de mídia profissional VN Prime já realizada — anúncio pronto para visitas qualificadas.",
       photos: [

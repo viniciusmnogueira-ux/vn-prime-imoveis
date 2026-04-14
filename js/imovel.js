@@ -50,26 +50,40 @@
   document.getElementById("imovel-type").textContent = data.type;
   document.getElementById("imovel-plan").textContent = data.planLabel || data.plan || "—";
 
-  var isVendaDireta = data.hideOwnerContact === true || data.listingProfile === "autonomia";
+  var profile = data.listingProfile || "";
+  var isTaxaDireta = profile === "venda_direta" || data.commissionPlan === "Taxa";
+  var isAssistida = profile === "autonomia" || data.commissionPlan === "3%";
+
   var privacy = document.getElementById("imovel-privacy-banner");
   if (privacy) {
     privacy.hidden = false;
-    if (isVendaDireta) {
+    if (isTaxaDireta) {
       privacy.className = "imovel-privacy imovel-privacy--direta";
       privacy.innerHTML =
-        "<p><strong>Venda direta (plano 3%).</strong> O endereço completo e os dados do proprietário ficam apenas no cadastro interno; na vitrine o público vê <strong>só o bairro</strong>. Telefone e e-mail do anunciante <strong>não são exibidos</strong> — o interesse entra pela plataforma.</p>";
+        "<p><strong>Venda direta (taxa).</strong> <strong>Sem comissão sobre o valor do imóvel</strong> — apenas taxa de publicação conforme contrato. Endereço completo e dados do proprietário ficam no cadastro interno; na vitrine, <strong>só o bairro</strong>. Contatos do anunciante <strong>não aparecem</strong> — interesse pela plataforma.</p>";
+    } else if (isAssistida) {
+      privacy.className = "imovel-privacy imovel-privacy--direta";
+      privacy.innerHTML =
+        "<p><strong>Venda assistida (3%).</strong> Você cadastrou as fotos e conduz a negociação; se a venda ocorrer <strong>pela plataforma</strong>, incide <strong>3% de comissão</strong>. Na ficha pública: <strong>só o bairro</strong>; telefone e e-mail do proprietário <strong>não são exibidos</strong>.</p>";
     } else {
       privacy.className = "imovel-privacy imovel-privacy--vn";
       privacy.innerHTML =
-        "<p><strong>Intermediação VN Prime (4% ou 6%).</strong> A operação é conduzida pelo time e, no modelo tradicional (6%), por <strong>corretor parceiro</strong> alocado no portal do corretor. Pacotes extras de foto, vídeo, drone e <strong>BOOSTER!</strong> são contratados à parte, quando fizer sentido.</p>";
+        "<p><strong>Venda premium ou completa VN Prime (4% ou 6%).</strong> A VN Prime conduz ou apoia o processo; na <strong>venda completa</strong>, entra a <strong>rede de corretores</strong> quando aplicável. Pacotes de mídia, drone e <strong>BOOSTER!</strong> podem ser contratados à parte.</p>";
     }
   }
 
   var leadIntro = document.getElementById("imovel-lead-intro");
   if (leadIntro) {
-    leadIntro.textContent = isVendaDireta
-      ? "Venda direta: preencha seus dados. A VN Prime encaminha ao proprietário sem expor o contato dele na página."
-      : "Seus dados seguem para o time VN Prime ou corretor parceiro, conforme a etapa da negociação.";
+    if (isTaxaDireta) {
+      leadIntro.textContent =
+        "Venda direta: preencha seus dados. A VN Prime encaminha o interesse ao proprietário sem expor o contato dele na página.";
+    } else if (isAssistida) {
+      leadIntro.textContent =
+        "Venda assistida: seus dados seguem para o proprietário via plataforma; a comissão de 3% aplica-se se a venda for formalizada pelo canal VN Prime.";
+    } else {
+      leadIntro.textContent =
+        "Seus dados seguem para o time VN Prime ou para um corretor da rede, conforme a etapa da negociação.";
+    }
   }
 
   var spec = document.getElementById("imovel-specs");

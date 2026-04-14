@@ -109,9 +109,10 @@
           <p class="home-intro__eyebrow">VN Prime Imóveis · Belo Horizonte e região</p>
           <h1 class="home-intro__title">Inteligência aplicada ao mercado imobiliário</h1>
           <p class="home-intro__lead">
-            Entenda em poucos minutos como a plataforma organiza <strong>compra</strong>, <strong>venda</strong> e
-            <strong>três modelos de comissão</strong> (3%, 4% e 6%) — com curadoria, privacidade do endereço na vitrine e um
-            ecossistema de corretores e fotógrafos quando você precisar de reforço operacional.
+            Entenda como a plataforma organiza <strong>compra</strong> e <strong>venda</strong>:
+            <strong>venda direta</strong> (só taxa, sem comissão na venda), <strong>venda assistida</strong> (fotos suas · 3% se vender pela
+            plataforma), <strong>venda premium VN Prime</strong> (mídia credenciada · 4%) e <strong>venda completa</strong> (processo
+            convencional com a VN Prime Imóveis · 6%) — além da <strong>rede de corretores</strong> parceiros.
           </p>
           <div class="home-intro__ctas">
             <a class="btn btn--primary" href="#compra">Explorar imóveis</a>
@@ -133,16 +134,16 @@
             <div class="home-pillar__icon" aria-hidden="true">◎</div>
             <h3>Para quem vende</h3>
             <p>
-              Cadastro em passos claros: você escolhe autonomia (3%), mídia profissional com comissão reduzida (4%) ou operação
-              completa (6%). Na vitrine pública entra só o <strong>bairro</strong>; endereço completo fica interno.
+              Quatro modalidades: <strong>direta</strong> (taxa), <strong>assistida</strong> (3% pela plataforma), <strong>premium</strong> (4% com mídia
+              profissional) e <strong>completa</strong> (6%, processo convencional VN Prime). Na vitrine entra só o <strong>bairro</strong>.
             </p>
           </article>
           <article class="card home-pillar">
             <div class="home-pillar__icon" aria-hidden="true">%</div>
-            <h3>Por que três porcentagens?</h3>
+            <h3>Comissão só quando faz sentido</h3>
             <p>
-              <strong>3%</strong> — você conduz visitas e negociação. <strong>4%</strong> — investe em pacote de mídia na plataforma.
-              <strong>6%</strong> — VN Prime e corretor parceiro na operação. Transparência em cada etapa.
+              Na <strong>venda direta</strong> não há comissão sobre o preço do imóvel — apenas taxa. Na <strong>assistida</strong>, 3% se a venda
+              vier pela plataforma. <strong>Premium</strong> e <strong>completa</strong> têm regras 4% e 6% explicadas nos planos abaixo.
             </p>
           </article>
         </div>
@@ -152,7 +153,7 @@
           <ol class="home-flow__steps">
             <li><strong>Cadastro</strong> — dados, localização e ficha técnica.</li>
             <li><strong>Mídia</strong> — fotos (suas ou com pacote credenciado, conforme o plano).</li>
-            <li><strong>Plano</strong> — define 3%, 4% ou 6% e opcionais (ex.: BOOSTER!).</li>
+            <li><strong>Plano</strong> — direta (taxa), assistida (3%), premium (4%) ou completa (6%); opcional BOOSTER!.</li>
             <li><strong>Curadoria</strong> — time valida; então o imóvel entra para compradores.</li>
           </ol>
         </div>
@@ -231,8 +232,9 @@
             <label for="q-transacao">Modelo de anúncio</label>
             <select id="q-transacao" name="transacao">
               <option value="">Todos</option>
-              <option value="autonomia">Venda por conta própria (plataforma)</option>
-              <option value="consultoria">Consultoria exclusiva VN Prime</option>
+              <option value="venda_direta">Venda direta (taxa · sem comissão na venda)</option>
+              <option value="autonomia">Venda assistida (3% · fotos do proprietário)</option>
+              <option value="consultoria">Venda premium ou completa (VN Prime)</option>
             </select>
           </div>
           <button type="submit" class="btn btn--accent">Buscar</button>
@@ -245,15 +247,15 @@
           </div>
           <div class="kpi-item">
             <strong>3%</strong>
-            <span>Comissão mínima</span>
+            <span>Venda assistida (plataforma)</span>
           </div>
           <div class="kpi-item">
             <strong>R$ 297</strong>
-            <span>Agendamento premium</span>
+            <span>Taxa ref. · venda direta</span>
           </div>
           <div class="kpi-item">
             <strong>R$ 49,90</strong>
-            <span>Corretor / mês</span>
+            <span>Rede de corretores / mês</span>
           </div>
         </div>
       </div>
@@ -361,39 +363,70 @@
         <div class="section__head">
           <h2>Planos para proprietários</h2>
           <p>
-            Três modelos claros: <strong>venda direta (3%)</strong> com privacidade na vitrine, <strong>mídia paga (4%)</strong> para
-            comissão menor com pacote profissional, ou <strong>tradicional (6%)</strong> com a VN Prime e corretor parceiro na
-            operação — sempre com identidade visual distinta abaixo.
+            Quatro formas de vender com a VN Prime Imóveis: <strong>venda direta</strong> (taxa, sem comissão sobre o valor do imóvel),
+            <strong>venda assistida</strong> (você cadastra as fotos · 3% se a venda for pela plataforma),
+            <strong>venda premium VN Prime</strong> (mídia credenciada · 4%) e <strong>venda completa</strong> (processo convencional · 6%).
           </p>
         </div>
 
         <div class="plan-stack">
-          <div class="plan-tier plan-tier--3">
-            <article class="plan-vertical" id="plano-3">
-              <p class="plan-vertical__meta">3% · Venda direta · Você cadastra e conduz a venda</p>
+          <div class="plan-tier plan-tier--direta">
+            <article class="plan-vertical" id="plano-direta">
+              <p class="plan-vertical__meta">Venda direta · Taxa de publicação · Sem comissão na venda</p>
               <div class="plan-vertical__head">
-                <h3>Portal do proprietário + vitrine sem expor seu contato</h3>
-                <p class="plan-vertical__price">3%</p>
+                <h3>Vitrine e leads pela plataforma; você negocia direto</h3>
+                <p class="plan-vertical__price">Taxa</p>
               </div>
               <div class="plan-vertical__body">
                 <p>
-                  <strong>Custo de entrada: R$ 0.</strong> No cadastro (5 passos) você informa o <strong>endereço completo</strong> para
-                  base interna, mapa e compliance; na <strong>vitrine pública só aparece o bairro</strong>. O anúncio é marcado como
-                  <strong>venda direta</strong>: telefone e e-mail do proprietário <strong>não são exibidos</strong> — o interesse entra pela
-                  plataforma e segue o fluxo seguro de leads.
+                  O proprietário <strong>não paga comissão</strong> sobre o preço de venda do imóvel — apenas uma
+                  <strong>taxa</strong> para uso da vitrine, curadoria inicial e fluxo de leads. Na ficha pública entra só o
+                  <strong>bairro</strong>; telefone e e-mail <strong>não são exibidos</strong> — interesse pela plataforma.
                 </p>
                 <p>
-                  Você faz fotos, visitas e negociação; a comissão na venda é <strong>3%</strong>. Pode contratar fotógrafos parceiros
-                  (Stripe) à parte para elevar a mídia sem mudar o modelo de comissão, se desejar.
+                  Valor de referência da taxa (ex.: <strong>R$ 297</strong>) é confirmado no cadastro/checkout. BOOSTER! segue opcional.
                 </p>
               </div>
               <div class="plan-vertical__actions">
-                <a class="btn btn--ghost" href="vender.html?fluxo=conta-propria">Começar no modelo 3%</a>
+                <a class="btn btn--ghost" href="vender.html?fluxo=venda-direta">Começar · venda direta</a>
                 <button
                   type="button"
                   class="btn btn--accent"
                   data-stripe-checkout
-                  data-title="BOOSTER! Impulso — plano 3%"
+                  data-title="BOOSTER! Impulso — venda direta"
+                  data-amount="R$ 49,90"
+                >
+                  BOOSTER! a partir de R$ 49,90
+                </button>
+              </div>
+            </article>
+          </div>
+
+          <div class="plan-tier plan-tier--3">
+            <article class="plan-vertical" id="plano-assistida">
+              <p class="plan-vertical__meta">Venda assistida · 3% · Fotos do proprietário · Venda pela plataforma</p>
+              <div class="plan-vertical__head">
+                <h3>Você cadastra as fotos; comissão só se vender pela plataforma</h3>
+                <p class="plan-vertical__price">3%</p>
+              </div>
+              <div class="plan-vertical__body">
+                <p>
+                  Modelo para quem quer autonomia com trilho seguro: <strong>você envia as fotos</strong> e conduz visitas e negociação.
+                  Se a venda ocorrer <strong>pelo ecossistema da plataforma</strong>, aplica-se <strong>3% de comissão</strong> — alinhado ao contrato
+                  no fechamento.
+                </p>
+                <p>
+                  Privacidade igual à venda direta na vitrine (só bairro; contatos ocultos). Fotógrafos credenciados permanecem opcionais
+                  (Stripe) para elevar a mídia.
+                </p>
+              </div>
+              <div class="plan-vertical__actions">
+                <a class="btn btn--ghost" href="vender.html?fluxo=conta-propria">Começar · venda assistida</a>
+                <button
+                  type="button"
+                  class="btn btn--accent"
+                  data-stripe-checkout
+                  data-title="BOOSTER! Impulso — venda assistida"
                   data-amount="R$ 49,90"
                 >
                   BOOSTER! a partir de R$ 49,90
@@ -403,27 +436,25 @@
           </div>
 
           <div class="plan-tier plan-tier--4">
-            <article class="plan-vertical plan-vertical--featured" id="plano-4">
-              <p class="plan-vertical__meta">4% · Mídia Pro — pacote pago reduz a comissão</p>
+            <article class="plan-vertical plan-vertical--featured" id="plano-premium">
+              <p class="plan-vertical__meta">Venda premium VN Prime · 4% · Mídia profissional credenciada</p>
               <div class="plan-vertical__head">
-                <h3>Investimento em foto/vídeo profissional = comissão 4%</h3>
+                <h3>Pacote foto/vídeo na plataforma = comissão 4% na venda</h3>
                 <p class="plan-vertical__price">4%</p>
               </div>
               <div class="plan-vertical__body">
                 <p>
-                  Sem o pacote de mídia contratado <strong>pela plataforma (Stripe)</strong>, a comissão de referência seria maior
-                  (alinha ao modelo 6%). Ao contratar o <strong>pacote de mídia</strong>, você “compra” a produção editorial e
-                  <strong>fixa a comissão em 4% na venda</strong> — transparência total no checkout e contrato com fotógrafos
-                  credenciados.
+                  A <strong>venda premium VN Prime</strong> combina produção editorial com fotógrafos credenciados e
+                  <strong>comissão de 4%</strong> na venda após contratação do pacote via <strong>Stripe</strong>. Sem o pacote pela
+                  plataforma, a referência de comissão alinha-se à <strong>venda completa (6%)</strong>.
                 </p>
                 <p>
-                  Faixas típicas: <strong>R$ 899</strong> (até 1 quarto / studio), <strong>R$ 1.499</strong> (2 a 3 quartos),
-                  <strong>R$ 1.999</strong> (4+ quartos / casas amplas). Pagamento por fora <strong>não</strong> mantém o benefício da
-                  comissão 4%: a trava é operacional e contratual.
+                  Faixas típicas: <strong>R$ 899</strong> (até 1 quarto), <strong>R$ 1.499</strong> (2–3 quartos),
+                  <strong>R$ 1.999</strong> (4+ quartos / casas amplas). Pagamento fora do fluxo credenciado <strong>não</strong> mantém o 4%.
                 </p>
               </div>
               <div class="plan-vertical__actions">
-                <a class="btn btn--primary" href="vender.html?fluxo=consultoria">Quero o plano 4%</a>
+                <a class="btn btn--primary" href="vender.html?fluxo=premium">Começar · venda premium</a>
                 <button
                   type="button"
                   class="btn btn--accent"
@@ -438,26 +469,24 @@
           </div>
 
           <div class="plan-tier plan-tier--6">
-            <article class="plan-vertical" id="plano-6">
-              <p class="plan-vertical__meta">6% · Tradicional — VN Prime + corretor parceiro</p>
+            <article class="plan-vertical" id="plano-completa">
+              <p class="plan-vertical__meta">Venda completa · 6% · Processo convencional VN Prime Imóveis</p>
               <div class="plan-vertical__head">
-                <h3>Operação completa; mídia extra e BOOSTER! à parte</h3>
+                <h3>A VN Prime conduz a operação; rede de corretores quando aplicável</h3>
                 <p class="plan-vertical__price">6%</p>
               </div>
               <div class="plan-vertical__body">
                 <p>
-                  <strong>Sem custo inicial de mídia obrigatório para você.</strong> A VN Prime organiza a operação; no modelo
-                  tradicional entra <strong>corretor parceiro</strong> (visível no portal do corretor) para atendimento e fechamento.
-                  Comissão total <strong>6%</strong> na venda — em geral <strong>3% corretor + 3% VN Prime</strong>, conforme acordo de
-                  parceria e placa exclusiva no imóvel.
+                  A <strong>venda completa</strong> é o processo <strong>convencional de venda</strong> feito pela VN Prime Imóveis: visitas,
+                  negociação, documentação e coordenação de ponta a ponta. Em geral entra <strong>corretor parceiro</strong> da rede para
+                  fechamento — comissão total <strong>6%</strong> (p.ex. <strong>3% corretor + 3% VN Prime</strong>), conforme contrato e placa.
                 </p>
                 <p>
-                  Produções adicionais (foto, vídeo, drone, tours) e <strong>BOOSTER!</strong> continuam disponíveis como
-                  <strong>contratação avulsa</strong>, quando quiser turbinar alcance além do pacote base da operação.
+                  Mídia extra (drone, tour, vídeo) e <strong>BOOSTER!</strong> podem ser contratados à parte para ampliar alcance.
                 </p>
               </div>
               <div class="plan-vertical__actions">
-                <a class="btn btn--accent" href="vender.html?fluxo=consultoria">Agendar conversa · plano 6%</a>
+                <a class="btn btn--accent" href="vender.html?fluxo=consultoria">Agendar · venda completa</a>
               </div>
             </article>
           </div>
@@ -513,10 +542,10 @@
     <section class="section section-anchor" id="planos-corretor">
       <div class="container">
         <div class="section__head">
-          <h2>Planos para corretores parceiros</h2>
+          <h2>Rede de corretores</h2>
           <p>
-            Um hub com leads qualificados, material de marketing, contratos com a imobiliária e camadas de gestão —
-            pensado para quem quer operar imóveis de alto padrão com a mesma elegância da marca VN Prime.
+            A <strong>rede de corretores</strong> VN Prime integra parceiros ao processo de <strong>venda completa</strong> e ao funil digital:
+            leads qualificados, material de marketing, contratos e painel de gestão — no padrão de marca alto padrão BH e região.
           </p>
         </div>
         <div class="grid-3">
@@ -534,19 +563,19 @@
           </article>
           <article class="card">
             <span class="card__tag">Comissão</span>
-            <h3>Na venda Full (6%)</h3>
+            <h3>Na venda completa (6%)</h3>
             <p class="card__price">3%</p>
             <p>
-              Quando você fecha a operação no plano tradicional, fica com <strong>metade da comissão total (3%)</strong>,
-              refletindo o atendimento completo ao comprador e à documentação — com a VN Prime na coordenação macro.
+              Quando você fecha a operação na <strong>venda completa</strong>, fica com <strong>metade da comissão total (3%)</strong>,
+              refletindo o atendimento ao comprador e à documentação — com a VN Prime na coordenação macro.
             </p>
           </article>
           <article class="card">
             <span class="card__tag">Regra de ouro</span>
-            <h3>Carteira + Parceria 6%</h3>
+            <h3>Carteira + venda completa</h3>
             <p class="card__price">Etiqueta</p>
             <p>
-              Você enxerga seus próprios imóveis captados e <strong>todos os anúncios do plano 6%</strong>, com selo
+              Você enxerga seus próprios imóveis captados e <strong>todos os anúncios em venda completa (6%)</strong>, com selo
               <em>Parceria disponível</em> na vitrine interna — priorizando oportunidades onde a operação e a comissão
               estão alinhadas com a curadoria VN Prime.
             </p>
@@ -596,7 +625,7 @@
         <div class="grid-3">
           <article class="card">
             <h3>Corretor</h3>
-            <p>Leads, imóveis 6%, material de apoio e Kanban integrado.</p>
+            <p>Leads, imóveis em <strong>venda completa</strong>, material de apoio e Kanban integrado.</p>
             <a href="dashboard.html">Entrar como corretor</a>
           </article>
           <article class="card">

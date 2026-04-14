@@ -251,8 +251,15 @@
     var planStr = String(o.plan || "");
     if (!o.listingProfile) {
       if (
+        comm === "Taxa" ||
+        planStr.toLowerCase().indexOf("venda direta") !== -1 ||
+        planStr.toLowerCase().indexOf("sem comissão") !== -1
+      ) {
+        o.listingProfile = "venda_direta";
+      } else if (
         comm.indexOf("3") === 0 ||
         planStr.indexOf("3%") !== -1 ||
+        planStr.toLowerCase().indexOf("assistida") !== -1 ||
         planStr.toLowerCase().indexOf("conta própria") !== -1 ||
         planStr.toLowerCase().indexOf("self") !== -1
       ) {
@@ -262,14 +269,19 @@
       }
     }
     if (!o.planLabel) {
-      if (comm === "3%") o.planLabel = "3% · Venda por conta própria";
-      else if (comm === "4%") o.planLabel = "4% · Mídia Pro (pacote)";
-      else if (comm === "6%") o.planLabel = "6% · VN Prime Tradicional";
+      if (comm === "Taxa") o.planLabel = "Venda direta · taxa (sem comissão na venda)";
+      else if (comm === "3%") o.planLabel = "Venda assistida · 3%";
+      else if (comm === "4%") o.planLabel = "Venda premium VN Prime · 4%";
+      else if (comm === "6%") o.planLabel = "Venda completa · 6%";
       else o.planLabel = planStr || "—";
     }
     if (!o.description) o.description = "Descrição em elaboração pela curadoria VN Prime.";
     if (!o.photos) o.photos = [];
-    o.hideOwnerContact = o.listingProfile === "autonomia" || comm === "3%";
+    o.hideOwnerContact =
+      o.listingProfile === "autonomia" ||
+      o.listingProfile === "venda_direta" ||
+      comm === "3%" ||
+      comm === "Taxa";
     return o;
   }
 

@@ -135,14 +135,18 @@
     var boostEl = document.querySelector('input[name="booster-plan"]:checked');
     var boost = (boostEl && boostEl.value) || "none";
 
-    var commissionPlan = comm === "4" ? "4%" : comm === "6" ? "6%" : "3%";
-    var listingProfile = comm === "3" ? "autonomia" : "consultoria";
+    var commissionPlan =
+      comm === "direta" ? "Taxa" : comm === "4" ? "4%" : comm === "6" ? "6%" : "3%";
+    var listingProfile =
+      comm === "direta" ? "venda_direta" : comm === "3" ? "autonomia" : "consultoria";
     var planLabel =
-      comm === "3"
-        ? "3% · Venda por conta própria"
-        : comm === "4"
-          ? "4% · Mídia Pro (pacote)"
-          : "6% · VN Prime Tradicional";
+      comm === "direta"
+        ? "Venda direta · taxa (sem comissão na venda)"
+        : comm === "3"
+          ? "Venda assistida · 3% (venda pela plataforma)"
+          : comm === "4"
+            ? "Venda premium VN Prime · 4% (mídia credenciada)"
+            : "Venda completa · 6% (processo convencional VN Prime)";
 
     var photos = readPhotosPreview();
 
@@ -203,12 +207,17 @@
     if (thanksKey === "sem-plano") {
       showThanks(
         "Rascunho salvo",
-        "Seu imóvel está como PENDENTE_PLANO: não entra na vitrine pública até você escolher 3%, 4% ou 6% e concluir os passos de pagamento quando aplicável."
+        "Seu imóvel está como PENDENTE_PLANO: não entra na vitrine pública até você escolher venda direta (taxa), assistida (3%), premium (4%) ou completa (6%) e concluir os passos de pagamento quando aplicável."
+      );
+    } else if (thanksKey === "direta") {
+      showThanks(
+        "Venda direta registrada",
+        "Taxa de publicação confirmada (simulado). Não há comissão sobre o valor da venda — apenas a taxa contratada. O anúncio segue para curadoria."
       );
     } else if (thanksKey === "3") {
       showThanks(
         "Recebemos seu anúncio",
-        "Seu pedido foi para análise da curadoria VN Prime. Você receberá retorno após a validação do material e da documentação."
+        "Venda assistida: após aprovação, a comissão de 3% incide se a venda ocorrer pela plataforma. Você receberá retorno da curadoria."
       );
     } else if (thanksKey === "4") {
       showThanks(
@@ -217,8 +226,8 @@
       );
     } else if (thanksKey === "6") {
       showThanks(
-        "Consultoria VN Prime",
-        "Um consultor entrará em contato em até 2 horas (horário comercial) para alinhar visita técnica, contrato e próximos passos."
+        "Venda completa VN Prime",
+        "Um consultor entrará em contato em até 2 horas (horário comercial) para conduzir o processo convencional de venda com a VN Prime Imóveis."
       );
     } else {
       showThanks("Obrigado!", "Registro concluído.");
@@ -303,6 +312,21 @@
         }
       }
 
+      if (comm === "direta") {
+        runCheckoutChain(
+          {
+            title: "Taxa Venda direta · publicação na vitrine",
+            amount: "R$ 297,00",
+          },
+          function () {
+            draft.plan = draft.plan + " · Taxa paga (simulado)";
+            draft.planLabel = draft.plan;
+            afterMediaIfNeeded();
+          }
+        );
+        return;
+      }
+
       if (comm === "4") {
         var media = mediaAmountForQuartos();
         runCheckoutChain(
@@ -326,10 +350,22 @@
 
   var params = new URLSearchParams(window.location.search);
   var fluxo = params.get("fluxo");
-  if (fluxo === "conta-propria") {
+  if (fluxo === "venda-direta") {
+    var rd = document.querySelector('input[name="commission-plan"][value="direta"]');
+    if (rd) {
+      rd.checked = true;
+      syncPlanRadios("commission-plan");
+    }
+  } else if (fluxo === "conta-propria") {
     var r3 = document.querySelector('input[name="commission-plan"][value="3"]');
     if (r3) {
       r3.checked = true;
+      syncPlanRadios("commission-plan");
+    }
+  } else if (fluxo === "premium") {
+    var r4 = document.querySelector('input[name="commission-plan"][value="4"]');
+    if (r4) {
+      r4.checked = true;
       syncPlanRadios("commission-plan");
     }
   } else if (fluxo === "consultoria") {
