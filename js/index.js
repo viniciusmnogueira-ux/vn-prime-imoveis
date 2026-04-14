@@ -155,80 +155,6 @@
     if (sec) sec.scrollIntoView({ behavior: "smooth" });
   }
 
-  var PRECO_M2 = {
-    savassi: 12500,
-    belvedere: 11800,
-    "nova lima": 10200,
-    lourdes: 11200,
-    funcionarios: 12000,
-    "serra": 9800,
-    "alphaville": 10500,
-    "cidade jardim": 10800,
-    default: 8500,
-  };
-
-  function pricePerM2Key(bairro) {
-    var k = (bairro || "").trim().toLowerCase();
-    if (PRECO_M2[k] != null) return PRECO_M2[k];
-    for (var key in PRECO_M2) {
-      if (key !== "default" && k.indexOf(key) !== -1) return PRECO_M2[key];
-    }
-    return PRECO_M2.default;
-  }
-
-  function updateCalculator() {
-    var m2 = Number((document.getElementById("calc-m2") || {}).value || 0);
-    var bairro = (document.getElementById("calc-bairro") || {}).value || "";
-    var anos = Number((document.getElementById("calc-prazo") || {}).value || 5);
-    var taxa = Number((document.getElementById("calc-taxa") || {}).value || 6) / 100;
-    var label = document.getElementById("calc-prazo-label");
-    if (label) label.textContent = anos + " " + (anos === 1 ? "ano" : "anos");
-
-    var baseValor = m2 > 0 ? m2 * pricePerM2Key(bairro) : Number((document.getElementById("calc-valor") || {}).value || 0);
-    var futuro = baseValor * Math.pow(1 + taxa, anos);
-    var res = document.getElementById("calc-resultado");
-    var det = document.getElementById("calc-detalhe");
-    if (res) res.textContent = formatBRL(Math.round(futuro));
-    if (det) {
-      if (m2 > 0) {
-        det.textContent =
-          "Estimativa a partir de " +
-          m2 +
-          " m² × referência regional (~" +
-          formatBRL(pricePerM2Key(bairro)) +
-          "/m²). Projeção composta " +
-          (taxa * 100).toFixed(1) +
-          "% a.a. — não é laudo.";
-      } else {
-        det.textContent =
-          "Informe metragem e bairro para estimativa por m², ou use o valor manual abaixo. Não constitui laudo.";
-      }
-    }
-  }
-
-  function onCalcSubmit(e) {
-    e.preventDefault();
-    var emailEl = document.getElementById("calc-email");
-    var m2El = document.getElementById("calc-m2");
-    var bairroEl = document.getElementById("calc-bairro");
-    var resultadoEl = document.getElementById("calc-resultado");
-    addLead({
-      id: "L-" + Date.now(),
-      name: "Lead Calculadora",
-      email: emailEl ? emailEl.value : "",
-      phone: "—",
-      column: "novo",
-      source:
-        "Calculadora · " +
-        (m2El ? m2El.value : "") +
-        " m² · " +
-        (bairroEl ? bairroEl.value : "") +
-        " · " +
-        (resultadoEl ? resultadoEl.textContent : ""),
-    });
-    showToast("Interesse registrado. Em produção: webhook n8n + e-mail transacional.");
-  }
-
   var heroForm = document.getElementById("hero-search");
   if (heroForm) heroForm.addEventListener("submit", runSearch);
 
@@ -240,15 +166,5 @@
       if (sec2) sec2.scrollIntoView({ behavior: "smooth" });
     });
 
-  ["calc-m2", "calc-bairro", "calc-valor", "calc-prazo", "calc-taxa"].forEach(function (id) {
-    var el = document.getElementById(id);
-    if (el) el.addEventListener("input", updateCalculator);
-    if (el) el.addEventListener("change", updateCalculator);
-  });
-
-  var calcForm = document.getElementById("calc-form");
-  if (calcForm) calcForm.addEventListener("submit", onCalcSubmit);
-
   renderListings(getPublicListings());
-  updateCalculator();
 })();

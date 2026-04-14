@@ -927,39 +927,6 @@ p {
   color: var(--color-navy);
 }
 
-.calculator {
-  display: grid;
-  gap: 2rem;
-  align-items: start;
-}
-
-@media (min-width: 900px) {
-  .calculator {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.calculator__result {
-  background: var(--color-navy);
-  color: var(--color-white);
-  border-radius: var(--radius-md);
-  padding: 2rem;
-}
-
-.calculator__result h3 {
-  color: var(--color-gold-soft);
-}
-
-.calculator__value {
-  font-family: var(--font-display);
-  font-size: 2.5rem;
-  margin: 0.5rem 0;
-}
-
-.calculator__result p {
-  color: rgba(250, 249, 246, 0.8);
-}
-
 .site-footer {
   background: var(--color-navy);
   color: rgba(250, 249, 246, 0.75);
@@ -1437,14 +1404,6 @@ th {
   }
 }
 
-.calculator .field-row {
-  margin-bottom: 0.5rem;
-}
-
-.calc-cta {
-  margin-top: 1.25rem;
-}
-
 /* Planos verticais (home) */
 .plan-stack {
   display: flex;
@@ -1599,6 +1558,62 @@ th {
 .booster-card h4 {
   margin: 0 0 0.35rem;
   font-size: 1.05rem;
+}
+
+.booster-card__title {
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-navy);
+}
+
+.booster-card__tagline {
+  margin: 0 0 0.5rem;
+  font-size: 0.98rem;
+  color: var(--color-navy);
+}
+
+.booster-card__checks {
+  margin: 0.35rem 0 0.85rem;
+  padding-left: 0;
+  list-style: none;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.booster-card__checks li {
+  position: relative;
+  margin-bottom: 0.4rem;
+  padding-left: 1.35rem;
+}
+
+.booster-card__checks li::before {
+  content: "\2713\00a0";
+  position: absolute;
+  left: 0;
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.booster-card__hint {
+  font-size: 0.88rem;
+  margin: 0 0 1rem;
+  color: var(--color-navy-muted);
+  line-height: 1.45;
+}
+
+.booster-card__hint--tip::before {
+  content: "\1F4A1\00a0";
+}
+
+.booster-card__hint--rocket::before {
+  content: "\1F680\00a0";
+}
+
+.booster-card__cta::before {
+  content: "\1F449\00a0";
+  margin-right: 0.25em;
 }
 
 /* Ficha do imóvel */

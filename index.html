@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
@@ -280,84 +280,6 @@
       </div>
     </section>
 
-    <section class="section section-anchor" id="calculadora">
-      <div class="container">
-        <div class="section__head">
-          <h2>Calculadora de valorização</h2>
-          <p>
-            Estime o potencial de valorização e receba contato do time. Lead capturado para CRM (local).
-          </p>
-        </div>
-        <div class="calculator">
-          <form id="calc-form" class="card">
-            <div class="field-row">
-              <div class="field">
-                <label for="calc-m2">Metragem (m²)</label>
-                <input type="number" id="calc-m2" min="1" step="1" placeholder="Ex.: 186" />
-              </div>
-              <div class="field">
-                <label for="calc-bairro">Bairro (referência de mercado)</label>
-                <input
-                  type="text"
-                  id="calc-bairro"
-                  name="calc-bairro"
-                  placeholder="Ex.: Savassi, Nova Lima..."
-                  list="calc-bairros-list"
-                  autocomplete="address-level3"
-                />
-                <datalist id="calc-bairros-list">
-                  <option value="Savassi"></option>
-                  <option value="Belvedere"></option>
-                  <option value="Nova Lima"></option>
-                  <option value="Lourdes"></option>
-                  <option value="Funcionários"></option>
-                  <option value="Serra"></option>
-                  <option value="Alphaville"></option>
-                  <option value="Cidade Jardim"></option>
-                </datalist>
-              </div>
-            </div>
-            <div class="field">
-              <label for="calc-valor">Valor atual do imóvel (R$) — opcional se informar m²</label>
-              <input type="number" id="calc-valor" min="100000" step="10000" value="2500000" />
-            </div>
-            <div class="field">
-              <label for="calc-prazo">Prazo (anos)</label>
-              <input type="range" id="calc-prazo" min="1" max="15" value="5" />
-              <span class="muted" id="calc-prazo-label">5 anos</span>
-            </div>
-            <div class="field">
-              <label for="calc-taxa">Cenário anual (%)</label>
-              <select id="calc-taxa">
-                <option value="4">Conservador (4%)</option>
-                <option value="6" selected>Base (6%)</option>
-                <option value="9">Otimista (9%)</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="calc-email">E-mail para retorno</label>
-              <input type="email" id="calc-email" placeholder="voce@email.com" required />
-            </div>
-            <button type="submit" class="btn btn--accent">Simular e enviar interesse</button>
-            <p class="muted" style="margin-bottom: 0">
-              <!-- n8n: POST webhook após submit com { email, valorEstimado, origem: 'calculadora' } -->
-              Produção: disparar fluxo n8n após validação do lead (opt-in LGPD).
-            </p>
-          </form>
-          <div class="calculator__result">
-            <h3>Projeção indicativa</h3>
-            <p class="calculator__value" id="calc-resultado">R$ 0</p>
-            <p id="calc-detalhe">
-              Ajuste os parâmetros ao lado. Não constitui laudo ou promessa de retorno.
-            </p>
-            <p class="calc-cta">
-              <a class="btn btn--accent" href="vender.html">Gostou do valor? Venda com a VN Prime</a>
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section class="section section--alt section-anchor" id="planos-proprietario">
       <div class="container">
         <div class="section__head">
@@ -374,7 +296,7 @@
             <article class="plan-vertical" id="plano-direta">
               <p class="plan-vertical__meta">Venda direta · Taxa de publicação · Sem comissão na venda</p>
               <div class="plan-vertical__head">
-                <h3>Vitrine e leads pela plataforma; você negocia direto</h3>
+                <h3>Portal do proprietário + vitrine sem expor seu contato</h3>
                 <p class="plan-vertical__price">Taxa</p>
               </div>
               <div class="plan-vertical__body">
@@ -493,40 +415,53 @@
         </div>
 
         <span class="subsection-label" style="margin-top: 2.5rem">BOOSTER! · Dois níveis (contratação avulsa)</span>
-        <p class="muted" style="max-width: 720px; margin-inline: auto; text-align: center">
-          Combine alcance orgânico, conteúdo e performance. Pagamento via Stripe; em produção, cada preço vira um Price ID.
+        <p class="booster-section__lead muted" style="max-width: 720px; margin-inline: auto; text-align: center">
+          Mais alcance, mais visibilidade e mais chances de vender — sob demanda.
         </p>
         <div class="booster-grid" style="margin-top: 1.5rem">
           <article class="booster-card">
-            <h4>BOOSTER! Impulso — R$ 49,90</h4>
-            <p class="muted" style="margin-bottom: 0.75rem">
-              Destaque na busca do portal, <strong>1 post</strong> no Instagram VN Prime e <strong>roteiro + legenda</strong> para Stories/Reels
-              (modelo pronto para você publicar). Ideal para dar volume sem investir em tráfego pago ainda.
+            <h4 class="booster-card__title">BOOSTER! IMPULSO — R$ 49,90</h4>
+            <p class="booster-card__tagline"><strong>Ganhe visibilidade rápida sem investir em tráfego pago</strong></p>
+            <p class="muted" style="margin-bottom: 0.65rem">
+              Seu imóvel recebe destaque dentro do portal + apoio de conteúdo para redes sociais.
             </p>
+            <ul class="booster-card__checks">
+              <li>Destaque na busca da plataforma</li>
+              <li>1 post no Instagram da VN Prime</li>
+              <li>Roteiro + legenda prontos para Stories/Reels</li>
+            </ul>
+            <p class="booster-card__hint booster-card__hint--tip">Ideal para gerar movimento inicial e atrair os primeiros interessados</p>
             <button
               type="button"
-              class="btn btn--ghost btn--sm"
+              class="btn btn--accent btn--sm booster-card__cta"
               data-stripe-checkout
               data-title="BOOSTER! Impulso"
               data-amount="R$ 49,90"
             >
-              Checkout Stripe
+              Ative agora
             </button>
           </article>
           <article class="booster-card">
-            <h4>BOOSTER! Performance — R$ 99,00</h4>
-            <p class="muted" style="margin-bottom: 0.75rem">
-              <strong>Edição de Reels</strong> com acabamento profissional, <strong>e-mail marketing</strong> para base de investidores,
-              <strong>tráfego pago</strong> (Meta Ads) com orçamento orientado e <strong>copy + tratamento de imagem</strong> para o anúncio.
+            <h4 class="booster-card__title">BOOSTER! PERFORMANCE — R$ 99,00</h4>
+            <p class="booster-card__tagline"><strong>Estratégia completa para gerar leads qualificados</strong></p>
+            <p class="muted" style="margin-bottom: 0.65rem">
+              Aqui seu imóvel entra em modo performance, com conteúdo profissional e tráfego direcionado.
             </p>
+            <ul class="booster-card__checks">
+              <li>Edição profissional de vídeo (Reels)</li>
+              <li>Copy estratégica + tratamento de imagem</li>
+              <li>Campanha de tráfego pago (Meta Ads)</li>
+              <li>Disparo para base de investidores</li>
+            </ul>
+            <p class="booster-card__hint booster-card__hint--rocket">Mais alcance, mais leads e maior potencial de venda</p>
             <button
               type="button"
-              class="btn btn--ghost btn--sm"
+              class="btn btn--accent btn--sm booster-card__cta"
               data-stripe-checkout
               data-title="BOOSTER! Performance"
               data-amount="R$ 99,00"
             >
-              Checkout Stripe
+              Potencialize seu anúncio
             </button>
           </article>
         </div>
