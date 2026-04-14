@@ -412,6 +412,80 @@ p {
   font-size: 0.8rem;
 }
 
+/* Barra “onde estou” — compra / navegação estrutural */
+.breadcrumb-nav {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  color: var(--color-navy-muted);
+  background: rgba(250, 249, 246, 0.98);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.breadcrumb-nav__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1.25rem;
+  padding: 0.55rem 0;
+}
+
+.breadcrumb-nav__back {
+  margin: 0;
+  padding: 0.35rem 0.65rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-navy);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.breadcrumb-nav__back:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.breadcrumb-nav__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.breadcrumb-nav__list li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.breadcrumb-nav__list li:not(:last-child)::after {
+  content: "/";
+  margin-left: 0.35rem;
+  color: var(--color-border);
+  font-weight: 400;
+  pointer-events: none;
+}
+
+.breadcrumb-nav__list a {
+  color: var(--color-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.breadcrumb-nav__list a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-nav__list li[aria-current="page"] {
+  color: var(--color-navy);
+  font-weight: 600;
+}
+
 .hero {
   position: relative;
   padding: clamp(3rem, 8vw, 5.5rem) 0 clamp(4rem, 10vw, 6rem);
@@ -1578,6 +1652,20 @@ th {
       </div>
     </header>
 
+    <nav class="breadcrumb-nav" aria-label="Onde você está no site">
+      <div class="container breadcrumb-nav__inner">
+        <button type="button" class="breadcrumb-nav__back" id="breadcrumb-history-back">
+          ← Voltar
+        </button>
+        <ol class="breadcrumb-nav__list">
+          <li>
+            <a href="#compra">Página inicial</a>
+          </li>
+          <li aria-current="page">Compra · catálogo</li>
+        </ol>
+      </div>
+    </nav>
+
     <section class="hero section-anchor" id="compra">
       <div class="container">
         <h1>Imóveis de alto padrão em Belo Horizonte e região metropolitana.</h1>
@@ -2523,6 +2611,24 @@ th {
       }
     });
   });
+
+  var backBtn = document.getElementById("breadcrumb-history-back");
+  if (backBtn) {
+    backBtn.addEventListener("click", function () {
+      if (window.history.length > 1) {
+        window.history.back();
+        return;
+      }
+      var path = (window.location.pathname || "").replace(/\\/g, "/");
+      var file = path.split("/").pop() || "";
+      if (/vn_prime_plataforma\.html/i.test(file)) {
+        window.location.hash = "compra";
+        window.scrollTo(0, 0);
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+  }
 })();
 
 </script>

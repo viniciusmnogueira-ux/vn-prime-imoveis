@@ -22,4 +22,22 @@
       }
     });
   });
+
+  var backBtn = document.getElementById("breadcrumb-history-back");
+  if (backBtn) {
+    backBtn.addEventListener("click", function () {
+      if (window.history.length > 1) {
+        window.history.back();
+        return;
+      }
+      var path = (window.location.pathname || "").replace(/\\/g, "/");
+      var file = path.split("/").pop() || "";
+      if (/vn_prime_plataforma\.html/i.test(file)) {
+        window.location.hash = "compra";
+        window.scrollTo(0, 0);
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+  }
 })();
