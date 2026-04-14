@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ficha do imóvel — VN Prime Imóveis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      (function () {
+        var paths = ["style.css", "../style.css"];
+        var i = 0;
+        function showAlert() {
+          var el = document.getElementById("vnprime-css-alert");
+          if (el) el.removeAttribute("hidden");
+          var loc = document.getElementById("vnprime-css-loc");
+          if (loc) loc.textContent = location.href;
+        }
+        function fail() {
+          document.documentElement.classList.add("vnprime-css-failed");
+          if (document.body) showAlert();
+          else document.addEventListener("DOMContentLoaded", showAlert);
+        }
+        function tryNext() {
+          if (i >= paths.length) return fail();
+          var link = document.createElement("link");
+          link.rel = "stylesheet";
+          try {
+            link.href = new URL(paths[i++], location.href).href;
+          } catch (e) {
+            return tryNext();
+          }
+          link.onload = function () {
+            document.documentElement.classList.add("vnprime-css-ok");
+          };
+          link.onerror = function () {
+            link.remove();
+            tryNext();
+          };
+          document.head.appendChild(link);
+        }
+        tryNext();
+      })();
+    </script>
+    <noscript><link rel="stylesheet" href="style.css" /></noscript>
+  </head>
+  <body>
+    <div
+      id="vnprime-css-alert"
+      hidden
+      style="
+        padding: 14px 16px;
+        margin: 0;
+        background: #fff8e6;
+        border-bottom: 3px solid #c9960e;
+        color: #0f2244;
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+      "
+    >
+      <strong>Os estilos não carregaram.</strong> Mantenha <code>style.css</code> na mesma pasta que este HTML.<br />
+      Caminho atual: <code id="vnprime-css-loc"></code>
+    </div>
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a href="index.html" class="brand-logo" aria-label="VN Prime Imóveis — Início">
+          <svg class="brand-logo__shield" viewBox="0 0 110 125" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="vnprimeBrandGold" x1="0" y1="0" x2="110" y2="125" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#f5d78e" />
+                <stop offset="35%" stop-color="#c9a84c" />
+                <stop offset="65%" stop-color="#a07830" />
+                <stop offset="100%" stop-color="#f5d78e" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M55 4 L100 22 L100 68 C100 92 78 112 55 121 C32 112 10 92 10 68 L10 22 Z"
+              fill="none"
+              stroke="url(#vnprimeBrandGold)"
+              stroke-width="3.5"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M55 10 L93 26 L93 68 C93 88 74 106 55 115 C36 106 17 88 17 68 L17 26 Z"
+              fill="none"
+              stroke="url(#vnprimeBrandGold)"
+              stroke-width="1"
+              stroke-linejoin="round"
+              opacity="0.4"
+            />
+            <text
+              x="55"
+              y="76"
+              text-anchor="middle"
+              font-family="'Cinzel', Georgia, serif"
+              font-size="32"
+              font-weight="700"
+              fill="url(#vnprimeBrandGold)"
+            >
+              VN
+            </text>
+          </svg>
+          <span class="brand-logo__text">
+            <span class="brand-logo__row">
+              <span class="brand-logo__vn">VN</span>
+              <span class="brand-logo__prime">PRIME</span>
+            </span>
+            <span class="brand-logo__sub">Imóveis</span>
+          </span>
+        </a>
+        <button
+          type="button"
+          class="nav-toggle"
+          aria-expanded="false"
+          aria-controls="primary-nav"
+          aria-label="Abrir menu"
+        >
+          Menu
+        </button>
+        <div class="site-header__nav" id="primary-nav">
+          <nav class="nav nav--primary" aria-label="Principal">
+            <a href="index.html#compra">Compra</a>
+            <a href="cadastrar.html">Venda</a>
+            <a href="index.html#planos-proprietario">Planos</a>
+            <a href="index.html#parceiros">Parceiro</a>
+            <a href="sobre.html">Sobre</a>
+          </nav>
+          <a class="btn btn--primary btn--sm nav-cta" href="vender.html">Quero vender</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="imovel-page section">
+      <div class="container" id="imovel-root">
+        <p class="muted"><a href="index.html#resultados">← Voltar à busca</a></p>
+        <div class="imovel-hero">
+          <div>
+            <div class="imovel-gallery__main">
+              <img id="imovel-main-img" src="" alt="" width="960" height="720" />
+            </div>
+            <div class="imovel-thumbs" id="imovel-thumbs"></div>
+          </div>
+          <div>
+            <p class="listing-card__code" id="imovel-code"></p>
+            <h1 id="imovel-title"></h1>
+            <p class="card__price" style="font-size: 2rem; margin: 0.25rem 0" id="imovel-price"></p>
+            <p>
+              <strong id="imovel-type"></strong> · <span id="imovel-neighborhood"></span>
+            </p>
+            <p class="muted" style="margin-bottom: 0.5rem">Modelo: <span id="imovel-plan"></span></p>
+            <div id="imovel-privacy-banner" class="imovel-privacy" hidden></div>
+            <ul class="spec-grid" id="imovel-specs"></ul>
+            <h2 style="margin-top: 1.5rem; font-size: 1.25rem">Sobre o imóvel</h2>
+            <p id="imovel-description" style="white-space: pre-wrap"></p>
+          </div>
+        </div>
+
+        <section class="card imovel-lead">
+          <h2 style="margin-top: 0">Quero visitar / receber informações</h2>
+          <p class="muted" id="imovel-lead-intro">Lead capturado no protótipo (localStorage). Em produção: CRM + n8n.</p>
+          <form id="imovel-lead-form" class="grid-3" style="display: grid; gap: 1rem">
+            <div class="field">
+              <label for="imovel-nome">Nome</label>
+              <input type="text" id="imovel-nome" name="nome" required />
+            </div>
+            <div class="field">
+              <label for="imovel-email">E-mail</label>
+              <input type="email" id="imovel-email" name="email" required />
+            </div>
+            <div class="field">
+              <label for="imovel-tel">WhatsApp</label>
+              <input type="tel" id="imovel-tel" name="tel" required />
+            </div>
+            <div style="grid-column: 1 / -1">
+              <button type="submit" class="btn btn--accent">Enviar interesse</button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer__inner">
+        <span>© 2026 VN Prime Imóveis</span>
+        <span><a href="index.html">Home</a> · <a href="lead.html">Contato</a></span>
+      </div>
+    </footer>
+
+    <script src="js/core.js"></script>
+    <script src="js/catalog-data.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/imovel.js"></script>
+  </body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portal — VN Prime Imóveis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&family=Playfair+Display:ital,wght@0,600;0,700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      (function () {
+        var paths = ["style.css", "../style.css"];
+        var i = 0;
+        function showAlert() {
+          var el = document.getElementById("vnprime-css-alert");
+          if (el) el.removeAttribute("hidden");
+          var loc = document.getElementById("vnprime-css-loc");
+          if (loc) loc.textContent = location.href;
+        }
+        function fail() {
+          document.documentElement.classList.add("vnprime-css-failed");
+          if (document.body) showAlert();
+          else document.addEventListener("DOMContentLoaded", showAlert);
+        }
+        function tryNext() {
+          if (i >= paths.length) return fail();
+          var link = document.createElement("link");
+          link.rel = "stylesheet";
+          try {
+            link.href = new URL(paths[i++], location.href).href;
+          } catch (e) {
+            return tryNext();
+          }
+          link.onload = function () {
+            document.documentElement.classList.add("vnprime-css-ok");
+          };
+          link.onerror = function () {
+            link.remove();
+            tryNext();
+          };
+          document.head.appendChild(link);
+        }
+        tryNext();
+      })();
+    </script>
+    <noscript><link rel="stylesheet" href="style.css" /></noscript>
+  </head>
+  <body>
+    <div
+      id="vnprime-css-alert"
+      hidden
+      style="
+        padding: 14px 16px;
+        margin: 0;
+        background: #fff8e6;
+        border-bottom: 3px solid #c9960e;
+        color: #0f2244;
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+      "
+    >
+      <strong>Os estilos não carregaram.</strong> Mantenha <code>style.css</code> na mesma pasta que este HTML.<br />
+      Caminho atual: <code id="vnprime-css-loc"></code>
+    </div>
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a href="index.html" class="brand-logo" aria-label="VN Prime Imóveis — Início">
+          <svg class="brand-logo__shield" viewBox="0 0 110 125" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="vnprimeBrandGold" x1="0" y1="0" x2="110" y2="125" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#f5d78e" />
+                <stop offset="35%" stop-color="#c9a84c" />
+                <stop offset="65%" stop-color="#a07830" />
+                <stop offset="100%" stop-color="#f5d78e" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M55 4 L100 22 L100 68 C100 92 78 112 55 121 C32 112 10 92 10 68 L10 22 Z"
+              fill="none"
+              stroke="url(#vnprimeBrandGold)"
+              stroke-width="3.5"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M55 10 L93 26 L93 68 C93 88 74 106 55 115 C36 106 17 88 17 68 L17 26 Z"
+              fill="none"
+              stroke="url(#vnprimeBrandGold)"
+              stroke-width="1"
+              stroke-linejoin="round"
+              opacity="0.4"
+            />
+            <text
+              x="55"
+              y="76"
+              text-anchor="middle"
+              font-family="'Cinzel', Georgia, serif"
+              font-size="32"
+              font-weight="700"
+              fill="url(#vnprimeBrandGold)"
+            >
+              VN
+            </text>
+          </svg>
+          <span class="brand-logo__text">
+            <span class="brand-logo__row">
+              <span class="brand-logo__vn">VN</span>
+              <span class="brand-logo__prime">PRIME</span>
+            </span>
+            <span class="brand-logo__sub">Imóveis</span>
+          </span>
+        </a>
+        <button
+          type="button"
+          class="nav-toggle"
+          aria-expanded="false"
+          aria-controls="primary-nav"
+          aria-label="Abrir menu"
+        >
+          Menu
+        </button>
+        <div class="site-header__nav" id="primary-nav">
+          <nav class="nav nav--primary" aria-label="Principal">
+            <a href="index.html#compra">Compra</a>
+            <a href="cadastrar.html">Venda</a>
+            <a href="index.html#planos-proprietario">Planos</a>
+            <a href="index.html#parceiros" class="is-active">Parceiro</a>
+            <a href="sobre.html">Sobre</a>
+          </nav>
+          <a class="btn btn--primary btn--sm nav-cta" href="cadastrar.html">Anunciar imóvel</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="section">
+      <div class="container dashboard-layout">
+        <aside class="sidebar">
+          <span class="role-badge" id="role-badge">Proprietário</span>
+          <label class="field" for="role-select" style="margin: 0">
+            <span>Perfil logado (simulação)</span>
+            <select id="role-select" aria-label="Selecionar perfil">
+              <option value="owner">Proprietário (ouro)</option>
+              <option value="broker">Corretor (esmeralda)</option>
+              <option value="photo">Fotógrafo (bronze)</option>
+              <option value="admin">Administração (marinho)</option>
+            </select>
+          </label>
+          <p class="muted" style="margin-top: 1rem; margin-bottom: 0">
+            O accent do site segue o perfil via <code>data-profile</code> no <code>&lt;html&gt;</code>.
+            Admin completo: <a href="admin.html">curadoria</a>.
+          </p>
+        </aside>
+
+        <div>
+          <!-- Painel Proprietário -->
+          <section id="panel-owner">
+            <div class="card" style="margin-bottom: 2rem; border-left: 4px solid var(--color-gold)">
+              <h2 style="margin-top: 0; font-size: 1.35rem">Portal do proprietário</h2>
+              <p class="muted" style="margin-bottom: 0.75rem">
+                Quem vende pela VN Prime usa este painel após o <a href="cadastrar.html">cadastro em 5 passos</a>.
+              </p>
+              <ul class="muted" style="margin: 0; padding-left: 1.25rem; line-height: 1.7">
+                <li>
+                  <strong>Plano 3% (venda direta):</strong> você cadastra com endereço completo; a vitrine mostra só o bairro e o selo
+                  <em>venda direta</em> — sem exibir seu telefone/e-mail na ficha pública.
+                </li>
+                <li>
+                  <strong>Plano 4%:</strong> checkout do pacote de mídia (Stripe) para fixar comissão reduzida; copy explicativa na home.
+                </li>
+                <li>
+                  <strong>Plano 6%:</strong> operação com VN Prime e corretor parceiro; foto, vídeo, drone e BOOSTER! seguem como extras.
+                </li>
+                <li>
+                  Benefícios de assinatura (marketing, métricas, <strong>FactorOne 30 dias</strong>, BOOSTER!, pacotes de mídia) aparecem
+                  aqui conforme o seu plano — protótipo local.
+                </li>
+              </ul>
+              <p style="margin-top: 1rem; margin-bottom: 0">
+                <a class="btn btn--accent btn--sm" href="cadastrar.html">Cadastrar ou atualizar imóvel</a>
+                <a class="btn btn--ghost btn--sm" href="index.html#planos-proprietario">Ver planos 3%, 4% e 6%</a>
+              </p>
+            </div>
+            <h2>Performance do anúncio</h2>
+            <p class="muted">Métricas ilustrativas. Produção: analytics + pixel.</p>
+            <div class="stats-row">
+              <div class="stat">
+                <strong id="owner-clicks">1.248</strong>
+                <span class="muted">Cliques 7d</span>
+              </div>
+              <div class="stat">
+                <strong id="owner-saves">312</strong>
+                <span class="muted">Salvos</span>
+              </div>
+              <div class="stat">
+                <strong id="owner-leads">28</strong>
+                <span class="muted">Leads qualificados</span>
+              </div>
+            </div>
+            <h3>Boosters (destaque pago)</h3>
+            <p class="muted">Simulação Stripe — BOOSTER! Impulso (R$ 49,90) e Performance (R$ 99,00).</p>
+            <div class="booster-grid" id="booster-grid"></div>
+            <div class="factorone-banner is-visible" id="owner-factorone" style="margin-top: 1.5rem; display: none">
+              <strong>FactorOne:</strong> período promocional de 30 dias ativo no plano Elite (ver
+              cadastro).
+            </div>
+          </section>
+
+          <!-- Painel Corretor -->
+          <section id="panel-broker" hidden>
+            <h2>Kanban de leads</h2>
+            <p class="muted">Arraste mentalmente: use os botões para mover coluna (protótipo).</p>
+            <div class="kanban" id="kanban-root"></div>
+            <h3 style="margin-top: 2rem">Imóveis Tradicional 6%</h3>
+            <p class="muted">Carteira reservada a operações com comissão integral.</p>
+            <div id="broker-tradicional-list"></div>
+            <button type="button" class="btn btn--primary" id="btn-pdf-leads" style="margin-top: 1rem">
+              Gerar PDF dos leads
+            </button>
+            <p class="muted" style="margin-top: 0.5rem">
+              <!-- PDF: em produção usar jsPDF ou PDF gerado no backend; aqui: janela imprimível -->
+              Abre janela para impressão / “Salvar como PDF” do navegador.
+            </p>
+          </section>
+
+          <!-- Painel Fotógrafo -->
+          <section id="panel-photo" hidden>
+            <h2>Mural de jobs</h2>
+            <p class="muted">Pacotes de R$ 899 a R$ 1.999 — aceite simula contratação.</p>
+            <div id="photo-jobs"></div>
+          </section>
+
+          <!-- Atalho Admin -->
+          <section id="panel-admin" hidden>
+            <h2>Administração</h2>
+            <p class="muted">Curadoria manual de anúncios pendentes.</p>
+            <a class="btn btn--accent" href="admin.html">Abrir painel de curadoria</a>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer__inner">
+        <span>VN Prime · Portal único</span>
+        <a href="index.html">Site público</a>
+      </div>
+    </footer>
+
+    <div class="modal-overlay" id="stripe-modal" aria-modal="true">
+      <div class="modal">
+        <h3 id="stripe-modal-title">Checkout</h3>
+        <p id="stripe-modal-amount" class="card__price" style="font-size: 1.5rem; margin: 0.5rem 0">—</p>
+        <p class="muted">Simulação Stripe — sem cobrança real.</p>
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem; justify-content: flex-end">
+          <button type="button" class="btn btn--ghost" id="stripe-modal-cancel">Cancelar</button>
+          <button type="button" class="btn btn--accent" id="stripe-modal-confirm">Pagar (simulado)</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/core.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

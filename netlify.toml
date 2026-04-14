@@ -1,0 +1,3 @@
+# Netlify (Drop ou CLI): pasta raiz = site público
+[build]
+  publish = "."

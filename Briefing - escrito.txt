@@ -1,0 +1,78 @@
+🏆 MASTER BRIEFING: VN PRIME IMÓVEIS (VERSÃO 2026)
+1. VISÃO GERAL E IDENTIDADE
+Nome do Projeto: VN Prime Imóveis.
+
+Posicionamento: Imobiliária de Luxo e Marketplace de Serviços Imobiliários (Híbrido de Imobiliária e SaaS).
+
+Localização Inicial: Belo Horizonte e Região Metropolitana (Foco: Nova Lima, Alphaville, Belvedere, Savassi).
+
+Paleta de Cores:
+
+Base: Marinha (#0F2244) e Dourado (#C9960E).
+
+Interface Adaptativa: O portal muda de cor conforme o usuário (Proprietário: Gold | Corretor: Verde | Fotógrafo: Bronze).
+
+2. ARQUITETURA DE MONETIZAÇÃO (O MOTOR FINANCEIRO)
+A. Planos de Assinatura (Recorrência via Stripe)
+Todo proprietário que deseja anunciar precisa escolher uma assinatura mensal:
+
+Essencial (R$ 29,90/mês): Acesso básico ao portal e anúncio ativo.
+
+Pro (R$ 59,90/mês): Inclui 01 Booster Lite mensal e análise de métricas avançada.
+
+Elite (R$ 99,90/mês): 01 Booster Pro mensal + Pacote Mkt Completo + 30 dias grátis FactorOne (Gestão Financeira).
+
+B. Modelo de Comissionamento de Venda
+No final do cadastro do imóvel, o cliente define o nível de serviço:
+
+3% (Venda Direta): Cliente faz o upload das fotos e gere as visitas.
+
+4% (Mídia Premium): Cliente paga pacote profissional (R$ 899 a R$ 1.999) e a comissão de venda cai para 4%.
+
+6% (VN Prime Full): A imobiliária assume tudo. Divisão: 3% para o corretor parceiro e 3% para a VN Prime.
+
+3. FLUXOS FUNCIONAIS POR SETOR
+🔵 Proprietário (O Captador)
+Calculadora de Valorização: Ferramenta na Home para atrair o lead.
+
+Cadastro em 5 Passos: Captura -> Localização (Maps) -> Dados Técnicos -> Fotos/Mídia -> Pagamento/Plano.
+
+Privacidade: Localização exata é interna; público vê apenas o Bairro.
+
+🟢 Corretor (A Força de Vendas - Assinatura R$ 49,90/mês)
+Mural Exclusivo: Acesso total aos leads de imóveis do plano de 6%.
+
+Sales Kit: Gerador de PDF de imóveis, Scripts de Abordagem e Funil Kanban.
+
+🟤 Fotógrafo (O Prestador de Serviço)
+Mural de Jobs: Aceita serviços pagos (R$ 899 a R$ 1.999).
+
+Segurança: Contrato digital integrado garantindo prazos e qualidade.
+
+4. ESPECIFICAÇÕES TÉCNICAS (PARA O CURSOR)
+Estrutura de Arquivos Recomendada:
+index.html: Home com busca estilo Quinto Andar e Calculadora de Valorização.
+
+cadastrar.html: Formulário dinâmico de 5 passos com lógica de "Pendente" até pagamento.
+
+login.html: Porta de entrada com redirecionamento por perfil (data-user-type).
+
+dashboard.html: Estrutura única que muda cores e menus via JS/CSS Variables conforme o usuário.
+
+admin.html: Central de aprovação de anúncios e gestão de pagamentos de parceiros.
+
+Integrações a serem comentadas no código:
+Stripe API: Assinaturas, Pacotes Mídia e Boosters.
+
+Google Maps API: Autocomplete de endereço e exibição de raio de bairro.
+
+n8n / Webhooks: Disparo de leads para corretores e integração com FactorOne.
+
+5. REGRAS DE OURO (NUNCA ESQUECER)
+Trava de Aprovação: Nenhum imóvel fica público sem autorização do Admin.
+
+Fidelização: O corretor parceiro só vê imóveis de 6% ou os seus próprios.
+
+Conversão: O "Booster" (R$ 39,90 a R$ 99,90) é oferecido como upsell constante no painel do proprietário.
+
+Com este briefing, o Cursor tem inteligência suficiente para construir 90% da estrutura funcional do seu site. Deseja que eu gere o arquivo final deste briefing em formato .txt para você salvar na pasta do projeto?

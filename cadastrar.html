@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastrar imóvel — VN Prime Imóveis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&family=Playfair+Display:ital,wght@0,600;0,700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      (function () {
+        var paths = ["style.css", "../style.css"];
+        var i = 0;
+        function showAlert() {
+          var el = document.getElementById("vnprime-css-alert");
+          if (el) el.removeAttribute("hidden");
+          var loc = document.getElementById("vnprime-css-loc");
+          if (loc) loc.textContent = location.href;
+        }
+        function fail() {
+          document.documentElement.classList.add("vnprime-css-failed");
+          if (document.body) showAlert();
+          else document.addEventListener("DOMContentLoaded", showAlert);
+        }
+        function tryNext() {
+          if (i >= paths.length) return fail();
+          var link = document.createElement("link");
+          link.rel = "stylesheet";
+          try {
+            link.href = new URL(paths[i++], location.href).href;
+          } catch (e) {
+            return tryNext();
+          }
+          link.onload = function () {
+            document.documentElement.classList.add("vnprime-css-ok");
+          };
+          link.onerror = function () {
+            link.remove();
+            tryNext();
+          };
+          document.head.appendChild(link);
+        }
+        tryNext();
+      })();
+    </script>
+    <noscript><link rel="stylesheet" href="style.css" /></noscript>
+  </head>
+  <body>
+    <div
+      id="vnprime-css-alert"
+      hidden
+      style="
+        padding: 14px 16px;
+        margin: 0;
+        background: #fff8e6;
+        border-bottom: 3px solid #c9960e;
+        color: #0f2244;
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+      "
+    >
+      <strong>Os estilos não carregaram.</strong> Mantenha <code>style.css</code> na mesma pasta que este HTML.<br />
+      Caminho atual: <code id="vnprime-css-loc"></code>
+    </div>
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a href="index.html" class="brand-logo" aria-label="VN Prime Imóveis — Início">
+          <svg class="brand-logo__shield" viewBox="0 0 110 125" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="vnprimeBrandGold" x1="0" y1="0" x2="110" y2="125" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#f5d78e" />
+                <stop offset="35%" stop-color="#c9a84c" />
+                <stop offset="65%" stop-color="#a07830" />
+                <stop offset="100%" stop-color="#f5d78e" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M55 4 L100 22 L100 68 C100 92 78 112 55 121 C32 112 10 92 10 68 L10 22 Z"
+              fill="none"
+              stroke="url(#vnprimeBrandGold)"
+              stroke-width="3.5"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M55 10 L93 26 L93 68 C93 88 74 106 55 115 C36 106 17 88 17 68 L17 26 Z"
+              fill="none"
+              stroke="url(#vnprimeBrandGold)"
+              stroke-width="1"
+              stroke-linejoin="round"
+              opacity="0.4"
+            />
+            <text
+              x="55"
+              y="76"
+              text-anchor="middle"
+              font-family="'Cinzel', Georgia, serif"
+              font-size="32"
+              font-weight="700"
+              fill="url(#vnprimeBrandGold)"
+            >
+              VN
+            </text>
+          </svg>
+          <span class="brand-logo__text">
+            <span class="brand-logo__row">
+              <span class="brand-logo__vn">VN</span>
+              <span class="brand-logo__prime">PRIME</span>
+            </span>
+            <span class="brand-logo__sub">Imóveis</span>
+          </span>
+        </a>
+        <button
+          type="button"
+          class="nav-toggle"
+          aria-expanded="false"
+          aria-controls="primary-nav"
+          aria-label="Abrir menu"
+        >
+          Menu
+        </button>
+        <div class="site-header__nav" id="primary-nav">
+          <nav class="nav nav--primary" aria-label="Principal">
+            <a href="index.html#compra">Compra</a>
+            <a href="cadastrar.html" class="is-active">Venda</a>
+            <a href="index.html#planos-proprietario">Planos</a>
+            <a href="index.html#parceiros">Parceiro</a>
+            <a href="sobre.html">Sobre</a>
+          </nav>
+          <a class="btn btn--primary btn--sm nav-cta" href="cadastrar.html">Anunciar imóvel</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="section">
+      <div class="container">
+        <div class="section__head">
+          <h2>Novo anúncio em 5 passos</h2>
+          <p>
+            Fluxo único (começa e termina na mesma sessão). Com plano definido, o anúncio segue para curadoria como
+            <strong>Pendente</strong>. Sem plano, fica <strong>PENDENTE_PLANO</strong> e não aparece na vitrine pública.
+          </p>
+        </div>
+
+        <div class="wizard">
+          <div class="steps" id="step-indicator" aria-hidden="true"></div>
+
+          <!-- Passo 1 -->
+          <div class="wizard-panel is-visible" data-step="1">
+            <div class="card">
+              <h3>1 · Dados básicos</h3>
+              <div class="field">
+                <label for="c-nome">Nome completo</label>
+                <input type="text" id="c-nome" required />
+              </div>
+              <div class="field">
+                <label for="c-email">E-mail (login / contato)</label>
+                <input type="email" id="c-email" required />
+              </div>
+              <div class="field">
+                <label for="c-zap">WhatsApp</label>
+                <input type="tel" id="c-zap" placeholder="(31) 99999-9999" required />
+              </div>
+              <div class="field">
+                <label for="c-tipo">Tipo de imóvel</label>
+                <select id="c-tipo" required>
+                  <option value="">Selecione</option>
+                  <option value="Apartamento">Apartamento</option>
+                  <option value="Cobertura">Cobertura</option>
+                  <option value="Casa">Casa</option>
+                  <option value="Terreno">Terreno</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Passo 2 -->
+          <div class="wizard-panel" data-step="2">
+            <div class="card">
+              <h3>2 · Localização</h3>
+              <p class="muted">
+                <strong>Endereço completo</strong> fica no cadastro interno (mapa, documentação, corretores). Na
+                <strong>vitrine pública</strong> só entra o <strong>bairro</strong>. No plano <strong>3% (venda direta)</strong>, seu telefone/e-mail
+                <strong>não aparecem</strong> na ficha — leads entram pela plataforma.
+              </p>
+              <div class="field">
+                <label for="c-bairro-pub">Bairro (público no anúncio)</label>
+                <input type="text" id="c-bairro-pub" required />
+              </div>
+              <div class="field">
+                <label for="c-endereco-priv">Endereço completo (privado — não exibido)</label>
+                <input type="text" id="c-endereco-priv" placeholder="Rua, número, complemento" />
+              </div>
+              <!-- Google Maps API (futuro):
+                - Carregar Maps JavaScript API com chave restrita por referrer.
+                - Autocomplete (Places) nos campos de endereço; geocodificar lat/lng para busca interna.
+                - Salvar placeId + geometria apenas no backend; nunca expor endereço privado na API pública.
+              -->
+              <div
+                class="map-placeholder"
+                id="map-placeholder"
+                role="img"
+                aria-label="Mapa — integração Google Maps pendente"
+              >
+                Mapa interativo (Google Maps)<br />
+                <small>Protótipo: substituir por mapa com marcador arrastável + modo privado.</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Passo 3 -->
+          <div class="wizard-panel" data-step="3">
+            <div class="card">
+              <h3>3 · Ficha técnica</h3>
+              <div class="field">
+                <label for="c-titulo">Título do anúncio</label>
+                <input type="text" id="c-titulo" required />
+              </div>
+              <div class="field">
+                <label for="c-preco">Valor (R$)</label>
+                <input type="number" id="c-preco" min="0" step="10000" required />
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="c-metragem">Área útil (m²)</label>
+                  <input type="number" id="c-metragem" min="1" step="1" />
+                </div>
+                <div class="field">
+                  <label for="c-quartos">Quartos</label>
+                  <input type="number" id="c-quartos" min="0" max="20" />
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="c-suites">Suítes</label>
+                  <input type="number" id="c-suites" min="0" max="20" value="0" />
+                </div>
+                <div class="field">
+                  <label for="c-salas">Salas</label>
+                  <input type="number" id="c-salas" min="0" max="20" value="0" />
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="c-banheiros">Banheiros</label>
+                  <input type="number" id="c-banheiros" min="0" max="30" value="0" />
+                </div>
+                <div class="field">
+                  <label for="c-vagas">Vagas</label>
+                  <input type="number" id="c-vagas" min="0" max="30" value="0" />
+                </div>
+              </div>
+              <div class="field">
+                <label for="c-descricao">Descrição (história do imóvel, diferenciais, andar…)</label>
+                <textarea id="c-descricao" rows="5" placeholder="Conte o que o comprador precisa sentir ao visitar."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Passo 4 -->
+          <div class="wizard-panel" data-step="4">
+            <div class="card">
+              <h3>4 · Mídia</h3>
+              <p class="muted">
+                Nos planos <strong>4%</strong> e <strong>6%</strong>, você pode pular a produção final (fotógrafo VN),
+                mas envie ao menos <strong>3 fotos de celular</strong> para conferência interna antes da visita. No
+                <strong>3%</strong>, envie o kit completo para análise.
+              </p>
+              <div class="field">
+                <label for="c-upload">Upload de imagens (protótipo)</label>
+                <input type="file" id="c-upload" multiple accept="image/*" />
+              </div>
+              <div class="plan-grid" style="grid-template-columns:1fr 1fr">
+                <label class="plan-option is-selected" data-pack="basico">
+                  <input type="radio" name="midia-pack" value="basico" checked />
+                  <strong>Pacote Essencial</strong>
+                  <span class="muted">R$ 899 · 15 fotos HDR</span>
+                </label>
+                <label class="plan-option" data-pack="premium">
+                  <input type="radio" name="midia-pack" value="premium" />
+                  <strong>Pacote Editorial</strong>
+                  <span class="muted">R$ 1.999 · foto + vídeo curto</span>
+                </label>
+              </div>
+              <button type="button" class="btn btn--ghost" id="btn-checkout-midia">
+                Simular checkout do pacote (Stripe)
+              </button>
+              <!-- Stripe: usar Price IDs distintos por pacote; Checkout Session no backend. -->
+            </div>
+          </div>
+
+          <!-- Passo 5 -->
+          <div class="wizard-panel" data-step="5">
+            <div class="card">
+              <h3>5 · Modelo de venda e BOOSTER!</h3>
+              <p class="muted">
+                Escolha a comissão na venda. O plano <strong>4%</strong> abre checkout do pacote de mídia (Stripe). O
+                <strong>6%</strong> segue para triagem com consultor. BOOSTER! é opcional em qualquer modelo.
+              </p>
+              <div class="plan-grid" style="grid-template-columns: 1fr">
+                <label class="plan-option is-selected" data-comm="3">
+                  <input type="radio" name="commission-plan" value="3" checked />
+                  <strong>3% — Venda por conta própria</strong>
+                  <span class="muted">Sem custo inicial · você faz a mídia · comissão 3% na venda</span>
+                </label>
+                <label class="plan-option" data-comm="4">
+                  <input type="radio" name="commission-plan" value="4" />
+                  <strong>4% — Mídia Pro</strong>
+                  <span class="muted">Paga pacote foto/vídeo (faixa por quartos) · comissão 4%</span>
+                </label>
+                <label class="plan-option" data-comm="6">
+                  <input type="radio" name="commission-plan" value="6" />
+                  <strong>6% — VN Prime Tradicional</strong>
+                  <span class="muted">Full service · placa exclusiva · consultor em até 2h (produção)</span>
+                </label>
+              </div>
+              <p class="muted" style="margin-top: 1rem"><strong>BOOSTER! opcional</strong> (adicional ao plano)</p>
+              <div class="plan-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr))">
+                <label class="plan-option is-selected" data-boost="none">
+                  <input type="radio" name="booster-plan" value="none" checked />
+                  <strong>Sem booster</strong>
+                  <span class="muted">Apenas o plano principal</span>
+                </label>
+                <label class="plan-option" data-boost="lite">
+                  <input type="radio" name="booster-plan" value="lite" />
+                  <strong>Impulso · R$ 49,90</strong>
+                  <span class="muted">Busca + post IG + roteiro Stories/Reels</span>
+                </label>
+                <label class="plan-option" data-boost="elite">
+                  <input type="radio" name="booster-plan" value="elite" />
+                  <strong>Performance · R$ 99,00</strong>
+                  <span class="muted">Reels + e-mail + tráfego + copy/imagem</span>
+                </label>
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.25rem">
+                <button type="button" class="btn btn--accent" id="btn-finalizar-plano">Enviar para análise</button>
+                <button type="button" class="btn btn--ghost" id="btn-sem-plano">Salvar sem plano (fica pendente)</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="wizard-actions">
+            <button type="button" class="btn btn--ghost" id="btn-prev" disabled>Voltar</button>
+            <button type="button" class="btn btn--primary" id="btn-next">Próximo</button>
+          </div>
+        </div>
+
+        <div class="thanks-panel" id="cadastro-thanks" aria-live="polite">
+          <h3 id="thanks-title">Obrigado!</h3>
+          <p id="thanks-body" class="muted" style="margin-bottom: 0"></p>
+          <p style="margin-top: 1rem; margin-bottom: 0">
+            <a class="btn btn--ghost btn--sm" href="index.html#resultados">Ver vitrine</a>
+            <a class="btn btn--primary btn--sm" href="admin.html">Ir à curadoria (admin)</a>
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer__inner">
+        <span>VN Prime Imóveis</span>
+        <a href="dashboard.html">Acessar portal</a>
+      </div>
+    </footer>
+
+    <!-- Modal simulação Stripe -->
+    <div class="modal-overlay" id="stripe-modal" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="modal">
+        <h3 id="stripe-modal-title">Checkout</h3>
+        <p id="stripe-modal-amount" class="card__price" style="font-size: 1.5rem; margin: 0.5rem 0">—</p>
+        <p class="muted">
+          Simulação: nenhuma cobrança real. Em produção, redirecionar para Stripe Checkout ou abrir Payment
+          Element.
+        </p>
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem; justify-content: flex-end">
+          <button type="button" class="btn btn--ghost" id="stripe-modal-cancel">Cancelar</button>
+          <button type="button" class="btn btn--accent" id="stripe-modal-confirm">Pagar (simulado)</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/core.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/cadastrar.js"></script>
+  </body>
+</html>

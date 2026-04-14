@@ -1,0 +1,188 @@
+from weasyprint import HTML
+
+# Conteúdo formatado para o documento de referência do Vinicius
+html_content = """
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm;
+            background-color: #fafafa;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #0F2244;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: center;
+            border-bottom: 3px solid #C9960E;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            color: #0F2244;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        header p {
+            color: #C9960E;
+            font-weight: bold;
+            margin: 5px 0 0;
+        }
+        h2 {
+            background-color: #0F2244;
+            color: #C9960E;
+            padding: 10px 15px;
+            font-size: 14pt;
+            border-radius: 4px;
+            margin-top: 25px;
+        }
+        h3 {
+            border-bottom: 2px solid #C9960E;
+            display: inline-block;
+            padding-right: 20px;
+            margin-bottom: 10px;
+            font-size: 12pt;
+        }
+        .grid {
+            display: table;
+            width: 100%;
+            margin: 15px 0;
+        }
+        .col {
+            display: table-cell;
+            padding: 10px;
+            border: 1px solid #eee;
+            vertical-align: top;
+        }
+        .plan-box {
+            background-color: #f4f7f9;
+            padding: 15px;
+            border-left: 4px solid #C9960E;
+            margin: 10px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th {
+            background-color: #0F2244;
+            color: white;
+            padding: 8px;
+            font-size: 10pt;
+            text-align: left;
+        }
+        td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            font-size: 10pt;
+        }
+        .footer {
+            text-align: center;
+            font-size: 9pt;
+            color: #999;
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>VN PRIME IMÓVEIS</h1>
+            <p>Documento Estrutural e Guia de Negócio</p>
+        </header>
+
+        <h2>1. IDENTIDADE E CONCEITO</h2>
+        <p>A VN Prime Imóveis é uma plataforma imobiliária de alto padrão focada em Belo Horizonte e Nova Lima. Atua como um ecossistema integrando proprietários, corretores e fotógrafos profissionais.</p>
+        <ul>
+            <li><strong>Cores:</strong> Marinha (#0F2244) e Ouro (#C9960E).</li>
+            <li><strong>Portais Dinâmicos:</strong> Cores de interface mudam conforme o perfil (Ouro: Proprietário | Verde: Corretor | Bronze: Fotógrafo).</li>
+        </ul>
+
+        <h2>2. ESTRUTURA DO SITE (SITE MAP)</h2>
+        <h3>Home Page (index.html)</h3>
+        <ul>
+            <li>Busca inteligente estilo Quinto Andar (Filtros: Bairro, Tipo, Valor).</li>
+            <li><strong>Calculadora de Valorização:</strong> Ferramenta de captura de leads baseada em m² e bairro.</li>
+            <li>Seção "Quero Vender": Direciona para o cadastro de proprietário.</li>
+        </ul>
+
+        <h3>Fluxo de Cadastro (cadastrar.html) - 5 Passos</h3>
+        <ol>
+            <li><strong>Identificação:</strong> Nome, E-mail e WhatsApp.</li>
+            <li><strong>Endereço:</strong> Localização exata (privada) via Google Maps.</li>
+            <li><strong>Ficha Técnica:</strong> m², quartos, suítes, vagas, lazer.</li>
+            <li><strong>Mídia:</strong> Upload de fotos ou contratação de pacote profissional.</li>
+            <li><strong>Planos e Checkout:</strong> Assinatura mensal e escolha da comissão de venda.</li>
+        </ol>
+
+        <h2>3. MODELO DE NEGÓCIO E PRECIFICAÇÃO</h2>
+        
+        <h3>Planos de Assinatura (Proprietário)</h3>
+        <table>
+            <tr><th>Plano</th><th>Mensalidade</th><th>Benefícios Extras</th></tr>
+            <tr><td>Essencial</td><td>R$ 29,90</td><td>Anúncio ativo no portal.</td></tr>
+            <tr><td>Pro</td><td>R$ 59,90</td><td>1 Booster Lite grátis/mês + Análise de Cliques.</td></tr>
+            <tr><td>Elite</td><td>R$ 99,90</td><td>1 Booster Pro grátis + Pacote Mkt + 30 dias FactorOne.</td></tr>
+        </table>
+
+        <h3>Serviços de Mídia (Plano 4%)</h3>
+        <p>Valores únicos baseados na metragem do imóvel:</p>
+        <ul>
+            <li><strong>Até 1 quarto:</strong> R$ 899,00</li>
+            <li><strong>2 a 3 quartos:</strong> R$ 1.499,00</li>
+            <li><strong>4+ quartos / Mansões:</strong> R$ 1.999,00</li>
+        </ul>
+
+        <h2>4. PORTAIS DE PARCEIROS</h2>
+        
+        <h3>Corretor Parceiro (Assinatura: R$ 49,90/mês)</h3>
+        <ul>
+            <li>Acesso total a leads e imóveis do plano de <strong>6%</strong>.</li>
+            <li>Ferramentas: Kanban de Leads, Gerador de PDF, Scripts de Venda.</li>
+            <li><strong>Comissão:</strong> 3% da venda (50% do total da imobiliária).</li>
+        </ul>
+
+        <h3>Fotógrafo Parceiro (Freelance)</h3>
+        <ul>
+            <li>Mural de "Jobs" disponíveis para aceitar conforme demanda.</li>
+            <li>Contrato digital de responsabilidade e qualidade integrado.</li>
+        </ul>
+
+        <h2>5. REGRAS DE OURO DA PLATAFORMA</h2>
+        <div class="plan-box">
+            <strong>Privacidade:</strong> Publicamente, o site exibe apenas o BAIRRO. O endereço exato só é revelado ao corretor após interesse real. <br>
+            <strong>Aprovação:</strong> Todo imóvel entra como PENDENTE e precisa de aprovação do Admin VN Prime. <br>
+            <strong>Booster:</strong> Pacotes avulsos de impulsionamento (R$ 39,90 a 99,90) disponíveis para compra a qualquer momento.
+        </div>
+
+        <div class="footer">
+            VN Prime Imóveis - Estratégia de Negócio 2026.
+        </div>
+    </div>
+</body>
+</html>
+"""
+
+import os
+from weasyprint import HTML
+
+# Salvar o PDF
+output_pdf = "VN_PRIME_Documento_Estrutural_v2.pdf"
+HTML(string=html_content).write_pdf(output_pdf)

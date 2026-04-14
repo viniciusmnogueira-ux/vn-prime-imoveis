@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VN Prime Imóveis — Luxo residencial · BH e região</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- CSS: tenta style.css na pasta do HTML e, se falhar, uma pasta acima (evita layout “cru” no Chrome). -->
+    <script>
+      (function () {
+        var paths = ["style.css", "../style.css"];
+        var i = 0;
+        function showAlert() {
+          var el = document.getElementById("vnprime-css-alert");
+          if (el) el.removeAttribute("hidden");
+          var loc = document.getElementById("vnprime-css-loc");
+          if (loc) loc.textContent = location.href;
+        }
+        function fail() {
+          document.documentElement.classList.add("vnprime-css-failed");
+          if (document.body) showAlert();
+          else document.addEventListener("DOMContentLoaded", showAlert);
+        }
+        function tryNext() {
+          if (i >= paths.length) return fail();
+          var link = document.createElement("link");
+          link.rel = "stylesheet";
+          try {
+            link.href = new URL(paths[i++], location.href).href;
+          } catch (e) {
+            return tryNext();
+          }
+          link.onload = function () {
+            document.documentElement.classList.add("vnprime-css-ok");
+          };
+          link.onerror = function () {
+            link.remove();
+            tryNext();
+          };
+          document.head.appendChild(link);
+        }
+        tryNext();
+      })();
+    </script>
+    <noscript><link rel="stylesheet" href="style.css" /></noscript>
+  </head>
+  <body>
+    <div
+      id="vnprime-css-alert"
+      hidden
+      style="
+        padding: 14px 16px;
+        margin: 0;
+        background: #fff8e6;
+        border-bottom: 3px solid #c9960e;
+        color: #0f2244;
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+      "
+    >
+      <strong>Os estilos não carregaram.</strong> Abra o <code>index.html</code> pela pasta completa do projeto (o
+      arquivo <code>style.css</code> precisa estar na mesma pasta).<br />
+      Caminho atual: <code id="vnprime-css-loc"></code>
+    </div>
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a href="index.html" class="brand-logo" aria-label="VN Prime Imóveis — Início">
+          <svg class="brand-logo__shield" viewBox="0 0 110 125" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="vnprimeBrandGold" x1="0" y1="0" x2="110" y2="125" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#f5d78e" />
+                <stop offset="35%" stop-color="#c9a84c" />
+                <stop offset="65%" stop-color="#a07830" />
+                <stop offset="100%" stop-color="#f5d78e" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M55 4 L100 22 L100 68 C100 92 78 112 55 121 C32 112 10 92 10 68 L10 22 Z"
+              fill="none"
+              stroke="url(#vnprimeBrandGold)"
+              stroke-width="3.5"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M55 10 L93 26 L93 68 C93 88 74 106 55 115 C36 106 17 88 17 68 L17 26 Z"
+              fill="none"
+              stroke="url(#vnprimeBrandGold)"
+              stroke-width="1"
+              stroke-linejoin="round"
+              opacity="0.4"
+            />
+            <text
+              x="55"
+              y="76"
+              text-anchor="middle"
+              font-family="'Cinzel', Georgia, serif"
+              font-size="32"
+              font-weight="700"
+              fill="url(#vnprimeBrandGold)"
+            >
+              VN
+            </text>
+          </svg>
+          <span class="brand-logo__text">
+            <span class="brand-logo__row">
+              <span class="brand-logo__vn">VN</span>
+              <span class="brand-logo__prime">PRIME</span>
+            </span>
+            <span class="brand-logo__sub">Imóveis</span>
+          </span>
+        </a>
+        <button
+          type="button"
+          class="nav-toggle"
+          aria-expanded="false"
+          aria-controls="primary-nav"
+          aria-label="Abrir menu"
+        >
+          Menu
+        </button>
+        <div class="site-header__nav" id="primary-nav">
+          <nav class="nav nav--primary" aria-label="Principal">
+            <a href="index.html#compra" class="is-active">Compra</a>
+            <a href="cadastrar.html">Venda</a>
+            <a href="index.html#planos-proprietario">Planos</a>
+            <a href="index.html#parceiros">Parceiro</a>
+            <a href="sobre.html">Sobre</a>
+          </nav>
+          <a class="btn btn--primary btn--sm nav-cta" href="vender.html">Quero vender</a>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero section-anchor" id="compra">
+      <div class="container">
+        <h1>Imóveis de alto padrão em Belo Horizonte e região metropolitana.</h1>
+        <p class="hero__lead">
+          Nova Lima, Savassi, Belvedere, Alphaville e mais — curadoria, mídia premium e planos claros
+          para quem compra e para quem vende.
+        </p>
+
+        <div class="hero__actions">
+          <a class="btn btn--accent" href="#resultados">Ver destaques</a>
+          <a class="btn btn--ghost" href="vender.html">Quero vender</a>
+          <a class="btn btn--ghost" href="lead.html">Fale com um consultor</a>
+        </div>
+
+        <form class="search-card" id="hero-search" aria-label="Buscar imóveis">
+          <div class="field">
+            <label for="q-bairro">Bairro</label>
+            <input
+              type="text"
+              id="q-bairro"
+              name="bairro"
+              placeholder="Ex.: Savassi, Nova Lima, Belvedere..."
+              autocomplete="address-level3"
+            />
+          </div>
+          <div class="field">
+            <label for="q-tipo">Tipo</label>
+            <select id="q-tipo" name="tipo">
+              <option value="">Todos</option>
+              <option value="Apartamento">Apartamento</option>
+              <option value="Cobertura">Cobertura</option>
+              <option value="Casa">Casa</option>
+              <option value="Terreno">Terreno</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="q-valor">Valor máximo (R$)</label>
+            <input
+              type="number"
+              id="q-valor"
+              name="valor"
+              placeholder="Ex.: 5000000"
+              min="0"
+              step="100000"
+            />
+          </div>
+          <div class="field">
+            <label for="q-transacao">Modelo de anúncio</label>
+            <select id="q-transacao" name="transacao">
+              <option value="">Todos</option>
+              <option value="autonomia">Venda por conta própria (plataforma)</option>
+              <option value="consultoria">Consultoria exclusiva VN Prime</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn--accent">Buscar</button>
+        </form>
+
+        <div class="kpi-bar" aria-label="Destaques da plataforma">
+          <div class="kpi-item">
+            <strong>4</strong>
+            <span>Modelos de venda</span>
+          </div>
+          <div class="kpi-item">
+            <strong>3%</strong>
+            <span>Comissão mínima</span>
+          </div>
+          <div class="kpi-item">
+            <strong>R$ 297</strong>
+            <span>Agendamento premium</span>
+          </div>
+          <div class="kpi-item">
+            <strong>R$ 49,90</strong>
+            <span>Corretor / mês</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--alt section-anchor" id="resultados">
+      <div class="container">
+        <div class="section__head">
+          <h2>Pesquisa de imóveis</h2>
+          <p>
+            Listagens aprovadas na curadoria — fotos, descrições completas e ficha técnica (metragem, quartos,
+            salas, banheiros e mais). Novos anúncios entram como <strong>Pendente</strong> até validação do time VN
+            Prime.
+          </p>
+          <p style="margin-bottom: 0">
+            <button type="button" class="btn btn--ghost btn--sm" id="btn-ver-todos">
+              Ver todos os imóveis disponíveis na plataforma
+            </button>
+          </p>
+        </div>
+        <div class="grid-3" id="listing-grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="section section-anchor" id="calculadora">
+      <div class="container">
+        <div class="section__head">
+          <h2>Calculadora de valorização</h2>
+          <p>
+            Estime o potencial de valorização e receba contato do time. Lead capturado para CRM (local).
+          </p>
+        </div>
+        <div class="calculator">
+          <form id="calc-form" class="card">
+            <div class="field-row">
+              <div class="field">
+                <label for="calc-m2">Metragem (m²)</label>
+                <input type="number" id="calc-m2" min="1" step="1" placeholder="Ex.: 186" />
+              </div>
+              <div class="field">
+                <label for="calc-bairro">Bairro (referência de mercado)</label>
+                <input
+                  type="text"
+                  id="calc-bairro"
+                  name="calc-bairro"
+                  placeholder="Ex.: Savassi, Nova Lima..."
+                  list="calc-bairros-list"
+                  autocomplete="address-level3"
+                />
+                <datalist id="calc-bairros-list">
+                  <option value="Savassi"></option>
+                  <option value="Belvedere"></option>
+                  <option value="Nova Lima"></option>
+                  <option value="Lourdes"></option>
+                  <option value="Funcionários"></option>
+                  <option value="Serra"></option>
+                  <option value="Alphaville"></option>
+                  <option value="Cidade Jardim"></option>
+                </datalist>
+              </div>
+            </div>
+            <div class="field">
+              <label for="calc-valor">Valor atual do imóvel (R$) — opcional se informar m²</label>
+              <input type="number" id="calc-valor" min="100000" step="10000" value="2500000" />
+            </div>
+            <div class="field">
+              <label for="calc-prazo">Prazo (anos)</label>
+              <input type="range" id="calc-prazo" min="1" max="15" value="5" />
+              <span class="muted" id="calc-prazo-label">5 anos</span>
+            </div>
+            <div class="field">
+              <label for="calc-taxa">Cenário anual (%)</label>
+              <select id="calc-taxa">
+                <option value="4">Conservador (4%)</option>
+                <option value="6" selected>Base (6%)</option>
+                <option value="9">Otimista (9%)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="calc-email">E-mail para retorno</label>
+              <input type="email" id="calc-email" placeholder="voce@email.com" required />
+            </div>
+            <button type="submit" class="btn btn--accent">Simular e enviar interesse</button>
+            <p class="muted" style="margin-bottom: 0">
+              <!-- n8n: POST webhook após submit com { email, valorEstimado, origem: 'calculadora' } -->
+              Produção: disparar fluxo n8n após validação do lead (opt-in LGPD).
+            </p>
+          </form>
+          <div class="calculator__result">
+            <h3>Projeção indicativa</h3>
+            <p class="calculator__value" id="calc-resultado">R$ 0</p>
+            <p id="calc-detalhe">
+              Ajuste os parâmetros ao lado. Não constitui laudo ou promessa de retorno.
+            </p>
+            <p class="calc-cta">
+              <a class="btn btn--accent" href="vender.html">Gostou do valor? Venda com a VN Prime</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--alt section-anchor" id="planos-proprietario">
+      <div class="container">
+        <div class="section__head">
+          <h2>Planos para proprietários</h2>
+          <p>
+            Três modelos claros: <strong>venda direta (3%)</strong> com privacidade na vitrine, <strong>mídia paga (4%)</strong> para
+            comissão menor com pacote profissional, ou <strong>tradicional (6%)</strong> com a VN Prime e corretor parceiro na
+            operação — sempre com identidade visual distinta abaixo.
+          </p>
+        </div>
+
+        <div class="plan-stack">
+          <div class="plan-tier plan-tier--3">
+            <article class="plan-vertical" id="plano-3">
+              <p class="plan-vertical__meta">3% · Venda direta · Você cadastra e conduz a venda</p>
+              <div class="plan-vertical__head">
+                <h3>Portal do proprietário + vitrine sem expor seu contato</h3>
+                <p class="plan-vertical__price">3%</p>
+              </div>
+              <div class="plan-vertical__body">
+                <p>
+                  <strong>Custo de entrada: R$ 0.</strong> No cadastro (5 passos) você informa o <strong>endereço completo</strong> para
+                  base interna, mapa e compliance; na <strong>vitrine pública só aparece o bairro</strong>. O anúncio é marcado como
+                  <strong>venda direta</strong>: telefone e e-mail do proprietário <strong>não são exibidos</strong> — o interesse entra pela
+                  plataforma e segue o fluxo seguro de leads.
+                </p>
+                <p>
+                  Você faz fotos, visitas e negociação; a comissão na venda é <strong>3%</strong>. Pode contratar fotógrafos parceiros
+                  (Stripe) à parte para elevar a mídia sem mudar o modelo de comissão, se desejar.
+                </p>
+              </div>
+              <div class="plan-vertical__actions">
+                <a class="btn btn--ghost" href="vender.html?fluxo=conta-propria">Começar no modelo 3%</a>
+                <button
+                  type="button"
+                  class="btn btn--accent"
+                  data-stripe-checkout
+                  data-title="BOOSTER! Impulso — plano 3%"
+                  data-amount="R$ 49,90"
+                >
+                  BOOSTER! a partir de R$ 49,90
+                </button>
+              </div>
+            </article>
+          </div>
+
+          <div class="plan-tier plan-tier--4">
+            <article class="plan-vertical plan-vertical--featured" id="plano-4">
+              <p class="plan-vertical__meta">4% · Mídia Pro — pacote pago reduz a comissão</p>
+              <div class="plan-vertical__head">
+                <h3>Investimento em foto/vídeo profissional = comissão 4%</h3>
+                <p class="plan-vertical__price">4%</p>
+              </div>
+              <div class="plan-vertical__body">
+                <p>
+                  Sem o pacote de mídia contratado <strong>pela plataforma (Stripe)</strong>, a comissão de referência seria maior
+                  (alinha ao modelo 6%). Ao contratar o <strong>pacote de mídia</strong>, você “compra” a produção editorial e
+                  <strong>fixa a comissão em 4% na venda</strong> — transparência total no checkout e contrato com fotógrafos
+                  credenciados.
+                </p>
+                <p>
+                  Faixas típicas: <strong>R$ 899</strong> (até 1 quarto / studio), <strong>R$ 1.499</strong> (2 a 3 quartos),
+                  <strong>R$ 1.999</strong> (4+ quartos / casas amplas). Pagamento por fora <strong>não</strong> mantém o benefício da
+                  comissão 4%: a trava é operacional e contratual.
+                </p>
+              </div>
+              <div class="plan-vertical__actions">
+                <a class="btn btn--primary" href="vender.html?fluxo=consultoria">Quero o plano 4%</a>
+                <button
+                  type="button"
+                  class="btn btn--accent"
+                  data-stripe-checkout
+                  data-title="Pacote Mídia Pro — apartamento médio (ex.)"
+                  data-amount="R$ 1.499,00"
+                >
+                  Simular pacote médio (Stripe)
+                </button>
+              </div>
+            </article>
+          </div>
+
+          <div class="plan-tier plan-tier--6">
+            <article class="plan-vertical" id="plano-6">
+              <p class="plan-vertical__meta">6% · Tradicional — VN Prime + corretor parceiro</p>
+              <div class="plan-vertical__head">
+                <h3>Operação completa; mídia extra e BOOSTER! à parte</h3>
+                <p class="plan-vertical__price">6%</p>
+              </div>
+              <div class="plan-vertical__body">
+                <p>
+                  <strong>Sem custo inicial de mídia obrigatório para você.</strong> A VN Prime organiza a operação; no modelo
+                  tradicional entra <strong>corretor parceiro</strong> (visível no portal do corretor) para atendimento e fechamento.
+                  Comissão total <strong>6%</strong> na venda — em geral <strong>3% corretor + 3% VN Prime</strong>, conforme acordo de
+                  parceria e placa exclusiva no imóvel.
+                </p>
+                <p>
+                  Produções adicionais (foto, vídeo, drone, tours) e <strong>BOOSTER!</strong> continuam disponíveis como
+                  <strong>contratação avulsa</strong>, quando quiser turbinar alcance além do pacote base da operação.
+                </p>
+              </div>
+              <div class="plan-vertical__actions">
+                <a class="btn btn--accent" href="vender.html?fluxo=consultoria">Agendar conversa · plano 6%</a>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <span class="subsection-label" style="margin-top: 2.5rem">BOOSTER! · Dois níveis (contratação avulsa)</span>
+        <p class="muted" style="max-width: 720px; margin-inline: auto; text-align: center">
+          Combine alcance orgânico, conteúdo e performance. Pagamento via Stripe; em produção, cada preço vira um Price ID.
+        </p>
+        <div class="booster-grid" style="margin-top: 1.5rem">
+          <article class="booster-card">
+            <h4>BOOSTER! Impulso — R$ 49,90</h4>
+            <p class="muted" style="margin-bottom: 0.75rem">
+              Destaque na busca do portal, <strong>1 post</strong> no Instagram VN Prime e <strong>roteiro + legenda</strong> para Stories/Reels
+              (modelo pronto para você publicar). Ideal para dar volume sem investir em tráfego pago ainda.
+            </p>
+            <button
+              type="button"
+              class="btn btn--ghost btn--sm"
+              data-stripe-checkout
+              data-title="BOOSTER! Impulso"
+              data-amount="R$ 49,90"
+            >
+              Checkout Stripe
+            </button>
+          </article>
+          <article class="booster-card">
+            <h4>BOOSTER! Performance — R$ 99,00</h4>
+            <p class="muted" style="margin-bottom: 0.75rem">
+              <strong>Edição de Reels</strong> com acabamento profissional, <strong>e-mail marketing</strong> para base de investidores,
+              <strong>tráfego pago</strong> (Meta Ads) com orçamento orientado e <strong>copy + tratamento de imagem</strong> para o anúncio.
+            </p>
+            <button
+              type="button"
+              class="btn btn--ghost btn--sm"
+              data-stripe-checkout
+              data-title="BOOSTER! Performance"
+              data-amount="R$ 99,00"
+            >
+              Checkout Stripe
+            </button>
+          </article>
+        </div>
+
+        <p style="margin-top: 2rem; margin-bottom: 0; text-align: center" class="muted">
+          Fechamento do funil: <a href="cadastrar.html">cadastro completo em 5 passos</a> (começa e termina na mesma
+          sessão). Sem plano selecionado, o imóvel fica <strong>PENDENTE_PLANO</strong> e fora da vitrine pública até
+          regularização.
+        </p>
+      </div>
+    </section>
+
+    <section class="section section-anchor" id="planos-corretor">
+      <div class="container">
+        <div class="section__head">
+          <h2>Planos para corretores parceiros</h2>
+          <p>
+            Um hub com leads qualificados, material de marketing, contratos com a imobiliária e camadas de gestão —
+            pensado para quem quer operar imóveis de alto padrão com a mesma elegância da marca VN Prime.
+          </p>
+        </div>
+        <div class="grid-3">
+          <article class="card card--featured">
+            <span class="card__tag">Assinatura</span>
+            <h3>Parceiro VN Prime</h3>
+            <p class="card__price">R$ 49,90</p>
+            <p class="muted" style="margin-top: -0.5rem">por mês</p>
+            <p>
+              Painel com <strong>funil de vendas</strong> (Kanban), <strong>leads centralizados</strong>, biblioteca de
+              e-mail marketing, roteiros de abordagem, gerador de PDF de apresentação e atalhos para a planilha
+              financeira do negócio. Em evolução: pesquisa de mercado por bairro e integrações com o grupo FactorOne.
+            </p>
+            <a class="btn btn--primary btn--sm" href="dashboard.html">Área do corretor</a>
+          </article>
+          <article class="card">
+            <span class="card__tag">Comissão</span>
+            <h3>Na venda Full (6%)</h3>
+            <p class="card__price">3%</p>
+            <p>
+              Quando você fecha a operação no plano tradicional, fica com <strong>metade da comissão total (3%)</strong>,
+              refletindo o atendimento completo ao comprador e à documentação — com a VN Prime na coordenação macro.
+            </p>
+          </article>
+          <article class="card">
+            <span class="card__tag">Regra de ouro</span>
+            <h3>Carteira + Parceria 6%</h3>
+            <p class="card__price">Etiqueta</p>
+            <p>
+              Você enxerga seus próprios imóveis captados e <strong>todos os anúncios do plano 6%</strong>, com selo
+              <em>Parceria disponível</em> na vitrine interna — priorizando oportunidades onde a operação e a comissão
+              estão alinhadas com a curadoria VN Prime.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-anchor" id="planos-fotografo">
+      <div class="container">
+        <div class="section__head">
+          <h2>Planos e valores · Fotógrafos parceiros</h2>
+          <p>Pacotes únicos conforme metragem/tipologia (referência do plano 4%). Mural de jobs no painel.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card">
+            <span class="card__tag">Até 1 quarto</span>
+            <h3>Pacote compacto</h3>
+            <p class="card__price">R$ 899</p>
+            <p>Ideal para studios e unidades enxutas — fotografia HDR e entrega para anúncio.</p>
+          </article>
+          <article class="card card--featured">
+            <span class="card__tag">2 a 3 quartos</span>
+            <h3>Pacote residencial</h3>
+            <p class="card__price">R$ 1.499</p>
+            <p>Cobertura completa dos ambientes principais e áreas comuns do condomínio quando aplicável.</p>
+          </article>
+          <article class="card">
+            <span class="card__tag">4+ quartos / mansões</span>
+            <h3>Pacote editorial</h3>
+            <p class="card__price">R$ 1.999</p>
+            <p>Produção ampla para imóveis de alto padrão; contrato digital e prazos em produção.</p>
+          </article>
+        </div>
+        <p style="margin-top: 1.5rem; text-align: center">
+          <a class="btn btn--accent" href="dashboard.html">Ver mural de jobs (painel)</a>
+        </p>
+      </div>
+    </section>
+
+    <section class="section section--alt section-anchor" id="parceiros">
+      <div class="container">
+        <div class="section__head">
+          <h2>Programa de parceiros</h2>
+          <p>Um único portal com visual que se adapta ao seu perfil (ouro, verde esmeralda ou bronze).</p>
+        </div>
+        <div class="grid-3">
+          <article class="card">
+            <h3>Corretor</h3>
+            <p>Leads, imóveis 6%, material de apoio e Kanban integrado.</p>
+            <a href="dashboard.html">Entrar como corretor</a>
+          </article>
+          <article class="card">
+            <h3>Fotógrafo</h3>
+            <p>Jobs de R$ 899 a R$ 1.999 e fluxo de aceite no painel.</p>
+            <a href="dashboard.html">Entrar como fotógrafo</a>
+          </article>
+          <article class="card">
+            <h3>Proprietário</h3>
+            <p>Métricas, boosters e gestão do anúncio após o cadastro.</p>
+            <a href="dashboard.html">Entrar como proprietário</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="container site-footer__inner">
+        <span>© 2026 VN Prime Imóveis — BH e região metropolitana.</span>
+        <span>
+          <a href="dashboard.html">Portal</a>
+          ·
+          <a href="admin.html">Curadoria</a>
+          ·
+          <a href="sobre.html">Contato</a>
+        </span>
+      </div>
+    </footer>
+
+    <script src="js/core.js"></script>
+    <script src="js/catalog-data.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/planos-stripe-home.js"></script>
+  </body>
+</html>
