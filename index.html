@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
@@ -70,13 +70,13 @@
     </div>
     <header class="site-header">
       <div class="container site-header__inner">
-        <a href="index.html" class="brand-logo" aria-label="VN Prime Imóveis — Início">
+        <a href="index.html#inicio" class="brand-logo" aria-label="VN Prime Imóveis — Início">
           <img
             class="brand-logo__img"
             src="assets/logo-vn-prime.png"
             alt="VN Prime Imóveis — Inteligência aplicada ao mercado imobiliário"
-            width="240"
-            height="96"
+            width="320"
+            height="128"
             decoding="async"
           />
         </a>
@@ -91,16 +91,81 @@
         </button>
         <div class="site-header__nav" id="primary-nav">
           <nav class="nav nav--primary" aria-label="Principal">
-            <a href="index.html#compra" class="is-active">Compra</a>
+            <a href="index.html#inicio" class="is-active">Início</a>
+            <a href="index.html#compra">Compra</a>
             <a href="cadastrar.html">Venda</a>
             <a href="index.html#planos-proprietario">Planos</a>
-            <a href="index.html#parceiros">Parceiro</a>
+            <a href="index.html#parceiros">Ecossistema</a>
             <a href="sobre.html">Sobre</a>
           </nav>
           <a class="btn btn--primary btn--sm nav-cta" href="vender.html">Quero vender</a>
         </div>
       </div>
     </header>
+
+    <section class="section section--home-intro section-anchor" id="inicio">
+      <div class="container">
+        <div class="home-intro__hero">
+          <p class="home-intro__eyebrow">VN Prime Imóveis · Belo Horizonte e região</p>
+          <h1 class="home-intro__title">Inteligência aplicada ao mercado imobiliário</h1>
+          <p class="home-intro__lead">
+            Entenda em poucos minutos como a plataforma organiza <strong>compra</strong>, <strong>venda</strong> e
+            <strong>três modelos de comissão</strong> (3%, 4% e 6%) — com curadoria, privacidade do endereço na vitrine e um
+            ecossistema de corretores e fotógrafos quando você precisar de reforço operacional.
+          </p>
+          <div class="home-intro__ctas">
+            <a class="btn btn--primary" href="#compra">Explorar imóveis</a>
+            <a class="btn btn--ghost" href="vender.html">Quero vender</a>
+            <a class="btn btn--ghost" href="index.html#planos-proprietario">Ver planos para proprietários</a>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <article class="card home-pillar">
+            <div class="home-pillar__icon" aria-hidden="true">◇</div>
+            <h3>Para quem compra</h3>
+            <p>
+              Busque por bairro, tipo e faixa de valor. Listagens passam por <strong>curadoria</strong>: fotos, ficha técnica e
+              descrição alinhadas ao padrão VN Prime — sem ruído de anúncios genéricos.
+            </p>
+          </article>
+          <article class="card home-pillar">
+            <div class="home-pillar__icon" aria-hidden="true">◎</div>
+            <h3>Para quem vende</h3>
+            <p>
+              Cadastro em passos claros: você escolhe autonomia (3%), mídia profissional com comissão reduzida (4%) ou operação
+              completa (6%). Na vitrine pública entra só o <strong>bairro</strong>; endereço completo fica interno.
+            </p>
+          </article>
+          <article class="card home-pillar">
+            <div class="home-pillar__icon" aria-hidden="true">%</div>
+            <h3>Por que três porcentagens?</h3>
+            <p>
+              <strong>3%</strong> — você conduz visitas e negociação. <strong>4%</strong> — investe em pacote de mídia na plataforma.
+              <strong>6%</strong> — VN Prime e corretor parceiro na operação. Transparência em cada etapa.
+            </p>
+          </article>
+        </div>
+
+        <div class="home-flow">
+          <h2>Fluxo simplificado — do anúncio à vitrine</h2>
+          <ol class="home-flow__steps">
+            <li><strong>Cadastro</strong> — dados, localização e ficha técnica.</li>
+            <li><strong>Mídia</strong> — fotos (suas ou com pacote credenciado, conforme o plano).</li>
+            <li><strong>Plano</strong> — define 3%, 4% ou 6% e opcionais (ex.: BOOSTER!).</li>
+            <li><strong>Curadoria</strong> — time valida; então o imóvel entra para compradores.</li>
+          </ol>
+        </div>
+
+        <p class="home-intro__footnote">
+          <strong>Corretores parceiros</strong>, <strong>fotógrafos credenciados</strong> e o <strong>programa de parceiros</strong>
+          (perfis ouro, esmeralda e bronze) estão explicados abaixo nesta mesma página — veja
+          <a href="index.html#planos-corretor">planos para corretores</a>,
+          <a href="index.html#planos-fotografo">valores de mídia para fotógrafos</a> e
+          <a href="index.html#parceiros">ecossistema de parceiros</a>.
+        </p>
+      </div>
+    </section>
 
     <nav class="breadcrumb-nav" aria-label="Onde você está no site">
       <div class="container breadcrumb-nav__inner">
@@ -109,7 +174,7 @@
         </button>
         <ol class="breadcrumb-nav__list">
           <li>
-            <a href="index.html">Página inicial</a>
+            <a href="index.html#inicio">Página inicial</a>
           </li>
           <li aria-current="page">Compra · catálogo</li>
         </ol>

@@ -33,10 +33,10 @@
       var path = (window.location.pathname || "").replace(/\\/g, "/");
       var file = path.split("/").pop() || "";
       if (/vn_prime_plataforma\.html/i.test(file)) {
-        window.location.hash = "compra";
+        window.location.hash = "inicio";
         window.scrollTo(0, 0);
       } else {
-        window.location.href = "index.html";
+        window.location.href = "index.html#inicio";
       }
     });
   }

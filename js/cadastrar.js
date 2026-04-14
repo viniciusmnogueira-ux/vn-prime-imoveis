@@ -264,21 +264,6 @@
     });
   });
 
-  var btnMidia = document.getElementById("btn-checkout-midia");
-  if (btnMidia)
-    btnMidia.addEventListener("click", function () {
-      var sel = document.querySelector('input[name="midia-pack"]:checked');
-      var pack = sel && sel.value === "premium" ? "Pacote Editorial" : "Pacote Essencial";
-      var amount = sel && sel.value === "premium" ? "R$ 1.999,00" : "R$ 899,00";
-      simulateStripeCheckout({
-        title: pack,
-        amountLabel: amount,
-        onSuccess: function () {
-          showToast("Pagamento simulado. Stripe: confirmar via webhook e liberar job para fotógrafo.");
-        },
-      });
-    });
-
   var btnSemPlano = document.getElementById("btn-sem-plano");
   if (btnSemPlano)
     btnSemPlano.addEventListener("click", function () {

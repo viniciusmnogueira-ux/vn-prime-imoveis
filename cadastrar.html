@@ -68,13 +68,13 @@
     </div>
     <header class="site-header">
       <div class="container site-header__inner">
-        <a href="index.html" class="brand-logo" aria-label="VN Prime Imóveis — Início">
+        <a href="index.html#inicio" class="brand-logo" aria-label="VN Prime Imóveis — Início">
           <img
             class="brand-logo__img"
             src="assets/logo-vn-prime.png"
             alt="VN Prime Imóveis — Inteligência aplicada ao mercado imobiliário"
-            width="240"
-            height="96"
+            width="320"
+            height="128"
             decoding="async"
           />
         </a>
@@ -89,10 +89,10 @@
         </button>
         <div class="site-header__nav" id="primary-nav">
           <nav class="nav nav--primary" aria-label="Principal">
+            <a href="index.html#inicio">Início</a>
             <a href="index.html#compra">Compra</a>
             <a href="cadastrar.html" class="is-active">Venda</a>
             <a href="index.html#planos-proprietario">Planos</a>
-            <a href="index.html#parceiros">Parceiro</a>
             <a href="sobre.html">Sobre</a>
           </nav>
           <a class="btn btn--primary btn--sm nav-cta" href="cadastrar.html">Anunciar imóvel</a>
@@ -107,6 +107,7 @@
           <p>
             Fluxo único (começa e termina na mesma sessão). Com plano definido, o anúncio segue para curadoria como
             <strong>Pendente</strong>. Sem plano, fica <strong>PENDENTE_PLANO</strong> e não aparece na vitrine pública.
+            Tabelas de mídia, corretores e parceiros estão na <a href="index.html#inicio">página inicial</a>.
           </p>
         </div>
 
@@ -230,30 +231,19 @@
             <div class="card">
               <h3>4 · Mídia</h3>
               <p class="muted">
-                Nos planos <strong>4%</strong> e <strong>6%</strong>, você pode pular a produção final (fotógrafo VN),
-                mas envie ao menos <strong>3 fotos de celular</strong> para conferência interna antes da visita. No
-                <strong>3%</strong>, envie o kit completo para análise.
+                Envie fotos para análise. Nos planos <strong>4%</strong> e <strong>6%</strong>, ao menos
+                <strong>3 fotos de celular</strong> para conferência interna; no <strong>3%</strong>, prefira um kit mais
+                completo. Valores de pacotes com fotógrafos credenciados e o fluxo de contratação estão descritos na
+                <a href="index.html#planos-fotografo">página inicial (seção fotógrafos)</a> — aqui o foco é o seu upload.
               </p>
               <div class="field">
                 <label for="c-upload">Upload de imagens (protótipo)</label>
                 <input type="file" id="c-upload" multiple accept="image/*" />
               </div>
-              <div class="plan-grid" style="grid-template-columns:1fr 1fr">
-                <label class="plan-option is-selected" data-pack="basico">
-                  <input type="radio" name="midia-pack" value="basico" checked />
-                  <strong>Pacote Essencial</strong>
-                  <span class="muted">R$ 899 · 15 fotos HDR</span>
-                </label>
-                <label class="plan-option" data-pack="premium">
-                  <input type="radio" name="midia-pack" value="premium" />
-                  <strong>Pacote Editorial</strong>
-                  <span class="muted">R$ 1.999 · foto + vídeo curto</span>
-                </label>
-              </div>
-              <button type="button" class="btn btn--ghost" id="btn-checkout-midia">
-                Simular checkout do pacote (Stripe)
-              </button>
-              <!-- Stripe: usar Price IDs distintos por pacote; Checkout Session no backend. -->
+              <p class="muted" style="margin-bottom: 0; font-size: 0.9rem">
+                No passo seguinte você escolhe o modelo <strong>3%</strong>, <strong>4%</strong> ou <strong>6%</strong>. O plano
+                <strong>4%</strong> abre a simulação de pagamento do pacote de mídia (Stripe) conforme a regra da home.
+              </p>
             </div>
           </div>
 

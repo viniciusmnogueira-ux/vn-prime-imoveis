@@ -68,13 +68,13 @@
     </div>
     <header class="site-header">
       <div class="container site-header__inner">
-        <a href="index.html" class="brand-logo" aria-label="VN Prime Imóveis — Início">
+        <a href="index.html#inicio" class="brand-logo" aria-label="VN Prime Imóveis — Início">
           <img
             class="brand-logo__img"
             src="assets/logo-vn-prime.png"
             alt="VN Prime Imóveis — Inteligência aplicada ao mercado imobiliário"
-            width="240"
-            height="96"
+            width="320"
+            height="128"
             decoding="async"
           />
         </a>
@@ -83,10 +83,10 @@
         </button>
         <div class="site-header__nav" id="primary-nav">
           <nav class="nav nav--primary" aria-label="Principal">
+            <a href="index.html#inicio">Início</a>
             <a href="index.html#compra">Compra</a>
             <a href="cadastrar.html" class="is-active">Venda</a>
             <a href="index.html#planos-proprietario">Planos</a>
-            <a href="index.html#parceiros">Parceiro</a>
             <a href="sobre.html">Sobre</a>
           </nav>
           <a class="btn btn--primary btn--sm nav-cta" href="cadastrar.html">Cadastrar imóvel</a>
@@ -97,37 +97,52 @@
     <main class="section">
       <div class="container" style="max-width: 900px">
         <div class="section__head">
-          <h1>Quero vender meu imóvel</h1>
+          <h1>Vender com a VN Prime</h1>
           <p>
-            Escolha como deseja operar. Em ambos os caminhos você verá os modelos <strong>3%</strong>,
-            <strong>4%</strong> e <strong>6%</strong> no final do cadastro — com regras claras de comissão e, no caso do
-            4%, checkout do pacote de mídia via Stripe.
+            Esta página é só o <strong>atalho para o cadastro</strong>. Os modelos <strong>3%</strong>, <strong>4%</strong> e
+            <strong>6%</strong>, BOOSTER!, mídia e regras de privacidade estão explicados na
+            <a href="index.html#inicio">página inicial</a> — leia antes se quiser comparar com calma.
+          </p>
+        </div>
+
+        <div class="card" style="margin-bottom: 2rem">
+          <h2 style="margin-top: 0; font-size: 1.15rem">O que acontece depois que você clica</h2>
+          <ol class="home-flow__steps" style="margin-top: 1rem">
+            <li><strong>Formulário guiado</strong> — 5 passos na mesma sessão (dados, endereço, ficha, fotos, plano).</li>
+            <li><strong>Curadoria</strong> — o time revisa material e documentação antes da vitrine pública.</li>
+            <li><strong>Compradores</strong> — após aprovação, o imóvel entra na busca; no modelo 3% seus contatos não aparecem na ficha.</li>
+          </ol>
+          <p class="muted" style="margin-bottom: 0; margin-top: 1rem; font-size: 0.92rem">
+            Planos para <strong>corretores</strong>, <strong>fotógrafos</strong> e o <strong>programa de parceiros</strong> ficam na home —
+            <a href="index.html#planos-corretor">corretores</a>,
+            <a href="index.html#planos-fotografo">fotógrafos</a>,
+            <a href="index.html#parceiros">ecossistema</a>.
           </p>
         </div>
 
         <div class="path-grid">
           <article class="path-card">
             <h2>Venda por conta própria</h2>
-            <p class="muted" style="font-style: italic; margin-top: -0.25rem">Sua autonomia, nossa plataforma.</p>
+            <p class="muted" style="font-style: italic; margin-top: -0.25rem">Autonomia na operação · comissão 3%</p>
             <p>
-              Você produz conteúdo, responde leads e conduz visitas. A comissão de referência é <strong>3%</strong>, sem
-              custo inicial para publicar. BOOSTER! e fotógrafos parceiros ficam disponíveis quando quiser acelerar.
+              Você responde leads e conduz visitas; a vitrine não exibe seu telefone nem e-mail. BOOSTER! e upgrades de mídia
+              são opcionais (detalhes na home).
             </p>
-            <a class="btn btn--accent" href="cadastrar.html?fluxo=conta-propria">Começar cadastro (3% sugerido)</a>
+            <a class="btn btn--accent" href="cadastrar.html?fluxo=conta-propria">Ir ao cadastro · modelo 3%</a>
           </article>
           <article class="path-card">
-            <h2>Consultoria exclusiva VN Prime</h2>
-            <p class="muted" style="font-style: italic; margin-top: -0.25rem">Nossa inteligência, sua tranquilidade.</p>
+            <h2>Consultoria VN Prime</h2>
+            <p class="muted" style="font-style: italic; margin-top: -0.25rem">Mídia Pro (4%) ou operação completa (6%)</p>
             <p>
-              Ideal para quem quer mídia profissional com comissão reduzida (<strong>4%</strong>) ou o modelo tradicional
-              completo (<strong>6%</strong>) com placa exclusiva, curadoria e corretor parceiro quando aplicável.
+              Para quem quer pacote de mídia com comissão reduzida ou operação tradicional com curadoria e apoio na negociação.
             </p>
-            <a class="btn btn--primary" href="cadastrar.html?fluxo=consultoria">Começar cadastro (consultoria)</a>
+            <a class="btn btn--primary" href="cadastrar.html?fluxo=consultoria">Ir ao cadastro · consultoria</a>
           </article>
         </div>
 
         <p class="muted" style="margin-top: 2rem; text-align: center; margin-bottom: 0">
-          Só quer falar com o time antes de cadastrar? <a href="lead.html">Deixe seus dados aqui</a>.
+          Prefere falar antes? <a href="lead.html">Fale com um consultor</a> ·
+          <a href="index.html#planos-proprietario">Ler planos para proprietários</a>
         </p>
       </div>
     </main>
