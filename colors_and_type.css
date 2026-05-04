@@ -1,0 +1,202 @@
+/* ==========================================================================
+   VN Prime Imóveis — Colors & Type Tokens
+   Display: Playfair Display  ·  Body: DM Sans  ·  Brand word: Cinzel
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap");
+
+:root {
+  /* ---------- Brand base ---------- */
+  --navy:            #0F2244;   /* Marinha — primary brand */
+  --navy-soft:       #162A52;
+  --navy-muted:      #1E3560;
+  --gold:            #C9960E;   /* Dourado — accent */
+  --gold-soft:       #D4A84A;
+  --gold-bright:     #F5D78E;   /* gradient highlight */
+  --gold-deep:       #A07830;   /* gradient shadow */
+
+  /* ---------- Surfaces ---------- */
+  --cream:           #FAF8F4;   /* off-white page bg */
+  --white:           #FFFFFF;
+  --surface:         #FFFFFF;
+  --surface-alt:     #FAF8F4;
+
+  /* ---------- Text ---------- */
+  --fg-1:            #1A1A1A;   /* body */
+  --fg-2:            #5C6478;   /* muted, secondary */
+  --fg-3:            rgba(15, 34, 68, 0.55);
+  --fg-on-navy:      #FAF8F4;
+  --fg-on-navy-2:    rgba(250, 249, 246, 0.85);
+
+  /* ---------- Borders ---------- */
+  --border:          rgba(15, 34, 68, 0.12);
+  --border-strong:   rgba(15, 34, 68, 0.22);
+
+  /* ---------- Profile accents (adaptive UI) ---------- */
+  --profile-owner:   #C9960E;   /* Proprietário — Ouro */
+  --profile-broker:  #059669;   /* Corretor — Esmeralda */
+  --profile-photo:   #B87333;   /* Fotógrafo — Bronze */
+  --profile-admin:   #0F2244;   /* Administração — Marinho */
+
+  /* ---------- Semantic status ---------- */
+  --status-pending-bg:     #FEF3C7;
+  --status-pending-fg:     #92400E;
+  --status-approved-bg:    #D1FAE5;
+  --status-approved-fg:    #065F46;
+  --status-plan-bg:        #E0E7FF;
+  --status-plan-fg:        #3730A3;
+
+  /* ---------- Elevation ---------- */
+  --shadow-card:     0 8px 32px rgba(15, 34, 68, 0.08);
+  --shadow-soft:     0 18px 50px rgba(15, 34, 68, 0.12);
+  --shadow-accent:   0 4px 24px rgba(201, 150, 14, 0.35);
+  --shadow-navy:     0 4px 20px rgba(15, 34, 68, 0.25);
+  --shadow-featured: 0 12px 40px rgba(201, 150, 14, 0.20);
+
+  /* ---------- Radii ---------- */
+  --radius-sm:       8px;
+  --radius-md:       14px;
+  --radius-lg:       22px;
+  --radius-pill:     999px;
+
+  /* ---------- Spacing scale ---------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 2.5rem;
+  --space-8: 3rem;
+
+  /* ---------- Type families ---------- */
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body:    "DM Sans", system-ui, -apple-system, Segoe UI, sans-serif;
+  --font-brand:   "Cinzel", Georgia, serif;   /* VN PRIME wordmark only */
+
+  /* ---------- Signature gradients ---------- */
+  --gradient-gold:       linear-gradient(145deg,#F5D78E 0%,#C9A84C 45%,#A07830 62%,#C9A84C 100%);
+  --gradient-gold-line:  linear-gradient(90deg,#B8892A,#D4A84A,#B8892A);
+  --gradient-navy-hero:  linear-gradient(135deg,#0F2244 0%,#162A52 45%,#1E3560 100%);
+  --gradient-navy-fact:  linear-gradient(90deg,#0F2244,#1E3560);
+
+  /* ---------- Dynamic accent (profile-adaptive) ---------- */
+  --accent:          var(--gold);
+  --accent-contrast: var(--navy);
+}
+
+[data-profile="owner"]  { --accent: var(--profile-owner);  --accent-contrast: #0F2244; }
+[data-profile="broker"] { --accent: var(--profile-broker); --accent-contrast: #FFFFFF; }
+[data-profile="photo"]  { --accent: var(--profile-photo);  --accent-contrast: #0F2244; }
+[data-profile="admin"]  { --accent: var(--profile-admin);  --accent-contrast: #C9960E; }
+
+/* ============================================================
+   Semantic type styles
+   ============================================================ */
+
+html { color-scheme: light; }
+
+body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--fg-1);
+  background: var(--cream);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--navy);
+  margin: 0 0 0.5em;
+}
+
+h1 { font-size: clamp(2.25rem, 4vw, 3.25rem); }
+h2 { font-size: clamp(1.75rem, 3vw, 2.35rem); }
+h3 { font-size: 1.35rem; }
+h4 { font-size: 1.1rem; }
+
+p { margin: 0 0 1em; color: var(--fg-2); }
+
+small, .text-xs { font-size: 0.75rem; }
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+
+.subsection-label {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.label-caps {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+
+.lead {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--fg-2);
+}
+
+.price {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--accent);
+  margin: 0.5rem 0;
+}
+
+.muted { color: var(--fg-2); }
+
+code {
+  font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  background: rgba(15, 34, 68, 0.06);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+/* Brand wordmark helper — VN PRIME only */
+.wordmark-vn {
+  font-family: var(--font-brand);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.wordmark-prime {
+  font-family: var(--font-brand);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--navy);
+}
+.wordmark-imoveis {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.58em;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  background: var(--gradient-gold-line);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

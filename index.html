@@ -1,599 +1,311 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VN Prime Imóveis — Luxo residencial · BH e região</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap"
-      rel="stylesheet"
-    />
-    <!-- CSS: tenta style.css na pasta do HTML e, se falhar, uma pasta acima (evita layout “cru” no Chrome). -->
-    <script>
-      (function () {
-        var paths = ["style.css", "../style.css"];
-        var i = 0;
-        function showAlert() {
-          var el = document.getElementById("vnprime-css-alert");
-          if (el) el.removeAttribute("hidden");
-          var loc = document.getElementById("vnprime-css-loc");
-          if (loc) loc.textContent = location.href;
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VN Prime Imóveis · Catálogo</title>
+<link rel="stylesheet" href="colors_and_type.css" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  input, select, textarea {
+    font-family: 'DM Sans', sans-serif;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.7rem 0.85rem;
+    background: var(--cream);
+    color: var(--navy);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,150,14,0.18);
+    background: #fff;
+  }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(15,34,68,0.18); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(15,34,68,0.32); }
+  .kpi-cell:last-child { border-right: none !important; }
+  a { color: inherit; }
+
+  /* ── Responsive header ── */
+  .vnp-nav-desktop { display: flex; }
+  .vnp-hamburger   { display: none; }
+  .vnp-drawer      { display: none; }
+
+  @media (max-width: 767px) {
+    .vnp-nav-desktop { display: none !important; }
+    .vnp-hamburger   { display: flex !important; align-items: center; justify-content: center; }
+    .vnp-drawer      {
+      display: block;
+      position: fixed; inset: 0; top: 57px; z-index: 99;
+      background: rgba(250,249,246,0.99); backdrop-filter: blur(16px);
+      padding: 24px 20px 40px;
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+    .vnp-drawer.open { transform: translateX(0); }
+  }
+
+  /* ── Serviços dropdown ── */
+  .vnp-dropdown { position: relative; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="catalog.js"></script>
+<script>
+// ── Gerador de pitches VN Prime (template-based, funciona sem backend) ────────
+window.claude = {
+  complete: function(prompt) {
+    return new Promise(function(resolve) {
+      // Extrai dados do prompt
+      var tipo      = (prompt.match(/Tipo:\s*(.+)/)       || [])[1] || 'Imóvel';
+      var bairro    = (prompt.match(/Localização:\s*([^,\n]+)/) || [])[1]?.trim() || 'Belo Horizonte';
+      var area      = (prompt.match(/Área:\s*(\d+)/)      || [])[1] || '';
+      var quartos   = (prompt.match(/(\d+) quartos/)      || [])[1] || '';
+      var suites    = (prompt.match(/(\d+) suítes/)       || [])[1] || '';
+      var vagas     = (prompt.match(/(\d+) vagas/)        || [])[1] || '';
+      var difRaw    = (prompt.match(/Diferenciais:\s*(.+)/) || [])[1] || '';
+      var difs      = difRaw !== 'não informado' ? difRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+      var difStr    = difs.length ? difs.slice(0, 2).join(' e ').toLowerCase() : '';
+
+      var areaStr   = area   ? area + ' m²'      : '';
+      var qtosStr   = quartos ? quartos + (quartos === '1' ? ' quarto' : ' quartos') : '';
+      var suitStr   = suites  ? suites  + (suites  === '1' ? ' suíte'  : ' suítes')  : '';
+      var vagStr    = vagas   ? vagas   + (vagas   === '1' ? ' vaga'   : ' vagas')   : '';
+
+      var specs = [areaStr, qtosStr, suitStr, vagStr].filter(Boolean).join(', ');
+
+      var pitches = [
+        {
+          label: 'Curto e direto',
+          text: tipo + ' de ' + (areaStr || 'alto padrão') + ' no ' + bairro + (specs ? ' — ' + specs : '') + '.' +
+            (difStr ? ' Destaques: ' + difStr + '.' : '') +
+            ' Curadoria VN Prime. Endereço completo disponível após contato qualificado.'
+        },
+        {
+          label: 'Editorial e descritivo',
+          text: 'Localizado no ' + bairro + ', este ' + tipo.toLowerCase() + (areaStr ? ' de ' + areaStr : '') +
+            ' foi projetado para quem valoriza espaço e qualidade de acabamento.' +
+            (specs ? ' São ' + [qtosStr, suitStr, vagStr].filter(Boolean).join(', ') + '.' : '') +
+            (difStr ? ' Entre os diferenciais: ' + difStr + '.' : '') +
+            ' Disponibilidade e visita mediante agendamento pelo portal VN Prime.'
+        },
+        {
+          label: 'Foco em estilo de vida',
+          text: bairro + ' é um dos bairros mais valorizados de BH — e este ' + tipo.toLowerCase() +
+            (areaStr ? ' de ' + areaStr : '') + ' está no coração dele.' +
+            (difStr ? ' ' + difStr.charAt(0).toUpperCase() + difStr.slice(1) + ' fazem parte do dia a dia.' : '') +
+            (qtosStr ? ' ' + qtosStr.charAt(0).toUpperCase() + qtosStr.slice(1) + (suitStr ? ', sendo ' + suitStr : '') + '.' : '') +
+            ' Para quem busca referência sem abrir mão de conforto.'
         }
-        function fail() {
-          document.documentElement.classList.add("vnprime-css-failed");
-          if (document.body) showAlert();
-          else document.addEventListener("DOMContentLoaded", showAlert);
-        }
-        function tryNext() {
-          if (i >= paths.length) return fail();
-          var link = document.createElement("link");
-          link.rel = "stylesheet";
-          try {
-            link.href = new URL(paths[i++], location.href).href;
-          } catch (e) {
-            return tryNext();
-          }
-          link.onload = function () {
-            document.documentElement.classList.add("vnprime-css-ok");
-          };
-          link.onerror = function () {
-            link.remove();
-            tryNext();
-          };
-          document.head.appendChild(link);
-        }
-        tryNext();
-      })();
-    </script>
-    <noscript><link rel="stylesheet" href="style.css" /></noscript>
-  </head>
-  <body>
-    <div
-      id="vnprime-css-alert"
-      hidden
-      style="
-        padding: 14px 16px;
-        margin: 0;
-        background: #fff8e6;
-        border-bottom: 3px solid #c9960e;
-        color: #0f2244;
-        font-family: system-ui, sans-serif;
-        font-size: 14px;
-        line-height: 1.5;
-      "
-    >
-      <strong>Os estilos não carregaram.</strong> Abra o <code>index.html</code> pela pasta completa do projeto (o
-      arquivo <code>style.css</code> precisa estar na mesma pasta).<br />
-      Caminho atual: <code id="vnprime-css-loc"></code>
-    </div>
-    <header class="site-header">
-      <div class="container site-header__inner">
-        <a href="index.html#inicio" class="brand-logo" aria-label="VN Prime Imóveis — Início">
-          <img
-            class="brand-logo__img"
-            src="assets/logo-vn-prime.png"
-            alt="VN Prime Imóveis — Inteligência aplicada ao mercado imobiliário"
-            width="320"
-            height="128"
-            decoding="async"
-          />
-        </a>
-        <button
-          type="button"
-          class="nav-toggle"
-          aria-expanded="false"
-          aria-controls="primary-nav"
-          aria-label="Abrir menu"
-        >
-          Menu
-        </button>
-        <div class="site-header__nav" id="primary-nav">
-          <nav class="nav nav--primary" aria-label="Principal">
-            <a href="index.html#inicio" class="is-active">Início</a>
-            <a href="index.html#compra">Compra</a>
-            <a href="cadastrar.html">Venda</a>
-            <a href="index.html#planos-proprietario">Planos</a>
-            <a href="index.html#parceiros">Parceiro</a>
-            <a href="sobre.html">Sobre</a>
-          </nav>
-          <a class="btn btn--primary btn--sm nav-cta" href="vender.html">Quero vender</a>
-        </div>
-      </div>
-    </header>
+      ];
 
-    <section class="section section--home-intro section-anchor" id="inicio">
-      <div class="container">
-        <div class="home-intro__hero">
-          <p class="home-intro__eyebrow">VN Prime Imóveis · Belo Horizonte e região</p>
-          <h1 class="home-intro__title">Inteligência aplicada ao mercado imobiliário</h1>
-          <p class="home-intro__lead">
-            Entenda como a plataforma organiza <strong>compra</strong> e <strong>venda</strong>:
-            <strong>venda direta</strong> (só taxa, sem comissão na venda), <strong>venda assistida</strong> (fotos suas · 3% se vender pela
-            plataforma), <strong>venda premium VN Prime</strong> (mídia credenciada · 4%) e <strong>venda completa</strong> (processo
-            convencional com a VN Prime Imóveis · 6%) — além da <strong>rede de corretores</strong> parceiros.
-          </p>
-          <div class="home-intro__ctas">
-            <a class="btn btn--primary" href="#compra">Explorar imóveis</a>
-            <a class="btn btn--ghost" href="vender.html">Quero vender</a>
-            <a class="btn btn--ghost" href="index.html#planos-proprietario">Ver planos para proprietários</a>
-          </div>
-        </div>
+      // Simula delay realista de 2.5s
+      setTimeout(function() {
+        resolve(JSON.stringify({ pitches: pitches }));
+      }, 2500);
+    });
+  }
+};
+</script>
+</head>
+<body>
+<div id="root"></div>
 
-        <div class="grid-3">
-          <article class="card home-pillar">
-            <div class="home-pillar__icon" aria-hidden="true">◇</div>
-            <h3>Para quem compra</h3>
-            <p>
-              Busque por bairro, tipo e faixa de valor. Listagens passam por <strong>curadoria</strong>: fotos, ficha técnica e
-              descrição alinhadas ao padrão VN Prime — sem ruído de anúncios genéricos.
-            </p>
-          </article>
-          <article class="card home-pillar">
-            <div class="home-pillar__icon" aria-hidden="true">◎</div>
-            <h3>Para quem vende</h3>
-            <p>
-              Quatro modalidades: <strong>direta</strong> (taxa), <strong>assistida</strong> (3% pela plataforma), <strong>premium</strong> (4% com mídia
-              profissional) e <strong>completa</strong> (6%, processo convencional VN Prime). Na vitrine entra só o <strong>bairro</strong>.
-            </p>
-          </article>
-          <article class="card home-pillar">
-            <div class="home-pillar__icon" aria-hidden="true">%</div>
-            <h3>Comissão só quando faz sentido</h3>
-            <p>
-              Na <strong>venda direta</strong> não há comissão sobre o preço do imóvel — apenas taxa. Na <strong>assistida</strong>, 3% se a venda
-              vier pela plataforma. <strong>Premium</strong> e <strong>completa</strong> têm regras 4% e 6% explicadas nos planos abaixo.
-            </p>
-          </article>
-        </div>
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="listing-card.jsx"></script>
+<script type="text/babel" src="page-home.jsx"></script>
+<script type="text/babel" src="page-search.jsx"></script>
+<script type="text/babel" src="page-detail.jsx"></script>
+<script type="text/babel" src="page-vender-hub.jsx"></script>
+<script type="text/babel" src="page-vender-roles.jsx"></script>
+<script type="text/babel" src="page-anunciar.jsx"></script>
+<script type="text/babel" src="page-portal.jsx"></script>
+<script type="text/babel" src="page-corretor.jsx"></script>
+<script type="text/babel" src="page-fotografo.jsx"></script>
+<script type="text/babel" src="page-sobre.jsx"></script>
+<script type="text/babel" src="page-lancamentos.jsx"></script>
+<script type="text/babel" src="page-proprietario.jsx"></script>
+<script type="text/babel" src="page-corretor-canal.jsx"></script>
+<script type="text/babel" src="page-fotografo-canal.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
 
-        <div class="home-flow">
-          <h2>Fluxo simplificado — do anúncio à vitrine</h2>
-          <ol class="home-flow__steps">
-            <li><strong>Cadastro</strong> — dados, localização e ficha técnica.</li>
-            <li><strong>Mídia</strong> — fotos (suas ou com pacote credenciado, conforme o plano).</li>
-            <li><strong>Plano</strong> — direta (taxa), assistida (3%), premium (4%) ou completa (6%); opcional BOOSTER!.</li>
-            <li><strong>Curadoria</strong> — time valida; então o imóvel entra para compradores.</li>
-          </ol>
-        </div>
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "density": "compact",
+  "accentMode": "gold",
+  "cardStyle": "elevated",
+  "headlineFont": "Cinzel",
+  "showFeaturedRibbon": true
+}/*EDITMODE-END*/;
 
-        <p class="home-intro__footnote">
-          <strong>Corretores parceiros</strong>, <strong>fotógrafos credenciados</strong> e o <strong>programa de parceiros</strong>
-          (perfis ouro, esmeralda e bronze) estão explicados abaixo nesta mesma página — veja
-          <a href="index.html#planos-corretor">planos para corretores</a>,
-          <a href="index.html#planos-fotografo">valores de mídia para fotógrafos</a> e
-          <a href="index.html#parceiros">Parceiro</a>.
-        </p>
-      </div>
-    </section>
+function App() {
+  const [route, setRoute] = React.useState({ name: 'home', params: {} });
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [authUser, setAuthUser] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem('vnprime_user')); } catch { return null; }
+  });
+  const [authModal, setAuthModal] = React.useState({ open: false, tab: 'entrar', pendingNav: null });
 
-    <nav class="breadcrumb-nav" aria-label="Onde você está no site">
-      <div class="container breadcrumb-nav__inner">
-        <button type="button" class="breadcrumb-nav__back" id="breadcrumb-history-back">
-          ← Voltar
-        </button>
-        <ol class="breadcrumb-nav__list">
-          <li>
-            <a href="index.html#inicio">Página inicial</a>
-          </li>
-          <li aria-current="page">Compra · catálogo</li>
-        </ol>
-      </div>
-    </nav>
+  const onAuthOpen = (tab = 'entrar', pendingNav = null) => {
+    setAuthModal({ open: true, tab, pendingNav });
+  };
+  const onAuthClose = () => setAuthModal(m => ({ ...m, open: false, pendingNav: null }));
+  const roleDestination = (role) => {
+    if (role === 'proprietario') return 'anunciar';
+    if (role === 'corretor')    return 'corretor';
+    if (role === 'fotografo')   return 'fotografo';
+    return 'busca';
+  };
 
-    <section class="hero section-anchor" id="compra">
-      <div class="container">
-        <h1>Imóveis de alto padrão em Belo Horizonte e região metropolitana.</h1>
-        <p class="hero__lead">
-          Nova Lima, Savassi, Belvedere, Alphaville e mais — curadoria, mídia premium e planos claros
-          para quem compra e para quem vende.
-        </p>
+  const onAuth = (user) => {
+    setAuthUser(user);
+    const pending = authModal.pendingNav;
+    onAuthClose();
+    if (pending) { setRoute({ name: pending, params: {} }); return; }
+    if (user.role) { setRoute({ name: roleDestination(user.role), params: {} }); return; }
+  };
+  const onLogout = () => {
+    localStorage.removeItem('vnprime_user');
+    setAuthUser(null);
+    setRoute({ name: 'home', params: {} });
+  };
 
-        <div class="hero__actions">
-          <a class="btn btn--accent" href="#resultados">Ver destaques</a>
-          <a class="btn btn--ghost" href="vender.html">Quero vender</a>
-          <a class="btn btn--ghost" href="lead.html">Fale com um consultor</a>
-        </div>
+  const onNav = (name, params = {}) => {
+    const protectedRoutes = ['anunciar', 'portal', 'corretor', 'fotografo'];
+    if (protectedRoutes.includes(name) && !authUser) {
+      onAuthOpen('entrar', name); return;
+    }
+    setRoute({ name, params });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
 
-        <form class="search-card" id="hero-search" aria-label="Buscar imóveis">
-          <div class="field">
-            <label for="q-bairro">Bairro</label>
-            <input
-              type="text"
-              id="q-bairro"
-              name="bairro"
-              placeholder="Ex.: Savassi, Nova Lima, Belvedere..."
-              autocomplete="address-level3"
-            />
-          </div>
-          <div class="field">
-            <label for="q-tipo">Tipo</label>
-            <select id="q-tipo" name="tipo">
-              <option value="">Todos</option>
-              <option value="Apartamento">Apartamento</option>
-              <option value="Cobertura">Cobertura</option>
-              <option value="Casa">Casa</option>
-              <option value="Terreno">Terreno</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="q-valor">Valor máximo (R$)</label>
-            <input
-              type="number"
-              id="q-valor"
-              name="valor"
-              placeholder="Ex.: 5000000"
-              min="0"
-              step="100000"
-            />
-          </div>
-          <div class="field">
-            <label for="q-transacao">Modelo de anúncio</label>
-            <select id="q-transacao" name="transacao">
-              <option value="">Todos</option>
-              <option value="venda_direta">Venda direta (taxa · sem comissão na venda)</option>
-              <option value="autonomia">Venda assistida (3% · fotos do proprietário)</option>
-              <option value="consultoria">Venda premium ou completa (VN Prime)</option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn--accent">Buscar</button>
-        </form>
+  // Apply tweaks to root scope
+  React.useEffect(() => {
+    const root = document.documentElement;
+    const accents = {
+      gold: { '--accent': '#C9960E', '--gold': '#C9960E', '--gold-soft': '#D4A84A' },
+      emerald: { '--accent': '#059669', '--gold': '#059669', '--gold-soft': '#10B981' },
+      bronze: { '--accent': '#B87333', '--gold': '#B87333', '--gold-soft': '#D08F4F' },
+    };
+    const a = accents[tweaks.accentMode] || accents.gold;
+    Object.entries(a).forEach(([k, v]) => root.style.setProperty(k, v));
+    if (tweaks.headlineFont) {
+      root.style.setProperty('--font-display', `"${tweaks.headlineFont}", Georgia, serif`);
+    }
+  }, [tweaks.accentMode, tweaks.headlineFont]);
 
-        <div class="kpi-bar" aria-label="Destaques da plataforma">
-          <div class="kpi-item">
-            <strong>4</strong>
-            <span>Modelos de venda</span>
-          </div>
-          <div class="kpi-item">
-            <strong>3%</strong>
-            <span>Venda assistida (plataforma)</span>
-          </div>
-          <div class="kpi-item">
-            <strong>R$ 297</strong>
-            <span>Taxa ref. · venda direta</span>
-          </div>
-          <div class="kpi-item">
-            <strong>R$ 49,90</strong>
-            <span>Rede de corretores / mês</span>
-          </div>
-        </div>
-      </div>
-    </section>
+  const headerActive = route.name === 'busca' && route.params.op === 'lancamento'
+    ? 'lancamentos' : route.name;
 
-    <section class="section section--alt section-anchor" id="resultados">
-      <div class="container">
-        <div class="section__head">
-          <h2>Pesquisa de imóveis</h2>
-          <p>
-            Listagens aprovadas na curadoria — fotos, descrições completas e ficha técnica (metragem, quartos,
-            salas, banheiros e mais). Novos anúncios entram como <strong>Pendente</strong> até validação do time VN
-            Prime.
-          </p>
-          <p style="margin-bottom: 0">
-            <button type="button" class="btn btn--ghost btn--sm" id="btn-ver-todos">
-              Ver todos os imóveis disponíveis na plataforma
-            </button>
-          </p>
-        </div>
-        <div class="grid-3" id="listing-grid" aria-live="polite"></div>
-      </div>
-    </section>
+  return (
+    <React.Fragment>
+      <AuthModal isOpen={authModal.open} defaultTab={authModal.tab} onClose={onAuthClose} onAuth={onAuth} />
+      <SiteHeader active={headerActive} onNav={onNav} density={tweaks.density}
+        authUser={authUser} onAuthOpen={onAuthOpen} onLogout={onLogout} />
 
-    <section class="section section--alt section-anchor" id="planos-proprietario">
-      <div class="container">
-        <div class="section__head">
-          <h2>Planos para proprietários</h2>
-          <p>
-            Quatro formas de vender com a VN Prime Imóveis: <strong>venda direta</strong> (taxa, sem comissão sobre o valor do imóvel),
-            <strong>venda assistida</strong> (você cadastra as fotos · 3% se a venda for pela plataforma),
-            <strong>venda premium VN Prime</strong> (mídia credenciada · 4%) e <strong>venda completa</strong> (processo convencional · 6%).
-          </p>
-        </div>
+      {route.name === 'home' && (
+        <HomePage onNav={onNav} density={tweaks.density} accentMode={tweaks.accentMode} />
+      )}
+      {route.name === 'busca' && (
+        <SearchResultsPage onNav={onNav} initial={route.params} density={tweaks.density} />
+      )}
+      {route.name === 'detalhe' && (
+        <PropertyDetailPage id={route.params.id} onNav={onNav} />
+      )}
+      {route.name === 'vender' && React.createElement(window.VenderHubPage, { onNav })}
+      {route.name === 'anunciar' && React.createElement(window.AnunciarPage, { onNav, authUser })}
+      {route.name === 'portal'    && React.createElement(window.PortalPage,    { onNav, authUser })}
+      {route.name === 'corretor'  && React.createElement(window.CorretorPage,  { onNav, authUser })}
+      {route.name === 'fotografo' && React.createElement(window.FotografoPage, { onNav, authUser })}
+      {route.name === 'sobre' && React.createElement(window.SobrePage, { onNav })}
+      {route.name === 'proprietario'    && React.createElement(window.ProprietarioPage,    { onNav })}
+      {route.name === 'corretor-canal'  && React.createElement(window.CorretorCanalPage,  { onNav })}
+      {route.name === 'fotografo-canal' && React.createElement(window.FotografoCanalPage, { onNav })}
+      {route.name === 'lancamentos' && React.createElement(window.LancamentosPage, { onNav })}
+      {route.name === 'aluguel' && (
+        <PlaceholderPage name="aluguel" onNav={onNav} />
+      )}
 
-        <div class="plan-stack">
-          <div class="plan-tier plan-tier--direta">
-            <article class="plan-vertical" id="plano-direta">
-              <p class="plan-vertical__meta">Venda direta · Taxa de publicação · Sem comissão na venda</p>
-              <div class="plan-vertical__head">
-                <h3>Portal do proprietário + vitrine sem expor seu contato</h3>
-                <p class="plan-vertical__price">Taxa</p>
-              </div>
-              <div class="plan-vertical__body">
-                <p>
-                  O proprietário <strong>não paga comissão</strong> sobre o preço de venda do imóvel — apenas uma
-                  <strong>taxa</strong> para uso da vitrine, curadoria inicial e fluxo de leads. Na ficha pública entra só o
-                  <strong>bairro</strong>; telefone e e-mail <strong>não são exibidos</strong> — interesse pela plataforma.
-                </p>
-                <p>
-                  Valor de referência da taxa (ex.: <strong>R$ 297</strong>) é confirmado no cadastro/checkout. BOOSTER! segue opcional.
-                </p>
-              </div>
-              <div class="plan-vertical__actions">
-                <a class="btn btn--ghost" href="vender.html?fluxo=venda-direta">Começar · venda direta</a>
-                <button
-                  type="button"
-                  class="btn btn--accent"
-                  data-stripe-checkout
-                  data-title="BOOSTER! Impulso — venda direta"
-                  data-amount="R$ 49,90"
-                >
-                  BOOSTER! a partir de R$ 49,90
-                </button>
-              </div>
-            </article>
-          </div>
+      <SiteFooter onNav={onNav} />
 
-          <div class="plan-tier plan-tier--3">
-            <article class="plan-vertical" id="plano-assistida">
-              <p class="plan-vertical__meta">Venda assistida · 3% · Fotos do proprietário · Venda pela plataforma</p>
-              <div class="plan-vertical__head">
-                <h3>Você cadastra as fotos; comissão só se vender pela plataforma</h3>
-                <p class="plan-vertical__price">3%</p>
-              </div>
-              <div class="plan-vertical__body">
-                <p>
-                  Modelo para quem quer autonomia com trilho seguro: <strong>você envia as fotos</strong> e conduz visitas e negociação.
-                  Se a venda ocorrer <strong>pelo ecossistema da plataforma</strong>, aplica-se <strong>3% de comissão</strong> — alinhado ao contrato
-                  no fechamento.
-                </p>
-                <p>
-                  Privacidade igual à venda direta na vitrine (só bairro; contatos ocultos). Fotógrafos credenciados permanecem opcionais
-                  (Stripe) para elevar a mídia.
-                </p>
-              </div>
-              <div class="plan-vertical__actions">
-                <a class="btn btn--ghost" href="vender.html?fluxo=conta-propria">Começar · venda assistida</a>
-                <button
-                  type="button"
-                  class="btn btn--accent"
-                  data-stripe-checkout
-                  data-title="BOOSTER! Impulso — venda assistida"
-                  data-amount="R$ 49,90"
-                >
-                  BOOSTER! a partir de R$ 49,90
-                </button>
-              </div>
-            </article>
-          </div>
+      {/* WhatsApp flutuante global */}
+      <a onClick={() => window.open('https://wa.me/5531984144250?text=' + encodeURIComponent('Olá! Vi a VN Prime Imóveis e gostaria de mais informações.'), '_blank')}
+        style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 400,
+          width: 56, height: 56, borderRadius: '50%', background: '#25d366',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 8px 28px rgba(37,211,102,0.45)', cursor: 'pointer',
+          fontSize: 26, textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 12px 36px rgba(37,211,102,0.55)'; }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(37,211,102,0.45)'; }}
+        title="Falar no WhatsApp">💬</a>
 
-          <div class="plan-tier plan-tier--4">
-            <article class="plan-vertical plan-vertical--featured" id="plano-premium">
-              <p class="plan-vertical__meta">Venda premium VN Prime · 4% · Mídia profissional credenciada</p>
-              <div class="plan-vertical__head">
-                <h3>Pacote foto/vídeo na plataforma = comissão 4% na venda</h3>
-                <p class="plan-vertical__price">4%</p>
-              </div>
-              <div class="plan-vertical__body">
-                <p>
-                  A <strong>venda premium VN Prime</strong> combina produção editorial com fotógrafos credenciados e
-                  <strong>comissão de 4%</strong> na venda após contratação do pacote via <strong>Stripe</strong>. Sem o pacote pela
-                  plataforma, a referência de comissão alinha-se à <strong>venda completa (6%)</strong>.
-                </p>
-                <p>
-                  Faixas típicas: <strong>R$ 899</strong> (até 1 quarto), <strong>R$ 1.499</strong> (2–3 quartos),
-                  <strong>R$ 1.999</strong> (4+ quartos / casas amplas). Pagamento fora do fluxo credenciado <strong>não</strong> mantém o 4%.
-                </p>
-              </div>
-              <div class="plan-vertical__actions">
-                <a class="btn btn--primary" href="vender.html?fluxo=premium">Começar · venda premium</a>
-                <button
-                  type="button"
-                  class="btn btn--accent"
-                  data-stripe-checkout
-                  data-title="Pacote Mídia Pro — apartamento médio (ex.)"
-                  data-amount="R$ 1.499,00"
-                >
-                  Simular pacote médio (Stripe)
-                </button>
-              </div>
-            </article>
-          </div>
+      <TweaksPanel title="Tweaks">
+        <TweakSection title="Layout">
+          <TweakRadio label="Densidade" value={tweaks.density}
+            options={[{value:'compact', label:'Compacto'}, {value:'comfortable', label:'Confortável'}]}
+            onChange={(v) => setTweak('density', v)} />
+        </TweakSection>
+        <TweakSection title="Identidade">
+          <TweakRadio label="Cor de destaque" value={tweaks.accentMode}
+            options={[
+              {value:'gold', label:'Dourado'},
+              {value:'emerald', label:'Esmeralda'},
+              {value:'bronze', label:'Bronze'},
+            ]}
+            onChange={(v) => setTweak('accentMode', v)} />
+          <TweakSelect label="Fonte de display" value={tweaks.headlineFont}
+            options={[
+              {value:'Playfair Display', label:'Playfair Display (padrão)'},
+              {value:'Cinzel', label:'Cinzel (mais luxo)'},
+              {value:'DM Serif Display', label:'DM Serif Display'},
+            ]}
+            onChange={(v) => setTweak('headlineFont', v)} />
+        </TweakSection>
+        <TweakSection title="Navegação rápida">
+          <TweakButton onClick={() => onNav('home')}>Home</TweakButton>
+          <TweakButton onClick={() => onNav('busca')}>Busca</TweakButton>
+          <TweakButton onClick={() => onNav('detalhe', { id: 'vn-4401' })}>Detalhe</TweakButton>
+          <TweakButton onClick={() => onNav('vender')}>Vender hub</TweakButton>
+          <TweakButton onClick={() => onNav('anunciar')}>Anunciar</TweakButton>
+          <TweakButton onClick={() => onNav('portal')}>Portal proprietário</TweakButton>
+          <TweakButton onClick={() => onNav('corretor')}>Portal corretor</TweakButton>
+          <TweakButton onClick={() => onNav('fotografo')}>Portal fotógrafo</TweakButton>
+          <TweakButton onClick={() => onNav('sobre')}>Sobre</TweakButton>
+          <TweakButton onClick={() => onNav('lancamentos')}>Lançamentos</TweakButton>
+          <TweakButton onClick={() => onNav('proprietario')}>Canal proprietário</TweakButton>
+          <TweakButton onClick={() => onNav('corretor-canal')}>Canal corretor</TweakButton>
+          <TweakButton onClick={() => onNav('fotografo-canal')}>Canal fotógrafo</TweakButton>
+        </TweakSection>
+      </TweaksPanel>
+    </React.Fragment>
+  );
+}
 
-          <div class="plan-tier plan-tier--6">
-            <article class="plan-vertical" id="plano-completa">
-              <p class="plan-vertical__meta">Venda completa · 6% · Processo convencional VN Prime Imóveis</p>
-              <div class="plan-vertical__head">
-                <h3>A VN Prime conduz a operação; rede de corretores quando aplicável</h3>
-                <p class="plan-vertical__price">6%</p>
-              </div>
-              <div class="plan-vertical__body">
-                <p>
-                  A <strong>venda completa</strong> é o processo <strong>convencional de venda</strong> feito pela VN Prime Imóveis: visitas,
-                  negociação, documentação e coordenação de ponta a ponta. Em geral entra <strong>corretor parceiro</strong> da rede para
-                  fechamento — comissão total <strong>6%</strong> (p.ex. <strong>3% corretor + 3% VN Prime</strong>), conforme contrato e placa.
-                </p>
-                <p>
-                  Mídia extra (drone, tour, vídeo) e <strong>BOOSTER!</strong> podem ser contratados à parte para ampliar alcance.
-                </p>
-              </div>
-              <div class="plan-vertical__actions">
-                <a class="btn btn--accent" href="vender.html?fluxo=consultoria">Agendar · venda completa</a>
-              </div>
-            </article>
-          </div>
-        </div>
+function PlaceholderPage({ name, onNav }) {
+  const labels = {
+    aluguel: ['Imóveis para alugar', 'Veja nossos imóveis em aluguel na busca.'],
+  };
+  const [t, p] = labels[name] || ['Página', 'Em construção'];
+  return (
+    <main style={{ padding: '80px 20px', textAlign: 'center', minHeight: '60vh' }}>
+      <Eyebrow color="var(--gold)">VN Prime · {name}</Eyebrow>
+      <h1>{t}</h1>
+      <p style={{ color: 'var(--fg-2)', maxWidth: 480, margin: '0 auto 24px' }}>{p}</p>
+      <Btn variant="accent" onClick={() => onNav(name === 'aluguel' ? 'busca' : name === 'lancamentos' ? 'busca' : 'home',
+        name === 'aluguel' ? { op: 'aluguel' } : name === 'lancamentos' ? { op: 'lancamento' } : {})}>
+        {name === 'aluguel' || name === 'lancamentos' ? 'Ver imóveis' : 'Voltar para o início'}
+      </Btn>
+    </main>
+  );
+}
 
-        <span class="subsection-label" style="margin-top: 2.5rem">BOOSTER! · Dois níveis (contratação avulsa)</span>
-        <p class="booster-section__lead muted" style="max-width: 720px; margin-inline: auto; text-align: center">
-          Mais alcance, mais visibilidade e mais chances de vender — sob demanda.
-        </p>
-        <div class="booster-grid" style="margin-top: 1.5rem">
-          <article class="booster-card">
-            <h4 class="booster-card__title">BOOSTER! IMPULSO — R$ 49,90</h4>
-            <p class="booster-card__tagline"><strong>Ganhe visibilidade rápida sem investir em tráfego pago</strong></p>
-            <p class="muted" style="margin-bottom: 0.65rem">
-              Seu imóvel recebe destaque dentro do portal + apoio de conteúdo para redes sociais.
-            </p>
-            <ul class="booster-card__checks">
-              <li>Destaque na busca da plataforma</li>
-              <li>1 post no Instagram da VN Prime</li>
-              <li>Roteiro + legenda prontos para Stories/Reels</li>
-            </ul>
-            <p class="booster-card__hint booster-card__hint--tip">Ideal para gerar movimento inicial e atrair os primeiros interessados</p>
-            <button
-              type="button"
-              class="btn btn--accent btn--sm booster-card__cta"
-              data-stripe-checkout
-              data-title="BOOSTER! Impulso"
-              data-amount="R$ 49,90"
-            >
-              Ative agora
-            </button>
-          </article>
-          <article class="booster-card">
-            <h4 class="booster-card__title">BOOSTER! PERFORMANCE — R$ 99,00</h4>
-            <p class="booster-card__tagline"><strong>Estratégia completa para gerar leads qualificados</strong></p>
-            <p class="muted" style="margin-bottom: 0.65rem">
-              Aqui seu imóvel entra em modo performance, com conteúdo profissional e tráfego direcionado.
-            </p>
-            <ul class="booster-card__checks">
-              <li>Edição profissional de vídeo (Reels)</li>
-              <li>Copy estratégica + tratamento de imagem</li>
-              <li>Campanha de tráfego pago (Meta Ads)</li>
-              <li>Disparo para base de investidores</li>
-            </ul>
-            <p class="booster-card__hint booster-card__hint--rocket">Mais alcance, mais leads e maior potencial de venda</p>
-            <button
-              type="button"
-              class="btn btn--accent btn--sm booster-card__cta"
-              data-stripe-checkout
-              data-title="BOOSTER! Performance"
-              data-amount="R$ 99,00"
-            >
-              Potencialize seu anúncio
-            </button>
-          </article>
-        </div>
-
-        <p style="margin-top: 2rem; margin-bottom: 0; text-align: center" class="muted">
-          Fechamento do funil: <a href="cadastrar.html">cadastro completo em 5 passos</a> (começa e termina na mesma
-          sessão). Sem plano selecionado, o imóvel fica <strong>PENDENTE_PLANO</strong> e fora da vitrine pública até
-          regularização.
-        </p>
-      </div>
-    </section>
-
-    <section class="section section-anchor" id="planos-corretor">
-      <div class="container">
-        <div class="section__head">
-          <h2>Rede de corretores</h2>
-          <p>
-            A <strong>rede de corretores</strong> VN Prime integra parceiros ao processo de <strong>venda completa</strong> e ao funil digital:
-            leads qualificados, material de marketing, contratos e painel de gestão — no padrão de marca alto padrão BH e região.
-          </p>
-        </div>
-        <div class="grid-3">
-          <article class="card card--featured">
-            <span class="card__tag">Assinatura</span>
-            <h3>Parceiro VN Prime</h3>
-            <p class="card__price">R$ 49,90</p>
-            <p class="muted" style="margin-top: -0.5rem">por mês</p>
-            <p>
-              Painel com <strong>funil de vendas</strong> (Kanban), <strong>leads centralizados</strong>, biblioteca de
-              e-mail marketing, roteiros de abordagem, gerador de PDF de apresentação e atalhos para a planilha
-              financeira do negócio. Em evolução: pesquisa de mercado por bairro e integrações com o grupo FactorOne.
-            </p>
-            <a class="btn btn--primary btn--sm" href="dashboard.html">Área do corretor</a>
-          </article>
-          <article class="card">
-            <span class="card__tag">Comissão</span>
-            <h3>Na venda completa (6%)</h3>
-            <p class="card__price">3%</p>
-            <p>
-              Quando você fecha a operação na <strong>venda completa</strong>, fica com <strong>metade da comissão total (3%)</strong>,
-              refletindo o atendimento ao comprador e à documentação — com a VN Prime na coordenação macro.
-            </p>
-          </article>
-          <article class="card">
-            <span class="card__tag">Regra de ouro</span>
-            <h3>Carteira + venda completa</h3>
-            <p class="card__price">Etiqueta</p>
-            <p>
-              Você enxerga seus próprios imóveis captados e <strong>todos os anúncios em venda completa (6%)</strong>, com selo
-              <em>Parceria disponível</em> na vitrine interna — priorizando oportunidades onde a operação e a comissão
-              estão alinhadas com a curadoria VN Prime.
-            </p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section section-anchor" id="planos-fotografo">
-      <div class="container">
-        <div class="section__head">
-          <h2>Planos e valores · Fotógrafos parceiros</h2>
-          <p>Pacotes únicos conforme metragem/tipologia (referência do plano 4%). Mural de jobs no painel.</p>
-        </div>
-        <div class="grid-3">
-          <article class="card">
-            <span class="card__tag">Até 1 quarto</span>
-            <h3>Pacote compacto</h3>
-            <p class="card__price">R$ 899</p>
-            <p>Ideal para studios e unidades enxutas — fotografia HDR e entrega para anúncio.</p>
-          </article>
-          <article class="card card--featured">
-            <span class="card__tag">2 a 3 quartos</span>
-            <h3>Pacote residencial</h3>
-            <p class="card__price">R$ 1.499</p>
-            <p>Cobertura completa dos ambientes principais e áreas comuns do condomínio quando aplicável.</p>
-          </article>
-          <article class="card">
-            <span class="card__tag">4+ quartos / mansões</span>
-            <h3>Pacote editorial</h3>
-            <p class="card__price">R$ 1.999</p>
-            <p>Produção ampla para imóveis de alto padrão; contrato digital e prazos em produção.</p>
-          </article>
-        </div>
-        <p style="margin-top: 1.5rem; text-align: center">
-          <a class="btn btn--accent" href="dashboard.html">Ver mural de jobs (painel)</a>
-        </p>
-      </div>
-    </section>
-
-    <section class="section section--alt section-anchor" id="parceiros">
-      <div class="container">
-        <div class="section__head">
-          <h2>Programa de parceiros</h2>
-          <p>Um único portal com visual que se adapta ao seu perfil (ouro, verde esmeralda ou bronze).</p>
-        </div>
-        <div class="grid-3">
-          <article class="card">
-            <h3>Corretor</h3>
-            <p>Leads, imóveis em <strong>venda completa</strong>, material de apoio e Kanban integrado.</p>
-            <a href="dashboard.html">Entrar como corretor</a>
-          </article>
-          <article class="card">
-            <h3>Fotógrafo</h3>
-            <p>Jobs de R$ 899 a R$ 1.999 e fluxo de aceite no painel.</p>
-            <a href="dashboard.html">Entrar como fotógrafo</a>
-          </article>
-          <article class="card">
-            <h3>Proprietário</h3>
-            <p>Métricas, boosters e gestão do anúncio após o cadastro.</p>
-            <a href="dashboard.html">Entrar como proprietário</a>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <footer class="site-footer">
-      <div class="container site-footer__inner">
-        <span>© 2026 VN Prime Imóveis — BH e região metropolitana.</span>
-        <span>
-          <a href="dashboard.html">Portal</a>
-          ·
-          <a href="admin.html">Curadoria</a>
-          ·
-          <a href="sobre.html">Contato</a>
-        </span>
-      </div>
-    </footer>
-
-    <script src="js/core.js"></script>
-    <script src="js/catalog-data.js"></script>
-    <script src="js/nav.js"></script>
-    <script src="js/index.js"></script>
-    <script src="js/planos-stripe-home.js"></script>
-  </body>
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
 </html>
