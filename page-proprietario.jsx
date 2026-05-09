@@ -5,6 +5,21 @@
 function ProprietarioPage({ onNav }) {
   return (
     <main style={{ background: 'var(--cream)' }}>
+      {/* Back to Vender */}
+      <div style={{ background: '#fff', borderBottom: '1px solid var(--border)', padding: '12px 0' }}>
+        <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto' }}>
+          <button onClick={() => onNav('vender')} style={{
+            background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex',
+            alignItems: 'center', gap: 7, fontFamily: 'DM Sans', fontSize: 13,
+            fontWeight: 600, color: 'var(--fg-2)', padding: 0,
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Voltar para perfis
+          </button>
+        </div>
+      </div>
       <ProprHero onNav={onNav} />
       <ProprPassos />
       <ProprTutorialFotos />
@@ -42,7 +57,7 @@ function ProprHero({ onNav }) {
             background: 'rgba(201,150,14,0.18)', border: '1px solid rgba(201,150,14,0.35)',
             borderRadius: 999, padding: '5px 14px', marginBottom: 18 }}>
             <span style={{ color: 'var(--gold-soft)', fontSize: 11, fontWeight: 700,
-              letterSpacing: '0.14em', textTransform: 'uppercase' }}>Canal · Proprietário</span>
+              letterSpacing: '0.14em', textTransform: 'uppercase' }}>Área do Proprietário</span>
           </div>
           <h1 style={{ color: '#fff', fontSize: 'clamp(2rem, 4.2vw, 3.2rem)',
             margin: '0 0 20px', lineHeight: 1.15 }}>
@@ -224,126 +239,125 @@ const FOTO_DICAS = [
     dont: ['Ordem aleatória', 'Pular cômodos', 'Fotos repetidas'] },
 ];
 
+const FOTO_FOTOS = [
+  'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=700&q=80',
+  'https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=700&q=80',
+  'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=700&q=80',
+  'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=700&q=80',
+  'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=700&q=80',
+  'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=700&q=80',
+];
+
 function ProprTutorialFotos() {
-  const [aberta, setAberta] = React.useState(null);
-  const [baixar, setBaixar] = React.useState(false);
+  const [ativa, setAtiva] = React.useState(0);
 
   return (
-    <section style={{ padding: 'clamp(4rem, 7vw, 5.5rem) 0',
-      background: 'linear-gradient(135deg, #0F2244 0%, #1E3560 100%)' }}>
+    <section style={{ padding: 'clamp(3rem, 6vw, 4.5rem) 0', background: '#fff',
+      borderTop: '1px solid var(--border)' }}>
       <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <Eyebrow>Guia exclusivo VN Prime</Eyebrow>
-          <h2 style={{ color: '#fff', margin: '8px 0 14px', fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>
+
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+          <Eyebrow color="var(--gold)">Guia exclusivo VN Prime</Eyebrow>
+          <h2 style={{ margin: '8px 0 10px', fontSize: 'clamp(1.5rem, 2.8vw, 2.2rem)' }}>
             Tutorial de fotos que vendem
           </h2>
-          <p style={{ color: 'rgba(250,249,246,0.82)', maxWidth: 520, margin: '0 auto', fontSize: 15, lineHeight: 1.7 }}>
-            Imóveis com fotos bem feitas vendem até 4× mais rápido. Siga nosso guia passo a passo e tire fotos profissionais com o celular.
+          <p style={{ color: 'var(--fg-2)', maxWidth: 520, margin: '0 auto', fontSize: 15, lineHeight: 1.6 }}>
+            Imóveis com fotos bem feitas vendem até 4× mais rápido. Tire fotos profissionais com o celular.
           </p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {FOTO_DICAS.map((d, i) => {
-            const open = aberta === i;
-            return (
-              <div key={i} style={{
-                background: open ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.06)',
-                border: `1px solid ${open ? d.cor + '50' : 'rgba(255,255,255,0.1)'}`,
-                borderRadius: 14, overflow: 'hidden', transition: 'all 0.2s',
-              }}>
-                <button onClick={() => setAberta(open ? null : i)}
-                  style={{ width: '100%', border: 'none', background: 'none',
-                    padding: '18px 22px', cursor: 'pointer', textAlign: 'left',
-                    display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <span style={{
-                    width: 44, height: 44, borderRadius: 10, flexShrink: 0,
-                    background: `${d.cor}22`, color: d.cor,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
-                  }}>{d.icon}</span>
-                  <div style={{ flex: 1, textAlign: 'left' }}>
-                    <div style={{ fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700,
-                      letterSpacing: '0.1em', textTransform: 'uppercase',
-                      color: d.cor, marginBottom: 3 }}>Dica {String(i+1).padStart(2,'0')}</div>
-                    <div style={{ fontFamily: 'Playfair Display', fontSize: 17, fontWeight: 600, color: '#fff' }}>{d.title}</div>
-                  </div>
-                  <span style={{ color: 'rgba(250,249,246,0.5)', fontSize: 18, transition: 'transform 0.2s',
-                    transform: open ? 'rotate(180deg)' : 'none', flexShrink: 0 }}>▾</span>
-                </button>
+        {/* Half + Half layout */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 32, alignItems: 'start' }}>
 
-                {open && (
-                  <div style={{ padding: '0 22px 22px', display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
-                    <div>
-                      <p style={{ color: 'rgba(250,249,246,0.82)', fontSize: 14, lineHeight: 1.75, margin: '0 0 16px' }}>
-                        {d.desc}
-                      </p>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                        <div style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)',
-                          borderRadius: 10, padding: '12px 14px' }}>
-                          <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em',
-                            textTransform: 'uppercase', color: '#10B981', marginBottom: 8 }}>✓ Faça</div>
-                          {d.do_.map(x => (
-                            <div key={x} style={{ fontSize: 12.5, color: 'rgba(250,249,246,0.85)',
-                              marginBottom: 4, display: 'flex', gap: 6 }}>
-                              <span style={{ color: '#10B981', flexShrink: 0 }}>✓</span>{x}
-                            </div>
-                          ))}
-                        </div>
-                        <div style={{ background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.22)',
-                          borderRadius: 10, padding: '12px 14px' }}>
-                          <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em',
-                            textTransform: 'uppercase', color: '#F87171', marginBottom: 8 }}>✕ Evite</div>
-                          {d.dont.map(x => (
-                            <div key={x} style={{ fontSize: 12.5, color: 'rgba(250,249,246,0.85)',
-                              marginBottom: 4, display: 'flex', gap: 6 }}>
-                              <span style={{ color: '#F87171', flexShrink: 0 }}>✕</span>{x}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+          {/* Left: compact tip list */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {FOTO_DICAS.map((d, i) => (
+              <button key={i} onClick={() => setAtiva(i)} style={{
+                background: ativa === i ? `${d.cor}10` : '#fff',
+                border: `1.5px solid ${ativa === i ? d.cor : 'var(--border)'}`,
+                borderRadius: 14, padding: '14px 18px', cursor: 'pointer', textAlign: 'left',
+                transition: 'all 0.18s', boxShadow: ativa === i ? `0 4px 18px ${d.cor}20` : 'none',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: ativa === i ? 10 : 0 }}>
+                  <span style={{ width: 38, height: 38, borderRadius: 9, flexShrink: 0,
+                    background: `${d.cor}18`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 18 }}>{d.icon}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontFamily: 'DM Sans', fontSize: 10, fontWeight: 700,
+                      letterSpacing: '0.1em', textTransform: 'uppercase', color: d.cor, marginBottom: 2 }}>
+                      Dica {String(i+1).padStart(2,'0')}
                     </div>
-                    {/* Visual tip */}
-                    <div style={{
-                      borderRadius: 12, overflow: 'hidden', position: 'relative', minHeight: 160,
-                      backgroundImage: [
-                        'url(https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=600&q=80)',
-                        'url(https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=600&q=80)',
-                        'url(https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=600&q=80)',
-                        'url(https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=600&q=80)',
-                        'url(https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=600&q=80)',
-                      ][i],
-                      backgroundSize: 'cover', backgroundPosition: 'center',
-                    }}>
-                      <div style={{ position: 'absolute', inset: 0,
-                        background: 'linear-gradient(to top, rgba(15,34,68,0.7), transparent)' }} />
-                      <div style={{ position: 'absolute', bottom: 10, left: 12,
-                        fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700,
-                        color: 'rgba(250,249,246,0.9)', letterSpacing: '0.06em' }}>
-                        Exemplo de boa foto
+                    <div style={{ fontWeight: 600, fontSize: 14.5, color: 'var(--navy)' }}>{d.title}</div>
+                  </div>
+                  <span style={{ color: 'var(--fg-2)', fontSize: 14, transition: 'transform 0.2s',
+                    transform: ativa === i ? 'rotate(90deg)' : 'none' }}>›</span>
+                </div>
+                {ativa === i && (
+                  <div>
+                    <p style={{ color: 'var(--fg-2)', fontSize: 13.5, lineHeight: 1.7, margin: '0 0 12px' }}>{d.desc}</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                      <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 9, padding: '10px 12px' }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                          color: '#15803d', marginBottom: 6 }}>✓ Faça</div>
+                        {d.do_.map(x => (
+                          <div key={x} style={{ fontSize: 12.5, color: '#15803d', marginBottom: 3, display: 'flex', gap: 5 }}>
+                            <span style={{ flexShrink: 0 }}>✓</span>{x}
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 9, padding: '10px 12px' }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                          color: '#dc2626', marginBottom: 6 }}>✕ Evite</div>
+                        {d.dont.map(x => (
+                          <div key={x} style={{ fontSize: 12.5, color: '#dc2626', marginBottom: 3, display: 'flex', gap: 5 }}>
+                            <span style={{ flexShrink: 0 }}>✕</span>{x}
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
                 )}
-              </div>
-            );
-          })}
-        </div>
+              </button>
+            ))}
+          </div>
 
-        {/* Download CTA */}
-        <div style={{ textAlign: 'center', marginTop: 32 }}>
-          <button onClick={() => setBaixar(true)} style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            background: 'rgba(201,150,14,0.15)', border: '1px solid rgba(201,150,14,0.4)',
-            borderRadius: 999, padding: '9px 20px', cursor: 'pointer',
-            fontFamily: 'DM Sans', fontSize: 13, fontWeight: 600, color: 'var(--gold-soft)',
-          }}>
-            ↓ Baixar checklist de fotos (PDF)
-          </button>
-          {baixar && (
-            <div style={{ marginTop: 14, fontSize: 13, color: 'rgba(250,249,246,0.65)' }}>
-              Disponível após cadastro — acesse pelo portal do proprietário.
+          {/* Right: photo gallery */}
+          <div style={{ position: 'sticky', top: 90 }}>
+            {/* Main photo */}
+            <div style={{ borderRadius: 18, overflow: 'hidden', marginBottom: 12,
+              boxShadow: '0 16px 48px rgba(15,34,68,0.15)', position: 'relative' }}>
+              <img src={FOTO_FOTOS[ativa]} alt="Foto de exemplo"
+                style={{ width: '100%', height: 320, objectFit: 'cover', display: 'block',
+                  transition: 'opacity 0.3s' }} />
+              <div style={{ position: 'absolute', inset: 0,
+                background: 'linear-gradient(to top, rgba(15,34,68,0.6) 0%, transparent 50%)' }} />
+              <div style={{ position: 'absolute', top: 14, left: 14,
+                background: 'rgba(15,34,68,0.75)', backdropFilter: 'blur(8px)',
+                borderRadius: 99, padding: '5px 14px',
+                fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700,
+                letterSpacing: '0.1em', textTransform: 'uppercase',
+                color: FOTO_DICAS[ativa]?.cor || 'var(--gold)' }}>
+                Dica {String(ativa+1).padStart(2,'0')} · {FOTO_DICAS[ativa]?.title}
+              </div>
+              <div style={{ position: 'absolute', bottom: 14, left: 16, right: 16,
+                fontFamily: 'DM Sans', fontSize: 12, fontWeight: 600, color: '#fff' }}>
+                Exemplo de boa foto
+              </div>
             </div>
-          )}
+            {/* Thumbnail strip */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 6 }}>
+              {FOTO_FOTOS.map((src, i) => (
+                <div key={i} onClick={() => setAtiva(i)} style={{
+                  borderRadius: 8, overflow: 'hidden', cursor: 'pointer',
+                  border: `2px solid ${ativa === i ? 'var(--gold)' : 'transparent'}`,
+                  transition: 'border-color 0.15s', opacity: ativa === i ? 1 : 0.65,
+                }}>
+                  <img src={src} alt={`Dica ${i+1}`}
+                    style={{ width: '100%', height: 44, objectFit: 'cover', display: 'block' }} />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>

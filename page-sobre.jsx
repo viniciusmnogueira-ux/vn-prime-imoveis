@@ -35,7 +35,7 @@ function SobrePage({ onNav }) {
             <Eyebrow color="var(--gold)">Nossa missão</Eyebrow>
             <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', margin: '8px 0 28px' }}>A VN Prime Imóveis</h2>
             <p style={{ color: 'var(--fg-2)', fontSize: 15, lineHeight: 1.85, marginBottom: 20 }}>
-              A VN Prime Imóveis é uma plataforma imobiliária de alto padrão, com atuação em Belo Horizonte e região metropolitana, especialmente em mercados estratégicos como Nova Lima, Alphaville, Belvedere e Savassi.
+              A VN Prime Imóveis é uma plataforma imobiliária de alto padrão, com atuação em Belo Horizonte e região metropolitana, especialmente em mercados estratégicos como Nova Lima, Alphaville, Belvedere e BH e região.
             </p>
             <p style={{ color: 'var(--fg-2)', fontSize: 15, lineHeight: 1.85, marginBottom: 20 }}>
               Conectamos proprietários, corretores e especialistas em um único ecossistema, combinando tecnologia, curadoria e estratégia comercial para gerar mais eficiência na venda de imóveis.
@@ -65,7 +65,7 @@ function SobrePage({ onNav }) {
                 fontFamily: 'Cinzel', fontWeight: 700, fontSize: 15, color: '#fff', flexShrink: 0 }}>VN</div>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 13.5, color: 'var(--navy)' }}>Curadoria VN Prime</div>
-                <div style={{ fontSize: 12, color: 'var(--fg-2)' }}>BH · Nova Lima · Alphaville</div>
+                <div style={{ fontSize: 12, color: 'var(--fg-2)' }}>BH · BH e região · Alphaville</div>
               </div>
             </div>
           </div>
@@ -211,29 +211,60 @@ function SobrePage({ onNav }) {
                 fontFamily: 'Cinzel', fontWeight: 700, fontSize: 20, color: '#fff',
               }}>VN</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 700, fontSize: 17, color: 'var(--navy)', marginBottom: 3 }}>Vinicius Nogueira</div>
+                <div style={{ fontWeight: 700, fontSize: 17, color: 'var(--navy)', marginBottom: 3 }}>VN Prime Imóveis</div>
                 <div style={{ fontSize: 13, color: 'var(--gold)', fontWeight: 600, marginBottom: 16 }}>
-                  VN Prime Imóveis · Fundador
+                  Plataforma imobiliária de alto padrão · BH e região
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   <a href="tel:+5531984144250" style={{
                     display: 'flex', alignItems: 'center', gap: 10,
                     fontSize: 14, color: 'var(--navy)', textDecoration: 'none', fontWeight: 500,
                   }}>
-                    <span style={{
-                      width: 32, height: 32, borderRadius: '50%', background: 'rgba(201,150,14,0.12)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0,
-                    }}>📞</span>
+                    <span style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(201,150,14,0.12)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}>📞</span>
                     (31) 98414-4250
+                  </a>
+                  <a href="https://wa.me/5531984144250" target="_blank" rel="noopener" style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    fontSize: 14, color: 'var(--navy)', textDecoration: 'none', fontWeight: 500,
+                  }}>
+                    <span style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(37,211,102,0.12)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.553 4.117 1.522 5.846L0 24l6.335-1.506A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.886 0-3.653-.497-5.187-1.362l-.371-.22-3.762.895.939-3.652-.241-.383A9.974 9.974 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                    </span>
+                    WhatsApp direto
+                  </a>
+                  <a href="https://instagram.com/vnprimeimoveis" target="_blank" rel="noopener" style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    fontSize: 14, color: 'var(--navy)', textDecoration: 'none', fontWeight: 500,
+                  }}>
+                    <span style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(225,48,108,0.1)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#E1306C" strokeWidth="2">
+                        <rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/>
+                        <circle cx="17.5" cy="6.5" r="0.5" fill="#E1306C"/>
+                      </svg>
+                    </span>
+                    @vnprimeimoveis
+                  </a>
+                  <a href="https://linkedin.com/company/vnprimeimoveis" target="_blank" rel="noopener" style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    fontSize: 14, color: 'var(--navy)', textDecoration: 'none', fontWeight: 500,
+                  }}>
+                    <span style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(0,119,181,0.1)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="#0077B5">
+                        <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/>
+                      </svg>
+                    </span>
+                    LinkedIn VN Prime
                   </a>
                   <a href="https://www.vnprimeimoveis.com.br" target="_blank" rel="noopener" style={{
                     display: 'flex', alignItems: 'center', gap: 10,
                     fontSize: 14, color: 'var(--navy)', textDecoration: 'none', fontWeight: 500,
                   }}>
-                    <span style={{
-                      width: 32, height: 32, borderRadius: '50%', background: 'rgba(201,150,14,0.12)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0,
-                    }}>🌐</span>
+                    <span style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(201,150,14,0.12)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}>🌐</span>
                     www.vnprimeimoveis.com.br
                   </a>
                 </div>
@@ -263,7 +294,7 @@ function SobrePage({ onNav }) {
                 letterSpacing: '0.12em', textTransform: 'uppercase',
                 color: 'var(--gold-soft)', marginBottom: 8 }}>Portfólio</div>
               <div style={{ color: 'rgba(250,249,246,0.88)', fontSize: 13.5, lineHeight: 1.55 }}>
-                BH · Nova Lima · Alphaville · Belvedere · Savassi
+                BH · BH e região · Alphaville · BH e região · BH e região
               </div>
             </div>
           </div>

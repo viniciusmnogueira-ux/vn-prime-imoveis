@@ -6,58 +6,67 @@ function VenderHubPage({ onNav }) {
       id: 'proprietario',
       title: 'Proprietário',
       subtitle: 'Quero vender meu imóvel',
-      desc: 'Escolha entre taxa fixa sem comissão, 3% com suporte VN Prime ou 6% com corretor dedicado. Em todos: 30 dias grátis de gestão financeira FactorOne.',
+      desc: 'Taxa fixa sem comissão, 3% com suporte VN Prime ou 6% com corretor dedicado. Em todos: 30 dias grátis de gestão financeira.',
       modality: 'Direta · Assistida · Completa',
       price: 'a partir de R$ 197',
       priceLabel: 'ou 3% / 6% sobre a venda',
+      photo: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=700&q=80',
       bullets: [
         'R$ 197 taxa fixa ou comissão só no sucesso',
         'IA para descrição · tutorial de fotos',
         'Endereço privado — vitrine exibe só o bairro',
-        'Pacotes de foto como add-on (qualquer plano)',
+        'Pacotes de foto como add-on',
         '30 dias grátis FactorOne — gestão financeira',
       ],
       icon: 'P',
       accent: 'var(--gold)',
+      accentHex: '#C9960E',
       cta: 'Anunciar meu imóvel',
+      portalLabel: 'Portal do Proprietário',
     },
     {
       id: 'corretor',
       title: 'Corretor parceiro',
       subtitle: 'Sou corretor credenciado',
-      desc: 'Acesse leads qualificados, imóveis em Venda Completa (6%) e ferramentas de gestão. Freemium com upgrade por R$ 49,90/mês.',
+      desc: 'Leads qualificados, imóveis em Venda Completa (6%) e CRM Kanban. Freemium disponível — comece sem pagar nada.',
       modality: 'Rede de Corretores',
       price: 'R$ 49,90',
       priceLabel: 'por mês · freemium disponível',
+      photo: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=700&q=80',
       bullets: [
-        'Leads com contato completo',
-        'Imóveis VN Prime em plano 6%',
-        'Funil Kanban de vendas',
+        'Leads com contato completo (WhatsApp + e-mail)',
+        'Portfólio de imóveis em plano 6%',
+        'Funil Kanban de vendas integrado',
         'IA para descrição de imóveis',
-        '3% de comissão garantida',
+        '3% de comissão garantida em cada venda',
       ],
       icon: 'C',
       accent: '#059669',
+      accentHex: '#059669',
       cta: 'Acessar portal do corretor',
+      portalLabel: 'Portal do Corretor',
     },
     {
       id: 'incorporadora',
       title: 'Incorporadoras',
       subtitle: 'Tenho um lançamento',
-      desc: 'Plano enterprise com vitrine exclusiva, plantas interativas e equipe de plantão VN Prime dedicada.',
+      desc: 'Plano enterprise com vitrine exclusiva, plantas interativas e gestão de mídias VN Prime dedicada.',
       modality: 'Lançamentos',
       price: 'Sob consulta',
       priceLabel: 'plano dedicado',
+      photo: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=700&q=80',
       bullets: [
         'Página dedicada do empreendimento',
         'Plantas e tour virtual 3D',
-        'Equipe de plantão exclusiva',
+        'Gestão de mídias e portfólio exclusivo',
         'Mídia paga compartilhada',
         'BOOSTER para unidades em estoque',
       ],
       icon: 'I',
       accent: '#B87333',
+      accentHex: '#B87333',
       cta: 'Falar com comercial',
+      portalLabel: 'Canal de Lançamentos',
     },
   ];
 
@@ -94,7 +103,7 @@ function VenderHubPage({ onNav }) {
           gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))' }}>
           {profiles.map(p => (
             <ProfileCard key={p.id} profile={p}
-              onClick={() => onNav(p.id === 'proprietario' ? 'proprietario' : p.id === 'corretor' ? 'corretor' : 'lancamentos')} />
+              onClick={() => onNav(p.id === 'proprietario' ? 'proprietario' : p.id === 'corretor' ? 'corretor-canal' : 'lancamentos')} />
           ))}
         </div>
       </section>
@@ -133,58 +142,83 @@ function ProfileCard({ profile, onClick }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: '#fff', borderRadius: 16, border: '1px solid var(--border)',
-        boxShadow: hovered ? '0 22px 60px rgba(15,34,68,0.18)' : '0 12px 40px rgba(15,34,68,0.10)',
+        background: '#fff', borderRadius: 20, border: '1px solid var(--border)',
+        boxShadow: hovered ? '0 28px 70px rgba(15,34,68,0.20)' : '0 12px 40px rgba(15,34,68,0.10)',
         padding: 0, cursor: 'pointer', textAlign: 'left',
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
-        transition: 'transform 0.2s ease, box-shadow 0.2s',
-        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
-        borderTop: `4px solid ${p.accent}`,
+        transition: 'transform 0.22s ease, box-shadow 0.22s',
+        transform: hovered ? 'translateY(-5px)' : 'translateY(0)',
       }}>
-      <div style={{ padding: '24px 26px 6px' }}>
-        <div style={{
-          width: 52, height: 52, borderRadius: 12,
-          background: `${p.accent}15`, color: p.accent,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'Cinzel, serif', fontSize: 24, fontWeight: 700, marginBottom: 16,
-        }}>{p.icon}</div>
-        <div style={{ fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700,
-          letterSpacing: '0.12em', textTransform: 'uppercase',
-          color: p.accent, marginBottom: 6 }}>{p.subtitle}</div>
-        <h3 style={{ margin: '0 0 8px', fontSize: 22, lineHeight: 1.2 }}>{p.title}</h3>
-        <p style={{ color: 'var(--fg-2)', fontSize: 14, lineHeight: 1.6, marginBottom: 16 }}>{p.desc}</p>
 
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
-          <span style={{ fontFamily: 'Playfair Display', fontSize: 28, fontWeight: 700, color: p.accent, lineHeight: 1 }}>{p.price}</span>
-          <span style={{ fontSize: 12, color: 'var(--fg-2)' }}>{p.priceLabel}</span>
+      {/* Photo header */}
+      <div style={{ position: 'relative', height: 180, overflow: 'hidden' }}>
+        <img src={p.photo} alt={p.title}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+            transform: hovered ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.4s ease' }} />
+        <div style={{ position: 'absolute', inset: 0,
+          background: `linear-gradient(to top, ${p.accentHex}cc 0%, rgba(0,0,0,0.3) 50%, transparent 100%)` }} />
+        {/* Portal badge */}
+        <div style={{ position: 'absolute', top: 12, right: 12,
+          background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(255,255,255,0.3)',
+          borderRadius: 999, padding: '4px 12px',
+          fontFamily: 'DM Sans', fontSize: 10, fontWeight: 700,
+          letterSpacing: '0.1em', textTransform: 'uppercase', color: '#fff' }}>
+          {p.portalLabel}
         </div>
-        <div style={{ fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em',
+        {/* Icon + title overlay */}
+        <div style={{ position: 'absolute', bottom: 14, left: 18, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10,
+            background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(6px)',
+            border: '1.5px solid rgba(255,255,255,0.45)', color: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: 'Cinzel, serif', fontSize: 18, fontWeight: 700 }}>{p.icon}</div>
+          <div>
+            <div style={{ fontFamily: 'DM Sans', fontSize: 10, fontWeight: 700,
+              letterSpacing: '0.12em', textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>{p.subtitle}</div>
+            <div style={{ fontFamily: 'Playfair Display', fontSize: 18, fontWeight: 700,
+              color: '#fff', lineHeight: 1.1 }}>{p.title}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div style={{ padding: '18px 22px 6px' }}>
+        <p style={{ color: 'var(--fg-2)', fontSize: 13.5, lineHeight: 1.65, marginBottom: 14 }}>{p.desc}</p>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 3 }}>
+          <span style={{ fontFamily: 'Playfair Display', fontSize: 26, fontWeight: 700,
+            color: p.accentHex, lineHeight: 1 }}>{p.price}</span>
+          <span style={{ fontSize: 11.5, color: 'var(--fg-2)' }}>{p.priceLabel}</span>
+        </div>
+        <div style={{ fontFamily: 'DM Sans', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em',
           textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 14 }}>{p.modality}</div>
       </div>
 
-      <div style={{ borderTop: '1px solid var(--border)', padding: '18px 26px', flex: 1,
-        background: hovered ? 'rgba(250,249,244,0.6)' : 'transparent', transition: 'background 0.2s' }}>
+      <div style={{ borderTop: '1px solid var(--border)', padding: '14px 22px', flex: 1,
+        background: hovered ? `${p.accentHex}06` : 'transparent', transition: 'background 0.2s' }}>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0,
-          display: 'flex', flexDirection: 'column', gap: 8 }}>
+          display: 'flex', flexDirection: 'column', gap: 7 }}>
           {p.bullets.map(b => (
             <li key={b} style={{ display: 'flex', gap: 10, alignItems: 'flex-start',
-              fontFamily: 'DM Sans', fontSize: 13.5, color: 'var(--fg-2)', lineHeight: 1.5 }}>
-              <span style={{ color: p.accent, fontWeight: 700, flexShrink: 0 }}>✓</span>
+              fontFamily: 'DM Sans', fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.5 }}>
+              <span style={{ color: p.accentHex, fontWeight: 700, flexShrink: 0, marginTop: 1 }}>✓</span>
               <span>{b}</span>
             </li>
           ))}
         </ul>
       </div>
 
-      <div style={{ padding: '18px 26px 22px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+      <div style={{ padding: '16px 22px 20px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+        borderTop: `3px solid ${hovered ? p.accentHex : 'transparent'}`, transition: 'border-color 0.2s' }}>
         <span style={{ fontFamily: 'DM Sans', fontSize: 14, fontWeight: 600,
-          color: hovered ? p.accent : 'var(--navy)' }}>{p.cta}</span>
-        <span style={{ width: 32, height: 32, borderRadius: 999,
-          background: hovered ? p.accent : 'rgba(15,34,68,0.06)',
+          color: hovered ? p.accentHex : 'var(--navy)', transition: 'color 0.2s' }}>{p.cta}</span>
+        <span style={{ width: 34, height: 34, borderRadius: 999,
+          background: hovered ? p.accentHex : 'rgba(15,34,68,0.06)',
           color: hovered ? '#fff' : 'var(--navy)',
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 16, fontWeight: 600, transition: 'all 0.2s' }}>→</span>
+          fontSize: 16, fontWeight: 600, transition: 'all 0.2s', flexShrink: 0 }}>→</span>
       </div>
     </button>
   );

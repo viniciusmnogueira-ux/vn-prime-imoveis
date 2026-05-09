@@ -2,12 +2,28 @@
 function CorretorCanalPage({ onNav }) {
   return (
     <main style={{ background: 'var(--cream)' }}>
+      {/* Back to Vender */}
+      <div style={{ background: '#fff', borderBottom: '1px solid var(--border)', padding: '12px 0' }}>
+        <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto' }}>
+          <button onClick={() => onNav('vender')} style={{
+            background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex',
+            alignItems: 'center', gap: 7, fontFamily: 'DM Sans', fontSize: 13,
+            fontWeight: 600, color: 'var(--fg-2)', padding: 0,
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Voltar para perfis
+          </button>
+        </div>
+      </div>
       <CorretorHero onNav={onNav} />
       <CorretorPassos />
       <CorretorFeatures />
       <CorretorKanban />
       <CorretorPlanos onNav={onNav} />
       <CorretorAreas />
+      <CorretorDepoimento />
       <CorretorBeneficios />
       <CorretorCtaFinal onNav={onNav} />
     </main>
@@ -35,7 +51,7 @@ function CorretorHero({ onNav }) {
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8,
             background: 'rgba(5,150,105,0.18)', border: '1px solid rgba(5,150,105,0.35)',
             borderRadius: 999, padding: '5px 14px', marginBottom: 18 }}>
-            <span style={{ color: '#10B981', fontSize: 13 }}>🤝</span>
+            <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
             <span style={{ fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700,
               letterSpacing: '0.14em', textTransform: 'uppercase', color: '#10B981' }}>
               Canal · Corretor Parceiro
@@ -74,39 +90,30 @@ function CorretorHero({ onNav }) {
           </div>
         </div>
 
-        {/* Mini CRM mockup */}
-        <div style={{ background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.14)', borderRadius: 18, padding: 20, position: 'relative' }}>
-          <div style={{ fontSize: 10.5, color: 'rgba(250,249,246,0.6)', letterSpacing: '0.1em',
-            textTransform: 'uppercase', fontFamily: 'DM Sans', marginBottom: 14 }}>
-            ▸ Dashboard · Pipeline
+        {/* Hero visual: photo + floating stats */}
+        <div style={{ position: 'relative' }}>
+          <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.38)' }}>
+            <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=820&q=80"
+              alt="Corretor mostrando imóvel a clientes"
+              style={{ width: '100%', height: 380, objectFit: 'cover', display: 'block' }} />
           </div>
-          {[
-            ['Leads novos hoje', '12', '#10B981', '↑ 3 vs ontem'],
-            ['Em agendamento', '5', '#F59E0B', '2 confirmados'],
-            ['Em proposta', '3', '#3B82F6', 'R$ 8,4M total'],
-            ['Fechado este mês', 'R$ 4,2M', 'var(--gold)', '3 unidades'],
-          ].map(([l, v, c, sub]) => (
-            <div key={l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-              <div>
-                <div style={{ color: 'rgba(250,249,246,0.85)', fontFamily: 'DM Sans', fontSize: 13.5 }}>{l}</div>
-                <div style={{ color: 'rgba(250,249,246,0.45)', fontSize: 11, marginTop: 2 }}>{sub}</div>
-              </div>
-              <span style={{ fontFamily: 'Playfair Display', fontSize: 20, fontWeight: 700, color: c }}>{v}</span>
-            </div>
-          ))}
-          <div style={{ marginTop: 14, display: 'flex', gap: 6 }}>
-            {['Leads', 'Visitas', 'Propostas', 'Contratos'].map((s, i) => (
-              <div key={s} style={{ flex: 1, borderRadius: 6, height: 6,
-                background: i === 0 ? '#10B981' : i === 1 ? '#F59E0B' : i === 2 ? '#3B82F6' : 'var(--gold)',
-                opacity: [1, 0.8, 0.6, 0.4][i] }} />
-            ))}
+          {/* Floating stat cards */}
+          <div style={{ position: 'absolute', top: 18, left: -18, background: 'rgba(5,150,105,0.95)',
+            backdropFilter: 'blur(12px)', borderRadius: 14, padding: '12px 18px',
+            boxShadow: '0 8px 28px rgba(0,0,0,0.3)' }}>
+            <div style={{ fontFamily: 'Playfair Display', fontSize: 22, fontWeight: 700, color: '#fff', lineHeight: 1 }}>R$ 4,2M</div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', marginTop: 3, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>fechado este mês</div>
           </div>
-          <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between' }}>
-            {['Leads', 'Visitas', 'Propostas', 'Contratos'].map(s => (
-              <div key={s} style={{ fontSize: 9.5, color: 'rgba(250,249,246,0.45)', fontFamily: 'DM Sans' }}>{s}</div>
-            ))}
+          <div style={{ position: 'absolute', bottom: 22, right: -14, background: 'rgba(255,255,255,0.95)',
+            backdropFilter: 'blur(12px)', borderRadius: 14, padding: '12px 18px',
+            boxShadow: '0 8px 28px rgba(0,0,0,0.25)' }}>
+            <div style={{ fontFamily: 'Playfair Display', fontSize: 22, fontWeight: 700, color: 'var(--navy)', lineHeight: 1 }}>12</div>
+            <div style={{ fontSize: 10, color: 'var(--fg-2)', marginTop: 3, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>leads novos hoje</div>
+          </div>
+          <div style={{ position: 'absolute', bottom: 88, left: -14, background: 'rgba(201,150,14,0.95)',
+            backdropFilter: 'blur(12px)', borderRadius: 14, padding: '10px 16px',
+            boxShadow: '0 8px 28px rgba(0,0,0,0.25)' }}>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.9)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>3% garantido · cada venda</div>
           </div>
         </div>
       </div>
@@ -117,16 +124,16 @@ function CorretorHero({ onNav }) {
 // ─── COMO FUNCIONA ────────────────────────────────────────────────────────────
 function CorretorPassos() {
   const passos = [
-    { n: '01', icon: '🔑', color: '#059669',
+    { n: '01', color: '#059669',
       title: 'Crie sua conta gratuita',
       desc: 'Cadastro sem custo. No modelo freemium você já vê o portfólio, leads e ferramentas — sem precisar pagar nada para começar.' },
-    { n: '02', icon: '🏠', color: 'var(--gold)',
+    { n: '02', color: 'var(--gold)',
       title: 'Acesse o portfólio VN Prime',
       desc: 'Imóveis em Venda Completa (6%) disponíveis para você intermediar. Fotos profissionais, descrição editorial e preço de mercado já prontos.' },
-    { n: '03', icon: '📲', color: '#3B82F6',
+    { n: '03', color: '#3B82F6',
       title: 'Receba leads qualificados',
       desc: 'Compradores que passaram pelo filtro VN Prime chegam direto para você. Contato completo, perfil e interesse já documentados.' },
-    { n: '04', icon: '💰', color: '#B87333',
+    { n: '04', color: '#B87333',
       title: 'Feche e receba 3%',
       desc: 'Comissão de 3% garantida sobre o valor da venda. Processamento pelo portal, sem negociação de percentual a cada negócio.' },
   ];
@@ -152,9 +159,9 @@ function CorretorPassos() {
                 fontFamily: 'Cinzel, serif', fontSize: 68, fontWeight: 700,
                 color: 'rgba(15,34,68,0.04)', lineHeight: 1, userSelect: 'none' }}>{p.n}</div>
               <div style={{ width: 52, height: 52, borderRadius: 14,
-                background: `${p.color === 'var(--gold)' ? '#C9960E' : p.color}18`, color: p.color,
+                background: p.color === 'var(--gold)' ? '#C9960E' : p.color, color: '#fff',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 24, marginBottom: 18 }}>{p.icon}</div>
+                fontFamily: 'Cinzel, serif', fontSize: 18, fontWeight: 700, marginBottom: 18 }}>{p.n}</div>
               <div style={{ fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700,
                 letterSpacing: '0.12em', textTransform: 'uppercase', color: p.color, marginBottom: 8 }}>Passo {p.n}</div>
               <h3 style={{ margin: '0 0 10px', fontSize: 19, lineHeight: 1.25 }}>{p.title}</h3>
@@ -170,18 +177,68 @@ function CorretorPassos() {
 // ─── FEATURES ────────────────────────────────────────────────────────────────
 function CorretorFeatures() {
   const features = [
-    { icon: '📋', title: 'Portfólio premium',
-      desc: 'Acesso a imóveis curados em plano 6% — fotos profissionais, descrição editorial e preço validado pela curadoria VN Prime.' },
-    { icon: '🎯', title: 'Leads pré-qualificados',
-      desc: 'Compradores que passaram pela VN Prime: perfil, orçamento e interesse documentados. Você não perde tempo filtrando curiosos.' },
-    { icon: '🤖', title: 'IA de descrição grátis',
-      desc: 'Gere descrições editoriais para qualquer imóvel da sua carteira particular — o mesmo gerador da plataforma, sem custo adicional.' },
-    { icon: '📊', title: 'Funil Kanban',
-      desc: 'CRM integrado com pipeline visual: leads → agendamento → visita → proposta → contrato. Histórico completo de cada negociação.' },
-    { icon: '📚', title: 'Material de marketing',
-      desc: 'Templates prontos para Instagram, WhatsApp e apresentações. Personalizáveis com sua identidade e os imóveis da VN Prime.' },
-    { icon: '⚖️', title: 'Compliance e documentação',
-      desc: 'Modelos de contrato, CRECI verificado, suporte jurídico básico e checklist documental para cada etapa da venda.' },
+    {
+      icon: (
+        React.createElement('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: '#059669', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+          React.createElement('rect', { x: 3, y: 3, width: 18, height: 18, rx: 2 }),
+          React.createElement('path', { d: 'M3 9h18M9 21V9' })
+        )
+      ),
+      title: 'Portfólio premium',
+      desc: 'Acesso a imóveis curados em plano 6% — fotos profissionais, descrição editorial e preço validado pela curadoria VN Prime.',
+    },
+    {
+      icon: (
+        React.createElement('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: '#059669', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+          React.createElement('path', { d: 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2' }),
+          React.createElement('circle', { cx: 9, cy: 7, r: 4 }),
+          React.createElement('path', { d: 'M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75' })
+        )
+      ),
+      title: 'Leads pré-qualificados',
+      desc: 'Compradores que passaram pela VN Prime: perfil, orçamento e interesse documentados. Você não perde tempo filtrando curiosos.',
+    },
+    {
+      icon: (
+        React.createElement('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: '#059669', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+          React.createElement('path', { d: 'M12 2a10 10 0 100 20 10 10 0 000-20z' }),
+          React.createElement('path', { d: 'M12 8v4l3 3' })
+        )
+      ),
+      title: 'IA de descrição grátis',
+      desc: 'Gere descrições editoriais para qualquer imóvel da sua carteira — o mesmo gerador da plataforma, sem custo adicional.',
+    },
+    {
+      icon: (
+        React.createElement('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: '#059669', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+          React.createElement('rect', { x: 2, y: 3, width: 20, height: 14, rx: 2 }),
+          React.createElement('path', { d: 'M8 21h8M12 17v4' }),
+          React.createElement('path', { d: 'M6 8h.01M10 8h8M6 12h12' })
+        )
+      ),
+      title: 'Funil Kanban',
+      desc: 'CRM integrado: leads → agendamento → visita → proposta → contrato. Histórico completo de cada negociação.',
+    },
+    {
+      icon: (
+        React.createElement('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: '#059669', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+          React.createElement('rect', { x: 3, y: 3, width: 18, height: 18, rx: 2 }),
+          React.createElement('path', { d: 'M3 9h18M3 15h18M9 3v18' })
+        )
+      ),
+      title: 'Material de marketing',
+      desc: 'Templates prontos para Instagram e WhatsApp — personalizáveis com sua identidade e os imóveis da VN Prime.',
+    },
+    {
+      icon: (
+        React.createElement('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: '#059669', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+          React.createElement('path', { d: 'M9 11l3 3L22 4' }),
+          React.createElement('path', { d: 'M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11' })
+        )
+      ),
+      title: 'Compliance e documentação',
+      desc: 'Modelos de contrato, CRECI verificado, suporte jurídico básico e checklist documental para cada etapa da venda.',
+    },
   ];
 
   return (
@@ -193,14 +250,31 @@ function CorretorFeatures() {
             Tudo que você precisa em um portal
           </h2>
         </div>
+
+        {/* Photo strip */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 40, borderRadius: 18, overflow: 'hidden' }}>
+          {[
+            ['https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80', 'Equipe VN Prime'],
+            ['https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&q=80', 'Reunião de negócio'],
+            ['https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&q=80', 'Corretor em campo'],
+          ].map(([src, alt]) => (
+            <div key={alt} style={{ position: 'relative', overflow: 'hidden', height: 180 }}>
+              <img src={src} alt={alt} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,34,68,0.55) 0%, transparent 60%)' }} />
+              <div style={{ position: 'absolute', bottom: 10, left: 12, fontSize: 11, color: '#fff',
+                fontFamily: 'DM Sans', fontWeight: 600, letterSpacing: '0.05em' }}>{alt}</div>
+            </div>
+          ))}
+        </div>
+
         <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
           {features.map(f => (
             <div key={f.title} style={{ background: '#fff', borderRadius: 16, padding: '24px 22px',
               border: '1px solid var(--border)', boxShadow: '0 4px 20px rgba(15,34,68,0.05)',
               display: 'flex', gap: 16, alignItems: 'flex-start' }}>
               <div style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0,
-                background: 'rgba(5,150,105,0.1)', color: '#059669',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
+                background: 'rgba(5,150,105,0.10)', border: '1px solid rgba(5,150,105,0.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {f.icon}
               </div>
               <div>
@@ -219,17 +293,17 @@ function CorretorFeatures() {
 function CorretorKanban() {
   const colunas = [
     { label: 'Leads novos', color: '#10B981', cards: [
-      { nome: 'Carlos M.', imovel: 'Apto · Savassi', valor: 'R$ 2,1M', tempo: 'há 2h' },
-      { nome: 'Ana L.', imovel: 'Casa · Nova Lima', valor: 'R$ 4,8M', tempo: 'há 5h' },
+      { nome: 'Carlos M.', imovel: 'Apto · BH e região', valor: 'R$ 2,1M', tempo: 'há 2h' },
+      { nome: 'Ana L.', imovel: 'Casa · BH e região', valor: 'R$ 4,8M', tempo: 'há 5h' },
     ]},
     { label: 'Em visita', color: '#F59E0B', cards: [
-      { nome: 'Pedro R.', imovel: 'Cobertura · Lourdes', valor: 'R$ 6,2M', tempo: 'amanhã 10h' },
+      { nome: 'Pedro R.', imovel: 'Cobertura · BH e região', valor: 'R$ 6,2M', tempo: 'amanhã 10h' },
     ]},
     { label: 'Em proposta', color: '#3B82F6', cards: [
-      { nome: 'Família S.', imovel: 'Casa · Belvedere', valor: 'R$ 9,5M', tempo: '3 dias' },
+      { nome: 'Família S.', imovel: 'Casa · BH e região', valor: 'R$ 9,5M', tempo: '3 dias' },
     ]},
     { label: 'Contratos', color: 'var(--gold)', cards: [
-      { nome: 'Ricardo F.', imovel: 'Apto · Funcionários', valor: 'R$ 1,9M', tempo: 'assinado' },
+      { nome: 'Ricardo F.', imovel: 'Apto · BH e região', valor: 'R$ 1,9M', tempo: 'assinado' },
     ]},
   ];
 
@@ -242,7 +316,7 @@ function CorretorKanban() {
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8,
               background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.25)',
               borderRadius: 999, padding: '5px 14px', marginBottom: 16 }}>
-              <span style={{ color: '#3B82F6', fontSize: 13 }}>📊</span>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#3B82F6', display: 'inline-block' }} />
               <span style={{ fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700,
                 letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--navy)' }}>
                 CRM integrado · Funil Kanban
@@ -388,10 +462,10 @@ function CorretorPlanos({ onNav }) {
 // ─── ÁREAS ───────────────────────────────────────────────────────────────────
 function CorretorAreas() {
   const grupos = [
-    { grupo: 'BH — Centro-Sul', cor: '#4F46E5', areas: ['Savassi', 'Funcionários', 'Lourdes', 'Serra', 'Anchieta', 'Santo Agostinho'] },
+    { grupo: 'BH — Centro-Sul', cor: '#4F46E5', areas: ['BH e região', 'Funcionários', 'Lourdes', 'Serra', 'Anchieta', 'Santo Agostinho'] },
     { grupo: 'BH — Oeste',      cor: '#0891B2', areas: ['Buritis', 'Estoril', 'Nova Suíça', 'Gutierrez', 'Santo Antônio'] },
     { grupo: 'BH — Pampulha',   cor: '#059669', areas: ['Pampulha', 'Santa Lúcia', 'Castelo', 'Itapoã', 'Universitário'] },
-    { grupo: 'Vetor Sul',        cor: '#0F766E', areas: ['Nova Lima', 'Vale do Sereno', 'Alphaville BH', 'Brumadinho'] },
+    { grupo: 'Vetor Sul',        cor: '#0F766E', areas: ['Nova Lima', 'Vetor Sul', 'Grande BH', 'Brumadinho'] },
     { grupo: 'Vetor Norte',      cor: '#6D28D9', areas: ['Lagoa Santa', 'Santa Luzia', 'Vespasiano', 'Pedro Leopoldo'] },
     { grupo: 'BH — Venda Nova',  cor: '#D97706', areas: ['Venda Nova', 'Jardim Leblon', 'São João Batista'] },
   ];
@@ -430,25 +504,107 @@ function CorretorAreas() {
   );
 }
 
+// ─── DEPOIMENTO ───────────────────────────────────────────────────────────────
+function CorretorDepoimento() {
+  return (
+    <section style={{ padding: 'clamp(4rem, 7vw, 5rem) 0', background: 'var(--gradient-navy-hero)' }}>
+      <div style={{ width: 'min(1100px, 94vw)', margin: '0 auto',
+        display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+        gap: 52, alignItems: 'center' }}>
+        <div style={{ position: 'relative' }}>
+          <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 28px 70px rgba(0,0,0,0.35)' }}>
+            <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=700&q=80"
+              alt="Corretor parceiro VN Prime"
+              style={{ width: '100%', height: 340, objectFit: 'cover', display: 'block' }} />
+          </div>
+          <div style={{ position: 'absolute', bottom: -18, right: -14,
+            background: 'rgba(5,150,105,0.95)', borderRadius: 14, padding: '14px 20px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
+            <div style={{ fontFamily: 'Playfair Display', fontSize: 26, fontWeight: 700, color: '#fff', lineHeight: 1 }}>340+</div>
+            <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.8)', marginTop: 3,
+              fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>corretores parceiros</div>
+          </div>
+        </div>
+        <div style={{ color: '#fff' }}>
+          <Eyebrow>Parceiro VN Prime · BH</Eyebrow>
+          <blockquote style={{ fontFamily: 'Playfair Display', fontSize: 'clamp(1.4rem, 2.5vw, 1.8rem)',
+            fontWeight: 600, lineHeight: 1.5, margin: '12px 0 20px', color: '#fff', fontStyle: 'italic' }}>
+            "Em três meses de parceria, fechei R$ 12M em transações usando leads do portal. O CRM e as fotos já prontas fazem toda a diferença."
+          </blockquote>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ width: 44, height: 44, borderRadius: '50%',
+              background: 'linear-gradient(135deg, #059669, #10B981)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontFamily: 'Cinzel, serif', fontSize: 18, fontWeight: 700, color: '#fff' }}>R</div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>Rafael M.</div>
+              <div style={{ fontSize: 12, color: 'rgba(250,249,246,0.6)' }}>CRECI-MG · BH e região · BH e região</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 28, marginTop: 28, flexWrap: 'wrap' }}>
+            {[['R$ 12M', 'em 3 meses'], ['8', 'imóveis fechados'], ['3%', 'split garantido']].map(([v, l]) => (
+              <div key={l}>
+                <div style={{ fontFamily: 'Playfair Display', fontSize: 24, fontWeight: 700,
+                  color: 'var(--gold-soft)', lineHeight: 1 }}>{v}</div>
+                <div style={{ fontSize: 11, color: 'rgba(250,249,246,0.5)', fontWeight: 600,
+                  letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: 4 }}>{l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── BENEFÍCIOS ───────────────────────────────────────────────────────────────
 function CorretorBeneficios() {
+  const items = [
+    {
+      icon: React.createElement('svg', { width: 28, height: 28, viewBox: '0 0 24 24', fill: 'none', stroke: '#059669', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+        React.createElement('rect', { x: 1, y: 4, width: 22, height: 16, rx: 2 }),
+        React.createElement('line', { x1: 1, y1: 10, x2: 23, y2: 10 })
+      ),
+      title: '30 dias FactorOne grátis',
+      desc: 'Gestão financeira pessoal inclusa para todos os corretores cadastrados, independente do plano.',
+    },
+    {
+      icon: React.createElement('svg', { width: 28, height: 28, viewBox: '0 0 24 24', fill: 'none', stroke: '#059669', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+        React.createElement('path', { d: 'M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z' }),
+        React.createElement('path', { d: 'M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z' })
+      ),
+      title: 'Capacitação mensal',
+      desc: 'Workshops sobre alto padrão, técnicas de fechamento, finanças imobiliárias e ferramentas VN Prime.',
+    },
+    {
+      icon: React.createElement('svg', { width: 28, height: 28, viewBox: '0 0 24 24', fill: 'none', stroke: '#059669', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+        React.createElement('line', { x1: 12, y1: 1, x2: 12, y2: 23 }),
+        React.createElement('path', { d: 'M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6' })
+      ),
+      title: 'Split transparente',
+      desc: '3% garantidos em cada venda. Percentual definido antes do primeiro contato — sem renegociação.',
+    },
+    {
+      icon: React.createElement('svg', { width: 28, height: 28, viewBox: '0 0 24 24', fill: 'none', stroke: '#059669', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+        React.createElement('path', { d: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z' })
+      ),
+      title: 'CRECI verificado',
+      desc: 'Sua credencial é validada na entrada. Compradores sabem que estão falando com corretores certificados.',
+    },
+  ];
+
   return (
     <section style={{ padding: 'clamp(3rem, 6vw, 4.5rem) 0', background: '#fff',
       borderTop: '1px solid var(--border)' }}>
       <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto',
         display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 28 }}>
-        {[
-          { icon: '📊', title: '30 dias FactorOne grátis',
-            desc: 'Gestão financeira pessoal inclusa para todos os corretores cadastrados, independente do plano.' },
-          { icon: '🎓', title: 'Capacitação mensal',
-            desc: 'Workshops sobre alto padrão, técnicas de fechamento, finanças imobiliárias e ferramentas VN Prime.' },
-          { icon: '🤝', title: 'Split transparente',
-            desc: '3% garantidos em cada venda. Percentual definido antes do primeiro contato — sem renegociação.' },
-          { icon: '🔒', title: 'CRECI verificado',
-            desc: 'Sua credencial é validada na entrada. Compradores sabem que estão falando com corretores certificados.' },
-        ].map(b => (
-          <div key={b.title} style={{ textAlign: 'center', padding: '20px 16px' }}>
-            <div style={{ fontSize: 36, marginBottom: 12 }}>{b.icon}</div>
+        {items.map(b => (
+          <div key={b.title} style={{ textAlign: 'center', padding: '24px 16px' }}>
+            <div style={{ width: 60, height: 60, borderRadius: 16,
+              background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.18)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              {b.icon}
+            </div>
             <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--navy)', marginBottom: 8 }}>{b.title}</div>
             <p style={{ fontSize: 13.5, color: 'var(--fg-2)', lineHeight: 1.65, margin: 0 }}>{b.desc}</p>
           </div>
@@ -465,8 +621,12 @@ function CorretorCtaFinal({ onNav }) {
       background: 'linear-gradient(135deg, #0F2244 0%, #1E3560 100%)', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
       <div style={{ width: 'min(720px, 94vw)', margin: '0 auto', textAlign: 'center' }}>
         <div style={{ width: 60, height: 60, borderRadius: '50%', margin: '0 auto 20px',
-          background: 'rgba(5,150,105,0.2)', border: '2px solid rgba(5,150,105,0.4)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>🤝</div>
+          background: '#059669', border: '2px solid rgba(5,150,105,0.6)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+          </svg>
+        </div>
         <h2 style={{ color: '#fff', margin: '0 0 14px', fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>
           Pronto para entrar na rede VN Prime?
         </h2>

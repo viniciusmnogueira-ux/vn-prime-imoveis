@@ -84,11 +84,11 @@ function Eyebrow({ children, color }) {
   );
 }
 
-// ImovelWeb-style operation tabs (Comprar / Alugar / Lançamentos)
+// ImovelWeb-style operation tabs (Comprar / Vender)
 function OperationTabs({ value, onChange }) {
   const tabs = [
     { id: 'compra', label: 'Comprar' },
-    { id: 'lancamento', label: 'Lançamentos' },
+    { id: 'venda',  label: 'Vender' },
   ];
   return (
     <div style={{ display: 'inline-flex', background: 'rgba(15,34,68,0.55)',
@@ -129,29 +129,6 @@ function Pill({ children, tone = 'gold', solid = false, style = {} }) {
   );
 }
 
-// Serviços dropdown card (desktop)
-function ServCard({ card, isActive, onClick }) {
-  const [hov, setHov] = React.useState(false);
-  return (
-    <button onClick={onClick}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        background: hov || isActive ? card.accent + '12' : 'transparent',
-        border: `2px solid ${isActive ? card.accent : hov ? card.accent + '55' : 'var(--border)'}`,
-        borderRadius: 12, padding: '14px 12px', cursor: 'pointer', textAlign: 'left',
-        transition: 'all 0.15s ease', width: '100%',
-      }}>
-      <div style={{ fontSize: 22, marginBottom: 10, lineHeight: 1 }}>{card.icon}</div>
-      <div style={{ fontFamily: 'DM Sans', fontWeight: 700, fontSize: 13.5, lineHeight: 1.2,
-        color: isActive || hov ? card.accent : 'var(--navy)', marginBottom: 4 }}>{card.label}</div>
-      <div style={{ fontFamily: 'DM Sans', fontSize: 10.5, fontWeight: 600,
-        color: card.accent, marginBottom: 6, letterSpacing: '0.04em' }}>{card.tagline}</div>
-      <div style={{ fontSize: 11.5, color: 'var(--fg-2)', lineHeight: 1.4 }}>{card.desc}</div>
-    </button>
-  );
-}
-
 // Site header — sticky w/ blur
 const ROLE_PORTAL = {
   proprietario: 'portal',
@@ -167,17 +144,25 @@ const ROLE_AVATAR_COLOR = {
 };
 const ROLE_CTA = {
   proprietario: { label: 'Anunciar imóvel', route: 'anunciar' },
-  corretor:     { label: 'Meu portal',      route: 'corretor' },
-  fotografo:    { label: 'Meus jobs',       route: 'fotografo' },
+  corretor:     { label: 'Meu portal',           route: 'corretor' },
+  fotografo:    { label: 'Meus jobs',            route: 'fotografo' },
   comprador:    { label: 'Anunciar imóvel', route: null },
 };
+
+const SERVICOS_ITEMS = [
+  { id: 'proprietario',   label: 'Área do Proprietário', desc: 'Anuncie seu imóvel — taxa fixa ou comissão' },
+  { id: 'corretor-canal', label: 'Portal do Corretor',   desc: 'Leads, CRM e portfólio premium de BH' },
+  { id: 'consorcio',      label: 'Consórcio',            desc: 'Compre sem juros com carta de crédito' },
+  { id: 'due-diligence',  label: 'Due Diligence',        desc: 'Análise jurídica e técnica antes de comprar' },
+  { id: 'fotografo-canal',label: 'Fotógrafo',            desc: 'Fotografia e mídias para imóveis de alto padrão' },
+];
 
 function SiteHeader({ active, onNav, density = 'comfortable', authUser, onAuthOpen, onLogout }) {
   const pad = density === 'compact' ? '10px 0' : '14px 0';
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [servOpen, setServOpen] = React.useState(false);
-  const [dropOpen, setDropOpen] = React.useState(false);
-  const dropRef = React.useRef(null);
+  const [openDrop, setOpenDrop] = React.useState(null);
+  const [servicosMob, setServicosMob] = React.useState(false);
+  const navRef = React.useRef(null);
 
   const portalRoute = authUser ? (ROLE_PORTAL[authUser.role] || 'portal') : null;
   const avatarColor = authUser ? (ROLE_AVATAR_COLOR[authUser.role] || 'var(--gold)') : null;
@@ -185,37 +170,31 @@ function SiteHeader({ active, onNav, density = 'comfortable', authUser, onAuthOp
 
   const handleCta = () => {
     setMobileOpen(false);
-    if (!authUser) { onAuthOpen('criar'); return; }
+    if (!authUser) { onNav('vender'); return; }
     if (cta.route) onNav(cta.route);
   };
-  const go = (id) => { setMobileOpen(false); setServOpen(false); setDropOpen(false); onNav(id); };
+  const go = (id) => { setMobileOpen(false); setOpenDrop(null); setServicosMob(false); onNav(id); };
 
-  React.useEffect(() => { setMobileOpen(false); setServOpen(false); setDropOpen(false); }, [active]);
+  React.useEffect(() => { setMobileOpen(false); setOpenDrop(null); }, [active]);
 
   React.useEffect(() => {
-    if (!dropOpen) return;
+    if (!openDrop) return;
     const handler = (e) => {
-      if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false);
+      if (navRef.current && !navRef.current.contains(e.target)) setOpenDrop(null);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [dropOpen]);
+  }, [openDrop]);
 
   const navItems = [
     { id: 'home',        label: 'Início' },
-    { id: 'busca',       label: 'Compra' },
-    { id: 'vender',      label: 'Venda' },
+    { id: 'busca',       label: 'Comprar' },
+    { id: 'vender',      label: 'Vender' },
     { id: 'lancamentos', label: 'Lançamentos' },
     { id: 'sobre',       label: 'Sobre' },
   ];
 
-  const servCards = [
-    { id: 'proprietario',    icon: '🏠', label: 'Proprietário',        tagline: 'Venda seu imóvel',           desc: 'Taxa fixa, assistida ou completa — você escolhe como anunciar.', accent: 'var(--gold)' },
-    { id: 'corretor-canal',  icon: '🤝', label: 'Corretor Parceiro',   tagline: 'Leads + CRM + imóveis',      desc: 'Acesse o portfólio premium de BH com ferramentas exclusivas.',    accent: '#059669' },
-    { id: 'fotografo-canal', icon: '📷', label: 'Fotógrafo',           tagline: 'Jobs + portfólio + pagamento', desc: 'Fotografe imóveis de alto padrão e receba por job via FactorOne.', accent: '#B87333' },
-  ];
-
-  const servActive = ['corretor', 'fotografo', 'anunciar', 'portal', 'proprietario', 'corretor-canal', 'fotografo-canal'].includes(active);
+  const servicosActive = ['anunciar', 'proprietario', 'corretor', 'corretor-canal', 'portal', 'consorcio', 'due-diligence', 'fotografo-canal', 'fotografo'].includes(active);
 
   const linkBase = (isActive) => ({
     fontFamily: 'DM Sans', fontSize: 13.5, fontWeight: 500, cursor: 'pointer',
@@ -224,13 +203,45 @@ function SiteHeader({ active, onNav, density = 'comfortable', authUser, onAuthOp
     padding: '4px 0', textDecoration: 'none', whiteSpace: 'nowrap',
   });
 
+  function DropMenu({ items }) {
+    return (
+      <div style={{
+        position: 'absolute', top: 'calc(100% + 12px)', left: 0,
+        background: '#fff', borderRadius: 14, padding: '8px',
+        boxShadow: '0 20px 56px rgba(15,34,68,0.18), 0 0 0 1px rgba(15,34,68,0.08)',
+        minWidth: 240, zIndex: 200,
+      }}>
+        <div style={{ position: 'absolute', top: -7, left: 24, width: 0, height: 0,
+          borderLeft: '7px solid transparent', borderRight: '7px solid transparent',
+          borderBottom: '7px solid #fff',
+          filter: 'drop-shadow(0 -1px 0 rgba(15,34,68,0.06))',
+        }} />
+        {items.map(it => (
+          <button key={it.id} onClick={() => go(it.id)} style={{
+            display: 'block', width: '100%', padding: '10px 14px',
+            borderRadius: 8, border: 'none',
+            background: active === it.id ? 'rgba(201,150,14,0.08)' : 'transparent',
+            cursor: 'pointer', textAlign: 'left', transition: 'background 0.12s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(15,34,68,0.04)'}
+          onMouseLeave={e => e.currentTarget.style.background = active === it.id ? 'rgba(201,150,14,0.08)' : 'transparent'}
+          >
+            <div style={{ fontFamily: 'DM Sans', fontWeight: 700, fontSize: 13.5,
+              color: active === it.id ? 'var(--gold)' : 'var(--navy)', marginBottom: 2 }}>{it.label}</div>
+            <div style={{ fontSize: 11.5, color: 'var(--fg-2)', lineHeight: 1.4 }}>{it.desc}</div>
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <header style={{
       position: 'sticky', top: 0, zIndex: 100,
       background: 'rgba(250,249,246,0.97)', backdropFilter: 'blur(12px)',
       borderBottom: '1px solid var(--border)',
     }}>
-      <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto', display: 'flex',
+      <div ref={navRef} style={{ width: 'min(1280px, 94vw)', margin: '0 auto', display: 'flex',
         alignItems: 'center', justifyContent: 'space-between', padding: pad, gap: 16 }}>
 
         {/* Logo */}
@@ -239,46 +250,25 @@ function SiteHeader({ active, onNav, density = 'comfortable', authUser, onAuthOp
           <BrandLockup />
         </a>
 
-        {/* ── Desktop nav ── */}
+        {/* Desktop nav */}
         <nav className="vnp-nav-desktop" style={{ alignItems: 'center', gap: 22 }}>
           {navItems.map(it => (
             <a key={it.id} onClick={(e) => { e.preventDefault(); go(it.id); }}
                style={linkBase(active === it.id)}>{it.label}</a>
           ))}
 
-          {/* SERVIÇOS dropdown — click-based, 3 visual cards */}
-          <div ref={dropRef} style={{ position: 'relative' }}>
-            <button onClick={() => setDropOpen(o => !o)} style={{
-              ...linkBase(servActive),
+          {/* SERVICOS dropdown */}
+          <div style={{ position: 'relative' }}>
+            <button onClick={() => setOpenDrop(o => o === 'servicos' ? null : 'servicos')} style={{
+              ...linkBase(servicosActive),
               display: 'inline-flex', alignItems: 'center', gap: 4,
               background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0',
             }}>
               Serviços
               <span style={{ fontSize: 9, opacity: 0.65, display: 'inline-block',
-                transform: dropOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}>▾</span>
+                transform: openDrop === 'servicos' ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}>{'▾'}</span>
             </button>
-            {dropOpen && (
-              <div style={{
-                position: 'absolute', top: 'calc(100% + 12px)', left: '50%',
-                transform: 'translateX(-50%)',
-                background: '#fff', borderRadius: 16, padding: '10px',
-                boxShadow: '0 20px 56px rgba(15,34,68,0.18), 0 0 0 1px rgba(15,34,68,0.08)',
-                width: 510, zIndex: 200,
-              }}>
-                {/* Arrow */}
-                <div style={{ position: 'absolute', top: -7, left: '50%', transform: 'translateX(-50%)',
-                  width: 0, height: 0,
-                  borderLeft: '7px solid transparent', borderRight: '7px solid transparent',
-                  borderBottom: '7px solid #fff',
-                  filter: 'drop-shadow(0 -1px 0 rgba(15,34,68,0.06))',
-                }} />
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                  {servCards.map(card => (
-                    <ServCard key={card.id} card={card} isActive={active === card.id} onClick={() => go(card.id)} />
-                  ))}
-                </div>
-              </div>
-            )}
+            {openDrop === 'servicos' && <DropMenu items={SERVICOS_ITEMS} />}
           </div>
 
           <span style={{ width: 1, height: 22, background: 'var(--border)' }} />
@@ -298,22 +288,33 @@ function SiteHeader({ active, onNav, density = 'comfortable', authUser, onAuthOp
                 }}>{authUser.name.charAt(0).toUpperCase()}</span>
                 {authUser.name.split(' ')[0]}
               </a>
+              {(authUser.email === 'vinicius.mnogueira@gmail.com' || authUser.role === 'admin') && (
+                <a onClick={() => go('admin')} title="Portal Admin" style={{
+                  fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em',
+                  color: 'var(--gold)', cursor: 'pointer', textDecoration: 'none',
+                  padding: '4px 10px', borderRadius: 6,
+                  background: 'rgba(201,150,14,0.1)', border: '1px solid rgba(201,150,14,0.3)',
+                }}>ADMIN</a>
+              )}
               <button onClick={onLogout} style={{
                 border: 'none', background: 'none', cursor: 'pointer',
                 fontFamily: 'DM Sans', fontSize: 12, color: 'var(--fg-2)',
               }}>Sair</button>
             </div>
           ) : (
-            <a onClick={() => onAuthOpen('entrar')} style={{
-              fontFamily: 'DM Sans', fontSize: 13, color: 'var(--navy-muted)', cursor: 'pointer',
-            }}>Entrar</a>
+            <button onClick={() => onAuthOpen('entrar')} style={{
+              fontFamily: 'DM Sans', fontSize: 13, fontWeight: 600, letterSpacing: '0.05em',
+              color: 'var(--navy)', border: '1.5px solid rgba(15,34,68,0.25)',
+              background: 'transparent', borderRadius: 8, padding: '6px 16px',
+              cursor: 'pointer', transition: 'border-color 0.15s, background 0.15s',
+            }}>ENTRAR</button>
           )}
-          <Btn size="sm" variant="primary" onClick={handleCta}>
-            {authUser ? cta.label : 'Cadastrar'}
+          <Btn size="sm" variant="accent" onClick={handleCta}>
+            {authUser ? cta.label : 'Anunciar grátis'}
           </Btn>
         </nav>
 
-        {/* ── Hamburger (mobile only) ── */}
+        {/* Hamburger (mobile only) */}
         <button className="vnp-hamburger" onClick={() => setMobileOpen(o => !o)}
           style={{
             width: 40, height: 40, background: 'none', border: '1px solid var(--border)',
@@ -334,7 +335,7 @@ function SiteHeader({ active, onNav, density = 'comfortable', authUser, onAuthOp
         </button>
       </div>
 
-      {/* ── Mobile drawer ── */}
+      {/* Mobile drawer */}
       <div className={`vnp-drawer${mobileOpen ? ' open' : ''}`}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginBottom: 24 }}>
           {navItems.map(it => (
@@ -347,31 +348,29 @@ function SiteHeader({ active, onNav, density = 'comfortable', authUser, onAuthOp
             }}>{it.label}</a>
           ))}
 
-          {/* Serviços expandable */}
+          {/* Servicos expandable */}
           <div>
-            <button onClick={() => setServOpen(o => !o)} style={{
+            <button onClick={() => setServicosMob(o => !o)} style={{
               width: '100%', padding: '13px 16px', borderRadius: 10,
-              fontFamily: 'DM Sans', fontSize: 16, fontWeight: servActive ? 700 : 500,
-              color: servActive ? 'var(--gold)' : 'var(--navy)',
-              background: servActive ? 'rgba(201,150,14,0.08)' : 'transparent',
+              fontFamily: 'DM Sans', fontSize: 16, fontWeight: servicosActive ? 700 : 500,
+              color: servicosActive ? 'var(--gold)' : 'var(--navy)',
+              background: servicosActive ? 'rgba(201,150,14,0.08)' : 'transparent',
               border: 'none', cursor: 'pointer', textAlign: 'left',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
               Serviços
-              <span style={{ fontSize: 12, opacity: 0.55 }}>{servOpen ? '▴' : '▾'}</span>
+              <span style={{ fontSize: 12, opacity: 0.55 }}>{servicosMob ? '▴' : '▾'}</span>
             </button>
-            {servOpen && (
+            {servicosMob && (
               <div style={{ paddingLeft: 16, paddingTop: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {servCards.map(s => (
+                {SERVICOS_ITEMS.map(s => (
                   <a key={s.id} onClick={() => go(s.id)} style={{
                     padding: '10px 16px', borderRadius: 8,
                     fontFamily: 'DM Sans', fontSize: 14, fontWeight: active === s.id ? 700 : 400,
-                    color: active === s.id ? s.accent : 'var(--navy)',
+                    color: active === s.id ? 'var(--gold)' : 'var(--navy)',
                     background: active === s.id ? 'rgba(201,150,14,0.08)' : 'transparent',
-                    cursor: 'pointer', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8,
-                  }}>
-                    <span>{s.icon}</span>{s.label}
-                  </a>
+                    cursor: 'pointer', textDecoration: 'none', display: 'block',
+                  }}>{s.label}</a>
                 ))}
               </div>
             )}
@@ -408,12 +407,12 @@ function SiteHeader({ active, onNav, density = 'comfortable', authUser, onAuthOp
             <button onClick={() => { setMobileOpen(false); onAuthOpen('entrar'); }} style={{
               padding: '13px', background: 'transparent', color: 'var(--navy)',
               border: '1.5px solid var(--border)', borderRadius: 10, fontWeight: 600, fontSize: 15, cursor: 'pointer',
-            }}>Entrar</button>
+            }}>ENTRAR</button>
             <button onClick={handleCta} style={{
               padding: '13px',
               background: 'linear-gradient(135deg, var(--gold) 0%, #e6a800 100%)',
               color: '#fff', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 15, cursor: 'pointer',
-            }}>Cadastrar</button>
+            }}>Anunciar grátis</button>
           </div>
         )}
       </div>
@@ -423,49 +422,29 @@ function SiteHeader({ active, onNav, density = 'comfortable', authUser, onAuthOp
 
 // Auth modal — login + criar conta (com seleção de perfil)
 const ROLES = [
-  {
-    id: 'proprietario',
-    label: 'Proprietário',
-    desc: 'Quero anunciar meu imóvel',
-    icon: '🏠',
-    accent: 'var(--gold)',
-  },
-  {
-    id: 'corretor',
-    label: 'Corretor',
-    desc: 'Sou parceiro VN Prime',
-    icon: '🤝',
-    accent: '#059669',
-  },
-  {
-    id: 'fotografo',
-    label: 'Fotógrafo',
-    desc: 'Ofereço serviços de mídia',
-    icon: '📷',
-    accent: '#B87333',
-  },
-  {
-    id: 'comprador',
-    label: 'Comprador',
-    desc: 'Quero encontrar um imóvel',
-    icon: '🔍',
-    accent: 'var(--navy)',
-  },
+  { id: 'proprietario', label: 'Proprietário', desc: 'Quero anunciar meu imóvel', initial: 'P', accent: 'var(--gold)' },
+  { id: 'corretor',     label: 'Corretor',          desc: 'Sou parceiro VN Prime',      initial: 'C', accent: '#059669' },
+  { id: 'fotografo',    label: 'Fotógrafo',    desc: 'Ofereço serviços de mídia', initial: 'F', accent: '#B87333' },
+  { id: 'comprador',    label: 'Comprador',          desc: 'Quero encontrar um imóvel', initial: 'B', accent: 'var(--navy)' },
 ];
 
-function AuthModal({ isOpen, defaultTab = 'entrar', onClose, onAuth }) {
+const ROLE_LABELS = { proprietario: 'Proprietário', corretor: 'Corretor', fotografo: 'Fotógrafo', comprador: 'Comprador' };
+
+function AuthModal({ isOpen, defaultTab = 'entrar', onClose, onAuth, presetRole = null }) {
   const [tab, setTab] = useState(defaultTab);
-  const [step, setStep] = useState(1); // 1: dados, 2: perfil
+  const [step, setStep] = useState(1);
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
-  const [role, setRole] = useState('');
+  const [role, setRole] = useState(presetRole || '');
   const [error, setError] = useState('');
+  const [showPass, setShowPass] = useState(false);
 
   useEffect(() => {
     setTab(defaultTab);
     setStep(1);
     setError('');
-    setRole('');
-  }, [defaultTab, isOpen]);
+    setRole(presetRole || '');
+    setShowPass(false);
+  }, [defaultTab, presetRole, isOpen]);
 
   if (!isOpen) return null;
 
@@ -476,6 +455,12 @@ function AuthModal({ isOpen, defaultTab = 'entrar', onClose, onAuth }) {
     setError('');
     if (!form.name.trim() || !form.email.trim() || !form.phone.trim() || !form.password.trim()) {
       setError('Preencha todos os campos obrigatórios.'); return;
+    }
+    if (presetRole) {
+      // Role already determined — skip selection step
+      const user = { name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim(), role: presetRole };
+      localStorage.setItem('vnprime_user', JSON.stringify(user));
+      onAuth(user); return;
     }
     setStep(2);
   };
@@ -503,6 +488,27 @@ function AuthModal({ isOpen, defaultTab = 'entrar', onClose, onAuth }) {
     setError('E-mail não encontrado. Crie uma conta para continuar.');
   };
 
+  const handleGoogleLogin = () => {
+    if (typeof google === 'undefined') {
+      setError('Login com Google não disponível. Tente pelo formulário.');
+      return;
+    }
+    google.accounts.id.initialize({
+      client_id: 'YOUR_GOOGLE_CLIENT_ID',
+      callback: (response) => {
+        try {
+          const payload = JSON.parse(atob(response.credential.split('.')[1]));
+          setForm(f => ({ ...f, name: payload.name || '', email: payload.email || '' }));
+          setTab('criar');
+          setStep(2);
+        } catch {
+          setError('Erro ao processar login Google. Tente novamente.');
+        }
+      },
+    });
+    google.accounts.id.prompt();
+  };
+
   const fl = { display: 'flex', flexDirection: 'column', gap: 6 };
   const lb = {
     fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700,
@@ -523,11 +529,27 @@ function AuthModal({ isOpen, defaultTab = 'entrar', onClose, onAuth }) {
         <button onClick={onClose} style={{
           position: 'absolute', top: 16, right: 16, border: 'none',
           background: 'none', cursor: 'pointer', fontSize: 20, color: 'var(--fg-2)', lineHeight: 1,
-        }}>✕</button>
+        }}>{'✕'}</button>
 
-        <div style={{ textAlign: 'center', marginBottom: 24 }}><BrandLockup /></div>
+        <div style={{ textAlign: 'center', marginBottom: presetRole ? 12 : 24 }}><BrandLockup /></div>
 
-        {/* Tabs — só visíveis no step 1 */}
+        {/* Role context badge */}
+        {presetRole && (
+          <div style={{ textAlign: 'center', marginBottom: 18 }}>
+            <span style={{
+              display: 'inline-block', padding: '4px 14px', borderRadius: 999,
+              background: presetRole === 'corretor' ? '#05966918' : presetRole === 'fotografo' ? '#B8733318' : 'var(--gold-soft)18',
+              border: `1px solid ${presetRole === 'corretor' ? '#05966930' : presetRole === 'fotografo' ? '#B8733330' : 'var(--gold)30'}`,
+              fontFamily: 'DM Sans', fontSize: 12, fontWeight: 700, letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: presetRole === 'corretor' ? '#059669' : presetRole === 'fotografo' ? '#B87333' : 'var(--gold)',
+            }}>
+              Área do {ROLE_LABELS[presetRole] || presetRole}
+            </span>
+          </div>
+        )}
+
+        {/* Tabs */}
         {step === 1 && (
           <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: 24 }}>
             {[['entrar', 'Entrar'], ['criar', 'Criar conta']].map(([id, label]) => (
@@ -559,7 +581,15 @@ function AuthModal({ isOpen, defaultTab = 'entrar', onClose, onAuth }) {
                   textAlign: 'center', transition: 'border-color 0.15s, box-shadow 0.15s',
                   boxShadow: role === r.id ? `0 0 0 3px ${r.accent}22` : 'none',
                 }}>
-                  <div style={{ fontSize: 28, marginBottom: 8 }}>{r.icon}</div>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: '50%', margin: '0 auto 10px',
+                    background: role === r.id ? r.accent : r.accent + '18',
+                    border: `2px solid ${r.accent}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontFamily: 'Cinzel, serif', fontWeight: 700, fontSize: 16,
+                    color: role === r.id ? '#fff' : r.accent,
+                    transition: 'background 0.15s, color 0.15s',
+                  }}>{r.initial}</div>
                   <div style={{ fontFamily: 'DM Sans', fontWeight: 700, fontSize: 14, color: 'var(--navy)', marginBottom: 4 }}>
                     {r.label}
                   </div>
@@ -569,13 +599,13 @@ function AuthModal({ isOpen, defaultTab = 'entrar', onClose, onAuth }) {
             </div>
             {error && <p style={{ color: '#dc2626', fontSize: 13, margin: '0 0 12px' }}>{error}</p>}
             <Btn variant="accent" fullWidth onClick={handleFinish}>
-              Criar minha conta →
+              Criar minha conta {'→'}
             </Btn>
             <div style={{ textAlign: 'center', marginTop: 12 }}>
               <button type="button" onClick={() => { setStep(1); setError(''); }} style={{
                 border: 'none', background: 'none', cursor: 'pointer',
                 fontSize: 13, color: 'var(--fg-2)', textDecoration: 'underline',
-              }}>← Voltar</button>
+              }}>{'←'} Voltar</button>
             </div>
           </div>
         ) : (
@@ -600,7 +630,29 @@ function AuthModal({ isOpen, defaultTab = 'entrar', onClose, onAuth }) {
             )}
             <div style={fl}>
               <label style={lb}>Senha *</label>
-              <input type="password" value={form.password} onChange={set('password')} placeholder="••••••••" required />
+              <div style={{ position: 'relative' }}>
+                <input type={showPass ? 'text' : 'password'} value={form.password} onChange={set('password')}
+                  placeholder={showPass ? 'sua senha' : '••••••••'}
+                  required style={{ width: '100%', paddingRight: 40, boxSizing: 'border-box' }} />
+                <button type="button" onClick={() => setShowPass(v => !v)} style={{
+                  position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
+                  border: 'none', background: 'none', cursor: 'pointer', padding: 4, color: 'var(--fg-2)',
+                  display: 'flex', alignItems: 'center',
+                }}>
+                  {showPass ? (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  ) : (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             {error && <p style={{ color: '#dc2626', fontSize: 13, margin: 0 }}>{error}</p>}
@@ -616,6 +668,33 @@ function AuthModal({ isOpen, defaultTab = 'entrar', onClose, onAuth }) {
             <Btn type="submit" variant="accent" fullWidth style={{ marginTop: 4 }}>
               {tab === 'entrar' ? 'Entrar na plataforma' : 'Continuar →'}
             </Btn>
+
+            {/* Divider */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+              <span style={{ fontSize: 11, color: 'var(--fg-2)', whiteSpace: 'nowrap' }}>ou continue com</span>
+              <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+            </div>
+
+            {/* Google OAuth */}
+            <button type="button" onClick={handleGoogleLogin} style={{
+              width: '100%', padding: '11px', border: '1.5px solid var(--border)',
+              borderRadius: 8, background: '#fff', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+              fontFamily: 'DM Sans', fontWeight: 600, fontSize: 14, color: 'var(--navy)',
+              transition: 'border-color 0.15s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(15,34,68,0.4)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              </svg>
+              Google
+            </button>
 
             <div style={{ textAlign: 'center' }}>
               <button type="button" onClick={() => { setTab(tab === 'entrar' ? 'criar' : 'entrar'); setError(''); }}
@@ -646,7 +725,7 @@ function SiteFooter({ onNav }) {
     {
       title: 'Vender',
       items: [
-        { label: 'Anunciar imóvel',  action: () => nav('anunciar') },
+        { label: 'Anunciar imóvel',  action: () => nav('vender') },
         { label: 'Modalidades',      action: () => nav('vender') },
         { label: 'Para corretores',  action: () => nav('corretor') },
         { label: 'Para fotógrafos',  action: () => nav('fotografo') },
@@ -659,7 +738,7 @@ function SiteFooter({ onNav }) {
         { label: 'Sobre',                  action: () => nav('sobre') },
         { label: 'Como funciona',          action: () => nav('vender') },
         { label: 'Contato',                action: () => {} },
-        { label: 'Política de privacidade',action: () => {} },
+        { label: 'Política de privacidade', action: () => {} },
       ],
     },
   ];
@@ -713,7 +792,7 @@ function SiteFooter({ onNav }) {
         {/* Bottom bar */}
         <div style={{ borderTop: '1px solid rgba(250,249,246,0.12)', paddingTop: 18,
           display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12, fontSize: 12 }}>
-          <span>© 2026 VN Prime Imóveis · CRECI-MG 12.345-J</span>
+          <span>{'©'} 2026 VN Prime Imóveis {'·'} CRECI-MG 12.345-J</span>
           <span style={{ color: 'var(--gold-soft)', fontFamily: 'DM Sans', letterSpacing: '0.1em' }}>
             INTELIGÊNCIA APLICADA AO MERCADO IMOBILIÁRIO
           </span>
@@ -726,7 +805,7 @@ function SiteFooter({ onNav }) {
 // Property feature row (icons + numbers) — used on cards & detail
 function FeatureRow({ areaM2, quartos, suites, vagas, banheiros, compact = false }) {
   const items = [
-    { icon: '⌗', val: areaM2, lbl: 'm²' },
+    { icon: '⌿', val: areaM2, lbl: 'm²' },
     { icon: '⌂', val: quartos, lbl: quartos === 1 ? 'qto' : 'qtos' },
     { icon: '✦', val: suites, lbl: suites === 1 ? 'suíte' : 'suítes' },
     { icon: '⛌', val: vagas, lbl: vagas === 1 ? 'vaga' : 'vagas' },

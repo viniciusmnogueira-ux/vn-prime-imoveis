@@ -27,12 +27,12 @@ const LANCAMENTOS = [
       { nome: 'Planta C — 4 Suítes', area: 142, quartos: 4, suites: 4, vagas: 3, preco: 'A partir de R$ 2,6 mi', rooms: ['Living integrado', 'Cozinha com ilha', '4 Suítes', 'Suíte master 40m²', 'Varanda 28m²', '3 Vagas', 'Lavabo'] },
     ],
     amenidades: [
-      { icon: '🏊', label: 'Piscina infinita' }, { icon: '🏋️', label: 'Academia' },
-      { icon: '🍖', label: 'Espaço gourmet' }, { icon: '💻', label: 'Coworking' },
-      { icon: '🛁', label: 'Spa & sauna' }, { icon: '🎮', label: 'Salão de jogos' },
-      { icon: '🧒', label: 'Brinquedoteca' }, { icon: '🔒', label: 'Portaria 24h' },
-      { icon: '🚗', label: 'Garagem coberta' }, { icon: '🌿', label: 'Área verde' },
-      { icon: '🐕', label: 'Pet place' }, { icon: '🌅', label: 'Rooftop view' },
+      { label: 'Piscina infinita' }, { label: 'Academia' },
+      { label: 'Espaço gourmet' }, { label: 'Coworking' },
+      { label: 'Spa & sauna' }, { label: 'Salão de jogos' },
+      { label: 'Brinquedoteca' }, { label: 'Portaria 24h' },
+      { label: 'Garagem coberta' }, { label: 'Área verde' },
+      { label: 'Pet place' }, { label: 'Rooftop view' },
     ],
   },
   {
@@ -57,10 +57,10 @@ const LANCAMENTOS = [
       { nome: 'Casa B — 5 Suítes', area: 480, quartos: 5, suites: 5, vagas: 6, preco: 'A partir de R$ 6,2 mi', rooms: ['Living 80m² integrado', 'Cozinha com ilha dupla', '5 Suítes', 'Home office', 'Piscina + hidro', 'Adega climatizada', '6 Vagas', 'Heliponto'] },
     ],
     amenidades: [
-      { icon: '🏊', label: 'Piscina privativa por casa' }, { icon: '⛳', label: 'Campo de golfe' },
-      { icon: '🎾', label: 'Quadras esportivas' }, { icon: '🍷', label: 'Clube exclusivo' },
-      { icon: '🔒', label: 'Segurança 24h' }, { icon: '🌿', label: 'Área verde preservada' },
-      { icon: '🚁', label: 'Heliponto' }, { icon: '🏋️', label: 'Fitness exclusivo' },
+      { label: 'Piscina privativa por casa' }, { label: 'Campo de golfe' },
+      { label: 'Quadras esportivas' }, { label: 'Clube exclusivo' },
+      { label: 'Segurança 24h' }, { label: 'Área verde preservada' },
+      { label: 'Heliponto' }, { label: 'Fitness exclusivo' },
     ],
   },
   {
@@ -68,13 +68,13 @@ const LANCAMENTOS = [
     nome: 'Mirante do Vale — Lotes',
     slogan: 'Construa o imóvel dos seus sonhos. Do seu jeito',
     tipo: 'Loteamento em condomínio fechado',
-    bairro: 'Vale do Sereno', cidade: 'Nova Lima',
+    bairro: 'Vetor Sul', cidade: 'Nova Lima',
     entrega: 'Pronto para construir', obras: '—',
     unidades: 48,
     precoMin: 320000, precoMax: 750000,
     status: 'Disponível', statusColor: '#059669',
     destaque: false,
-    sobre: 'Lotes exclusivos no Vale do Sereno com infraestrutura completa, vista para a Serra do Curral e topografia privilegiada. Cada lote tem entre 450 e 900 m² e escritura já disponível.',
+    sobre: 'Lotes exclusivos no Vetor Sul com infraestrutura completa, vista para a Serra do Curral e topografia privilegiada. Cada lote tem entre 450 e 900 m² e escritura já disponível.',
     fotos: [
       'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=85',
       'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=85',
@@ -86,10 +86,10 @@ const LANCAMENTOS = [
       { nome: 'Lote C — 900 m²', area: 900, quartos: null, suites: null, vagas: null, preco: 'A partir de R$ 690 mil', rooms: ['Lote de esquina', 'Vista panorâmica', 'Topografia plana', 'Escritura inclusa', 'Maior lote disponível'] },
     ],
     amenidades: [
-      { icon: '🔒', label: 'Condomínio fechado' }, { icon: '🌿', label: 'Área verde 30%' },
-      { icon: '💡', label: 'Energia subterrânea' }, { icon: '💧', label: 'Rede de água/esgoto' },
-      { icon: '🌅', label: 'Vista Serra do Curral' }, { icon: '📋', label: 'Escritura pronta' },
-      { icon: '🏊', label: 'Área de lazer coletiva' }, { icon: '🛣️', label: 'Vias asfaltadas' },
+      { label: 'Condomínio fechado' }, { label: 'Área verde 30%' },
+      { label: 'Energia subterrânea' }, { label: 'Rede de água/esgoto' },
+      { label: 'Vista Serra do Curral' }, { label: 'Escritura pronta' },
+      { label: 'Área de lazer coletiva' }, { label: 'Vias asfaltadas' },
     ],
   },
 ];
@@ -201,18 +201,18 @@ function PlantaModal({ planta, nome, onClose }) {
                 color: 'var(--gold)', marginBottom: 14 }}>{planta.preco}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <button onClick={() => {
-                  alert('📄 Memorial da ' + planta.nome + ' — ' + nome + '\n\nO PDF seria gerado aqui em produção com plantas técnicas, especificações e tabela de preços.');
+                  alert('Planta em PDF — ' + planta.nome + ' — ' + nome + '\n\nO PDF seria gerado aqui em produção com plantas técnicas, especificações e tabela de preços.');
                 }} style={{
                   padding: '11px 16px', background: 'var(--gold)', color: 'var(--navy)',
                   border: 'none', borderRadius: 10, fontFamily: 'DM Sans', fontWeight: 700,
                   fontSize: 13.5, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                }}>📄 Baixar planta em PDF</button>
+                }}>Baixar planta em PDF</button>
                 <button onClick={() => whatsApp('Tenho interesse na ' + planta.nome + ' do ' + nome + '. Pode me enviar mais informações?')}
                   style={{
                     padding: '11px 16px', background: '#25d366', color: '#fff',
                     border: 'none', borderRadius: 10, fontFamily: 'DM Sans', fontWeight: 700,
                     fontSize: 13.5, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  }}>💬 Quero mais informações</button>
+                  }}>Quero mais informações</button>
               </div>
             </div>
           </div>
@@ -234,7 +234,7 @@ function FormInteresse({ lancNome, compact = false }) {
   };
   if (sent) return (
     <div style={{ textAlign: 'center', padding: '24px 0' }}>
-      <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
+      <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', color: '#fff', fontSize: 22, fontWeight: 700 }}>✓</div>
       <div style={{ fontFamily: 'DM Sans', fontWeight: 700, fontSize: 16, color: compact ? '#fff' : 'var(--navy)' }}>
         Recebemos seu interesse!
       </div>
@@ -271,15 +271,11 @@ function FormInteresse({ lancNome, compact = false }) {
 // ─── Card de empreendimento (full-width section) ─────────────────────────────
 function LancamentoSection({ lc, reverse = false }) {
   const [photoIdx, setPhotoIdx] = React.useState(0);
-  const [plantaOpen, setPlantaOpen] = React.useState(null);
   const [formOpen, setFormOpen] = React.useState(false);
 
   return (
     <section style={{ background: lc.destaque ? 'var(--cream)' : '#fff',
       borderTop: '1px solid var(--border)', padding: 'clamp(3rem, 6vw, 5rem) 0' }}>
-      {plantaOpen !== null && (
-        <PlantaModal planta={lc.plantas[plantaOpen]} nome={lc.nome} onClose={() => setPlantaOpen(null)} />
-      )}
 
       <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto' }}>
 
@@ -403,72 +399,6 @@ function LancamentoSection({ lc, reverse = false }) {
           </div>
         </div>
 
-        {/* PLANTAS */}
-        <div style={{ marginBottom: 48 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
-            <div>
-              <Eyebrow color="var(--gold)">Plantas baixas · {lc.tipo}</Eyebrow>
-              <h3 style={{ margin: '4px 0 0', fontSize: 22 }}>
-                {lc.plantas.length === 1 ? '1 opção disponível' : lc.plantas.length + ' opções de planta'}
-              </h3>
-            </div>
-            <button onClick={() => {
-              alert('📦 Apresentação completa de ' + lc.nome + '\n\nO arquivo PDF com plantas, especificações técnicas, memorial descritivo e tabela de preços seria baixado aqui em produção.');
-            }} style={{
-              display: 'flex', alignItems: 'center', gap: 8,
-              padding: '10px 20px', background: 'var(--navy)', color: '#fff',
-              border: 'none', borderRadius: 10, fontFamily: 'DM Sans',
-              fontWeight: 700, fontSize: 13, cursor: 'pointer',
-            }}>📄 Baixar apresentação completa</button>
-          </div>
-
-          <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
-            {lc.plantas.map((p, idx) => (
-              <div key={idx} style={{
-                background: '#fff', borderRadius: 16, overflow: 'hidden',
-                border: '1px solid var(--border)', boxShadow: '0 4px 20px rgba(15,34,68,0.06)',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-                cursor: 'pointer',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(15,34,68,0.12)'; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(15,34,68,0.06)'; }}
-              onClick={() => setPlantaOpen(idx)}
-              >
-                {/* preview planta */}
-                <div style={{ height: 140, background: 'linear-gradient(145deg, #eef2f7 0%, #e4eaf2 100%)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                  <svg width="120" height="90" viewBox="0 0 120 90" fill="none" opacity="0.35">
-                    <rect x="4" y="4" width="112" height="82" stroke="#0F2244" strokeWidth="2"/>
-                    <rect x="4" y="4" width="60" height="48" stroke="#0F2244" strokeWidth="1.5"/>
-                    <rect x="64" y="4" width="52" height="48" stroke="#0F2244" strokeWidth="1.5"/>
-                    <rect x="4" y="52" width="112" height="34" stroke="#0F2244" strokeWidth="1.5"/>
-                    <line x1="4" y1="68" x2="64" y2="68" stroke="#0F2244" strokeWidth="1"/>
-                    <line x1="64" y1="52" x2="64" y2="86" stroke="#0F2244" strokeWidth="1"/>
-                    <circle cx="30" cy="26" r="8" stroke="#C9960E" strokeWidth="1.5"/>
-                    <circle cx="90" cy="26" r="6" stroke="#C9960E" strokeWidth="1.5"/>
-                  </svg>
-                  <div style={{ position: 'absolute', top: 10, right: 10,
-                    background: 'var(--navy)', color: '#fff', borderRadius: 6, padding: '3px 8px',
-                    fontFamily: 'DM Sans', fontSize: 10, fontWeight: 700 }}>Ver planta</div>
-                </div>
-                <div style={{ padding: '16px 18px' }}>
-                  <div style={{ fontFamily: 'DM Sans', fontWeight: 700, fontSize: 13.5,
-                    color: 'var(--navy)', marginBottom: 4 }}>{p.nome}</div>
-                  <div style={{ fontFamily: 'Playfair Display', fontSize: 20, fontWeight: 700,
-                    color: 'var(--gold)', marginBottom: 6 }}>{p.area} m²</div>
-                  <div style={{ display: 'flex', gap: 10, fontSize: 12, color: 'var(--fg-2)', flexWrap: 'wrap' }}>
-                    {p.quartos != null && <span>🛏 {p.quartos} qtos</span>}
-                    {p.suites != null && <span>✦ {p.suites} suítes</span>}
-                    {p.vagas != null && <span>🚗 {p.vagas} vagas</span>}
-                  </div>
-                  <div style={{ marginTop: 8, fontFamily: 'DM Sans', fontSize: 12, color: 'var(--gold)', fontWeight: 600 }}>{p.preco}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* AMENIDADES */}
         <div>
           <Eyebrow color="var(--gold)">Lazer & infraestrutura</Eyebrow>
@@ -482,7 +412,9 @@ function LancamentoSection({ lc, reverse = false }) {
                 background: 'rgba(201,150,14,0.06)', borderRadius: 10,
                 padding: '12px 14px', border: '1px solid rgba(201,150,14,0.14)',
               }}>
-                <span style={{ fontSize: 20 }}>{a.icon}</span>
+                <span style={{ width: 22, height: 22, borderRadius: 5, background: 'rgba(201,150,14,0.2)',
+                  color: 'var(--gold)', display: 'inline-flex', alignItems: 'center',
+                  justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>✓</span>
                 <span style={{ fontFamily: 'DM Sans', fontSize: 12.5, fontWeight: 600,
                   color: 'var(--navy)', lineHeight: 1.3 }}>{a.label}</span>
               </div>
@@ -498,28 +430,28 @@ function LancamentoSection({ lc, reverse = false }) {
 function SecaoPagamento({ onNav }) {
   const steps = [
     {
-      num: '01', icon: '✍️', color: '#C9960E',
+      num: '01', color: '#C9960E',
       title: 'Assinatura & Entrada',
       sub: '10% a 20% do valor',
       desc: 'Você assina o contrato e parcela a entrada em até 36 meses. Parcelas acessíveis — você não sente o peso enquanto a obra avança.',
       tag: 'Entrada facilitada',
     },
     {
-      num: '02', icon: '🏗️', color: '#059669',
+      num: '02', color: '#059669',
       title: 'Durante as obras',
       sub: 'Fluxo mensal reduzido',
       desc: 'Ao longo dos 48 meses de construção, você paga parcelas mensais de baixo valor — calculadas para caber no seu orçamento sem sacrifícios.',
       tag: '~4 anos de obra',
     },
     {
-      num: '03', icon: '🔑', color: '#B87333',
+      num: '03', color: '#B87333',
       title: 'Entrega das chaves',
       sub: '50% a 60% pago',
       desc: 'Na entrega, você terá quitado entre 50% e 60% do valor total. Sem surpresas, sem revisão de preço — tudo corrigido pelo INCC conforme contrato.',
       tag: 'Chaves em mãos',
     },
     {
-      num: '04', icon: '🏦', color: '#6366F1',
+      num: '04', color: '#6366F1',
       title: 'Financiamento bancário',
       sub: 'Saldo restante',
       desc: 'O saldo (40% a 50%) é financiado via Caixa Econômica, Banco do Brasil ou banco de sua escolha — com prazo de até 30 anos e taxas competitivas.',
@@ -558,7 +490,7 @@ function SecaoPagamento({ onNav }) {
                 fontFamily: 'Cinzel, serif', fontSize: 60, fontWeight: 700,
                 color: 'rgba(255,255,255,0.04)', lineHeight: 1, userSelect: 'none',
               }}>{s.num}</div>
-              <div style={{ fontSize: 36, marginBottom: 14 }}>{s.icon}</div>
+              <div style={{ width: 44, height: 44, borderRadius: 10, background: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14, color: s.color === '#C9960E' ? 'var(--navy)' : '#fff', fontFamily: 'Cinzel, serif', fontSize: 18, fontWeight: 700 }}>{s.num}</div>
               <div style={{
                 display: 'inline-block', background: s.color,
                 color: s.color === '#C9960E' ? 'var(--navy)' : '#fff',
@@ -612,16 +544,16 @@ function SecaoPagamento({ onNav }) {
         {/* benefícios do comprar na planta */}
         <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
           {[
-            { icon: '📈', title: 'Valorização garantida', desc: 'Imóveis na planta costumam valorizar 30 a 50% entre a assinatura e a entrega. Você compra no melhor momento.' },
-            { icon: '💰', title: 'Preço pré-lançamento', desc: 'O preço do lançamento é sempre o menor da tabela. Cada etapa da obra sobe o valor do imóvel.' },
-            { icon: '🔒', title: 'Preço fixado em contrato', desc: 'Após assinar, o preço é seu. Correção apenas pelo INCC (índice da construção civil) — sem revisão de valores.' },
-            { icon: '🏦', title: 'Financiamento facilitado', desc: 'Na entrega, você usa seu FGTS, comprovante de renda e o financiamento bancário com as melhores taxas do mercado.' },
+            { title: 'Valorização garantida', desc: 'Imóveis na planta costumam valorizar 30 a 50% entre a assinatura e a entrega. Você compra no melhor momento.' },
+            { title: 'Preço pré-lançamento', desc: 'O preço do lançamento é sempre o menor da tabela. Cada etapa da obra sobe o valor do imóvel.' },
+            { title: 'Preço fixado em contrato', desc: 'Após assinar, o preço é seu. Correção apenas pelo INCC (índice da construção civil) — sem revisão de valores.' },
+            { title: 'Financiamento facilitado', desc: 'Na entrega, você usa seu FGTS, comprovante de renda e o financiamento bancário com as melhores taxas do mercado.' },
           ].map(b => (
             <div key={b.title} style={{
               background: 'rgba(255,255,255,0.05)', borderRadius: 16, padding: '24px 20px',
               border: '1px solid rgba(255,255,255,0.08)',
             }}>
-              <div style={{ fontSize: 28, marginBottom: 12 }}>{b.icon}</div>
+              <div style={{ width: 32, height: 4, background: 'var(--gold)', borderRadius: 2, marginBottom: 16 }} />
               <div style={{ color: '#fff', fontWeight: 700, fontSize: 14.5, marginBottom: 8 }}>{b.title}</div>
               <p style={{ color: 'rgba(250,249,246,0.68)', fontSize: 13, lineHeight: 1.7, margin: 0 }}>{b.desc}</p>
             </div>
@@ -670,7 +602,7 @@ function Calculadoras() {
 
         <div style={{ display: 'flex', gap: 4, background: '#e8e4da', borderRadius: 14,
           padding: 4, width: 'fit-content', margin: '0 auto 32px' }}>
-          {[['fin', '🏦 Simulador de Financiamento'], ['inv', '📈 Retorno do Investimento']].map(([id, lbl]) => (
+          {[['fin', 'Simulador de Financiamento'], ['inv', 'Retorno do Investimento']].map(([id, lbl]) => (
             <button key={id} onClick={() => setTab(id)} style={{
               padding: '11px 22px', borderRadius: 10, border: 'none', cursor: 'pointer',
               fontFamily: 'DM Sans', fontSize: 13.5, fontWeight: 600,
@@ -832,7 +764,7 @@ function LancamentosPage({ onNav }) {
                 border: 'none', borderRadius: 10, fontFamily: 'DM Sans',
                 fontWeight: 800, fontSize: 15, cursor: 'pointer',
                 boxShadow: '0 8px 28px rgba(37,211,102,0.35)',
-              }}>💬 Falar no WhatsApp</button>
+              }}>Falar no WhatsApp</button>
               <Btn variant="ghostOnNavy" size="lg" onClick={() => document.getElementById('lancamentos-lista')?.scrollIntoView({ behavior: 'smooth' })}>
                 Ver empreendimentos ↓
               </Btn>
@@ -842,17 +774,17 @@ function LancamentosPage({ onNav }) {
           {/* stats hero */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             {[
-              { v: LANCAMENTOS.length, l: 'Empreendimentos', icon: '🏗️' },
-              { v: LANCAMENTOS.reduce((a, b) => a + b.unidades, 0), l: 'Unidades', icon: '🏠' },
-              { v: '4 anos', l: 'Ciclo médio de obras', icon: '📅' },
-              { v: '50–60%', l: 'Pago até as chaves', icon: '🔑' },
+              { v: LANCAMENTOS.length, l: 'Empreendimentos' },
+              { v: LANCAMENTOS.reduce((a, b) => a + b.unidades, 0), l: 'Unidades' },
+              { v: '4 anos', l: 'Ciclo médio de obras' },
+              { v: '50–60%', l: 'Pago até as chaves' },
             ].map(s => (
               <div key={s.l} style={{
                 background: 'rgba(255,255,255,0.08)', borderRadius: 16,
                 padding: '20px 18px', border: '1px solid rgba(255,255,255,0.12)',
                 backdropFilter: 'blur(8px)',
               }}>
-                <div style={{ fontSize: 26, marginBottom: 8 }}>{s.icon}</div>
+                <div style={{ width: 6, height: 4, background: 'var(--gold)', borderRadius: 2, marginBottom: 12 }} />
                 <div style={{ fontFamily: 'Playfair Display', fontSize: 28, fontWeight: 700,
                   color: 'var(--gold-soft)', lineHeight: 1 }}>{s.v}</div>
                 <div style={{ fontFamily: 'DM Sans', fontSize: 11, fontWeight: 600,
@@ -865,8 +797,6 @@ function LancamentosPage({ onNav }) {
       </section>
 
       {/* COMO FUNCIONA O PAGAMENTO */}
-      <SecaoPagamento onNav={onNav} />
-
       {/* LISTA DE EMPREENDIMENTOS */}
       <div id="lancamentos-lista">
         {LANCAMENTOS.map((lc, i) => (
@@ -887,7 +817,7 @@ function LancamentosPage({ onNav }) {
               Tem um empreendimento para lançar?
             </h2>
             <p style={{ color: 'rgba(250,249,246,0.78)', fontSize: 15, lineHeight: 1.8, marginBottom: 24 }}>
-              A VN Prime distribui seu lançamento para compradores qualificados em BH e região metropolitana. Curadoria, fotografia profissional, estratégia digital e equipe de vendas VN Prime.
+              A VN Prime distribui seu lançamento para compradores qualificados em BH e região metropolitana. Curadoria, fotografia profissional e estratégia digital dedicada.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <button onClick={() => whatsApp('Tenho um empreendimento e gostaria de conversar sobre uma parceria com a VN Prime.')} style={{
@@ -895,7 +825,7 @@ function LancamentosPage({ onNav }) {
                 padding: '13px 22px', background: '#25d366', color: '#fff',
                 border: 'none', borderRadius: 10, fontFamily: 'DM Sans',
                 fontWeight: 700, fontSize: 14, cursor: 'pointer',
-              }}>💬 WhatsApp</button>
+              }}>WhatsApp</button>
               <Btn variant="ghostOnNavy" onClick={() => onNav('sobre')}>Sobre a VN Prime</Btn>
             </div>
           </div>

@@ -133,6 +133,9 @@ window.claude = {
 <script type="text/babel" src="page-proprietario.jsx"></script>
 <script type="text/babel" src="page-corretor-canal.jsx"></script>
 <script type="text/babel" src="page-fotografo-canal.jsx"></script>
+<script type="text/babel" src="page-consorcio.jsx"></script>
+<script type="text/babel" src="page-due-diligence.jsx"></script>
+<script type="text/babel" src="page-admin.jsx"></script>
 <script type="text/babel" src="tweaks-panel.jsx"></script>
 
 <script type="text/babel">
@@ -150,12 +153,12 @@ function App() {
   const [authUser, setAuthUser] = React.useState(() => {
     try { return JSON.parse(localStorage.getItem('vnprime_user')); } catch { return null; }
   });
-  const [authModal, setAuthModal] = React.useState({ open: false, tab: 'entrar', pendingNav: null });
+  const [authModal, setAuthModal] = React.useState({ open: false, tab: 'entrar', pendingNav: null, presetRole: null });
 
-  const onAuthOpen = (tab = 'entrar', pendingNav = null) => {
-    setAuthModal({ open: true, tab, pendingNav });
+  const onAuthOpen = (tab = 'entrar', pendingNav = null, presetRole = null) => {
+    setAuthModal({ open: true, tab, pendingNav, presetRole });
   };
-  const onAuthClose = () => setAuthModal(m => ({ ...m, open: false, pendingNav: null }));
+  const onAuthClose = () => setAuthModal(m => ({ ...m, open: false, pendingNav: null, presetRole: null }));
   const roleDestination = (role) => {
     if (role === 'proprietario') return 'anunciar';
     if (role === 'corretor')    return 'corretor';
@@ -165,10 +168,9 @@ function App() {
 
   const onAuth = (user) => {
     setAuthUser(user);
-    const pending = authModal.pendingNav;
     onAuthClose();
-    if (pending) { setRoute({ name: pending, params: {} }); return; }
-    if (user.role) { setRoute({ name: roleDestination(user.role), params: {} }); return; }
+    // Always route to the user's role destination — enforces portal isolation
+    setRoute({ name: roleDestination(user.role), params: {} });
   };
   const onLogout = () => {
     localStorage.removeItem('vnprime_user');
@@ -176,10 +178,19 @@ function App() {
     setRoute({ name: 'home', params: {} });
   };
 
+  const routeRole = { anunciar: 'proprietario', corretor: 'corretor', fotografo: 'fotografo' };
   const onNav = (name, params = {}) => {
     const protectedRoutes = ['anunciar', 'portal', 'corretor', 'fotografo'];
-    if (protectedRoutes.includes(name) && !authUser) {
-      onAuthOpen('entrar', name); return;
+    if (protectedRoutes.includes(name)) {
+      if (!authUser) {
+        onAuthOpen('entrar', name, routeRole[name] || null); return;
+      }
+      // Role guard: logged-in users can only access their own portal
+      if (routeRole[name] && authUser.role !== routeRole[name]) {
+        const myRoute = roleDestination(authUser.role);
+        setRoute({ name: myRoute, params: {} });
+        window.scrollTo({ top: 0, behavior: 'instant' }); return;
+      }
     }
     setRoute({ name, params });
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -205,7 +216,7 @@ function App() {
 
   return (
     <React.Fragment>
-      <AuthModal isOpen={authModal.open} defaultTab={authModal.tab} onClose={onAuthClose} onAuth={onAuth} />
+      <AuthModal isOpen={authModal.open} defaultTab={authModal.tab} presetRole={authModal.presetRole} onClose={onAuthClose} onAuth={onAuth} />
       <SiteHeader active={headerActive} onNav={onNav} density={tweaks.density}
         authUser={authUser} onAuthOpen={onAuthOpen} onLogout={onLogout} />
 
@@ -231,6 +242,9 @@ function App() {
       {route.name === 'aluguel' && (
         <PlaceholderPage name="aluguel" onNav={onNav} />
       )}
+      {route.name === 'consorcio' && React.createElement(window.ConsorcioPage, { onNav, authUser, onAuthOpen })}
+      {route.name === 'due-diligence' && React.createElement(window.DueDiligencePage, { onNav })}
+      {route.name === 'admin' && React.createElement(window.AdminPage, { onNav, authUser })}
 
       <SiteFooter onNav={onNav} />
 
@@ -281,6 +295,9 @@ function App() {
           <TweakButton onClick={() => onNav('proprietario')}>Canal proprietário</TweakButton>
           <TweakButton onClick={() => onNav('corretor-canal')}>Canal corretor</TweakButton>
           <TweakButton onClick={() => onNav('fotografo-canal')}>Canal fotógrafo</TweakButton>
+          <TweakButton onClick={() => onNav('consorcio')}>Consórcio</TweakButton>
+          <TweakButton onClick={() => onNav('due-diligence')}>Due Diligence</TweakButton>
+          <TweakButton onClick={() => onNav('admin')}>Admin</TweakButton>
         </TweakSection>
       </TweaksPanel>
     </React.Fragment>
@@ -289,7 +306,8 @@ function App() {
 
 function PlaceholderPage({ name, onNav }) {
   const labels = {
-    aluguel: ['Imóveis para alugar', 'Veja nossos imóveis em aluguel na busca.'],
+    aluguel:   ['Imóveis para alugar',  'Veja nossos imóveis em aluguel na busca.'],
+    consorcio: ['Consórcio Imobiliário', 'Compre sem juros com carta de crédito VN Prime. Página em breve.'],
   };
   const [t, p] = labels[name] || ['Página', 'Em construção'];
   return (

@@ -158,60 +158,77 @@ function PaywallModal({ onClose }) {
 }
 
 // ── Seletor de áreas ──────────────────────────────────────────────────────────
+const AREA_LIMIT = 2;
+
 function AreasTab({ selected, onChange }) {
-  const totalAreas = AREAS_GBH.reduce((s, g) => s + g.areas.length, 0);
-  const gruposSelecionados = [...new Set(selected.map(a => AREA_TO_GRUPO[a]).filter(Boolean))];
+  const [solicitando, setSolicitando] = React.useState(false);
+  const [motivo, setMotivo]           = React.useState('');
+  const [enviado, setEnviado]         = React.useState(false);
+
+  const atLimit = selected.length >= AREA_LIMIT;
 
   const toggleArea = (area) => {
-    onChange(selected.includes(area) ? selected.filter(x => x !== area) : [...selected, area]);
-  };
-
-  const toggleGrupo = (grupo) => {
-    const areasDoGrupo = AREAS_GBH.find(g => g.grupo === grupo)?.areas || [];
-    const todasSelecionadas = areasDoGrupo.every(a => selected.includes(a));
-    if (todasSelecionadas) {
-      onChange(selected.filter(a => !areasDoGrupo.includes(a)));
+    if (selected.includes(area)) {
+      onChange(selected.filter(x => x !== area));
     } else {
-      const novas = areasDoGrupo.filter(a => !selected.includes(a));
-      onChange([...selected, ...novas]);
+      if (atLimit) return; // limit reached
+      onChange([...selected, area]);
     }
   };
 
-  const selectAll = () => onChange(AREAS_GBH.flatMap(g => g.areas));
   const clearAll  = () => onChange([]);
 
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
       {/* Header */}
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:12 }}>
-        <div>
-          <h2 style={{ margin:0, fontSize:17, color:'var(--navy)' }}>Áreas de atuação</h2>
-          <p style={{ margin:'4px 0 0', fontSize:13, color:'var(--fg-2)' }}>
-            Selecione onde você atua — leads e imóveis serão filtrados automaticamente
-          </p>
-        </div>
-        <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-          <span style={{ fontSize:13, color:'var(--fg-2)' }}>
-            <strong style={{ color:'var(--navy)' }}>{selected.length}</strong> / {totalAreas} áreas
-          </span>
-          <button onClick={selectAll} style={{ padding:'6px 12px', background:'var(--navy)', color:'#fff', border:'none', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer' }}>
-            Selecionar tudo
-          </button>
-          <button onClick={clearAll} style={{ padding:'6px 12px', background:'transparent', color:'var(--fg-2)', border:'1px solid var(--border)', borderRadius:6, fontSize:12, cursor:'pointer' }}>
-            Limpar
-          </button>
-        </div>
+      <div>
+        <h2 style={{ margin:'0 0 6px', fontSize:17, color:'var(--navy)' }}>Áreas de atuação</h2>
+        <p style={{ margin:0, fontSize:13, color:'var(--fg-2)', lineHeight:1.5 }}>
+          Selecione até <strong>{AREA_LIMIT} áreas</strong> — leads e imóveis serão filtrados automaticamente.
+          Para expandir para mais regiões, solicite aprovação da curadoria.
+        </p>
       </div>
 
-      {/* Grupos selecionados — chips resumo */}
-      {gruposSelecionados.length > 0 && (
+      {/* Quota indicator */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12,
+        background: atLimit ? '#FFF7ED' : '#F0FDF4',
+        border: `1px solid ${atLimit ? '#FED7AA' : '#BBF7D0'}`,
+        borderRadius:12, padding:'12px 16px' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+          <div style={{ display:'flex', gap:6 }}>
+            {[0,1].map(i => (
+              <div key={i} style={{
+                width:28, height:28, borderRadius:8,
+                background: i < selected.length ? '#059669' : 'rgba(0,0,0,0.06)',
+                border: `2px solid ${i < selected.length ? '#059669' : 'var(--border)'}`,
+                display:'flex', alignItems:'center', justifyContent:'center',
+                fontSize:13, color:'#fff', fontWeight:700,
+              }}>{i < selected.length ? '✓' : ''}</div>
+            ))}
+          </div>
+          <span style={{ fontSize:13, color: atLimit ? '#92400E' : '#15803D', fontWeight:600 }}>
+            {selected.length} de {AREA_LIMIT} áreas selecionadas
+            {atLimit && ' — limite atingido'}
+          </span>
+        </div>
+        {selected.length > 0 && (
+          <button onClick={clearAll} style={{ padding:'5px 10px', background:'transparent',
+            color:'var(--fg-2)', border:'1px solid var(--border)', borderRadius:6, fontSize:12, cursor:'pointer' }}>
+            Limpar
+          </button>
+        )}
+      </div>
+
+      {/* Chips selecionadas */}
+      {selected.length > 0 && (
         <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
-          {gruposSelecionados.map(g => {
-            const grupo = AREAS_GBH.find(x => x.grupo === g);
-            const count = (grupo?.areas || []).filter(a => selected.includes(a)).length;
+          {selected.map(a => {
+            const g = AREAS_GBH.find(x => x.areas.includes(a));
             return (
-              <span key={g} style={{ padding:'3px 10px', borderRadius:99, fontSize:12, fontWeight:600, background:`${grupo.cor}18`, color:grupo.cor, border:`1px solid ${grupo.cor}40` }}>
-                {g} · {count}
+              <span key={a} onClick={() => toggleArea(a)}
+                style={{ padding:'5px 12px', borderRadius:99, fontSize:12, fontWeight:700, cursor:'pointer',
+                  background: g?.cor, color:'#fff', display:'flex', alignItems:'center', gap:6 }}>
+                {a} <span style={{ opacity:0.7, fontSize:11 }}>✕</span>
               </span>
             );
           })}
@@ -219,60 +236,34 @@ function AreasTab({ selected, onChange }) {
       )}
 
       {/* Grupos */}
-      <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+      <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
         {AREAS_GBH.map(grupo => {
-          const selecionadasNoGrupo = grupo.areas.filter(a => selected.includes(a));
-          const todasSel = selecionadasNoGrupo.length === grupo.areas.length;
-          const algumaSel = selecionadasNoGrupo.length > 0;
-
+          const algumaSel = grupo.areas.some(a => selected.includes(a));
           return (
             <div key={grupo.grupo} style={{ background:'#fff', border:'1px solid var(--border)', borderRadius:12, overflow:'hidden' }}>
               {/* Grupo header */}
-              <div
-                onClick={() => toggleGrupo(grupo.grupo)}
-                style={{
-                  padding:'12px 16px', display:'flex', alignItems:'center', gap:12, cursor:'pointer',
-                  background: todasSel ? `${grupo.cor}10` : algumaSel ? `${grupo.cor}06` : '#fff',
-                  borderBottom:'1px solid var(--border)',
-                }}
-              >
-                {/* Checkbox grupo */}
-                <div style={{
-                  width:20, height:20, borderRadius:5, flexShrink:0,
-                  border: todasSel ? `2px solid ${grupo.cor}` : algumaSel ? `2px solid ${grupo.cor}` : '2px solid var(--border)',
-                  background: todasSel ? grupo.cor : algumaSel ? `${grupo.cor}30` : '#fff',
-                  display:'flex', alignItems:'center', justifyContent:'center',
-                }}>
-                  {todasSel && <span style={{ color:'#fff', fontSize:12, fontWeight:900 }}>✓</span>}
-                  {algumaSel && !todasSel && <span style={{ color:grupo.cor, fontSize:14, fontWeight:900, lineHeight:1 }}>–</span>}
-                </div>
-                <div style={{ flex:1 }}>
-                  <span style={{ fontWeight:700, fontSize:14, color:'var(--navy)' }}>{grupo.grupo}</span>
-                  <span style={{ marginLeft:8, fontSize:12, color:'var(--fg-2)' }}>{grupo.areas.length} áreas</span>
-                </div>
-                {algumaSel && (
-                  <span style={{ padding:'2px 8px', borderRadius:99, fontSize:11, fontWeight:700, background:grupo.cor, color:'#fff' }}>
-                    {selecionadasNoGrupo.length} sel.
-                  </span>
-                )}
+              <div style={{ padding:'10px 16px', display:'flex', alignItems:'center', gap:10,
+                background: algumaSel ? `${grupo.cor}08` : '#fff', borderBottom:'1px solid var(--border)' }}>
+                <div style={{ width:10, height:10, borderRadius:'50%', background:grupo.cor, flexShrink:0 }} />
+                <div style={{ flex:1, fontWeight:700, fontSize:13.5, color:'var(--navy)' }}>{grupo.grupo}</div>
+                <div style={{ fontSize:11, color:'var(--fg-2)' }}>{grupo.areas.length} bairros</div>
               </div>
-
               {/* Chips de área */}
-              <div style={{ padding:'12px 16px', display:'flex', flexWrap:'wrap', gap:8 }}>
+              <div style={{ padding:'10px 14px', display:'flex', flexWrap:'wrap', gap:7 }}>
                 {grupo.areas.map(area => {
                   const sel = selected.includes(area);
+                  const disabled = !sel && atLimit;
                   return (
-                    <button
-                      key={area}
-                      onClick={() => toggleArea(area)}
+                    <button key={area} onClick={() => toggleArea(area)}
+                      title={disabled ? `Limite de ${AREA_LIMIT} áreas atingido` : ''}
                       style={{
                         padding:'5px 12px', borderRadius:99, fontSize:12, fontWeight:sel ? 700 : 500,
-                        cursor:'pointer', transition:'all 0.12s',
+                        cursor: disabled ? 'not-allowed' : 'pointer', transition:'all 0.12s',
                         background: sel ? grupo.cor : 'transparent',
-                        color: sel ? '#fff' : 'var(--navy)',
-                        border: sel ? `1.5px solid ${grupo.cor}` : '1.5px solid var(--border)',
-                      }}
-                    >{area}</button>
+                        color: sel ? '#fff' : disabled ? '#ccc' : 'var(--navy)',
+                        border: sel ? `1.5px solid ${grupo.cor}` : disabled ? '1.5px solid #e5e7eb' : '1.5px solid var(--border)',
+                        opacity: disabled ? 0.5 : 1,
+                      }}>{area}</button>
                   );
                 })}
               </div>
@@ -281,10 +272,54 @@ function AreasTab({ selected, onChange }) {
         })}
       </div>
 
-      {/* Save feedback */}
-      <div style={{ padding:'12px 16px', background:'#F0FDF4', border:'1px solid #BBF7D0', borderRadius:10, fontSize:13, color:'#15803D', display:'flex', alignItems:'center', gap:8 }}>
+      {/* Solicitar área adicional */}
+      <div style={{ background:'#F0F9FF', border:'1px solid #BAE6FD', borderRadius:12, padding:'16px 18px' }}>
+        <div style={{ fontWeight:700, fontSize:14, color:'var(--navy)', marginBottom:6 }}>
+          Precisa de mais áreas?
+        </div>
+        <p style={{ fontSize:12.5, color:'var(--fg-2)', margin:'0 0 12px', lineHeight:1.5 }}>
+          Como há outros corretores nas mesmas regiões, a expansão é aprovada pela curadoria VN Prime.
+          Envie uma solicitação — geralmente aprovada em 24h.
+        </p>
+        {!solicitando && !enviado && (
+          <button onClick={() => setSolicitando(true)} style={{
+            padding:'8px 16px', background:'var(--navy)', color:'#fff',
+            border:'none', borderRadius:8, fontSize:12.5, fontWeight:600, cursor:'pointer' }}>
+            Solicitar área adicional
+          </button>
+        )}
+        {solicitando && !enviado && (
+          <div>
+            <textarea value={motivo} onChange={e => setMotivo(e.target.value)}
+              placeholder="Explique por quê você precisa de mais áreas e quais regiões de interesse..."
+              style={{ width:'100%', minHeight:72, padding:'10px 12px', borderRadius:8,
+                border:'1.5px solid var(--border)', fontFamily:'DM Sans', fontSize:13,
+                resize:'vertical', boxSizing:'border-box', outline:'none', marginBottom:8 }} />
+            <div style={{ display:'flex', gap:8 }}>
+              <button onClick={() => setEnviado(true)} disabled={!motivo.trim()} style={{
+                padding:'7px 14px', background: motivo.trim() ? 'var(--navy)' : '#ccc',
+                color:'#fff', border:'none', borderRadius:8, fontSize:12.5, fontWeight:600,
+                cursor: motivo.trim() ? 'pointer' : 'default' }}>
+                Enviar solicitação
+              </button>
+              <button onClick={() => setSolicitando(false)} style={{
+                padding:'7px 14px', background:'transparent', color:'var(--fg-2)',
+                border:'1px solid var(--border)', borderRadius:8, fontSize:12.5, cursor:'pointer' }}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )}
+        {enviado && (
+          <div style={{ display:'flex', alignItems:'center', gap:8, fontSize:13, color:'#0369A1', fontWeight:600 }}>
+            <span>✓</span> Solicitação enviada — curadoria responde em até 24h.
+          </div>
+        )}
+      </div>
+
+      <div style={{ padding:'10px 14px', background:'#F0FDF4', border:'1px solid #BBF7D0', borderRadius:10, fontSize:12.5, color:'#15803D', display:'flex', alignItems:'center', gap:8 }}>
         <span>✓</span>
-        <span>Suas áreas são salvas automaticamente e aplicadas aos leads e imóveis.</span>
+        <span>Áreas salvas automaticamente — leads e imóveis filtrados na hora.</span>
       </div>
     </div>
   );
@@ -425,9 +460,14 @@ function CorretorPage({ onNav, authUser }) {
               <div style={{ opacity:0.7, fontSize:13, marginBottom:2 }}>Portal do Corretor · Freemium</div>
               <div style={{ fontWeight:700, fontSize:22 }}>Olá, {nome.split(' ')[0]}</div>
             </div>
-            <button onClick={() => setPaywall(true)} style={{ padding:'10px 20px', background:'linear-gradient(135deg,var(--gold) 0%,#e6a800 100%)', color:'#fff', border:'none', borderRadius:8, fontWeight:700, fontSize:13, cursor:'pointer' }}>
-              ⭐ Tornar-se membro · R$ 49,90/mês
-            </button>
+            <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+              <button onClick={() => onNav('anunciar')} style={{ padding:'10px 20px', background:'rgba(255,255,255,0.12)', color:'#fff', border:'1.5px solid rgba(255,255,255,0.35)', borderRadius:8, fontWeight:700, fontSize:13, cursor:'pointer' }}>
+                Anunciar imóvel
+              </button>
+              <button onClick={() => setPaywall(true)} style={{ padding:'10px 20px', background:'linear-gradient(135deg,var(--gold) 0%,#e6a800 100%)', color:'#fff', border:'none', borderRadius:8, fontWeight:700, fontSize:13, cursor:'pointer' }}>
+                Tornar-se membro · R$ 49,90/mês
+              </button>
+            </div>
           </div>
 
           <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))', gap:12 }}>

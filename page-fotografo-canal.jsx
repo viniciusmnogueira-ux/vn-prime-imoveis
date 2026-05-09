@@ -10,9 +10,11 @@ function FotografoCanalPage({ onNav }) {
     <main style={{ background: 'var(--cream)', minHeight: '100vh' }}>
       <FotoHero onNav={onNav} />
       <FotoPassos />
+      <FotoBanner />
       <FotoJobs />
       <FotoPacotes onNav={onNav} />
       <FotoPortfolio />
+      <FotoDroneVideos />
       <FotoFactorOne />
       <FotoCtaFinal onNav={onNav} />
     </main>
@@ -29,7 +31,7 @@ function FotoJobCardMock() {
         <span style={{ background: '#22c55e22', color: '#4ade80', border: '1px solid #4ade8044',
           borderRadius: 999, padding: '2px 10px', fontSize: 10.5, fontWeight: 700 }}>Novo</span>
       </div>
-      <div style={{ fontSize: 15, fontWeight: 600, color: '#fff', marginBottom: 3 }}>Apartamento · Lourdes</div>
+      <div style={{ fontSize: 15, fontWeight: 600, color: '#fff', marginBottom: 3 }}>Apartamento · BH e região</div>
       <div style={{ fontSize: 12.5, color: 'rgba(250,249,246,0.6)', marginBottom: 14 }}>Belo Horizonte — 240 m²</div>
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
         {['Foto', 'Drone', 'Tour 3D'].map(t => (
@@ -95,13 +97,14 @@ function FotoHero({ onNav }) {
               Você recebe os jobs, fotografa com liberdade e recebe com segurança via FactorOne.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <button onClick={() => onNav('fotografo')} style={{
+              <a href="https://wa.me/5531984144250?text=Ol%C3%A1!%20Gostaria%20de%20contratar%20um%20fot%C3%B3grafo%20VN%20Prime%20para%20fotografar%20meu%20im%C3%B3vel." target="_blank" rel="noopener" style={{
                 background: `linear-gradient(135deg, ${FOTO_BRONZE_LIGHT}, ${FOTO_BRONZE})`,
                 color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer',
                 padding: '0.9rem 1.8rem', fontFamily: 'DM Sans', fontWeight: 700, fontSize: 15,
-                boxShadow: `0 8px 28px ${FOTO_BRONZE}55` }}>
-                Quero ser credenciado →
-              </button>
+                boxShadow: `0 8px 28px ${FOTO_BRONZE}55`,
+                textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+                Contratar fotógrafo VN Prime →
+              </a>
               <button onClick={() => document.getElementById('foto-pacotes')?.scrollIntoView({ behavior: 'smooth' })} style={{
                 background: 'rgba(255,255,255,0.08)', color: '#fff',
                 border: '1px solid rgba(250,249,246,0.3)', borderRadius: 10, cursor: 'pointer',
@@ -111,9 +114,29 @@ function FotoHero({ onNav }) {
             </div>
           </div>
 
-          {/* Job card mockup */}
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <FotoJobCardMock />
+          {/* Hero photo */}
+          <div style={{ position: 'relative' }}>
+            <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.40)' }}>
+              <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=820&q=80"
+                alt="Fotógrafo profissional de imóveis"
+                style={{ width: '100%', height: 360, objectFit: 'cover', display: 'block' }} />
+            </div>
+            <div style={{ position: 'absolute', bottom: -16, left: -16,
+              background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)',
+              borderRadius: 14, padding: '12px 18px',
+              boxShadow: '0 8px 28px rgba(0,0,0,0.18)' }}>
+              <div style={{ fontFamily: 'Playfair Display', fontSize: 22, fontWeight: 700, color: FOTO_BRONZE, lineHeight: 1 }}>R$ 750</div>
+              <div style={{ fontSize: 10, color: 'var(--fg-2)', marginTop: 3, fontWeight: 600,
+                letterSpacing: '0.08em', textTransform: 'uppercase' }}>por job completo</div>
+            </div>
+            <div style={{ position: 'absolute', top: 18, right: -14,
+              background: `rgba(184,115,51,0.95)`, backdropFilter: 'blur(12px)',
+              borderRadius: 14, padding: '10px 16px',
+              boxShadow: '0 8px 28px rgba(0,0,0,0.25)', color: '#fff',
+              fontFamily: 'DM Sans', fontSize: 10, fontWeight: 700,
+              letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              100% da comissão é sua
+            </div>
           </div>
         </div>
 
@@ -138,10 +161,10 @@ function FotoHero({ onNav }) {
 
 function FotoPassos() {
   const passos = [
-    { num: '01', title: 'Monte seu portfólio', desc: 'Cadastre suas melhores fotos de imóveis. Nossa equipe avalia seu estilo e técnica.', icon: '📸' },
-    { num: '02', title: 'Curadoria VN Prime', desc: 'Um curador aprova seu credenciamento em até 5 dias úteis. Feedback garantido.', icon: '✓' },
-    { num: '03', title: 'Receba jobs', desc: 'Jobs chegam filtrados por bairro e disponibilidade. Você aceita ou recusa — sem obrigação.', icon: '📲' },
-    { num: '04', title: 'Fotografe e receba', desc: 'Entregue as fotos pela plataforma. Pagamento automático em até 30 dias via FactorOne.', icon: '💰' },
+    { num: '01', title: 'Monte seu portfólio', desc: 'Cadastre suas melhores fotos de imóveis. Nossa equipe avalia seu estilo e técnica.' },
+    { num: '02', title: 'Curadoria VN Prime', desc: 'Um curador aprova seu credenciamento em até 5 dias úteis. Feedback garantido.' },
+    { num: '03', title: 'Receba jobs', desc: 'Jobs chegam filtrados por bairro e disponibilidade. Você aceita ou recusa — sem obrigação.' },
+    { num: '04', title: 'Fotografe e receba', desc: 'Entregue as fotos pela plataforma. Pagamento automático em até 30 dias via FactorOne.' },
   ];
   return (
     <section style={{ padding: 'clamp(3rem, 6vw, 4.5rem) 0', background: '#fff' }}>
@@ -159,8 +182,9 @@ function FotoPassos() {
               border: '1px solid var(--border)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
                 <div style={{ width: 48, height: 48, borderRadius: 12, flexShrink: 0,
-                  background: `${FOTO_BRONZE}15`, color: FOTO_BRONZE,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{p.icon}</div>
+                  background: FOTO_BRONZE, color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: 'Cinzel, serif', fontSize: 16, fontWeight: 700 }}>{p.num}</div>
                 <span style={{ fontFamily: 'DM Sans', fontSize: 10, fontWeight: 800,
                   letterSpacing: '0.16em', color: `${FOTO_BRONZE}88`, textTransform: 'uppercase' }}>
                   Passo {p.num}
@@ -176,14 +200,69 @@ function FotoPassos() {
   );
 }
 
+function FotoBanner() {
+  const fotos = [
+    { src: 'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=800&q=80', label: 'Interior premium' },
+    { src: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&q=80', label: 'Sala de estar' },
+    { src: 'https://images.unsplash.com/photo-1516815231560-8f41ec531527?w=800&q=80', label: 'Drone 4K' },
+    { src: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80', label: 'Cozinha gourmet' },
+  ];
+  return (
+    <section style={{ padding: 'clamp(2.5rem, 5vw, 4rem) 0', background: 'var(--cream)' }}>
+      <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto' }}>
+        {/* Photo strip */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 40, borderRadius: 18, overflow: 'hidden' }}>
+          {fotos.map(({ src, label }) => (
+            <div key={label} style={{ position: 'relative', height: 220, overflow: 'hidden' }}>
+              <img src={src} alt={label}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                  transition: 'transform 0.4s ease' }}
+                onMouseEnter={e => e.target.style.transform='scale(1.06)'}
+                onMouseLeave={e => e.target.style.transform='scale(1)'} />
+              <div style={{ position: 'absolute', inset: 0,
+                background: 'linear-gradient(to top, rgba(15,34,68,0.65) 0%, transparent 60%)' }} />
+              <div style={{ position: 'absolute', bottom: 12, left: 14,
+                fontFamily: 'DM Sans', fontSize: 12, fontWeight: 700,
+                color: '#fff', letterSpacing: '0.04em' }}>{label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Wide banner strip */}
+        <div style={{ borderRadius: 20, overflow: 'hidden', position: 'relative',
+          boxShadow: '0 20px 60px rgba(15,34,68,0.15)' }}>
+          <img src="https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=1600&q=80"
+            alt="Imóvel fotografado por VN Prime"
+            style={{ width: '100%', height: 280, objectFit: 'cover', display: 'block' }} />
+          <div style={{ position: 'absolute', inset: 0,
+            background: 'linear-gradient(to right, rgba(15,34,68,0.85) 0%, rgba(15,34,68,0.3) 60%, transparent 100%)' }} />
+          <div style={{ position: 'absolute', top: '50%', left: 40, transform: 'translateY(-50%)', maxWidth: 500 }}>
+            <div style={{ fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
+              textTransform: 'uppercase', color: FOTO_BRONZE_LIGHT, marginBottom: 10 }}>
+              Portfólio VN Prime · BH e região
+            </div>
+            <h2 style={{ color: '#fff', margin: '0 0 14px', fontSize: 'clamp(1.4rem, 2.5vw, 1.9rem)', lineHeight: 1.3 }}>
+              Cada foto é uma obra que vende
+            </h2>
+            <p style={{ color: 'rgba(250,249,246,0.8)', fontSize: 14.5, lineHeight: 1.65, margin: 0, maxWidth: 380 }}>
+              Fotógrafos credenciados VN Prime fotografam imóveis de R$ 500k a R$ 8M —
+              alto padrão, arte de execução, remuneração justa.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function FotoJobs() {
   const jobs = [
     { tipo: 'Apartamento', bairro: 'Lourdes', size: '240 m²', pkg: 'Full', val: 750, tags: ['Foto', 'Drone', 'Tour 3D'], status: 'novo', urgente: false },
-    { tipo: 'Casa', bairro: 'Mangabeiras', size: '380 m²', pkg: 'Premium', val: 450, tags: ['Foto', 'Edição avançada'], status: 'disponível', urgente: true },
-    { tipo: 'Cobertura', bairro: 'Savassi', size: '190 m²', pkg: 'Full', val: 750, tags: ['Foto', 'Drone', 'Tour 3D'], status: 'novo', urgente: false },
-    { tipo: 'Apartamento', bairro: 'Buritis', size: '120 m²', pkg: 'Básico', val: 250, tags: ['Foto', 'Edição básica'], status: 'disponível', urgente: false },
-    { tipo: 'Penthouse', bairro: 'Serra', size: '320 m²', pkg: 'Full', val: 750, tags: ['Foto', 'Drone', 'Tour 3D'], status: 'agendado', urgente: false },
-    { tipo: 'Casa', bairro: 'Nova Lima', size: '420 m²', pkg: 'Premium', val: 450, tags: ['Foto', 'Edição avançada'], status: 'disponível', urgente: true },
+    { tipo: 'Casa', bairro: 'BH e região', size: '380 m²', pkg: 'Premium', val: 450, tags: ['Foto', 'Edição avançada'], status: 'disponível', urgente: true },
+    { tipo: 'Cobertura', bairro: 'BH e região', size: '190 m²', pkg: 'Full', val: 750, tags: ['Foto', 'Drone', 'Tour 3D'], status: 'novo', urgente: false },
+    { tipo: 'Apartamento', bairro: 'BH e região', size: '120 m²', pkg: 'Básico', val: 250, tags: ['Foto', 'Edição básica'], status: 'disponível', urgente: false },
+    { tipo: 'Penthouse', bairro: 'BH e região', size: '320 m²', pkg: 'Full', val: 750, tags: ['Foto', 'Drone', 'Tour 3D'], status: 'agendado', urgente: false },
+    { tipo: 'Casa', bairro: 'Grande BH', size: '420 m²', pkg: 'Premium', val: 450, tags: ['Foto', 'Edição avançada'], status: 'disponível', urgente: true },
   ];
   const statusStyle = {
     'novo':       ['#22c55e22', '#4ade80',        '#4ade8044'],
@@ -359,6 +438,58 @@ function FotoPacotes({ onNav }) {
             Começar agora →
           </button>
         </div>
+
+        {/* Pricing tiers by bedroom count */}
+        <div style={{ marginTop: 40 }}>
+          <div style={{ textAlign: 'center', marginBottom: 28 }}>
+            <Eyebrow color={FOTO_BRONZE}>Tabela de valores · por dormitório</Eyebrow>
+            <h3 style={{ margin: '4px 0 8px', fontSize: 20 }}>Valores referência por porte do imóvel</h3>
+            <p style={{ color: 'var(--fg-2)', fontSize: 13.5, margin: 0 }}>
+              Imóveis maiores demandam mais tempo e equipamento — o valor reflete a complexidade do job.
+            </p>
+          </div>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0,
+              border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden',
+              fontFamily: 'DM Sans', fontSize: 13.5 }}>
+              <thead>
+                <tr style={{ background: 'var(--navy)', color: '#fff' }}>
+                  <th style={{ padding: '14px 20px', textAlign: 'left', fontWeight: 600, fontSize: 12,
+                    letterSpacing: '0.08em', textTransform: 'uppercase' }}>Porte do imóvel</th>
+                  {[{ id: 'basico', label: 'Básico' }, { id: 'premium', label: 'Premium' }, { id: 'full', label: 'Full' }].map(p => (
+                    <th key={p.id} style={{ padding: '14px 20px', textAlign: 'center', fontWeight: 700, fontSize: 13,
+                      color: p.id === 'premium' ? FOTO_BRONZE_LIGHT : '#fff' }}>{p.label}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { tier: '1–2 quartos', basico: 'R$250', premium: 'R$450', full: 'R$750', note: 'Apartamentos, studios e kitinets' },
+                  { tier: '3–4 quartos', basico: 'R$320', premium: 'R$550', full: 'R$900', note: 'Casas, coberturas e aptos. maiores' },
+                  { tier: '5+ quartos',  basico: 'R$420', premium: 'R$680', full: 'R$1.100', note: 'Mansões, condomínios e lançamentos' },
+                ].map((row, i) => (
+                  <tr key={row.tier} style={{ background: i % 2 === 0 ? '#fff' : 'rgba(201,150,14,0.03)' }}>
+                    <td style={{ padding: '16px 20px', borderBottom: i < 2 ? '1px solid var(--border)' : 'none' }}>
+                      <div style={{ fontWeight: 700, color: 'var(--navy)', marginBottom: 2 }}>{row.tier}</div>
+                      <div style={{ fontSize: 11.5, color: 'var(--fg-2)' }}>{row.note}</div>
+                    </td>
+                    {[row.basico, row.premium, row.full].map((val, j) => (
+                      <td key={j} style={{ padding: '16px 20px', textAlign: 'center',
+                        borderBottom: i < 2 ? '1px solid var(--border)' : 'none',
+                        borderLeft: '1px solid var(--border)' }}>
+                        <span style={{ fontFamily: 'Playfair Display', fontSize: 18, fontWeight: 700,
+                          color: j === 1 ? FOTO_BRONZE : 'var(--navy)' }}>{val}</span>
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p style={{ fontSize: 11.5, color: 'var(--fg-2)', textAlign: 'center', marginTop: 12 }}>
+            Valores de referência. Jobs com drone ou tour 3D podem ter acréscimo negociado diretamente no portal.
+          </p>
+        </div>
       </div>
     </section>
   );
@@ -366,31 +497,25 @@ function FotoPacotes({ onNav }) {
 
 function FotoPortfolio() {
   const photos = [
-    { room: 'Sala de estar', bairro: 'Lourdes', type: 'Grande angular', wide: false },
-    { room: 'Fachada aérea', bairro: 'Savassi', type: 'Drone', wide: true },
-    { room: 'Cozinha gourmet', bairro: 'Mangabeiras', type: 'Interior', wide: false },
-    { room: 'Suíte master', bairro: 'Serra', type: 'Interior', wide: false },
-    { room: 'Área externa', bairro: 'Nova Lima', type: 'Drone', wide: true },
-    { room: 'Hall de entrada', bairro: 'Buritis', type: 'Interior', wide: false },
-  ];
-  const palettes = [
-    `linear-gradient(135deg, rgba(184,115,51,0.35) 0%, rgba(15,34,68,0.75) 100%)`,
-    `linear-gradient(135deg, rgba(15,34,68,0.55) 0%, rgba(184,115,51,0.45) 100%)`,
-    `linear-gradient(135deg, rgba(184,115,51,0.25) 0%, rgba(15,34,68,0.65) 100%)`,
-    `linear-gradient(135deg, rgba(15,34,68,0.45) 0%, rgba(208,143,79,0.55) 100%)`,
-    `linear-gradient(135deg, rgba(184,115,51,0.4) 0%, rgba(15,34,68,0.6) 100%)`,
-    `linear-gradient(135deg, rgba(15,34,68,0.6) 0%, rgba(184,115,51,0.3) 100%)`,
+    { room: 'Sala de estar',  bairro: 'Lourdes',     type: 'Grande angular', wide: false, url: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&q=80' },
+    { room: 'Fachada aérea',  bairro: 'BH e região',     type: 'Drone',          wide: true,  url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80' },
+    { room: 'Cozinha gourmet',bairro: 'BH e região',  type: 'Interior',       wide: false, url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80' },
+    { room: 'Suíte master',   bairro: 'BH e região',        type: 'Interior',       wide: false, url: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=80' },
+    { room: 'Área externa',   bairro: 'Grande BH',    type: 'Drone',          wide: true,  url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=80' },
+    { room: 'Hall de entrada',bairro: 'BH e região',      type: 'Interior',       wide: false, url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80' },
   ];
   return (
     <section style={{ padding: 'clamp(3rem, 6vw, 4.5rem) 0', background: 'var(--cream)' }}>
       <div style={{ width: 'min(1100px, 92vw)', margin: '0 auto' }}>
         <div style={{ display: 'grid', gap: 48, gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', alignItems: 'center' }}>
 
-          {/* Photo grid mockup */}
+          {/* Photo grid — real photos */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             {photos.map((p, i) => (
               <div key={i} style={{
-                background: palettes[i], borderRadius: 10, overflow: 'hidden',
+                backgroundImage: `linear-gradient(to bottom, transparent 50%, rgba(10,24,48,0.75) 100%), url(${p.url})`,
+                backgroundSize: 'cover', backgroundPosition: 'center',
+                borderRadius: 10, overflow: 'hidden',
                 aspectRatio: p.wide ? '16/9' : '4/3',
                 gridColumn: p.wide ? 'span 2' : 'span 1',
                 display: 'flex', alignItems: 'flex-end', padding: '10px 12px',
@@ -398,7 +523,7 @@ function FotoPortfolio() {
               }}>
                 <div>
                   <div style={{ fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700, color: '#fff' }}>{p.room}</div>
-                  <div style={{ fontFamily: 'DM Sans', fontSize: 9.5, color: 'rgba(255,255,255,0.6)' }}>{p.bairro} · {p.type}</div>
+                  <div style={{ fontFamily: 'DM Sans', fontSize: 9.5, color: 'rgba(255,255,255,0.7)' }}>{p.bairro} · {p.type}</div>
                 </div>
               </div>
             ))}
@@ -437,11 +562,75 @@ function FotoPortfolio() {
   );
 }
 
+function FotoDroneVideos() {
+  const videos = [
+    { title: 'Cobertura · BH e região', area: '320 m²', url: 'https://images.unsplash.com/photo-1516815231560-8f41ec531527?w=900&q=80', tag: 'Drone 4K' },
+    { title: 'Casa · BH e região', area: '560 m²', url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=900&q=80', tag: 'Aéreo + Interior' },
+    { title: 'Residencial · BH e região', area: '180 unid.', url: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=900&q=80', tag: 'Lançamento' },
+    { title: 'Penthouse · BH e região', area: '420 m²', url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=900&q=80', tag: 'Drone 4K' },
+    { title: 'Condomínio · Vetor Sul', area: '24 lotes', url: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=900&q=80', tag: 'Aéreo' },
+    { title: 'Apartamento · BH e região', area: '240 m²', url: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=900&q=80', tag: 'Drone + Tour 3D' },
+  ];
+  return (
+    <section style={{ padding: 'clamp(3rem, 6vw, 4.5rem) 0', background: 'var(--navy)' }}>
+      <div style={{ width: 'min(1100px, 92vw)', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <Eyebrow>Vídeos de drone · Trabalhos realizados</Eyebrow>
+          <h2 style={{ color: '#fff', margin: '6px 0 12px' }}>Imóveis vistos do alto</h2>
+          <p style={{ color: 'rgba(250,249,246,0.72)', maxWidth: 500, margin: '0 auto', fontSize: 15 }}>
+            Cobertura aérea que valoriza cada empreendimento. Drone credenciado com DJI Mavic 3 Pro — autorização ANAC incluída.
+          </p>
+        </div>
+        <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
+          {videos.map((v, i) => (
+            <div key={i} style={{
+              position: 'relative', borderRadius: 14, overflow: 'hidden', cursor: 'pointer',
+              boxShadow: '0 10px 32px rgba(0,0,0,0.35)',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 18px 50px rgba(0,0,0,0.5)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 10px 32px rgba(0,0,0,0.35)'; }}
+            >
+              <div style={{
+                height: 190, backgroundImage: `url(${v.url})`,
+                backgroundSize: 'cover', backgroundPosition: 'center',
+              }} />
+              {/* Play button overlay */}
+              <div style={{
+                position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(15,34,68,0.35)',
+              }}>
+                <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(255,255,255,0.92)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.4)' }}>
+                  <div style={{ width: 0, height: 0, borderTop: '10px solid transparent', borderBottom: '10px solid transparent',
+                    borderLeft: `16px solid ${FOTO_BRONZE}`, marginLeft: 4 }} />
+                </div>
+              </div>
+              {/* Tag */}
+              <div style={{ position: 'absolute', top: 12, left: 12,
+                background: FOTO_BRONZE, color: '#fff', borderRadius: 6,
+                padding: '3px 10px', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em' }}>{v.tag}</div>
+              {/* Caption */}
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0,
+                background: 'linear-gradient(transparent, rgba(10,24,48,0.88))',
+                padding: '24px 14px 12px' }}>
+                <div style={{ fontFamily: 'DM Sans', fontWeight: 700, fontSize: 13.5, color: '#fff' }}>{v.title}</div>
+                <div style={{ fontSize: 11.5, color: 'rgba(250,249,246,0.65)' }}>{v.area}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function FotoFactorOne() {
   const pagamentos = [
-    { label: 'Cobertura · Savassi', date: '28 abr', val: 'R$750', pago: true },
+    { label: 'Cobertura · BH e região', date: '28 abr', val: 'R$750', pago: true },
     { label: 'Casa · Mangabeiras', date: '22 abr', val: 'R$450', pago: true },
-    { label: 'Apt · Lourdes', date: '12 mai', val: 'R$750', pago: false },
+    { label: 'Apt · BH e região', date: '12 mai', val: 'R$750', pago: false },
   ];
   return (
     <section style={{ padding: 'clamp(3rem, 6vw, 4.5rem) 0', background: '#fff' }}>
@@ -496,7 +685,7 @@ function FotoFactorOne() {
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontFamily: 'Playfair Display', fontWeight: 700, fontSize: 17, color: FOTO_BRONZE_LIGHT }}>{p.val}</div>
                   <div style={{ fontSize: 10, fontWeight: 700, color: p.pago ? '#4ade80' : FOTO_BRONZE_LIGHT }}>
-                    {p.pago ? '✓ pago' : '⏱ a receber'}
+                    {p.pago ? '✓ pago' : 'a receber'}
                   </div>
                 </div>
               </div>
@@ -512,8 +701,13 @@ function FotoCtaFinal({ onNav }) {
   return (
     <section style={{ padding: 'clamp(3.5rem, 7vw, 5rem) 0', background: 'var(--cream)' }}>
       <div style={{ width: 'min(760px, 92vw)', margin: '0 auto', textAlign: 'center' }}>
-        <div style={{ width: 64, height: 64, borderRadius: 18, background: `${FOTO_BRONZE}18`, color: FOTO_BRONZE,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, margin: '0 auto 20px' }}>📸</div>
+        <div style={{ width: 64, height: 64, borderRadius: 18, background: FOTO_BRONZE,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8">
+            <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+        </div>
         <Eyebrow color={FOTO_BRONZE}>Pronto para começar?</Eyebrow>
         <h2 style={{ margin: '6px 0 16px', fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>
           Fotografe os imóveis mais bonitos de BH
