@@ -3,3 +3,6 @@ Thumbs.db
 *.zip
 .cursor/
 node_modules/
+
+.env
+.env.*
