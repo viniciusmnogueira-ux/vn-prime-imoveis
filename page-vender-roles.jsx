@@ -136,7 +136,7 @@ function IncorporadoraPage({ onNav }) {
           </h1>
           <p style={{ color: 'rgba(250,249,246,0.85)', fontSize: 17.5, lineHeight: 1.65,
             maxWidth: 640, margin: '0 auto 28px' }}>
-            Página dedicada do empreendimento, plantas interativas, tour virtual e equipe de plantão exclusiva. Plano enterprise sob medida.
+            Página dedicada do empreendimento, plantas interativas, tour virtual e gestão de mídias exclusiva. Plano enterprise sob medida.
           </p>
           <div style={{ display: 'inline-flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
             <Btn variant="accent" size="lg">Falar com comercial</Btn>

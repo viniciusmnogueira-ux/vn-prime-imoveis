@@ -11,6 +11,8 @@
     "@babel/core": "^7.29.0",
     "@babel/plugin-transform-react-jsx": "^7.28.6",
     "@babel/preset-env": "^7.29.3",
-    "@babel/preset-react": "^7.28.5"
+    "@babel/preset-react": "^7.28.5",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
   }
 }

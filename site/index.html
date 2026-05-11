@@ -1255,11 +1255,11 @@ function SiteHeader({ active, onNav, density = 'comfortable' }) {
   const items = [
     { id: 'home', label: 'Início' },
     { id: 'busca', label: 'Comprar' },
-    { id: 'vender', label: 'Vender' },
+    { id: 'vender', label: 'Anuncie' },
     { id: 'lancamentos', label: 'Lançamentos' },
     { id: 'sobre', label: 'Sobre' },
     { id: 'servicos', label: 'Serviços', dropdown: [
-      { id: 'proprietario', label: 'Área do Proprietário', desc: 'Anuncie seu imóvel · taxa fixa ou comissão' },
+      { id: 'proprietario', label: 'Proprietário Direto', desc: 'Anuncie seu imóvel · taxa fixa ou comissão' },
       { id: 'corretor', label: 'Portal do Corretor', desc: 'Leads, CRM e portfólio premium de BH' },
       { id: 'fotografo', label: 'Canal do Fotógrafo', desc: 'Fotografia e mídias para imóveis de alto padrão' },
       { id: 'consorcio', label: 'Consórcio', desc: 'Compre sem juros com carta de crédito' },
@@ -1340,7 +1340,7 @@ function SiteFooter() {
             </p>
           </div>
           <FootCol title="Comprar" links={['Apartamentos', 'Casas', 'Coberturas', 'Lançamentos', 'Por bairro']} />
-          <FootCol title="Vender" links={['Anunciar imóvel', 'Modalidades', 'Para corretores', 'Para fotógrafos']} />
+          <FootCol title="Anuncie" links={['Anunciar imóvel', 'Modalidades', 'Para corretores', 'Para fotógrafos']} />
           <FootCol title="Empresa" links={['Sobre', 'Curadoria', 'Imprensa', 'Contato', 'Política de privacidade']} />
         </div>
         <div style={{ borderTop: '1px solid rgba(245,248,250,0.10)', paddingTop: 22,
@@ -2730,66 +2730,71 @@ function ContactModal({ listing, onClose }) {
 
 Object.assign(window, { PropertyDetailPage });
 </script>
-<script type="text/babel">// Vender hub — profile picker (Proprietário Direto / Imobiliária Corretor / Incorporadoras)
-
+<script type="text/babel">// Vender Hub — 3 caminhos para anunciar
 function VenderHubPage({ onNav }) {
-  const profiles = [
+  const caminhos = [
     {
       id: 'proprietario',
-      title: 'Proprietário Direto',
-      subtitle: 'Quero vender meu imóvel',
-      desc: 'Você publica, conduz e fecha. Plataforma só cobra taxa fixa de R$ 297. Sem comissão sobre venda.',
-      modality: 'Venda Direta',
-      price: 'R$ 297',
-      priceLabel: 'taxa fixa de publicação',
+      tag: 'Proprietário Direto',
+      title: 'Você conduz a venda.',
+      highlight: 'Do anúncio ao fechamento.',
+      desc: 'Publique seu imóvel na vitrine VN Prime com taxa fixa de R$ 297 ou comissão de 3% apenas quando vender. Você define o preço, agenda visitas pelo app e fecha direto com o comprador. Nossa plataforma cuida de tudo que envolve tecnologia.',
       bullets: [
-        'Você define preço e descrição',
-        'Anúncio com até 25 fotos + vídeo',
-        'Pitch gerado por IA',
-        'Visitas agendadas pelo app',
-        'Sem corretor, sem comissão',
+        'Taxa fixa R$ 297 ou 3% só no sucesso',
+        'Até 25 fotos + vídeo no anúncio',
+        'Descrição editorial gerada por IA',
+        'Visitas agendadas pelo app — sem intermediários',
+        'Endereço privado · exibe só o bairro na vitrine',
+        'Suporte VN Prime do anúncio à escritura',
       ],
-      icon: 'O',
-      accent: 'var(--gold)',
-      cta: 'Anunciar como proprietário',
+      cta: 'Acessar portal do proprietário',
+      route: 'proprietario',
+      img: (window.__resources?.img60||'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=85'),
+      accent: '#D4A857',
+      accentLight: '#F2DDA9',
+      stat: [['R$ 297', 'taxa fixa'], ['3%', 'comissão s/ venda'], ['24h', 'aprovação']],
     },
     {
       id: 'corretor',
-      title: 'Imobiliária / Corretor',
-      subtitle: 'Sou parceiro VN Prime',
-      desc: 'Acesso ao portfólio curado, leads qualificados e ferramentas de gestão. Plano por R$ 49,90/mês.',
-      modality: 'Rede de Corretores',
-      price: 'R$ 49,90',
-      priceLabel: 'por mês',
+      tag: 'Corretor Parceiro',
+      title: 'Corretor conduz.',
+      highlight: 'Você aprova e assina.',
+      desc: 'No plano 6% — Venda Completa — um corretor credenciado VN Prime cuida de tudo: fotografia, descrição, qualificação de compradores, visitas acompanhadas e negociação. Você só precisa aprovar a proposta e assinar.',
       bullets: [
-        'Carteira de imóveis VN Prime',
-        'Split de comissão claro',
-        'CRM integrado · Pipeline',
-        'Material de marketing',
-        'Capacitação contínua',
+        'Corretor parceiro credenciado dedicado ao seu imóvel',
+        'Fotografia profissional + vídeo cinematográfico',
+        'Qualificação de compradores antes das visitas',
+        'Visitas acompanhadas pelo corretor',
+        'Negociação e suporte jurídico até a escritura',
+        '6% de comissão — 3% corretor + 3% VN Prime',
       ],
-      icon: 'C',
-      accent: '#059669',
       cta: 'Acessar portal do corretor',
+      route: 'corretor',
+      img: (window.__resources?.img70||'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1600&q=85'),
+      accent: '#2F8674',
+      accentLight: '#6ee7b7',
+      stat: [['6%', 'sobre a venda'], ['Mãos livres', 'você aprova'], ['Corretor', 'dedicado']],
     },
     {
       id: 'incorporadora',
-      title: 'Incorporadoras / Construtoras',
-      subtitle: 'Tenho um lançamento',
-      desc: 'Plano enterprise com vitrine exclusiva, plantas interativas e equipe de plantão dedicada.',
-      modality: 'Lançamentos',
-      price: 'Sob consulta',
-      priceLabel: 'plano dedicado',
+      tag: 'Incorporadora / Construtora',
+      title: 'Lance seu empreendimento.',
+      highlight: 'Alcance qualificado e alto padrão.',
+      desc: 'Plano enterprise para incorporadoras e construtoras. Vitrine exclusiva, página dedicada do empreendimento com plantas interativas, equipe de plantão VN Prime, mídia paga gerenciada e gestão de leads de compradores qualificados.',
       bullets: [
-        'Página dedicada do empreendimento',
-        'Plantas e tour virtual',
-        'Equipe de plantão exclusiva',
-        'Mídia paga compartilhada',
-        'BOOSTER! para unidades',
+        'Página dedicada do empreendimento na vitrine VN Prime',
+        'Plantas interativas e tour virtual 3D',
+        'Equipe de plantão VN Prime exclusiva',
+        'Mídia paga em Meta, Google e portais parceiros',
+        'Leads de compradores qualificados com contato direto',
+        'Relatórios de performance e funil de vendas',
       ],
-      icon: 'I',
-      accent: '#B87333',
-      cta: 'Falar com comercial',
+      cta: 'Acessar portal da incorporadora',
+      route: 'incorporadora',
+      img: (window.__resources?.img34||'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=85'),
+      accent: '#B8862E',
+      accentLight: '#F2DDA9',
+      stat: [['Sob consulta', 'plano dedicado'], ['Plantão', 'exclusivo'], ['Leads', 'qualificados']],
     },
   ];
 
@@ -2799,126 +2804,138 @@ function VenderHubPage({ onNav }) {
       <section style={{
         position: 'relative', overflow: 'hidden',
         background: 'var(--gradient-navy-hero)', color: '#fff',
-        padding: 'clamp(3rem, 7vw, 5rem) 0 clamp(2rem, 5vw, 3rem)',
+        padding: 'clamp(3.5rem, 7vw, 5.5rem) 0 clamp(3rem, 5vw, 4rem)',
       }}>
-        <div style={{ position: 'absolute', top: -180, right: -180, width: 540, height: 540,
-          background: 'radial-gradient(circle, rgba(201,150,14,0.28) 0%, transparent 65%)',
-          pointerEvents: 'none' }} />
-        <div style={{ position: 'relative', zIndex: 1, width: 'min(1080px, 92vw)',
-          margin: '0 auto', textAlign: 'center' }}>
+        <div style={{ position: 'absolute', top: -200, right: -200, width: 600, height: 600,
+          background: 'radial-gradient(circle, rgba(212,168,87,0.22) 0%, transparent 65%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', zIndex: 1, width: 'min(1080px, 92vw)', margin: '0 auto', textAlign: 'center' }}>
           <Eyebrow>Anuncie com VN Prime</Eyebrow>
-          <h1 style={{ color: '#fff', margin: '6px 0 14px', fontSize: 'clamp(2rem, 4vw, 2.8rem)' }}>
-            Com qual perfil você <em style={{
-              background: 'var(--gradient-gold)', WebkitBackgroundClip: 'text',
-              backgroundClip: 'text', color: 'transparent', fontStyle: 'italic',
-            }}>se identifica?</em>
+          <h1 style={{ color: '#fff', margin: '8px 0 16px', fontSize: 'clamp(2rem, 4vw, 2.9rem)', lineHeight: 1.15 }}>
+            Qual o seu{' '}
+            <em className="italic-accent" style={{ background: 'var(--gradient-gold)',
+              WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>
+              caminho para vender?
+            </em>
           </h1>
-          <p style={{ color: 'rgba(250,249,246,0.85)', maxWidth: 540, margin: '0 auto', fontSize: 16 }}>
-            Selecione o perfil que melhor descreve sua necessidade. Cada caminho com sua estrutura, suas ferramentas e seu plano.
+          <p style={{ color: 'rgba(245,248,250,0.85)', maxWidth: 560, margin: '0 auto', fontSize: 16, lineHeight: 1.7 }}>
+            Escolha o modelo que combina com você. Cada caminho tem sua estrutura, suas ferramentas e seu plano — todos com o padrão VN Prime.
           </p>
         </div>
       </section>
 
-      {/* Profile cards */}
-      <section style={{ padding: '0 0 60px', marginTop: -40, position: 'relative', zIndex: 2 }}>
-        <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto',
-          display: 'grid', gap: 22,
-          gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))' }}>
-          {profiles.map(p => (
-            <ProfileCard key={p.id} profile={p}
-              onClick={() => onNav(p.id === 'proprietario' ? 'anunciar' : p.id === 'corretor' ? 'corretor' : 'lancamentos')} />
-          ))}
-        </div>
-      </section>
+      {/* 3 Caminhos */}
+      <div style={{ background: 'var(--cream)' }}>
+        {caminhos.map((c, idx) => {
+          const reverse = idx % 2 === 1;
+          return (
+            <section key={c.id} style={{
+              padding: 'clamp(3rem, 6vw, 5rem) 0',
+              background: idx % 2 === 0 ? 'var(--cream)' : 'var(--white)',
+              borderTop: '1px solid var(--border)',
+            }}>
+              <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto',
+                display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(32px, 5vw, 64px)',
+                alignItems: 'center',
+                direction: reverse ? 'rtl' : 'ltr',
+              }}>
+                {/* Foto */}
+                <div style={{ direction: 'ltr', position: 'relative', borderRadius: 20, overflow: 'hidden',
+                  boxShadow: '0 24px 64px rgba(27,39,51,0.18)', aspectRatio: '4/3' }}>
+                  <img src={c.img} alt={c.tag}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  <div style={{ position: 'absolute', inset: 0,
+                    background: `linear-gradient(180deg, transparent 40%, rgba(15,22,32,0.72) 100%)` }} />
+                  {/* Stats overlay */}
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0,
+                    padding: '20px 24px', display: 'flex', gap: 0 }}>
+                    {c.stat.map((s, i) => (
+                      <div key={i} style={{
+                        flex: 1, textAlign: 'center',
+                        borderRight: i < c.stat.length - 1 ? '1px solid rgba(255,255,255,0.15)' : 'none',
+                        padding: '0 12px',
+                      }}>
+                        <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1rem, 2vw, 1.4rem)',
+                          fontWeight: 700, color: c.accentLight, lineHeight: 1 }}>{s[0]}</div>
+                        <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em',
+                          textTransform: 'uppercase', color: 'rgba(255,255,255,0.65)', marginTop: 4 }}>{s[1]}</div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Tag badge */}
+                  <div style={{ position: 'absolute', top: 18, left: 18,
+                    background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(10px)',
+                    border: `1px solid ${c.accent}66`,
+                    borderRadius: 999, padding: '5px 14px' }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em',
+                      textTransform: 'uppercase', color: '#fff' }}>{c.tag}</span>
+                  </div>
+                </div>
+
+                {/* Conteúdo */}
+                <div style={{ direction: 'ltr' }}>
+                  <div style={{ width: 40, height: 3, background: c.accent, borderRadius: 2, marginBottom: 22 }} />
+                  <h2 style={{ margin: '0 0 6px', fontSize: 'clamp(1.7rem, 3vw, 2.3rem)', lineHeight: 1.15, fontWeight: 400 }}>
+                    {c.title}{' '}
+                    <em className="italic-accent" style={{ color: c.accent }}>{c.highlight}</em>
+                  </h2>
+                  <p style={{ fontSize: 15.5, color: 'var(--fg-2)', lineHeight: 1.75, margin: '16px 0 24px' }}>
+                    {c.desc}
+                  </p>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px',
+                    display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {c.bullets.map(b => (
+                      <li key={b} style={{ display: 'flex', alignItems: 'flex-start', gap: 10,
+                        fontSize: 14, color: 'var(--fg-1)', lineHeight: 1.55 }}>
+                        <span style={{ width: 18, height: 18, borderRadius: '50%',
+                          background: `${c.accent}18`, border: `1.5px solid ${c.accent}44`,
+                          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                          color: c.accent, fontSize: 10, fontWeight: 800, flexShrink: 0, marginTop: 1 }}>✓</span>
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
+                  <button onClick={() => onNav(c.route)} style={{
+                    background: c.accent, color: '#fff', border: 'none',
+                    borderRadius: 10, padding: '14px 28px',
+                    fontFamily: 'inherit', fontWeight: 700, fontSize: 15, cursor: 'pointer',
+                    boxShadow: `0 8px 24px ${c.accent}44`,
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 12px 32px ${c.accent}55`; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = `0 8px 24px ${c.accent}44`; }}>
+                    {c.cta} →
+                  </button>
+                </div>
+              </div>
+            </section>
+          );
+        })}
+      </div>
 
       {/* Trust strip */}
-      <section style={{ padding: '40px 0 60px', background: '#fff', borderTop: '1px solid var(--border)' }}>
-        <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto', textAlign: 'center' }}>
-          <Eyebrow color="var(--gold)">Padrão VN Prime</Eyebrow>
-          <h2 style={{ marginBottom: 28 }}>Por que anunciar conosco?</h2>
-          <div style={{ display: 'grid', gap: 24,
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', textAlign: 'left' }}>
+      <section style={{ padding: 'clamp(3rem, 5vw, 4rem) 0', background: 'var(--navy)', color: '#fff' }}>
+        <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 36 }}>
+            <Eyebrow>Padrão VN Prime</Eyebrow>
+            <h2 style={{ color: '#fff', margin: '8px 0 0', fontWeight: 400 }}>Por que anunciar conosco?</h2>
+          </div>
+          <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
             {[
-              ['Curadoria real', 'Não somos um classificado. Cada imóvel passa por nossa curadoria de fotografia e descrição.'],
-              ['Sem custo de entrada', 'Você paga só quando faz sentido — taxa de publicação ou comissão sobre venda.'],
-              ['Inteligência de mercado', 'Comparativos de preço da região, tempo médio de venda e simulador de margem.'],
-              ['Concierge de visita', 'Curador VN Prime conduz visitas e qualifica compradores antes do contato.'],
+              ['Vitrine de alto padrão', 'Imóveis selecionados com rigor técnico e posicionamento de mercado. Não somos um classificado.'],
+              ['Só paga se vender', 'Sem custo de entrada — taxa fixa de publicação ou comissão sobre o valor da venda.'],
+              ['Inteligência de mercado', 'Comparativos de preço da região, tempo médio de venda e análise de demanda por localização.'],
+              ['Suporte do início ao fim', 'Time VN Prime acompanha da publicação do anúncio até a assinatura da escritura.'],
             ].map(([t, d]) => (
-              <div key={t}>
-                <div style={{ fontFamily: 'Playfair Display', fontSize: 18, fontWeight: 600,
-                  color: 'var(--navy)', marginBottom: 6 }}>{t}</div>
-                <p style={{ color: 'var(--fg-2)', fontSize: 14, lineHeight: 1.6, margin: 0 }}>{d}</p>
+              <div key={t} style={{ borderTop: '2px solid rgba(212,168,87,0.35)', paddingTop: 18 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 600,
+                  color: 'var(--gold-soft)', marginBottom: 8 }}>{t}</div>
+                <p style={{ color: 'rgba(245,248,250,0.72)', fontSize: 13.5, lineHeight: 1.65, margin: 0 }}>{d}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
     </main>
-  );
-}
-
-function ProfileCard({ profile, onClick }) {
-  const [hovered, setHovered] = useState(false);
-  const p = profile;
-  return (
-    <button onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: '#fff', borderRadius: 16, border: '1px solid var(--border)',
-        boxShadow: hovered ? '0 22px 60px rgba(15,34,68,0.18)' : '0 12px 40px rgba(15,34,68,0.10)',
-        padding: 0, cursor: 'pointer', textAlign: 'left',
-        display: 'flex', flexDirection: 'column', overflow: 'hidden',
-        transition: 'transform 0.2s ease, box-shadow 0.2s',
-        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
-        borderTop: `4px solid ${p.accent}`,
-      }}>
-      <div style={{ padding: '24px 26px 6px' }}>
-        <div style={{
-          width: 52, height: 52, borderRadius: 12,
-          background: `${p.accent}15`, color: p.accent,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'Cinzel, serif', fontSize: 24, fontWeight: 700, marginBottom: 16,
-        }}>{p.icon}</div>
-        <div style={{ fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700,
-          letterSpacing: '0.12em', textTransform: 'uppercase',
-          color: p.accent, marginBottom: 6 }}>{p.subtitle}</div>
-        <h3 style={{ margin: '0 0 8px', fontSize: 22, lineHeight: 1.2 }}>{p.title}</h3>
-        <p style={{ color: 'var(--fg-2)', fontSize: 14, lineHeight: 1.6, marginBottom: 16 }}>{p.desc}</p>
-
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
-          <span style={{ fontFamily: 'Playfair Display', fontSize: 28, fontWeight: 700, color: p.accent, lineHeight: 1 }}>{p.price}</span>
-          <span style={{ fontSize: 12, color: 'var(--fg-2)' }}>{p.priceLabel}</span>
-        </div>
-        <div style={{ fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em',
-          textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 14 }}>{p.modality}</div>
-      </div>
-
-      <div style={{ borderTop: '1px solid var(--border)', padding: '18px 26px', flex: 1,
-        background: hovered ? 'rgba(250,249,244,0.6)' : 'transparent', transition: 'background 0.2s' }}>
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0,
-          display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {p.bullets.map(b => (
-            <li key={b} style={{ display: 'flex', gap: 10, alignItems: 'flex-start',
-              fontFamily: 'DM Sans', fontSize: 13.5, color: 'var(--fg-2)', lineHeight: 1.5 }}>
-              <span style={{ color: p.accent, fontWeight: 700, flexShrink: 0 }}>✓</span>
-              <span>{b}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div style={{ padding: '18px 26px 22px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-        <span style={{ fontFamily: 'DM Sans', fontSize: 14, fontWeight: 600,
-          color: hovered ? p.accent : 'var(--navy)' }}>{p.cta}</span>
-        <span style={{ width: 32, height: 32, borderRadius: 999,
-          background: hovered ? p.accent : 'rgba(15,34,68,0.06)',
-          color: hovered ? '#fff' : 'var(--navy)',
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 16, fontWeight: 600, transition: 'all 0.2s' }}>→</span>
-      </div>
-    </button>
   );
 }
 
@@ -3043,98 +3060,406 @@ function CorretorPage({ onNav }) {
 }
 
 function IncorporadoraPage({ onNav }) {
+  const [tab, setTab] = React.useState('overview');
+  const [formData, setFormData] = React.useState({
+    nome: '', bairro: '', tipo: 'Residencial', unidades: '', area: '', preco: '', descricao: '',
+  });
+  const [submitted, setSubmitted] = React.useState(false);
+
+  const accent = '#B8862E';
+
+  const empreendimentos = [
+    { nome: 'Residencial Alto das Pedras', bairro: 'Buritis', unidades: 48, leads: 23, status: 'Em lançamento' },
+    { nome: 'Edifício Jardins', bairro: 'Savassi', unidades: 24, leads: 11, status: 'Pré-lançamento' },
+  ];
+
+  const leadsData = [
+    { nome: 'Ana Lima',      email: 'ana@email.com',    tel: '(31) 98400-0001', interesse: 'Alto das Pedras', data: '10/05/2026', status: 'Novo'       },
+    { nome: 'Carlos Melo',   email: 'carlos@email.com', tel: '(31) 97400-0002', interesse: 'Jardins',         data: '09/05/2026', status: 'Contatado'  },
+    { nome: 'Fernanda Souza',email: 'fe@email.com',     tel: '(31) 99400-0003', interesse: 'Alto das Pedras', data: '08/05/2026', status: 'Proposta'   },
+    { nome: 'Bruno Alves',   email: 'bruno@email.com',  tel: '(31) 98400-0004', interesse: 'Alto das Pedras', data: '07/05/2026', status: 'Novo'       },
+    { nome: 'Mariana Costa', email: 'mari@email.com',   tel: '(31) 97400-0005', interesse: 'Jardins',         data: '06/05/2026', status: 'Contatado'  },
+  ];
+
+  const tabs = [
+    { id: 'overview', label: 'Visão Geral' },
+    { id: 'novo',     label: 'Novo Lançamento' },
+    { id: 'leads',    label: 'Leads' },
+  ];
+
+  const statusColor = s => s === 'Novo' ? { bg: '#EBF5FB', fg: '#2563EB' }
+    : s === 'Proposta' ? { bg: `${accent}18`, fg: accent }
+    : { bg: '#F0FDF4', fg: '#059669' };
+
   return (
     <main style={{ background: 'var(--cream)', minHeight: '100vh' }}>
-      {/* Hero */}
-      <section style={{
-        background: 'var(--gradient-navy-hero)', color: '#fff',
-        padding: 'clamp(3rem, 7vw, 5rem) 0 clamp(2.5rem, 5vw, 3.5rem)',
-        position: 'relative', overflow: 'hidden',
-      }}>
-        <div style={{ position: 'absolute', top: -200, left: -200, width: 600, height: 600,
-          background: 'radial-gradient(circle, rgba(184,115,51,0.28), transparent 65%)' }} />
-        <div style={{ width: 'min(1080px, 94vw)', margin: '0 auto', position: 'relative', zIndex: 1,
-          textAlign: 'center' }}>
-          <Eyebrow>Para Incorporadoras & Construtoras</Eyebrow>
-          <h1 style={{ color: '#fff', margin: '8px 0 16px', fontSize: 'clamp(2.4rem, 5vw, 3.4rem)' }}>
-            Lançamentos com <em style={{
-              background: 'linear-gradient(135deg, #B87333 0%, #D08F4F 100%)',
-              WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', fontStyle: 'italic',
-            }}>vitrine premium</em>
-          </h1>
-          <p style={{ color: 'rgba(250,249,246,0.85)', fontSize: 17.5, lineHeight: 1.65,
-            maxWidth: 640, margin: '0 auto 28px' }}>
-            Página dedicada do empreendimento, plantas interativas, tour virtual e equipe de plantão exclusiva. Plano enterprise sob medida.
-          </p>
-          <div style={{ display: 'inline-flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <Btn variant="accent" size="lg">Falar com comercial</Btn>
-            <Btn variant="ghost" size="lg" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}>
-              Ver case
-            </Btn>
-          </div>
-        </div>
-      </section>
 
-      {/* Pillars */}
-      <section style={{ padding: '60px 0', background: '#fff' }}>
+      {/* HERO */}
+      <section style={{
+        position: 'relative',
+        background: `linear-gradient(180deg, rgba(15,22,32,0.62) 0%, rgba(15,22,32,0.90) 100%), url(${window.__resources?.img30||'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1800&q=85'})`,
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        color: '#fff', padding: 'clamp(70px, 10vw, 110px) 0 clamp(50px, 7vw, 80px)',
+      }}>
         <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 36 }}>
-            <Eyebrow color="#B87333">Plano Enterprise</Eyebrow>
-            <h2 style={{ marginTop: 6 }}>Como vendemos seu lançamento</h2>
-          </div>
-          <div style={{ display: 'grid', gap: 22,
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
-            {[
-              ['01', 'Página dedicada', 'URL exclusiva, identidade visual do empreendimento, plantas e galeria magazine.'],
-              ['02', 'Plantas interativas', 'Visualização 2D + 3D, configurador de unidades e simulador de financiamento.'],
-              ['03', 'Plantão dedicado', 'Equipe VN Prime no estande físico ou virtual, treinada na sua narrativa.'],
-              ['04', 'Mídia paga', 'Investimento conjunto em Meta, Google e portais. Relatórios semanais.'],
-              ['05', 'BOOSTER!', 'Plano Plus para unidades estratégicas com mais visibilidade e visitas direcionadas.'],
-              ['06', 'CRM espelhado', 'Você acessa o pipeline em tempo real — leads, visitas, propostas, fechamentos.'],
-            ].map(([n,t,d]) => (
-              <div key={n} style={{ padding: 22, background: 'var(--cream)', borderRadius: 14,
-                border: '1px solid var(--border)' }}>
-                <div style={{ fontFamily: 'Cinzel', fontSize: 22, fontWeight: 700,
-                  color: '#B87333', marginBottom: 10, letterSpacing: '0.05em' }}>{n}</div>
-                <h3 style={{ margin: '0 0 6px', fontSize: 18 }}>{t}</h3>
-                <p style={{ color: 'var(--fg-2)', fontSize: 13.5, margin: 0, lineHeight: 1.6 }}>{d}</p>
+          <Eyebrow>Portal da Incorporadora</Eyebrow>
+          <h1 style={{ color: '#fff', margin: '12px 0 16px',
+            fontSize: 'clamp(2.2rem, 4.5vw, 3.2rem)', lineHeight: 1.05 }}>
+            Lance com <em style={{ color: '#D4A857', fontStyle: 'italic' }}>estrutura profissional</em><br/>
+            e alcance os compradores certos.
+          </h1>
+          <p style={{ color: 'rgba(245,248,250,0.85)', fontSize: 16.5, maxWidth: 560, marginBottom: 32 }}>
+            Gerencie empreendimentos, acompanhe leads qualificados e receba notificações de interesse diretamente neste portal.
+          </p>
+          <div style={{ display: 'flex', gap: 36, flexWrap: 'wrap' }}>
+            {[['2','empreendimentos'],['34','leads totais'],['R$ 28M','VGV ativo']].map(([n,l]) => (
+              <div key={l}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 700,
+                  color: '#D4A857', lineHeight: 1 }}>{n}</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)',
+                  letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'DM Sans', marginTop: 4 }}>{l}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Form */}
-      <section style={{ padding: '50px 0 70px', background: 'var(--cream)' }}>
-        <div style={{ width: 'min(720px, 94vw)', margin: '0 auto' }}>
-          <div style={{ background: '#fff', borderRadius: 16, padding: 'clamp(28px, 4vw, 40px)',
-            border: '1px solid var(--border)', boxShadow: '0 16px 50px rgba(15,34,68,0.10)' }}>
-            <h2 style={{ marginTop: 0, marginBottom: 6 }}>Vamos conversar?</h2>
-            <p style={{ color: 'var(--fg-2)', marginBottom: 22 }}>
-              Conte sobre seu empreendimento. Nosso head de incorporadoras retorna em até 1 dia útil.
-            </p>
-            <div style={{ display: 'grid', gap: 14, gridTemplateColumns: '1fr 1fr' }}>
-              <input placeholder="Nome" style={{ width: '100%' }} />
-              <input placeholder="Cargo" style={{ width: '100%' }} />
-              <input placeholder="Incorporadora" style={{ width: '100%', gridColumn: '1 / -1' }} />
-              <input placeholder="E-mail" style={{ width: '100%' }} />
-              <input placeholder="Telefone" style={{ width: '100%' }} />
-              <textarea placeholder="Sobre o empreendimento (localização, VGV, prazo)"
-                style={{ width: '100%', gridColumn: '1 / -1', minHeight: 90, resize: 'vertical' }} />
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 18 }}>
-              <Btn variant="accent" size="lg">Enviar contato</Btn>
-            </div>
-          </div>
-          <div style={{ textAlign: 'center', marginTop: 16 }}>
-            <button onClick={() => onNav('vender')} style={{ background: 'none', border: 'none',
-              color: 'var(--fg-2)', cursor: 'pointer', fontFamily: 'DM Sans', fontSize: 13 }}>
-              ← Trocar perfil
-            </button>
+      {/* TAB NAV */}
+      <div style={{ background: '#fff', borderBottom: '1px solid var(--border)',
+        position: 'sticky', top: 0, zIndex: 10 }}>
+        <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto',
+          display: 'flex', alignItems: 'stretch' }}>
+          {tabs.map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)} style={{
+              background: 'none', border: 'none',
+              borderBottom: tab === t.id ? `2px solid ${accent}` : '2px solid transparent',
+              padding: '16px 24px', cursor: 'pointer', fontFamily: 'DM Sans',
+              fontSize: 14, fontWeight: 600,
+              color: tab === t.id ? accent : 'var(--fg-2)',
+              transition: 'color 0.15s', marginBottom: -1,
+            }}>{t.label}</button>
+          ))}
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+            <button onClick={() => onNav('vender')} style={{
+              background: 'none', border: 'none', color: 'var(--fg-2)',
+              cursor: 'pointer', fontFamily: 'DM Sans', fontSize: 13, padding: '8px 12px',
+            }}>← Trocar perfil</button>
           </div>
         </div>
-      </section>
+      </div>
+
+      {/* CONTENT */}
+      <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto', padding: '40px 0 80px' }}>
+
+        {/* ── VISÃO GERAL ── */}
+        {tab === 'overview' && (
+          <div>
+            <div style={{ display: 'grid', gap: 16,
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: 40 }}>
+              {[
+                ['34', 'Leads totais',          accent],
+                ['12', 'Leads esta semana',      '#059669'],
+                ['3',  'Propostas em aberto',    '#D4A857'],
+                ['2',  'Empreendimentos ativos', 'var(--navy)'],
+              ].map(([n,l,c]) => (
+                <div key={l} style={{ background: '#fff', borderRadius: 14, padding: '22px 24px',
+                  border: '1px solid var(--border)', boxShadow: '0 4px 18px rgba(15,34,68,0.06)' }}>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 36, fontWeight: 700,
+                    color: c, lineHeight: 1, marginBottom: 6 }}>{n}</div>
+                  <div style={{ fontFamily: 'DM Sans', fontSize: 13, color: 'var(--fg-2)' }}>{l}</div>
+                </div>
+              ))}
+            </div>
+
+            <h2 style={{ margin: '0 0 20px', fontSize: 22 }}>Seus empreendimentos</h2>
+            <div style={{ display: 'grid', gap: 16,
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', marginBottom: 44 }}>
+              {empreendimentos.map(e => (
+                <div key={e.nome} style={{ background: '#fff', borderRadius: 14, padding: '24px 26px',
+                  border: '1px solid var(--border)', borderLeft: `4px solid ${accent}`,
+                  boxShadow: '0 4px 18px rgba(15,34,68,0.06)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+                    <div>
+                      <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', marginBottom: 3 }}>{e.nome}</div>
+                      <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>{e.bairro} · {e.unidades} unidades</div>
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.07em',
+                      textTransform: 'uppercase', padding: '4px 10px', borderRadius: 999,
+                      background: e.status === 'Em lançamento' ? `${accent}18` : '#05966918',
+                      color: e.status === 'Em lançamento' ? accent : '#059669',
+                      whiteSpace: 'nowrap', flexShrink: 0, marginLeft: 12 }}>{e.status}</span>
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 28,
+                      fontWeight: 700, color: accent }}>{e.leads}</div>
+                    <div style={{ fontSize: 12, color: 'var(--fg-2)',
+                      letterSpacing: '0.08em', textTransform: 'uppercase' }}>leads</div>
+                  </div>
+                </div>
+              ))}
+              <button onClick={() => setTab('novo')} style={{
+                background: 'none', borderRadius: 14, border: '2px dashed var(--border)',
+                padding: '24px 26px', cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center', gap: 10, color: 'var(--fg-2)',
+                fontFamily: 'DM Sans', fontSize: 14, minHeight: 130,
+                transition: 'border-color 0.2s, color 0.2s',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = accent; e.currentTarget.style.color = accent; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--fg-2)'; }}>
+                <span style={{ fontSize: 30, fontWeight: 300, lineHeight: 1 }}>+</span>
+                <span>Adicionar lançamento</span>
+              </button>
+            </div>
+
+            <h2 style={{ margin: '0 0 16px', fontSize: 22 }}>Leads recentes</h2>
+            <div style={{ background: '#fff', borderRadius: 14, border: '1px solid var(--border)',
+              boxShadow: '0 4px 18px rgba(15,34,68,0.06)', overflow: 'hidden' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'DM Sans', fontSize: 14 }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--cream)' }}>
+                    {['Nome','Interesse','Contato','Data','Status'].map(h => (
+                      <th key={h} style={{ padding: '12px 18px', textAlign: 'left', fontWeight: 700,
+                        fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase',
+                        color: 'var(--fg-2)' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {leadsData.slice(0, 4).map((l, i) => {
+                    const sc = statusColor(l.status);
+                    return (
+                      <tr key={l.nome} style={{ borderBottom: i < 3 ? '1px solid var(--border)' : 'none' }}>
+                        <td style={{ padding: '14px 18px', fontWeight: 600, color: 'var(--navy)' }}>{l.nome}</td>
+                        <td style={{ padding: '14px 18px', color: 'var(--fg-2)' }}>{l.interesse}</td>
+                        <td style={{ padding: '14px 18px', color: 'var(--fg-2)' }}>{l.email}</td>
+                        <td style={{ padding: '14px 18px', color: 'var(--fg-2)' }}>{l.data}</td>
+                        <td style={{ padding: '14px 18px' }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em',
+                            textTransform: 'uppercase', padding: '3px 10px', borderRadius: 999,
+                            background: sc.bg, color: sc.fg }}>{l.status}</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              <div style={{ padding: '14px 18px', borderTop: '1px solid var(--border)', textAlign: 'center' }}>
+                <button onClick={() => setTab('leads')} style={{ background: 'none', border: 'none',
+                  color: accent, cursor: 'pointer', fontFamily: 'DM Sans', fontSize: 13.5, fontWeight: 600 }}>
+                  Ver todos os leads →
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── NOVO LANÇAMENTO ── */}
+        {tab === 'novo' && (
+          <div style={{ maxWidth: 760 }}>
+            <h2 style={{ margin: '0 0 6px', fontSize: 24 }}>Novo lançamento</h2>
+            <p style={{ color: 'var(--fg-2)', marginBottom: 32, fontSize: 15 }}>
+              Preencha os dados. Nossa equipe valida e publica em até 1 dia útil.
+            </p>
+            {submitted ? (
+              <div style={{ background: '#fff', borderRadius: 16, padding: 40, textAlign: 'center',
+                border: '1px solid var(--border)', boxShadow: '0 8px 32px rgba(15,34,68,0.08)' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700,
+                  color: 'var(--navy)', marginBottom: 10 }}>Empreendimento enviado!</div>
+                <p style={{ color: 'var(--fg-2)', marginBottom: 24, fontSize: 15 }}>
+                  Nossa equipe comercial entrará em contato em até 1 dia útil para revisar e publicar.
+                </p>
+                <Btn variant="accent" onClick={() => { setSubmitted(false); setTab('overview'); }}>
+                  Voltar ao painel
+                </Btn>
+              </div>
+            ) : (
+              <div style={{ background: '#fff', borderRadius: 16, padding: 'clamp(24px, 4vw, 36px)',
+                border: '1px solid var(--border)', boxShadow: '0 8px 32px rgba(15,34,68,0.08)' }}>
+
+                {/* Identificação */}
+                <IncSection label="Identificação">
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <IncFieldLabel>Nome do empreendimento</IncFieldLabel>
+                    <input value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})}
+                      placeholder="Ex.: Residencial Alto das Pedras"
+                      style={{ width: '100%', boxSizing: 'border-box' }} />
+                  </div>
+                  <div>
+                    <IncFieldLabel>Bairro / Cidade</IncFieldLabel>
+                    <input value={formData.bairro} onChange={e => setFormData({...formData, bairro: e.target.value})}
+                      placeholder="Buritis, BH" style={{ width: '100%', boxSizing: 'border-box' }} />
+                  </div>
+                  <div>
+                    <IncFieldLabel>Tipo</IncFieldLabel>
+                    <select value={formData.tipo} onChange={e => setFormData({...formData, tipo: e.target.value})}
+                      style={{ width: '100%', boxSizing: 'border-box' }}>
+                      {['Residencial','Comercial','Misto','Loteamento'].map(o => <option key={o}>{o}</option>)}
+                    </select>
+                  </div>
+                </IncSection>
+
+                {/* Características */}
+                <IncSection label="Características">
+                  <div>
+                    <IncFieldLabel>Unidades</IncFieldLabel>
+                    <input value={formData.unidades} onChange={e => setFormData({...formData, unidades: e.target.value})}
+                      placeholder="48" style={{ width: '100%', boxSizing: 'border-box' }} />
+                  </div>
+                  <div>
+                    <IncFieldLabel>Área (m²)</IncFieldLabel>
+                    <input value={formData.area} onChange={e => setFormData({...formData, area: e.target.value})}
+                      placeholder="75 – 120" style={{ width: '100%', boxSizing: 'border-box' }} />
+                  </div>
+                  <div>
+                    <IncFieldLabel>Faixa de preço</IncFieldLabel>
+                    <input value={formData.preco} onChange={e => setFormData({...formData, preco: e.target.value})}
+                      placeholder="R$ 450k – R$ 900k" style={{ width: '100%', boxSizing: 'border-box' }} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <IncFieldLabel>Descrição</IncFieldLabel>
+                    <textarea value={formData.descricao} onChange={e => setFormData({...formData, descricao: e.target.value})}
+                      placeholder="Diferenciais, localização, prazo de entrega, padrão de acabamento..."
+                      style={{ width: '100%', minHeight: 90, resize: 'vertical', boxSizing: 'border-box' }} />
+                  </div>
+                </IncSection>
+
+                {/* Materiais */}
+                <div style={{ marginBottom: 32 }}>
+                  <IncSectionHeader label="Materiais" />
+                  <div style={{ display: 'grid', gap: 14, gridTemplateColumns: '1fr 1fr' }}>
+                    {[
+                      ['Fotos do empreendimento',  'JPG/PNG · até 30 arquivos · máx 5 MB cada'],
+                      ['Plantas baixas',           'PDF ou imagem · por tipologia'],
+                      ['Memorial descritivo',      'PDF · especificações técnicas'],
+                      ['Book de vendas',           'PDF · material de apresentação'],
+                    ].map(([lbl, hint]) => (
+                      <div key={lbl} style={{ border: '2px dashed var(--border)', borderRadius: 12,
+                        padding: '18px 20px', cursor: 'pointer', transition: 'border-color 0.15s' }}
+                        onMouseEnter={e => e.currentTarget.style.borderColor = accent}
+                        onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
+                        <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--navy)', marginBottom: 4 }}>{lbl}</div>
+                        <div style={{ fontSize: 12, color: 'var(--fg-2)', marginBottom: 10 }}>{hint}</div>
+                        <label style={{ display: 'inline-block', padding: '6px 14px',
+                          background: `${accent}12`, color: accent, borderRadius: 8, fontSize: 12.5,
+                          fontWeight: 600, cursor: 'pointer' }}>
+                          Selecionar arquivos
+                          <input type="file" multiple style={{ display: 'none' }} />
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+                  <Btn variant="ghost" onClick={() => setTab('overview')}>Cancelar</Btn>
+                  <Btn variant="accent" size="lg" onClick={() => setSubmitted(true)}>Enviar para publicação</Btn>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── LEADS ── */}
+        {tab === 'leads' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+              <h2 style={{ margin: 0, fontSize: 24 }}>Leads</h2>
+              <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>{leadsData.length} registrados</span>
+            </div>
+            <div style={{ background: '#fff', borderRadius: 14, border: '1px solid var(--border)',
+              boxShadow: '0 4px 18px rgba(15,34,68,0.06)', overflow: 'hidden', marginBottom: 32 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'DM Sans', fontSize: 14 }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--cream)' }}>
+                    {['Nome','Empreendimento','E-mail','Telefone','Data','Status'].map(h => (
+                      <th key={h} style={{ padding: '12px 18px', textAlign: 'left', fontWeight: 700,
+                        fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase',
+                        color: 'var(--fg-2)' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {leadsData.map((l, i) => {
+                    const sc = statusColor(l.status);
+                    return (
+                      <tr key={l.nome} style={{ borderBottom: i < leadsData.length - 1 ? '1px solid var(--border)' : 'none',
+                        background: i % 2 === 0 ? '#fff' : 'rgba(245,248,250,0.4)' }}>
+                        <td style={{ padding: '14px 18px', fontWeight: 600, color: 'var(--navy)' }}>{l.nome}</td>
+                        <td style={{ padding: '14px 18px', color: 'var(--fg-2)' }}>{l.interesse}</td>
+                        <td style={{ padding: '14px 18px', color: 'var(--fg-2)' }}>{l.email}</td>
+                        <td style={{ padding: '14px 18px', color: 'var(--fg-2)' }}>{l.tel}</td>
+                        <td style={{ padding: '14px 18px', color: 'var(--fg-2)' }}>{l.data}</td>
+                        <td style={{ padding: '14px 18px' }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em',
+                            textTransform: 'uppercase', padding: '3px 10px', borderRadius: 999,
+                            background: sc.bg, color: sc.fg }}>{l.status}</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Notificações */}
+            <div style={{ background: '#fff', borderRadius: 14, padding: '24px 26px',
+              border: '1px solid var(--border)', boxShadow: '0 4px 18px rgba(15,34,68,0.06)' }}>
+              <h3 style={{ margin: '0 0 10px', fontSize: 18 }}>Notificações por e-mail</h3>
+              <p style={{ color: 'var(--fg-2)', fontSize: 14, marginBottom: 18 }}>
+                Escolha em quais eventos receber notificação imediata.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {[
+                  ['Novo lead cadastrado',         true],
+                  ['Lead retornou contato',         true],
+                  ['Proposta recebida',             true],
+                  ['Relatório semanal de leads',   false],
+                ].map(([label, chk]) => (
+                  <label key={label} style={{ display: 'flex', alignItems: 'center', gap: 12,
+                    cursor: 'pointer', fontFamily: 'DM Sans', fontSize: 14, color: 'var(--navy)' }}>
+                    <input type="checkbox" defaultChecked={chk}
+                      style={{ width: 16, height: 16, accentColor: accent }} />
+                    {label}
+                  </label>
+                ))}
+              </div>
+              <div style={{ marginTop: 20, paddingTop: 18, borderTop: '1px solid var(--border)',
+                display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                <input defaultValue="contato@incorporadora.com.br" placeholder="E-mail para notificações"
+                  style={{ flex: 1, minWidth: 220, maxWidth: 360 }} />
+                <Btn variant="accent">Salvar</Btn>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </main>
+  );
+}
+
+function IncSectionHeader({ label }) {
+  return (
+    <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: 12, letterSpacing: '0.09em',
+      textTransform: 'uppercase', marginBottom: 14, paddingBottom: 10,
+      borderBottom: '1px solid var(--border)' }}>{label}</div>
+  );
+}
+
+function IncSection({ label, children }) {
+  return (
+    <div style={{ marginBottom: 26 }}>
+      <IncSectionHeader label={label} />
+      <div style={{ display: 'grid', gap: 14, gridTemplateColumns: '1fr 1fr' }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function IncFieldLabel({ children }) {
+  return (
+    <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: 'var(--fg-2)',
+      marginBottom: 5, letterSpacing: '0.04em' }}>{children}</label>
   );
 }
 
