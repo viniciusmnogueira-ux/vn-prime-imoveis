@@ -1327,10 +1327,35 @@ function SiteHeader({ active, onNav, density = 'comfortable' }) {
   );
 }
 
-function SiteFooter() {
+function SiteFooter({ onNewsletter }) {
   return (
     <footer style={{ background: 'var(--navy)', color: 'rgba(245,248,250,0.72)', padding: '64px 0 32px', marginTop: 60 }}>
       <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto' }}>
+
+        {/* Newsletter strip */}
+        <div style={{ background: 'rgba(212,168,87,0.10)', border: '1px solid rgba(212,168,87,0.22)',
+          borderRadius: 16, padding: '28px 36px', marginBottom: 48,
+          display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 20 }}>
+          <div>
+            <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.2em',
+              textTransform: 'uppercase', color: 'var(--gold-soft)', marginBottom: 8 }}>
+              Fique por dentro
+            </div>
+            <p style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#fff', lineHeight: 1.4 }}>
+              Receba novos imóveis e lançamentos em primeira mão.
+            </p>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgba(245,248,250,0.62)' }}>
+              Sem precisar criar uma conta — só nome e e-mail.
+            </p>
+          </div>
+          <button onClick={onNewsletter} style={{ padding: '13px 28px', borderRadius: 10,
+            border: 'none', background: 'var(--gradient-gold)', color: 'var(--navy)',
+            fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 14.5,
+            cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            Quero receber novidades
+          </button>
+        </div>
+
         <div style={{ display: 'grid', gap: 40, gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: 40 }}>
           <div>
             <BrandLockup onNavy />
@@ -1561,8 +1586,8 @@ function HomePage({ onNav, density, accentMode }) {
     {
       title: 'Área do Proprietário',
       subtitle: 'Venda com autonomia total',
-      desc: 'Anuncie com taxa fixa ou comissão só no sucesso. Você define o preço, conduz visitas e fecha direto com o comprador. A VN Prime cuida da plataforma, fotos, mídia e suporte jurídico.',
-      bullets: ['Taxa fixa R$ 297 ou 3% sobre a venda', 'Fotografia profissional inclusa', 'Mídia paga em Meta, Google e portais', 'Suporte jurídico até a escritura'],
+      desc: 'Você define o preço, cadastra seu imóvel e conduz a venda. A VN Prime cuida da plataforma, suporte e qualificação de compradores. Fotografia e mídia são pacotes adicionais.',
+      bullets: ['Taxa fixa R$ 297 ou 3% só no sucesso', 'Cadastro e gestão do anúncio pelo proprietário', 'Qualificação de compradores pela plataforma', 'Pacotes de fotografia e mídia à parte'],
       cta: 'Anunciar meu imóvel', route: 'proprietario',
       img: (window.__resources?.img60||'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=80'),
       accent: '#D4A857',
@@ -1630,8 +1655,8 @@ function HomePage({ onNav, density, accentMode }) {
       tag: 'Mais escolhido',
       price: '3%',
       priceLabel: 'sobre o valor da venda — só no sucesso',
-      desc: 'Você conduz as visitas, a VN Prime cuida de tudo que envolve tecnologia e divulgação: fotos profissionais, descrição editorial, mídia paga e qualificação de compradores.',
-      bullets: ['Fotografia profissional inclusa', 'Descrição editorial com IA', 'Mídia paga em Meta e Google', 'Qualificação de compradores', 'Time VN Prime nos bastidores'],
+      desc: 'Você cadastra o imóvel e conduz o processo. A VN Prime atua como suporte consultivo: curadoria do anúncio, IA editorial e qualificação de compradores. Fotografia e mídia são contratados à parte.',
+      bullets: ['Você cadastra e anuncia o imóvel', 'Curadoria e descrição editorial com IA', 'Qualificação de compradores', 'Suporte consultivo VN Prime', 'Pacotes de fotografia e mídia à parte'],
       cta: 'Escolher este plano',
       img: (window.__resources?.img39||'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1400&q=85'),
     },
@@ -1640,8 +1665,8 @@ function HomePage({ onNav, density, accentMode }) {
       tag: 'Mãos livres',
       price: '6%',
       priceLabel: 'sobre o valor da venda — só no sucesso',
-      desc: 'Entregue tudo para a VN Prime. Corretor parceiro dedicado, visitas acompanhadas, vídeo cinematográfico, concierge de negociação e suporte jurídico completo.',
-      bullets: ['Corretor parceiro dedicado à sua venda', 'Visitas acompanhadas pelo corretor', 'Vídeo cinematográfico do imóvel', 'Concierge de negociação', 'Suporte jurídico até a escritura'],
+      desc: 'Entregue tudo para a VN Prime. Corretor parceiro dedicado, sessão fotográfica profissional inclusa, mídia paga gerenciada, visitas acompanhadas, concierge de negociação e suporte jurídico completo.',
+      bullets: ['Corretor parceiro dedicado à sua venda', 'Sessão fotográfica profissional inclusa', 'Mídia paga em Meta, Google e portais', 'Visitas acompanhadas pelo corretor', 'Concierge de negociação', 'Suporte jurídico até a escritura'],
       cta: 'Quero mãos livres',
       img: (window.__resources?.img40||'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1400&q=85'),
     },
@@ -2738,14 +2763,14 @@ function VenderHubPage({ onNav }) {
       tag: 'Proprietário Direto',
       title: 'Você conduz a venda.',
       highlight: 'Do anúncio ao fechamento.',
-      desc: 'Publique seu imóvel na vitrine VN Prime com taxa fixa de R$ 297 ou comissão de 3% apenas quando vender. Você define o preço, agenda visitas pelo app e fecha direto com o comprador. Nossa plataforma cuida de tudo que envolve tecnologia.',
+      desc: 'Publique seu imóvel na vitrine VN Prime com taxa fixa de R$ 297 ou comissão de 3% apenas quando vender. Você cadastra, define o preço e conduz a venda. No plano 3% a VN Prime apoia como venda assistida — fotografia e mídia são pacotes à parte.',
       bullets: [
         'Taxa fixa R$ 297 ou 3% só no sucesso',
-        'Até 25 fotos + vídeo no anúncio',
+        'Você cadastra e gerencia seu anúncio',
         'Descrição editorial gerada por IA',
         'Visitas agendadas pelo app — sem intermediários',
         'Endereço privado · exibe só o bairro na vitrine',
-        'Suporte VN Prime do anúncio à escritura',
+        'Pacotes de fotografia e mídia disponíveis à parte',
       ],
       cta: 'Acessar portal do proprietário',
       route: 'proprietario',
@@ -2759,10 +2784,11 @@ function VenderHubPage({ onNav }) {
       tag: 'Corretor Parceiro',
       title: 'Corretor conduz.',
       highlight: 'Você aprova e assina.',
-      desc: 'No plano 6% — Venda Completa — um corretor credenciado VN Prime cuida de tudo: fotografia, descrição, qualificação de compradores, visitas acompanhadas e negociação. Você só precisa aprovar a proposta e assinar.',
+      desc: 'No plano 6% — Venda Completa — um corretor credenciado VN Prime cuida de tudo: sessão fotográfica profissional inclusa, mídia paga gerenciada, qualificação de compradores, visitas acompanhadas e negociação. Você só precisa aprovar a proposta e assinar.',
       bullets: [
         'Corretor parceiro credenciado dedicado ao seu imóvel',
-        'Fotografia profissional + vídeo cinematográfico',
+        'Sessão fotográfica profissional inclusa',
+        'Mídia paga em Meta, Google e portais',
         'Qualificação de compradores antes das visitas',
         'Visitas acompanhadas pelo corretor',
         'Negociação e suporte jurídico até a escritura',
@@ -4935,6 +4961,7 @@ function LoginPage({ onNav, mode: initialMode = 'login' }) {
                     ['comprador', 'Comprador'],
                     ['corretor', 'Corretor'],
                     ['incorporadora', 'Incorporadora'],
+                    ['fotografo', 'Fotógrafo'],
                   ].map(([k, lbl]) => (
                     <button key={k} onClick={() => setPerfil(k)} style={{
                       padding: '12px 14px',
@@ -5073,6 +5100,119 @@ function FormField({ label, type = 'text', placeholder }) {
 }
 
 Object.assign(window, { LoginPage });
+</script>
+<script type="text/babel">
+// ============================================================
+// NEWSLETTER MODAL — captura leve (nome + e-mail)
+// Para quem quer acompanhar lançamentos e listagens sem criar conta
+// ============================================================
+const { useState: useStateNL } = React;
+
+function NewsletterModal({ onClose }) {
+  const [nome, setNome] = useStateNL('');
+  const [email, setEmail] = useStateNL('');
+  const [sent, setSent] = useStateNL(false);
+
+  const accent = 'var(--gold)';
+  const navy = 'var(--navy)';
+
+  if (sent) return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999,
+      background: 'rgba(15,24,36,0.72)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      onClick={onClose}>
+      <div style={{ background: 'var(--white)', borderRadius: 20, padding: '48px 40px',
+        maxWidth: 400, width: '90%', textAlign: 'center', boxShadow: '0 24px 64px rgba(15,24,36,0.28)' }}
+        onClick={e => e.stopPropagation()}>
+        <div style={{ fontSize: 40, marginBottom: 16 }}>✓</div>
+        <h3 style={{ margin: '0 0 10px', fontSize: 22, fontWeight: 700, color: navy }}>Tudo certo!</h3>
+        <p style={{ color: 'var(--fg-2)', fontSize: 15, margin: '0 0 28px' }}>
+          Você está na lista. Avisaremos sobre novos imóveis e lançamentos em primeira mão.
+        </p>
+        <button onClick={onClose} style={{ padding: '13px 32px', borderRadius: 10,
+          border: 'none', background: accent, color: navy, fontWeight: 700, fontSize: 15,
+          cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+          Fechar
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999,
+      background: 'rgba(15,24,36,0.72)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      onClick={onClose}>
+      <div style={{ background: 'var(--white)', borderRadius: 20, padding: '44px 40px',
+        maxWidth: 440, width: '90%', boxShadow: '0 24px 64px rgba(15,24,36,0.28)',
+        position: 'relative' }}
+        onClick={e => e.stopPropagation()}>
+
+        <button onClick={onClose} style={{ position: 'absolute', top: 16, right: 18,
+          background: 'none', border: 'none', fontSize: 22, color: 'var(--fg-3)',
+          cursor: 'pointer', lineHeight: 1 }}>×</button>
+
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.2em',
+          textTransform: 'uppercase', color: accent, marginBottom: 12 }}>
+          Fique por dentro
+        </div>
+        <h2 style={{ margin: '0 0 10px', fontSize: 26, fontWeight: 800,
+          letterSpacing: '-0.025em', color: navy }}>
+          Receba lançamentos e novidades
+        </h2>
+        <p style={{ color: 'var(--fg-2)', fontSize: 14.5, margin: '0 0 28px', lineHeight: 1.6 }}>
+          Cadastre-se para receber em primeira mão os novos imóveis e lançamentos da plataforma VN Prime.
+          Sem compromisso — cancele quando quiser.
+        </p>
+
+        <div style={{ marginBottom: 18 }}>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 700,
+            letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 8 }}>
+            Seu nome
+          </label>
+          <input value={nome} onChange={e => setNome(e.target.value)}
+            placeholder="Como devemos te chamar?"
+            style={{ width: '100%', padding: '13px 16px', borderRadius: 10,
+              border: '1.5px solid var(--border)', fontFamily: 'var(--font-body)',
+              fontSize: 15, color: navy, outline: 'none', boxSizing: 'border-box' }}
+            onFocus={e => e.target.style.borderColor = accent}
+            onBlur={e => e.target.style.borderColor = 'var(--border)'} />
+        </div>
+
+        <div style={{ marginBottom: 24 }}>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 700,
+            letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 8 }}>
+            E-mail
+          </label>
+          <input value={email} onChange={e => setEmail(e.target.value)}
+            type="email" placeholder="seu@email.com"
+            style={{ width: '100%', padding: '13px 16px', borderRadius: 10,
+              border: '1.5px solid var(--border)', fontFamily: 'var(--font-body)',
+              fontSize: 15, color: navy, outline: 'none', boxSizing: 'border-box' }}
+            onFocus={e => e.target.style.borderColor = accent}
+            onBlur={e => e.target.style.borderColor = 'var(--border)'} />
+        </div>
+
+        <button
+          disabled={!nome.trim() || !email.trim()}
+          onClick={() => setSent(true)}
+          style={{ width: '100%', padding: '15px 24px', borderRadius: 10,
+            border: 'none', background: (!nome.trim() || !email.trim()) ? 'var(--border)' : 'var(--gradient-gold)',
+            color: (!nome.trim() || !email.trim()) ? 'var(--fg-3)' : navy,
+            fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 15,
+            cursor: (!nome.trim() || !email.trim()) ? 'not-allowed' : 'pointer',
+            transition: 'background 0.2s' }}>
+          Quero receber novidades
+        </button>
+
+        <p style={{ textAlign: 'center', marginTop: 14, fontSize: 12,
+          color: 'var(--fg-3)', margin: '14px 0 0' }}>
+          Sem spam. Apenas imóveis e lançamentos que valem a pena.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { NewsletterModal });
 </script>
 <script type="text/babel">
 // tweaks-panel.jsx
@@ -5512,6 +5652,7 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 function App() {
   const [route, setRoute] = React.useState({ name: 'home', params: {} });
   const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [showNewsletter, setShowNewsletter] = React.useState(false);
 
   const onNav = (name, params = {}) => {
     setRoute({ name, params });
@@ -5539,7 +5680,7 @@ function App() {
 
   return (
     <React.Fragment>
-      <SiteHeader active={headerActive} onNav={onNav} density={tweaks.density} />
+      <SiteHeader active={headerActive} onNav={onNav} density={tweaks.density} onNewsletter={() => setShowNewsletter(true)} />
 
       {route.name === 'home' && (
         <HomePage onNav={onNav} density={tweaks.density} accentMode={tweaks.accentMode} />
@@ -5564,7 +5705,9 @@ function App() {
         <PlaceholderPage name={route.name} onNav={onNav} />
       )}
 
-      <SiteFooter />
+      <SiteFooter onNewsletter={() => setShowNewsletter(true)} />
+
+      {showNewsletter && window.NewsletterModal && React.createElement(window.NewsletterModal, { onClose: () => setShowNewsletter(false) })}
 
       <TweaksPanel title="Tweaks">
         <TweakSection title="Layout">
