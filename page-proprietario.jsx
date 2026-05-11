@@ -61,15 +61,16 @@ function ProprHero({ onNav }) {
           </div>
           <h1 style={{ color: '#fff', fontSize: 'clamp(2rem, 4.2vw, 3.2rem)',
             margin: '0 0 20px', lineHeight: 1.15 }}>
-            Venda seu imóvel com{' '}
+            Anuncie seu imóvel com a{' '}
             <em style={{ background: 'var(--gradient-gold)', WebkitBackgroundClip: 'text',
               backgroundClip: 'text', color: 'transparent', fontStyle: 'italic' }}>
-              inteligência e autonomia
-            </em>
+              liberdade
+            </em>{' '}
+            de quem manda no negócio.
           </h1>
           <p style={{ color: 'rgba(250,249,246,0.88)', fontSize: 16, lineHeight: 1.75, marginBottom: 28, maxWidth: 520 }}>
-            Anuncie na vitrine VN Prime com taxa fixa de R$ 197 ou 3% só quando vender.
-            IA para fotos, descrição e impulsionamento. Você no controle — nós nos bastidores.
+            Taxa fixa de R$ 197 ou 3% só quando vender. IA para fotos, descrição e impulsionamento.
+            Você no controle — nós nos bastidores. 30 dias grátis de gestão financeira.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <Btn variant="accent" size="lg" onClick={() => onNav('anunciar')}>

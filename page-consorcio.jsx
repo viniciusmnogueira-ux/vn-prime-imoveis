@@ -257,12 +257,11 @@ function ConsHero({ onNav }) {
               </span>
             </div>
             <h1 style={{ color: '#fff', margin: '0 0 18px', fontSize: 'clamp(2rem, 3.8vw, 3.2rem)', lineHeight: 1.12 }}>
-              Realize seu{' '}
-              <em style={{ background: 'linear-gradient(135deg, #fcd34d, var(--gold))',
+              Compre seu imóvel{' '}
+              <em style={{ background: `linear-gradient(135deg, ${CONS_LIME}, ${CONS_GREEN})`,
                 WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', fontStyle: 'italic' }}>
-                próximo grande
-              </em>{' '}
-              <span style={{ color: 'rgba(250,249,246,0.92)' }}>patrimônio.</span>
+                sem juros.
+              </em>
             </h1>
             <p style={{ color: 'rgba(250,249,246,0.78)', fontSize: 16, lineHeight: 1.75, margin: '0 0 28px', maxWidth: 500 }}>
               Compre imóveis, veículos e muito mais sem pagar juros. O consórcio é a forma mais

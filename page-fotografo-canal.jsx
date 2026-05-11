@@ -85,12 +85,12 @@ function FotoHero({ onNav }) {
               </span>
             </div>
             <h1 style={{ color: '#fff', margin: '0 0 18px', fontSize: 'clamp(1.9rem, 3.5vw, 2.9rem)', lineHeight: 1.18 }}>
-              Fotografe imóveis de{' '}
+              Fotografia que{' '}
               <em style={{ background: `linear-gradient(135deg, ${FOTO_BRONZE_LIGHT}, ${FOTO_BRONZE})`,
                 WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', fontStyle: 'italic' }}>
-                alto padrão.
+                vende
               </em>{' '}
-              <span style={{ color: 'rgba(250,249,246,0.88)' }}>Cresça seu portfólio.</span>
+              imóveis de alto padrão.
             </h1>
             <p style={{ color: 'rgba(250,249,246,0.8)', fontSize: 16, lineHeight: 1.7, margin: '0 0 28px', maxWidth: 520 }}>
               VN Prime credencia fotógrafos profissionais para cobrir imóveis premium em BH e região.

@@ -68,9 +68,9 @@ function DDHero({ onNav }) {
               Compre com{' '}
               <em style={{ background: `linear-gradient(135deg, ${DD_VIOLET}, ${DD_INDIGO})`,
                 WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', fontStyle: 'italic' }}>
-                total segurança.
+                segurança jurídica
               </em>{' '}
-              <span style={{ color: 'rgba(250,249,246,0.88)' }}>Sem riscos ocultos.</span>
+              total.
             </h1>
             <p style={{ color: 'rgba(250,249,246,0.78)', fontSize: 16, lineHeight: 1.75, margin: '0 0 28px', maxWidth: 520 }}>
               Antes de assinar qualquer contrato, a VN Prime analisa toda a documentação jurídica e

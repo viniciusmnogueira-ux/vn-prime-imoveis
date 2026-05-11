@@ -752,7 +752,12 @@ function LancamentosPage({ onNav }) {
             <h1 style={{ color: '#fff', fontSize: 'clamp(2rem, 4.2vw, 3.4rem)',
               margin: '10px 0 20px', lineHeight: 1.12, maxWidth: '18ch',
               textShadow: '0 2px 20px rgba(0,0,0,0.3)' }}>
-              Alta valorização. Condições que cabem no seu momento.
+              Alta{' '}
+              <em style={{ background: 'var(--gradient-gold)', WebkitBackgroundClip: 'text',
+                backgroundClip: 'text', color: 'transparent', fontStyle: 'italic' }}>
+                valorização.
+              </em>{' '}
+              Condições que cabem no seu momento.
             </h1>
             <p style={{ color: 'rgba(250,249,246,0.88)', fontSize: 16, maxWidth: 520, lineHeight: 1.8, marginBottom: 28 }}>
               Apartamentos, casas em condomínio e lotes no melhor da Grande BH. Compre na planta com entrada facilitada, fluxo baixo durante as obras e financiamento bancário na entrega.
