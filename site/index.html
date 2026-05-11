@@ -1286,11 +1286,19 @@ function SiteHeader({ active, onNav, density = 'comfortable' }) {
                  onMouseLeave={() => it.dropdown && setOpenMenu(null)}>
               <a onClick={(e) => { e.preventDefault(); !it.dropdown && onNav(it.id); }}
                  style={{
-                   fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 13.5, fontWeight: 600, cursor: 'pointer',
-                   color: active === it.id ? 'var(--navy)' : 'var(--navy-muted)',
-                   borderBottom: active === it.id ? '2px solid var(--gold)' : '2px solid transparent',
-                   padding: '8px 0', textDecoration: 'none',
+                   fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
+                   color: it.id === 'vender'
+                     ? 'var(--gold-deep)'
+                     : active === it.id ? 'var(--navy)' : 'var(--navy-muted)',
+                   borderBottom: it.id === 'vender'
+                     ? '2px solid var(--gold)'
+                     : active === it.id ? '2px solid var(--gold)' : '2px solid transparent',
+                   background: it.id === 'vender' ? 'rgba(212,168,87,0.10)' : 'transparent',
+                   padding: it.id === 'vender' ? '6px 14px' : '8px 0',
+                   borderRadius: it.id === 'vender' ? 8 : 0,
+                   textDecoration: 'none',
                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                   transition: 'background 0.15s',
                  }}>
                 {it.label}
                 {it.dropdown && <span style={{ fontSize: 9, opacity: 0.6 }}>▼</span>}
@@ -1642,30 +1650,30 @@ function HomePage({ onNav, density, accentMode }) {
   const PLANOS = [
     {
       name: 'Venda Direta',
-      tag: 'Autonomia total',
+      tag: 'Sem comissão',
       price: 'R$ 297',
-      priceLabel: 'taxa fixa única — sem comissão',
-      desc: 'Você conduz a venda do início ao fim. Plataforma, vitrine premium, tutorial de fotos, gerador de descrição com IA e suporte para documentação inclusos.',
-      bullets: ['Anúncio por 90 dias na vitrine VN Prime', 'Tutorial profissional de fotografia', 'Gerador de descrição com IA', 'Endereço privado — exibe só o bairro', 'Suporte por WhatsApp'],
+      priceLabel: 'taxa única — você fica com 100% da venda',
+      desc: 'Anuncie na maior vitrine premium de BH e venda mais sem pagar comissão. Você define o preço, conduz as visitas e fecha direto com o comprador. 100% do valor da venda é seu.',
+      bullets: ['Sem comissão — 0% sobre a venda', 'Anúncio por 90 dias na vitrine VN Prime', 'Gerador de descrição editorial com IA', 'Endereço privado — exibe só o bairro', 'Suporte por WhatsApp'],
       cta: 'Começar agora',
       img: (window.__resources?.img38||'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1400&q=85'),
     },
     {
       name: 'Venda Assistida',
-      tag: 'Mais escolhido',
+      tag: 'Mais escolhido · Venda garantida',
       price: '3%',
-      priceLabel: 'sobre o valor da venda — só no sucesso',
-      desc: 'Você cadastra o imóvel e conduz o processo. A VN Prime atua como suporte consultivo: curadoria do anúncio, IA editorial e qualificação de compradores. Fotografia e mídia são contratados à parte.',
-      bullets: ['Você cadastra e anuncia o imóvel', 'Curadoria e descrição editorial com IA', 'Qualificação de compradores', 'Suporte consultivo VN Prime', 'Pacotes de fotografia e mídia à parte'],
+      priceLabel: 'só no sucesso — você só paga quando vender',
+      desc: 'Venda mais rápido com o apoio da VN Prime. Você cadastra o imóvel e conduz o processo; a equipe VN Prime qualifica compradores, cuida do anúncio e mantém tudo otimizado até fechar o negócio.',
+      bullets: ['Só paga se vender — 0 risco', 'Curadoria e descrição editorial com IA', 'Qualificação ativa de compradores', 'Time VN Prime nos bastidores', 'Pacotes de fotografia e mídia à parte'],
       cta: 'Escolher este plano',
       img: (window.__resources?.img39||'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1400&q=85'),
     },
     {
       name: 'Venda Completa',
-      tag: 'Mãos livres',
+      tag: 'Mãos livres · Venda garantida',
       price: '6%',
-      priceLabel: 'sobre o valor da venda — só no sucesso',
-      desc: 'Entregue tudo para a VN Prime. Corretor parceiro dedicado, sessão fotográfica profissional inclusa, mídia paga gerenciada, visitas acompanhadas, concierge de negociação e suporte jurídico completo.',
+      priceLabel: 'só no sucesso — você aprova a proposta e assina',
+      desc: 'A VN Prime cuida de tudo. Corretor dedicado, fotos profissionais, mídia paga gerenciada, visitas conduzidas e negociação. Você só precisa aprovar a proposta e assinar a escritura.',
       bullets: ['Corretor parceiro dedicado à sua venda', 'Sessão fotográfica profissional inclusa', 'Mídia paga em Meta, Google e portais', 'Visitas acompanhadas pelo corretor', 'Concierge de negociação', 'Suporte jurídico até a escritura'],
       cta: 'Quero mãos livres',
       img: (window.__resources?.img40||'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1400&q=85'),
@@ -2097,6 +2105,14 @@ Object.assign(window, { HomePage });
 </script>
 <script type="text/babel">// Search results page — ImovelWeb-style with sidebar filters + map toggle
 
+const PRICE_RANGES = {
+  'ate500': [0, 500000],
+  '500-1M': [500000, 1000000],
+  '1M-2M': [1000000, 2000000],
+  '2M-5M': [2000000, 5000000],
+  'acima5M': [5000000, Infinity],
+};
+
 function SearchResultsPage({ onNav, initial = {}, density = 'comfortable' }) {
   const [filters, setFilters] = useState({
     op: initial.op || 'compra',
@@ -2104,8 +2120,11 @@ function SearchResultsPage({ onNav, initial = {}, density = 'comfortable' }) {
     tipo: initial.tipo || '',
     bairros: [],
     quartos: 0,
+    suites: 0,
+    vagas: 0,
     priceMin: '', priceMax: '',
-    areaMin: '',
+    priceRange: '',
+    areaMin: '', areaMax: '',
     onlyFeatured: false,
     onlyNew: false,
   });
@@ -2127,9 +2146,14 @@ function SearchResultsPage({ onNav, initial = {}, density = 'comfortable' }) {
       if (filters.tipo && l.type !== filters.tipo) return false;
       if (filters.bairros.length && !filters.bairros.includes(l.neighborhood)) return false;
       if (filters.quartos && l.quartos < filters.quartos) return false;
-      if (filters.priceMin && l.price < +filters.priceMin) return false;
-      if (filters.priceMax && l.price > +filters.priceMax) return false;
+      if (filters.suites && (l.suites||0) < filters.suites) return false;
+      if (filters.vagas && (l.vagas||0) < filters.vagas) return false;
+      const effMin = filters.priceRange ? PRICE_RANGES[filters.priceRange]?.[0] : (filters.priceMin ? +filters.priceMin : null);
+      const effMax = filters.priceRange ? PRICE_RANGES[filters.priceRange]?.[1] : (filters.priceMax ? +filters.priceMax : null);
+      if (effMin && l.price < effMin) return false;
+      if (effMax && l.price > effMax) return false;
       if (filters.areaMin && l.areaM2 < +filters.areaMin) return false;
+      if (filters.areaMax && l.areaM2 > +filters.areaMax) return false;
       if (filters.onlyFeatured && !l.isFeatured) return false;
       if (filters.onlyNew && !l.isNew) return false;
       return true;
@@ -2209,58 +2233,124 @@ function SearchResultsPage({ onNav, initial = {}, density = 'comfortable' }) {
             <div style={{ fontFamily: 'Playfair Display', fontSize: 17, fontWeight: 600,
               color: 'var(--navy)', marginBottom: 4 }}>Refinar busca</div>
             <button onClick={() => setFilters({ op: filters.op, q: '', tipo: '', bairros: [],
-              quartos: 0, priceMin: '', priceMax: '', areaMin: '', onlyFeatured: false, onlyNew: false })}
+              quartos: 0, suites: 0, vagas: 0, priceMin: '', priceMax: '', priceRange: '',
+              areaMin: '', areaMax: '', onlyFeatured: false, onlyNew: false })}
               style={{ background: 'none', border: 'none', color: 'var(--gold)', cursor: 'pointer',
                 fontFamily: 'DM Sans', fontSize: 11.5, fontWeight: 600, padding: 0,
                 marginBottom: 18, textDecoration: 'underline' }}>Limpar filtros</button>
 
             <FilterGroup title="Localização">
-              <input type="text" placeholder="Bairro ou cidade"
+              <input type="text" placeholder="Bairro, cidade ou código"
                 value={filters.q} onChange={(e) => setFilters({ ...filters, q: e.target.value })}
                 style={{ ...inputStyle, fontSize: 13 }} />
             </FilterGroup>
 
             <FilterGroup title="Tipo de imóvel">
-              <select value={filters.tipo} onChange={(e) => setFilters({ ...filters, tipo: e.target.value })}
-                style={{ ...inputStyle, fontSize: 13 }}>
-                <option value="">Todos os tipos</option>
-                <option>Apartamento</option><option>Casa</option><option>Cobertura</option>
-              </select>
-            </FilterGroup>
-
-            <FilterGroup title="Quartos">
-              <div style={{ display: 'flex', gap: 4 }}>
-                {[0, 1, 2, 3, 4].map(n => (
-                  <button key={n} onClick={() => setFilters({ ...filters, quartos: n })}
-                    style={{
-                      flex: 1, padding: '0.5rem 0', border: '1px solid',
-                      borderColor: filters.quartos === n ? 'var(--gold)' : 'var(--border)',
-                      background: filters.quartos === n ? 'rgba(201,150,14,0.1)' : '#fff',
-                      color: 'var(--navy)', cursor: 'pointer', borderRadius: 6,
-                      fontFamily: 'DM Sans', fontSize: 12, fontWeight: 600,
-                    }}>{n === 0 ? 'Todos' : `${n}+`}</button>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {['', 'Apartamento', 'Casa', 'Cobertura', 'Studio', 'Loft', 'Casa de condomínio', 'Terreno', 'Loteamento'].map(t => (
+                  <button key={t} onClick={() => setFilters({ ...filters, tipo: t })}
+                    style={{ padding: '6px 11px', border: '1px solid',
+                      borderColor: filters.tipo === t ? 'var(--gold)' : 'var(--border)',
+                      background: filters.tipo === t ? 'rgba(201,150,14,0.10)' : '#fff',
+                      color: filters.tipo === t ? 'var(--navy)' : 'var(--fg-2)',
+                      cursor: 'pointer', borderRadius: 20, fontFamily: 'DM Sans', fontSize: 12,
+                      fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    {t || 'Todos'}
+                  </button>
                 ))}
               </div>
             </FilterGroup>
 
             <FilterGroup title="Faixa de preço">
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+                {[
+                  ['', 'Qualquer'],
+                  ['ate500', 'Até R$ 500k'],
+                  ['500-1M', 'R$ 500k–1M'],
+                  ['1M-2M', 'R$ 1M–2M'],
+                  ['2M-5M', 'R$ 2M–5M'],
+                  ['acima5M', 'Acima R$ 5M'],
+                ].map(([k, lbl]) => (
+                  <button key={k} onClick={() => setFilters({ ...filters, priceRange: k, priceMin: '', priceMax: '' })}
+                    style={{ padding: '6px 10px', border: '1px solid',
+                      borderColor: filters.priceRange === k ? 'var(--gold)' : 'var(--border)',
+                      background: filters.priceRange === k ? 'rgba(201,150,14,0.10)' : '#fff',
+                      color: filters.priceRange === k ? 'var(--navy)' : 'var(--fg-2)',
+                      cursor: 'pointer', borderRadius: 20, fontFamily: 'DM Sans', fontSize: 11.5,
+                      fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    {lbl}
+                  </button>
+                ))}
+              </div>
+              {!filters.priceRange && (
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <input type="number" placeholder="Mín R$" value={filters.priceMin}
+                    onChange={(e) => setFilters({ ...filters, priceMin: e.target.value })}
+                    style={{ ...inputStyle, fontSize: 12.5 }} />
+                  <input type="number" placeholder="Máx R$" value={filters.priceMax}
+                    onChange={(e) => setFilters({ ...filters, priceMax: e.target.value })}
+                    style={{ ...inputStyle, fontSize: 12.5 }} />
+                </div>
+              )}
+            </FilterGroup>
+
+            <FilterGroup title="Quartos">
+              <div style={{ display: 'flex', gap: 4 }}>
+                {[0, 1, 2, 3, 4, 5].map(n => (
+                  <button key={n} onClick={() => setFilters({ ...filters, quartos: n })}
+                    style={{
+                      flex: 1, padding: '0.45rem 0', border: '1px solid',
+                      borderColor: filters.quartos === n ? 'var(--gold)' : 'var(--border)',
+                      background: filters.quartos === n ? 'rgba(201,150,14,0.1)' : '#fff',
+                      color: 'var(--navy)', cursor: 'pointer', borderRadius: 6,
+                      fontFamily: 'DM Sans', fontSize: 12, fontWeight: 600,
+                    }}>{n === 0 ? 'T' : `${n}+`}</button>
+                ))}
+              </div>
+            </FilterGroup>
+
+            <FilterGroup title="Suítes">
+              <div style={{ display: 'flex', gap: 4 }}>
+                {[0, 1, 2, 3, 4].map(n => (
+                  <button key={n} onClick={() => setFilters({ ...filters, suites: n })}
+                    style={{
+                      flex: 1, padding: '0.45rem 0', border: '1px solid',
+                      borderColor: filters.suites === n ? 'var(--gold)' : 'var(--border)',
+                      background: filters.suites === n ? 'rgba(201,150,14,0.1)' : '#fff',
+                      color: 'var(--navy)', cursor: 'pointer', borderRadius: 6,
+                      fontFamily: 'DM Sans', fontSize: 12, fontWeight: 600,
+                    }}>{n === 0 ? 'T' : `${n}+`}</button>
+                ))}
+              </div>
+            </FilterGroup>
+
+            <FilterGroup title="Vagas de garagem">
+              <div style={{ display: 'flex', gap: 4 }}>
+                {[0, 1, 2, 3, 4].map(n => (
+                  <button key={n} onClick={() => setFilters({ ...filters, vagas: n })}
+                    style={{
+                      flex: 1, padding: '0.45rem 0', border: '1px solid',
+                      borderColor: filters.vagas === n ? 'var(--gold)' : 'var(--border)',
+                      background: filters.vagas === n ? 'rgba(201,150,14,0.1)' : '#fff',
+                      color: 'var(--navy)', cursor: 'pointer', borderRadius: 6,
+                      fontFamily: 'DM Sans', fontSize: 12, fontWeight: 600,
+                    }}>{n === 0 ? 'T' : `${n}+`}</button>
+                ))}
+              </div>
+            </FilterGroup>
+
+            <FilterGroup title="Área (m²)">
               <div style={{ display: 'flex', gap: 6 }}>
-                <input type="number" placeholder="Mín" value={filters.priceMin}
-                  onChange={(e) => setFilters({ ...filters, priceMin: e.target.value })}
+                <input type="number" placeholder="Mín" value={filters.areaMin}
+                  onChange={(e) => setFilters({ ...filters, areaMin: e.target.value })}
                   style={{ ...inputStyle, fontSize: 12.5 }} />
-                <input type="number" placeholder="Máx" value={filters.priceMax}
-                  onChange={(e) => setFilters({ ...filters, priceMax: e.target.value })}
+                <input type="number" placeholder="Máx" value={filters.areaMax}
+                  onChange={(e) => setFilters({ ...filters, areaMax: e.target.value })}
                   style={{ ...inputStyle, fontSize: 12.5 }} />
               </div>
             </FilterGroup>
 
-            <FilterGroup title="Área mínima (m²)">
-              <input type="number" placeholder="Ex.: 100" value={filters.areaMin}
-                onChange={(e) => setFilters({ ...filters, areaMin: e.target.value })}
-                style={{ ...inputStyle, fontSize: 13 }} />
-            </FilterGroup>
-
-            <FilterGroup title="Bairros populares">
+            <FilterGroup title="Bairros">
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {allBairros.map(b => (
                   <label key={b} style={{ display: 'flex', alignItems: 'center', gap: 8,
@@ -4623,52 +4713,170 @@ function LancamentosPage({ onNav }) {
         </div>
       </section>
 
-      {/* GALERIA DE ARQUITETURA — design assinado dos empreendimentos */}
+      {/* COMO COMPRAR NA PLANTA */}
       <section style={{ padding: 'clamp(50px, 7vw, 90px) 0', background: 'var(--white)' }}>
         <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto' }}>
-          <div style={{ maxWidth: 640, marginBottom: 40 }}>
-            <Eyebrow color="var(--gold-deep)">Arquitetura</Eyebrow>
+          <div style={{ maxWidth: 640, marginBottom: 48 }}>
+            <Eyebrow color="var(--gold-deep)">Passo a passo</Eyebrow>
             <h2 style={{ margin: '8px 0 14px' }}>
-              Design <em className="italic-accent">assinado</em> em cada projeto
+              Como comprar <em className="italic-accent">na planta</em>
             </h2>
-            <p style={{ color: 'var(--fg-2)', fontSize: 16 }}>
-              Selecionamos empreendimentos com arquitetura de alto padrão. Fachadas, volumetria e implantação que valorizam o terreno e o estilo de vida da Grande BH.
+            <p style={{ color: 'var(--fg-2)', fontSize: 16, lineHeight: 1.7 }}>
+              Comprar na planta oferece condições únicas: preço de pré-lançamento, financiamento direto com a incorporadora e valorização garantida na entrega. Veja como funciona:
             </p>
           </div>
-          <div style={{ display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-            {arquitetura.map((arq, i) => (
-              <div key={arq.nome} style={{
-                position: 'relative',
-                borderRadius: 'var(--radius-lg)',
-                overflow: 'hidden',
-                aspectRatio: i === 0 || i === 3 ? '4/3' : '1/1',
-                backgroundImage: `url(${arq.img})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                cursor: 'pointer',
-                transition: 'transform 0.3s ease, box-shadow 0.3s',
-                boxShadow: 'var(--shadow-card)',
-              }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = 'var(--shadow-soft)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'var(--shadow-card)'; }}>
-                <div style={{ position: 'absolute', inset: 0,
-                  background: 'linear-gradient(180deg, transparent 45%, rgba(15,22,32,0.85) 100%)' }} />
-                <div style={{ position: 'absolute', bottom: 20, left: 22, right: 22, color: '#fff' }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em',
-                    textTransform: 'uppercase', color: 'var(--gold-soft)', marginBottom: 4 }}>
-                    {arq.tipo}
-                  </div>
-                  <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.015em' }}>{arq.nome}</div>
-                </div>
+
+          {/* Steps */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24, marginBottom: 60 }}>
+            {[
+              ['01', 'Escolha o empreendimento', 'Analise localização, tipologia, prazo de entrega e condições de pagamento. Nossa equipe envia o book completo.'],
+              ['02', 'Reserve sua unidade', 'Com um sinal simbólico você reserva a unidade por até 30 dias enquanto avalia a proposta com calma.'],
+              ['03', 'Assine o contrato', 'Contrato direto com a incorporadora, sem intermediários. Revisamos toda a documentação por você.'],
+              ['04', 'Pague durante a obra', 'Parcelas mensais direto para a incorporadora durante a construção — sem juros de banco.'],
+              ['05', 'Financie o saldo na entrega', 'Na entrega das chaves, financie o saldo restante com banco de sua escolha ou quite à vista com desconto.'],
+              ['06', 'Receba as chaves', 'Vistoria técnica acompanhada pela VN Prime. Você recebe o imóvel pronto para morar ou alugar.'],
+            ].map(([num, title, desc]) => (
+              <div key={num} style={{ padding: '24px 22px', background: 'var(--cream)',
+                borderRadius: 16, border: '1px solid var(--border)', position: 'relative' }}>
+                <div style={{ fontSize: 32, fontWeight: 900, color: 'rgba(212,168,87,0.25)',
+                  fontFamily: 'var(--font-display)', lineHeight: 1, marginBottom: 14 }}>{num}</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--navy)',
+                  marginBottom: 8, lineHeight: 1.3 }}>{title}</div>
+                <p style={{ fontSize: 13.5, color: 'var(--fg-2)', margin: 0, lineHeight: 1.6 }}>{desc}</p>
               </div>
             ))}
           </div>
+
+          {/* Tabela de vantagens */}
+          <div style={{ background: 'var(--navy)', borderRadius: 20, padding: 'clamp(28px, 4vw, 48px)', marginBottom: 60, color: '#fff' }}>
+            <h3 style={{ color: '#fff', margin: '0 0 28px', fontSize: 22, fontWeight: 700 }}>
+              Comprar na planta vs. pronto — comparativo
+            </h3>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'var(--font-body)', fontSize: 14 }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
+                    {['', 'Na planta (VN Prime)', 'Pronto no mercado'].map((h, i) => (
+                      <th key={h} style={{ padding: '10px 16px', textAlign: i === 0 ? 'left' : 'center',
+                        color: i === 1 ? 'var(--gold-soft)' : 'rgba(245,248,250,0.65)',
+                        fontWeight: 700, fontSize: 13, letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    ['Preço de entrada', 'Pré-lançamento (−15 a −25%)', 'Preço de mercado'],
+                    ['Valorização', '40–60% até a entrega', 'Depende do mercado'],
+                    ['Forma de pagamento', 'Parcelas direto c/ incorporadora', 'Financiamento bancário imediato'],
+                    ['Juros durante a obra', 'Sem juros de banco', 'Financiamento completo'],
+                    ['Personalização', 'Sim — planta e acabamentos', 'Não (pronto)'],
+                    ['Prazo', '24–48 meses', 'Imediato'],
+                  ].map(([item, planta, pronto]) => (
+                    <tr key={item} style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                      <td style={{ padding: '12px 16px', color: 'rgba(245,248,250,0.75)', fontWeight: 500 }}>{item}</td>
+                      <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--gold-soft)', fontWeight: 600 }}>{planta}</td>
+                      <td style={{ padding: '12px 16px', textAlign: 'center', color: 'rgba(245,248,250,0.55)' }}>{pronto}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Formulário de captura */}
+          <LeadLancamentoForm />
         </div>
       </section>
     </main>
+  );
+}
+
+function LeadLancamentoForm() {
+  const useStateLead = React.useState.bind(React);
+  const [form, setForm] = useStateLead({ nome: '', email: '', whatsapp: '', telefone: '', interesse: '' });
+  const [sent, setSent] = useStateLead(false);
+
+  if (sent) return (
+    <div style={{ background: 'var(--cream)', borderRadius: 20, padding: '48px 40px', textAlign: 'center',
+      border: '1px solid var(--border)' }}>
+      <div style={{ fontSize: 44, marginBottom: 16 }}>✓</div>
+      <h3 style={{ margin: '0 0 10px', fontSize: 22, color: 'var(--navy)' }}>Recebemos seu interesse!</h3>
+      <p style={{ color: 'var(--fg-2)', fontSize: 15, maxWidth: 480, margin: '0 auto' }}>
+        Nossa equipe entrará em contato em até 24h com todas as informações sobre o empreendimento de seu interesse.
+      </p>
+    </div>
+  );
+
+  return (
+    <div style={{ background: 'var(--cream)', borderRadius: 20, padding: 'clamp(28px, 4vw, 48px)',
+      border: '1px solid var(--border)' }}>
+      <div style={{ maxWidth: 680, margin: '0 auto' }}>
+        <Eyebrow color="var(--gold-deep)">Receba informações</Eyebrow>
+        <h3 style={{ margin: '8px 0 10px', fontSize: 24, fontWeight: 800, color: 'var(--navy)' }}>
+          Quero saber mais sobre os lançamentos
+        </h3>
+        <p style={{ color: 'var(--fg-2)', fontSize: 14.5, margin: '0 0 32px', lineHeight: 1.6 }}>
+          Preencha seus dados e nossa equipe envia o book completo, tabela de preços e condições de pagamento diretamente para você.
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 20px' }}>
+          {[
+            ['nome', 'Nome completo', 'text', 'Seu nome'],
+            ['email', 'E-mail', 'email', 'seu@email.com'],
+            ['whatsapp', 'WhatsApp', 'tel', '(31) 9 9999-9999'],
+            ['telefone', 'Telefone (opcional)', 'tel', '(31) 3333-3333'],
+          ].map(([key, lbl, type, ph]) => (
+            <div key={key}>
+              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700,
+                letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 8 }}>
+                {lbl}
+              </label>
+              <input type={type} placeholder={ph} value={form[key]}
+                onChange={e => setForm({ ...form, [key]: e.target.value })}
+                style={{ width: '100%', padding: '12px 14px', borderRadius: 10,
+                  border: '1.5px solid var(--border)', fontFamily: 'var(--font-body)',
+                  fontSize: 14.5, color: 'var(--navy)', outline: 'none', boxSizing: 'border-box' }}
+                onFocus={e => e.target.style.borderColor = 'var(--gold)'}
+                onBlur={e => e.target.style.borderColor = 'var(--border)'} />
+            </div>
+          ))}
+
+          <div style={{ gridColumn: '1 / -1' }}>
+            <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700,
+              letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 8 }}>
+              Empreendimento de interesse
+            </label>
+            <select value={form.interesse} onChange={e => setForm({ ...form, interesse: e.target.value })}
+              style={{ width: '100%', padding: '12px 14px', borderRadius: 10,
+                border: '1.5px solid var(--border)', fontFamily: 'var(--font-body)',
+                fontSize: 14.5, color: 'var(--navy)', outline: 'none', background: '#fff' }}>
+              <option value="">Todos — quero ver as opções disponíveis</option>
+              <option>Sereno One — Belvedere</option>
+              <option>Vale dos Cristais — Nova Lima</option>
+              <option>Alphaville Residences</option>
+            </select>
+          </div>
+        </div>
+
+        <button
+          disabled={!form.nome.trim() || !form.email.trim() || !form.whatsapp.trim()}
+          onClick={() => setSent(true)}
+          style={{ marginTop: 24, width: '100%', padding: '15px 24px', borderRadius: 12,
+            border: 'none',
+            background: (!form.nome.trim() || !form.email.trim() || !form.whatsapp.trim())
+              ? 'var(--border)' : 'var(--gradient-gold)',
+            color: (!form.nome.trim() || !form.email.trim() || !form.whatsapp.trim())
+              ? 'var(--fg-3)' : 'var(--navy)',
+            fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 15.5,
+            cursor: (!form.nome.trim() || !form.email.trim() || !form.whatsapp.trim())
+              ? 'not-allowed' : 'pointer' }}>
+          Quero receber o book e a tabela de preços
+        </button>
+        <p style={{ textAlign: 'center', marginTop: 12, fontSize: 12, color: 'var(--fg-3)' }}>
+          Retorno em até 24h · Sem compromisso
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -5701,7 +5909,8 @@ function App() {
       {route.name === 'due-diligence' && React.createElement(window.DueDiligencePage, { onNav })}
       {route.name === 'lancamentos' && React.createElement(window.LancamentosPage, { onNav })}
       {route.name === 'login' && React.createElement(window.LoginPage, { onNav, mode: route.params.mode })}
-      {(route.name === 'sobre' || route.name === 'aluguel') && (
+      {route.name === 'sobre' && <SobrePage onNav={onNav} />}
+      {route.name === 'aluguel' && (
         <PlaceholderPage name={route.name} onNav={onNav} />
       )}
 
@@ -5739,6 +5948,148 @@ function App() {
         </TweakSection>
       </TweaksPanel>
     </React.Fragment>
+  );
+}
+
+// ============================================================
+// SOBRE — Página institucional
+// ============================================================
+function SobrePage({ onNav }) {
+  return (
+    <main style={{ background: 'var(--cream)', minHeight: '100vh' }}>
+      {/* Hero */}
+      <section style={{
+        position: 'relative',
+        backgroundImage: `linear-gradient(120deg, rgba(15,22,32,0.90) 0%, rgba(15,22,32,0.70) 100%), url(${window.__resources?.img59||'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=2400&q=85'})`,
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        padding: 'clamp(70px, 10vw, 120px) 0',
+        color: '#fff',
+      }}>
+        <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.22em',
+            textTransform: 'uppercase', color: 'var(--gold-soft)', marginBottom: 18 }}>
+            Nossa missão
+          </div>
+          <h1 style={{ color: '#fff', margin: '0 0 24px', fontSize: 'clamp(2.4rem, 4.6vw, 4rem)',
+            fontWeight: 800, letterSpacing: '-0.035em', lineHeight: 1.05, maxWidth: 800 }}>
+            A plataforma imobiliária de alto padrão da Grande BH.
+          </h1>
+          <p style={{ color: 'rgba(245,248,250,0.85)', fontSize: 18, lineHeight: 1.7,
+            maxWidth: 640, margin: 0 }}>
+            Conectamos proprietários, corretores e especialistas em um único ecossistema, combinando tecnologia, curadoria e estratégia comercial.
+          </p>
+        </div>
+      </section>
+
+      {/* Sobre */}
+      <section style={{ padding: 'clamp(60px, 8vw, 100px) 0' }}>
+        <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto',
+          display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 80, alignItems: 'start' }}>
+
+          <div>
+            <Eyebrow color="var(--gold-deep)">Quem somos</Eyebrow>
+            <h2 style={{ margin: '10px 0 24px', fontSize: 'clamp(1.8rem, 2.8vw, 2.6rem)',
+              fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+              A VN Prime Imóveis
+            </h2>
+            <div style={{ fontSize: 16, lineHeight: 1.8, color: 'var(--fg-1)', display: 'flex', flexDirection: 'column', gap: 18 }}>
+              <p style={{ margin: 0 }}>
+                A VN Prime Imóveis é uma plataforma imobiliária de alto padrão, com atuação em Belo Horizonte e região metropolitana, especialmente em mercados estratégicos como Nova Lima, Alphaville, Belvedere e BH e região.
+              </p>
+              <p style={{ margin: 0 }}>
+                Conectamos proprietários, corretores e especialistas em um único ecossistema, combinando tecnologia, curadoria e estratégia comercial para gerar mais eficiência na venda de imóveis.
+              </p>
+              <p style={{ margin: 0 }}>
+                Nossa atuação prioriza privacidade, qualidade e resultado: o endereço completo do imóvel é protegido, enquanto a vitrine pública exibe apenas as informações essenciais para atrair interessados qualificados.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {[
+              ['Privacidade', 'O endereço completo é protegido na vitrine. Apenas o bairro é exibido — compradores qualificados têm acesso mediante contato.'],
+              ['Curadoria', 'Cada imóvel passa por análise de qualidade antes de entrar na vitrine. Fotos, descrição e informações são revisadas pela equipe VN Prime.'],
+              ['Tecnologia', 'IA editorial, gerador de descrição, qualificação automatizada de leads e relatórios de performance para proprietários e corretores.'],
+              ['Resultado', 'Modelos de negócio flexíveis — taxa fixa, comissão ou plano enterprise — para que cada cliente escolha a solução mais adequada ao seu perfil.'],
+            ].map(([title, desc]) => (
+              <div key={title} style={{ padding: '22px 24px', background: 'var(--white)',
+                borderRadius: 16, border: '1px solid var(--border)',
+                borderLeft: '4px solid var(--gold)' }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--navy)', marginBottom: 8 }}>{title}</div>
+                <p style={{ margin: 0, fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.65 }}>{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Números */}
+      <section style={{ background: 'var(--navy)', padding: 'clamp(50px, 7vw, 80px) 0' }}>
+        <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto',
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 32, textAlign: 'center' }}>
+          {[
+            ['142', 'Imóveis curados'],
+            ['R$ 4,2 bi', 'Em portfólio'],
+            ['96%', 'Satisfação dos clientes'],
+            ['18 dias', 'Tempo médio de venda'],
+            ['Grande BH', 'Área de atuação'],
+          ].map(([val, lbl]) => (
+            <div key={lbl}>
+              <div style={{ fontSize: 'clamp(2rem, 3vw, 2.8rem)', fontWeight: 900,
+                color: 'var(--gold-soft)', letterSpacing: '-0.03em', lineHeight: 1 }}>{val}</div>
+              <div style={{ fontSize: 13, color: 'rgba(245,248,250,0.65)',
+                marginTop: 8, fontWeight: 500 }}>{lbl}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Mercados de atuação */}
+      <section style={{ padding: 'clamp(60px, 8vw, 100px) 0' }}>
+        <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto' }}>
+          <div style={{ maxWidth: 560, marginBottom: 48 }}>
+            <Eyebrow color="var(--gold-deep)">Onde atuamos</Eyebrow>
+            <h2 style={{ margin: '10px 0 14px' }}>Mercados estratégicos</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 16, lineHeight: 1.7 }}>
+              Atuamos nos mercados de maior potencial de valorização da Grande Belo Horizonte, com conhecimento profundo de cada microregião.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+            {[
+              ['Nova Lima', 'Alphaville · Vale dos Cristais · Quintas do Sol · Retiro do Chalé'],
+              ['Belvedere', 'O bairro mais valorizado de BH — alto padrão residencial e corporativo'],
+              ['Savassi & Lourdes', 'Mercado premium urbano no coração de Belo Horizonte'],
+              ['Alphaville BH', 'Condomínios de alto padrão com infraestrutura completa'],
+              ['Mangabeiras', 'Residências exclusivas com vista panorâmica da cidade'],
+              ['Centro-Sul BH', 'Coberturas e apartamentos de luxo em localização privilegiada'],
+            ].map(([bairro, desc]) => (
+              <div key={bairro} style={{ padding: '22px 20px', background: 'var(--white)',
+                borderRadius: 14, border: '1px solid var(--border)' }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--navy)', marginBottom: 6 }}>{bairro}</div>
+                <p style={{ margin: 0, fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.6 }}>{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section style={{ background: 'var(--cream)', borderTop: '1px solid var(--border)',
+        padding: 'clamp(50px, 7vw, 80px) 0', textAlign: 'center' }}>
+        <div style={{ width: 'min(640px, 94vw)', margin: '0 auto' }}>
+          <h2 style={{ margin: '0 0 16px', fontSize: 'clamp(1.8rem, 3vw, 2.4rem)', fontWeight: 800 }}>
+            Faça parte da plataforma
+          </h2>
+          <p style={{ color: 'var(--fg-2)', fontSize: 16, margin: '0 0 32px', lineHeight: 1.65 }}>
+            Proprietário, corretor, incorporadora ou fotógrafo — há um espaço para você na VN Prime Imóveis.
+          </p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Btn variant="accent" size="lg" onClick={() => onNav('vender')}>Anunciar meu imóvel</Btn>
+            <Btn variant="ghost" size="lg" onClick={() => onNav('login', { mode: 'cadastro' })}>Criar minha conta</Btn>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
 
