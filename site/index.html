@@ -3059,119 +3059,415 @@ Object.assign(window, { VenderHubPage });
 </script>
 <script type="text/babel">// Corretor portal & Incorporadora landing — placeholder hi-fi pages
 
-function CorretorPage({ onNav }) {
+// ============================================================
+// PORTAL SHELL — layout base compartilhado pelos 4 portais
+// ============================================================
+function PortalShell({ title, accent = 'var(--gold)', navItems, active, onSection, onNav, children }) {
   return (
-    <main style={{ background: 'var(--cream)', minHeight: '100vh' }}>
-      {/* Hero */}
-      <section style={{
-        background: 'var(--gradient-navy-hero)', color: '#fff',
-        padding: 'clamp(3rem, 7vw, 5rem) 0 clamp(2.5rem, 5vw, 3.5rem)',
-        position: 'relative', overflow: 'hidden',
-      }}>
-        <div style={{ position: 'absolute', top: -200, right: -200, width: 600, height: 600,
-          background: 'radial-gradient(circle, rgba(5,150,105,0.25), transparent 65%)' }} />
-        <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto', position: 'relative', zIndex: 1,
-          display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 40, alignItems: 'center' }}>
-          <div>
-            <Eyebrow>Portal do Corretor</Eyebrow>
-            <h1 style={{ color: '#fff', margin: '8px 0 14px', fontSize: 'clamp(2.2rem, 4.4vw, 3rem)' }}>
-              Sua carteira VN Prime, <em style={{
-                background: 'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
-                WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', fontStyle: 'italic',
-              }}>com leads qualificados</em>
-            </h1>
-            <p style={{ color: 'rgba(250,249,246,0.85)', fontSize: 17, lineHeight: 1.65, marginBottom: 26 }}>
-              Acesso ao portfólio premium, CRM integrado, split de comissão claro e capacitação contínua. Para corretores autônomos e imobiliárias parceiras.
-            </p>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <Btn variant="accent" size="lg">Quero ser parceiro</Btn>
-              <Btn variant="ghost" size="lg" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}>
-                Já sou parceiro · Login
-              </Btn>
-            </div>
-            <div style={{ marginTop: 24, display: 'flex', gap: 28, flexWrap: 'wrap' }}>
-              {[['R$ 49,90', 'mensalidade'], ['+340', 'corretores'], ['82%', 'fechamento']].map(([n,l]) => (
-                <div key={l}>
-                  <div style={{ fontFamily: 'Playfair Display', fontSize: 26, fontWeight: 700, color: '#10B981' }}>{n}</div>
-                  <div style={{ fontSize: 11.5, color: 'rgba(250,249,246,0.65)',
-                    letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'DM Sans' }}>{l}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Banner photo + KPI overlay */}
-          <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden',
-            aspectRatio: '4/5', boxShadow: '0 20px 60px rgba(0,0,0,0.35)' }}>
-            <img src={window.__resources?.img70||"https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1100&q=85"}
-                 alt="Corretora VN Prime"
-                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            <div style={{ position: 'absolute', inset: 0,
-              background: 'linear-gradient(180deg, transparent 40%, rgba(15,22,32,0.85) 100%)' }} />
-            <div style={{ position: 'absolute', bottom: 22, left: 22, right: 22,
-              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-              {[['23', 'Leads/mês'], ['82%', 'Fechamento'], ['R$ 4,2M', 'GMV/mês']].map(([n,l]) => (
-                <div key={l}>
-                  <div style={{ fontFamily: 'Playfair Display', fontSize: 22, fontWeight: 700,
-                    color: '#10B981' }}>{n}</div>
-                  <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.78)',
-                    letterSpacing: '0.08em', textTransform: 'uppercase',
-                    fontFamily: 'DM Sans' }}>{l}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+    <div style={{ display: 'flex', minHeight: 'calc(100vh - 80px)' }}>
+      {/* Sidebar */}
+      <aside style={{ width: 230, flexShrink: 0, background: 'var(--navy-deep)',
+        position: 'sticky', top: 80, height: 'calc(100vh - 80px)',
+        overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.22em',
+            textTransform: 'uppercase', color: accent, marginBottom: 5 }}>VN Prime</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>{title}</div>
         </div>
-      </section>
+        <nav style={{ padding: '12px 10px', flex: 1 }}>
+          {navItems.map(item => (
+            <button key={item.id} onClick={() => onSection(item.id)} style={{
+              width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+              padding: '9px 10px', borderRadius: 8, border: 'none',
+              background: active === item.id ? `${accent}22` : 'transparent',
+              color: active === item.id ? accent : 'rgba(245,248,250,0.60)',
+              fontFamily: 'var(--font-body)', fontSize: 13.5,
+              fontWeight: active === item.id ? 700 : 400,
+              cursor: 'pointer', textAlign: 'left', marginBottom: 2,
+              transition: 'all 0.12s',
+            }}>
+              <span style={{ fontSize: 15, width: 20, textAlign: 'center', flexShrink: 0 }}>{item.icon}</span>
+              {item.label}
+            </button>
+          ))}
+        </nav>
+        <div style={{ padding: '12px 10px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <button onClick={() => onNav('home')} style={{
+            width: '100%', display: 'flex', alignItems: 'center', gap: 8,
+            padding: '8px 10px', borderRadius: 8, border: 'none',
+            background: 'transparent', color: 'rgba(245,248,250,0.38)',
+            fontFamily: 'var(--font-body)', fontSize: 12.5, cursor: 'pointer',
+          }}>← Voltar ao site</button>
+        </div>
+      </aside>
+      {/* Main */}
+      <main style={{ flex: 1, minWidth: 0, background: 'var(--cream)', overflowX: 'hidden' }}>
+        {children}
+      </main>
+    </div>
+  );
+}
 
-      {/* Features */}
-      <section style={{ padding: '60px 0', background: '#fff' }}>
-        <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 36 }}>
-            <Eyebrow color="#059669">Tudo o que você precisa</Eyebrow>
-            <h2 style={{ marginTop: 6 }}>Ferramentas pensadas pra fechar mais</h2>
+// helper: stat card used across portals
+function PortalStat({ label, value, sub, accent = 'var(--gold)' }) {
+  return (
+    <div style={{ background: '#fff', borderRadius: 14, padding: '18px 22px',
+      border: '1px solid var(--border)', boxShadow: '0 2px 8px rgba(15,34,68,0.05)' }}>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
+        textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 8 }}>{label}</div>
+      <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--navy)',
+        letterSpacing: '-0.03em', lineHeight: 1 }}>{value}</div>
+      {sub && <div style={{ fontSize: 12, color: 'var(--fg-2)', marginTop: 6 }}>{sub}</div>}
+    </div>
+  );
+}
+
+// helper: section header inside portal
+function PortalSection({ title, action, children }) {
+  return (
+    <div style={{ background: '#fff', borderRadius: 16, border: '1px solid var(--border)',
+      overflow: 'hidden', marginBottom: 20 }}>
+      <div style={{ padding: '16px 22px', borderBottom: '1px solid var(--border)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--navy)' }}>{title}</div>
+        {action}
+      </div>
+      <div style={{ padding: '18px 22px' }}>{children}</div>
+    </div>
+  );
+}
+
+// ============================================================
+// PORTAL DO CORRETOR — dashboard operacional
+// ============================================================
+function CorretorPage({ onNav }) {
+  const [sec, setSec] = React.useState('dashboard');
+  const accent = '#10B981';
+
+  const leads = [
+    { id: 1, nome: 'André Carvalho', imovel: 'Cobertura · Belvedere', valor: 'R$ 3,2M', status: 'Visita agendada', data: '14/05', telefone: '(31) 9 8811-2234' },
+    { id: 2, nome: 'Fernanda Lemos', imovel: 'Apto 4 suítes · Savassi', valor: 'R$ 1,8M', status: 'Em contato', data: '12/05', telefone: '(31) 9 9900-4421' },
+    { id: 3, nome: 'Rodrigo Neves', imovel: 'Casa · Alphaville', valor: 'R$ 4,5M', status: 'Proposta enviada', data: '10/05', telefone: '(31) 9 7722-8801' },
+    { id: 4, nome: 'Camila Torres', imovel: 'Apto 3 suítes · Mangabeiras', valor: 'R$ 1,2M', status: 'Novo', data: '09/05', telefone: '(31) 9 8833-6612' },
+    { id: 5, nome: 'Paulo Meireles', imovel: 'Casa cond. · Nova Lima', valor: 'R$ 2,6M', status: 'Contrato assinado', data: '05/05', telefone: '(31) 9 9955-0012' },
+  ];
+
+  const pipeline = [
+    { stage: 'Novos', count: 4, color: '#6B7280' },
+    { stage: 'Em contato', count: 7, color: '#3B82F6' },
+    { stage: 'Visita marcada', count: 3, color: '#F59E0B' },
+    { stage: 'Proposta enviada', count: 2, color: '#8B5CF6' },
+    { stage: 'Fechados (mês)', count: 1, color: accent },
+  ];
+
+  const comissoes = [
+    { mes: 'Maio/2026', descricao: 'Venda · Casa Mangabeiras', valor: 'R$ 62.400', status: 'A receber', pago: false },
+    { mes: 'Abril/2026', descricao: 'Venda · Apto Savassi', valor: 'R$ 38.700', status: 'Pago', pago: true },
+    { mes: 'Março/2026', descricao: 'Venda · Cobertura BH', valor: 'R$ 51.000', status: 'Pago', pago: true },
+    { mes: 'Fev./2026', descricao: 'Venda · Casa Nova Lima', valor: 'R$ 45.600', status: 'Pago', pago: true },
+  ];
+
+  const imoveis = window.VN_CATALOG ? window.VN_CATALOG.slice(0, 6) : [];
+
+  const navItems = [
+    { id: 'dashboard', icon: '◈', label: 'Dashboard' },
+    { id: 'leads', icon: '◉', label: 'Leads' },
+    { id: 'pipeline', icon: '⟶', label: 'Pipeline' },
+    { id: 'carteira', icon: '⊞', label: 'Carteira' },
+    { id: 'comissoes', icon: '◎', label: 'Comissões' },
+    { id: 'agenda', icon: '▦', label: 'Agenda' },
+  ];
+
+  const statusColor = { 'Novo': '#6B7280', 'Em contato': '#3B82F6', 'Visita agendada': '#F59E0B',
+    'Proposta enviada': '#8B5CF6', 'Contrato assinado': accent };
+
+  return (
+    <PortalShell title="Portal do Corretor" accent={accent} navItems={navItems}
+      active={sec} onSection={setSec} onNav={onNav}>
+
+      {/* Portal header */}
+      <div style={{ background: 'var(--navy)', padding: '22px 32px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.18em',
+            textTransform: 'uppercase', color: accent, marginBottom: 4 }}>
+            {navItems.find(n => n.id === sec)?.label}
           </div>
-          <div style={{ display: 'grid', gap: 20,
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
-            {[
-              ['Carteira premium', 'Acesso a 800+ imóveis curados, com fotos profissionais e descrição pronta.', (window.__resources?.img71||'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=80')],
-              ['Leads qualificados', 'Compradores pré-qualificados pela VN Prime antes de irem para você.', (window.__resources?.img72||'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=900&q=80')],
-              ['CRM + Pipeline', 'Funil de vendas, agendamentos, propostas e contratos no mesmo lugar.', (window.__resources?.img64||'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&q=80')],
-              ['Split transparente', 'Sua porcentagem é definida no início de cada negócio. Sem surpresas.', (window.__resources?.img61||'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=900&q=80')],
-              ['Material de marketing', 'Templates de Stories, posts e apresentações personalizáveis.', (window.__resources?.img65||'https://images.unsplash.com/photo-1611926653458-09294b3142bf?w=900&q=80')],
-              ['Capacitação contínua', 'Workshops mensais sobre alto padrão, finanças e técnicas de fechamento.', (window.__resources?.img39||'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=900&q=80')],
-            ].map(([t,d,img]) => (
-              <div key={t} style={{ background: '#fff', borderRadius: 14, overflow: 'hidden',
-                border: '1px solid var(--border)', boxShadow: '0 4px 18px rgba(15,34,68,0.06)' }}>
-                <div style={{ height: 160, backgroundImage: `url(${img})`,
-                  backgroundSize: 'cover', backgroundPosition: 'center' }} />
-                <div style={{ padding: 22 }}>
-                  <div style={{ width: 32, height: 3, background: '#10B981', marginBottom: 12 }} />
-                  <h3 style={{ fontSize: 18, margin: '0 0 6px', color: 'var(--navy)' }}>{t}</h3>
-                  <p style={{ color: 'var(--fg-2)', fontSize: 14, margin: 0, lineHeight: 1.55 }}>{d}</p>
+          <h2 style={{ color: '#fff', margin: 0, fontSize: 22, fontWeight: 700 }}>
+            Olá, Corretor VN Prime
+          </h2>
+        </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button style={{ padding: '9px 18px', background: `${accent}22`, color: accent,
+            border: `1px solid ${accent}44`, borderRadius: 8, fontFamily: 'var(--font-body)',
+            fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Solicitar leads</button>
+          <button onClick={() => onNav('busca')} style={{ padding: '9px 18px', background: 'rgba(255,255,255,0.08)',
+            color: '#fff', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8,
+            fontFamily: 'var(--font-body)', fontSize: 13, cursor: 'pointer' }}>Ver portfólio</button>
+        </div>
+      </div>
+
+      <div style={{ padding: '28px 32px' }}>
+
+        {/* DASHBOARD */}
+        {sec === 'dashboard' && (
+          <React.Fragment>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+              <PortalStat label="Leads ativos" value="17" sub="4 novos hoje" accent={accent} />
+              <PortalStat label="Visitas esta semana" value="3" sub="Próx.: 14/05 · 14h" accent={accent} />
+              <PortalStat label="Em negociação" value="5" sub="2 com proposta" accent={accent} />
+              <PortalStat label="Fechamentos (mês)" value="1" sub="R$ 62.400 comissão" accent={accent} />
+            </div>
+
+            {/* Pipeline resumo */}
+            <PortalSection title="Pipeline de vendas">
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                {pipeline.map(p => (
+                  <div key={p.stage} style={{ flex: 1, minWidth: 100, background: 'var(--cream)',
+                    borderRadius: 10, padding: '14px 16px', borderTop: `3px solid ${p.color}` }}>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: p.color, lineHeight: 1 }}>{p.count}</div>
+                    <div style={{ fontSize: 12, color: 'var(--fg-2)', marginTop: 4, fontWeight: 600 }}>{p.stage}</div>
+                  </div>
+                ))}
+              </div>
+            </PortalSection>
+
+            {/* Leads recentes */}
+            <PortalSection title="Leads recentes"
+              action={<button onClick={() => setSec('leads')} style={{ background: 'none', border: 'none',
+                color: accent, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>Ver todos →</button>}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    {['Nome', 'Imóvel', 'Valor', 'Status', 'Data'].map(h => (
+                      <th key={h} style={{ padding: '6px 12px', textAlign: 'left', fontSize: 11,
+                        fontWeight: 700, color: 'var(--fg-3)', textTransform: 'uppercase',
+                        letterSpacing: '0.08em' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {leads.slice(0, 4).map(l => (
+                    <tr key={l.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={{ padding: '10px 12px', fontWeight: 600, color: 'var(--navy)' }}>{l.nome}</td>
+                      <td style={{ padding: '10px 12px', color: 'var(--fg-2)', fontSize: 13 }}>{l.imovel}</td>
+                      <td style={{ padding: '10px 12px', fontWeight: 600, color: 'var(--navy)' }}>{l.valor}</td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11.5, fontWeight: 600,
+                          background: `${statusColor[l.status] || '#6B7280'}18`,
+                          color: statusColor[l.status] || '#6B7280' }}>{l.status}</span>
+                      </td>
+                      <td style={{ padding: '10px 12px', color: 'var(--fg-3)', fontSize: 13 }}>{l.data}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </PortalSection>
+
+            {/* Próxima comissão */}
+            <PortalSection title="Próxima comissão">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 4 }}>Venda · Casa Mangabeiras</div>
+                  <div style={{ fontSize: 32, fontWeight: 900, color: accent,
+                    letterSpacing: '-0.03em' }}>R$ 62.400</div>
+                  <div style={{ fontSize: 12, color: 'var(--fg-3)', marginTop: 4 }}>
+                    3% sobre R$ 2.080.000 · Previsão: 20/05/2026
+                  </div>
+                </div>
+                <div style={{ padding: '14px 24px', background: `${accent}12`, borderRadius: 12,
+                  textAlign: 'center', border: `1px solid ${accent}30` }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: accent,
+                    textTransform: 'uppercase', letterSpacing: '0.1em' }}>Status</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--navy)', marginTop: 6 }}>
+                    Contrato assinado
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            </PortalSection>
+          </React.Fragment>
+        )}
 
-      {/* CTA */}
-      <section style={{ padding: '50px 0 60px', background: 'var(--cream)' }}>
-        <div style={{ width: 'min(720px, 94vw)', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ marginBottom: 12 }}>Pronto para entrar na rede?</h2>
-          <p style={{ color: 'var(--fg-2)', marginBottom: 22 }}>
-            Cadastre-se gratuitamente. Primeira mensalidade só após sua primeira visita agendada.
-          </p>
-          <Btn variant="accent" size="lg">Quero ser parceiro VN Prime</Btn>
-          <div style={{ marginTop: 14 }}>
-            <button onClick={() => onNav('vender')} style={{ background: 'none', border: 'none',
-              color: 'var(--fg-2)', cursor: 'pointer', fontFamily: 'DM Sans', fontSize: 13 }}>
-              ← Trocar perfil
-            </button>
-          </div>
-        </div>
-      </section>
-    </main>
+        {/* LEADS */}
+        {sec === 'leads' && (
+          <PortalSection title={`Todos os leads (${leads.length})`}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid var(--border)' }}>
+                  {['Nome', 'Telefone', 'Imóvel de interesse', 'Valor', 'Status', 'Data'].map(h => (
+                    <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 11.5,
+                      fontWeight: 700, color: 'var(--fg-2)', textTransform: 'uppercase',
+                      letterSpacing: '0.07em' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {leads.map(l => (
+                  <tr key={l.id} style={{ borderBottom: '1px solid var(--border)' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--cream)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <td style={{ padding: '12px 12px', fontWeight: 600, color: 'var(--navy)' }}>{l.nome}</td>
+                    <td style={{ padding: '12px 12px', color: 'var(--fg-2)', fontSize: 13 }}>{l.telefone}</td>
+                    <td style={{ padding: '12px 12px', color: 'var(--fg-1)', fontSize: 13 }}>{l.imovel}</td>
+                    <td style={{ padding: '12px 12px', fontWeight: 600, color: 'var(--navy)' }}>{l.valor}</td>
+                    <td style={{ padding: '12px 12px' }}>
+                      <span style={{ padding: '4px 10px', borderRadius: 20, fontSize: 11.5, fontWeight: 600,
+                        background: `${statusColor[l.status] || '#6B7280'}18`,
+                        color: statusColor[l.status] || '#6B7280' }}>{l.status}</span>
+                    </td>
+                    <td style={{ padding: '12px 12px', color: 'var(--fg-3)', fontSize: 13 }}>{l.data}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </PortalSection>
+        )}
+
+        {/* PIPELINE */}
+        {sec === 'pipeline' && (
+          <React.Fragment>
+            <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 8 }}>
+              {pipeline.map(p => (
+                <div key={p.stage} style={{ minWidth: 200, background: '#fff',
+                  borderRadius: 14, border: `1px solid var(--border)`, padding: 18,
+                  borderTop: `4px solid ${p.color}`, flexShrink: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: p.color,
+                    textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
+                    {p.stage}
+                  </div>
+                  {leads.filter(l => {
+                    if (p.stage === 'Novos') return l.status === 'Novo';
+                    if (p.stage === 'Em contato') return l.status === 'Em contato';
+                    if (p.stage === 'Visita marcada') return l.status === 'Visita agendada';
+                    if (p.stage === 'Proposta enviada') return l.status === 'Proposta enviada';
+                    if (p.stage === 'Fechados (mês)') return l.status === 'Contrato assinado';
+                    return false;
+                  }).map(l => (
+                    <div key={l.id} style={{ background: 'var(--cream)', borderRadius: 8,
+                      padding: '10px 12px', marginBottom: 8, border: '1px solid var(--border)' }}>
+                      <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--navy)' }}>{l.nome}</div>
+                      <div style={{ fontSize: 12, color: 'var(--fg-2)', marginTop: 2 }}>{l.imovel}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', marginTop: 6 }}>{l.valor}</div>
+                    </div>
+                  ))}
+                  {leads.filter(l => l.status === p.stage.replace('Visita marcada', 'Visita agendada')
+                    .replace('Fechados (mês)', 'Contrato assinado')).length === 0 &&
+                    p.stage !== 'Fechados (mês)' && p.stage !== 'Novos' && (
+                    <div style={{ fontSize: 12, color: 'var(--fg-3)', textAlign: 'center',
+                      padding: '12px 0', fontStyle: 'italic' }}>Nenhum lead</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </React.Fragment>
+        )}
+
+        {/* CARTEIRA */}
+        {sec === 'carteira' && (
+          <React.Fragment>
+            <div style={{ marginBottom: 20, display: 'flex', gap: 12 }}>
+              <input type="text" placeholder="Buscar por bairro, tipo ou código..."
+                style={{ flex: 1, padding: '10px 14px', borderRadius: 8,
+                  border: '1.5px solid var(--border)', fontFamily: 'var(--font-body)',
+                  fontSize: 14, color: 'var(--navy)', outline: 'none' }} />
+              <select style={{ padding: '10px 14px', borderRadius: 8, border: '1.5px solid var(--border)',
+                fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--navy)', outline: 'none' }}>
+                <option>Todos os tipos</option>
+                <option>Apartamento</option>
+                <option>Casa</option>
+                <option>Cobertura</option>
+              </select>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+              {imoveis.map(l => (
+                <div key={l.id} style={{ background: '#fff', borderRadius: 14, overflow: 'hidden',
+                  border: '1px solid var(--border)', cursor: 'pointer' }}
+                  onClick={() => onNav('detalhe', { id: l.id })}>
+                  <div style={{ height: 160, backgroundImage: `url(${l.photos?.[0]})`,
+                    backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                  <div style={{ padding: '14px 16px' }}>
+                    <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 4 }}>{l.neighborhood} · {l.type}</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--navy)',
+                      marginBottom: 6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.title}</div>
+                    <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--navy)' }}>
+                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(l.price)}
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--fg-3)', marginTop: 4 }}>
+                      {l.areaM2}m² · {l.quartos} qts · {l.vagas} vaga{l.vagas !== 1 ? 's' : ''}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </React.Fragment>
+        )}
+
+        {/* COMISSÕES */}
+        {sec === 'comissoes' && (
+          <React.Fragment>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+              <PortalStat label="Comissão a receber" value="R$ 62.400" sub="1 venda em fechamento" accent={accent} />
+              <PortalStat label="Recebido este mês" value="R$ 0" sub="Fechamentos em andamento" accent={accent} />
+              <PortalStat label="Total 2026" value="R$ 135.300" sub="3 vendas fechadas" accent={accent} />
+            </div>
+            <PortalSection title="Histórico de comissões">
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid var(--border)' }}>
+                    {['Mês', 'Descrição', 'Valor', 'Status'].map(h => (
+                      <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 11.5,
+                        fontWeight: 700, color: 'var(--fg-2)', textTransform: 'uppercase',
+                        letterSpacing: '0.07em' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {comissoes.map((c, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={{ padding: '12px 12px', color: 'var(--fg-2)', fontSize: 13 }}>{c.mes}</td>
+                      <td style={{ padding: '12px 12px', fontWeight: 600, color: 'var(--navy)' }}>{c.descricao}</td>
+                      <td style={{ padding: '12px 12px', fontWeight: 700, color: 'var(--navy)', fontSize: 15 }}>{c.valor}</td>
+                      <td style={{ padding: '12px 12px' }}>
+                        <span style={{ padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                          background: c.pago ? `${accent}18` : '#F59E0B18',
+                          color: c.pago ? accent : '#F59E0B' }}>{c.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </PortalSection>
+          </React.Fragment>
+        )}
+
+        {/* AGENDA */}
+        {sec === 'agenda' && (
+          <PortalSection title="Próximas visitas e reuniões">
+            {[
+              { data: 'Quarta, 14 Mai', hora: '14h00', tipo: 'Visita', imovel: 'Cobertura · Belvedere', cliente: 'André Carvalho', cor: accent },
+              { data: 'Sexta, 16 Mai', hora: '10h00', tipo: 'Reunião', imovel: 'VN Prime Office', cliente: 'Capacitação mensal', cor: '#3B82F6' },
+              { data: 'Segunda, 19 Mai', hora: '15h30', tipo: 'Visita', imovel: 'Apto 4 suítes · Savassi', cliente: 'Fernanda Lemos', cor: accent },
+              { data: 'Quarta, 21 Mai', hora: '11h00', tipo: 'Proposta', imovel: 'Casa · Alphaville', cliente: 'Rodrigo Neves', cor: '#8B5CF6' },
+            ].map((ev, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 20,
+                padding: '16px 0', borderBottom: '1px solid var(--border)' }}>
+                <div style={{ width: 4, height: 48, background: ev.cor, borderRadius: 2, flexShrink: 0, marginTop: 2 }} />
+                <div>
+                  <div style={{ fontSize: 12, color: 'var(--fg-2)', fontWeight: 600 }}>{ev.data} · {ev.hora}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--navy)', marginTop: 2 }}>{ev.imovel}</div>
+                  <div style={{ fontSize: 13, color: 'var(--fg-2)', marginTop: 2 }}>{ev.cliente}</div>
+                </div>
+                <span style={{ marginLeft: 'auto', padding: '3px 10px', borderRadius: 20,
+                  fontSize: 11.5, fontWeight: 700, background: `${ev.cor}18`, color: ev.cor }}>
+                  {ev.tipo}
+                </span>
+              </div>
+            ))}
+          </PortalSection>
+        )}
+
+      </div>
+    </PortalShell>
   );
 }
 
@@ -3207,41 +3503,43 @@ function IncorporadoraPage({ onNav }) {
     : s === 'Proposta' ? { bg: `${accent}18`, fg: accent }
     : { bg: '#F0FDF4', fg: '#059669' };
 
+  const incNavItems = [
+    { id: 'overview', icon: '◈', label: 'Visão Geral' },
+    { id: 'novo',     icon: '+', label: 'Novo Lançamento' },
+    { id: 'leads',    icon: '◉', label: 'Leads' },
+    { id: 'notif',    icon: '◎', label: 'Notificações' },
+  ];
+
   return (
-    <main style={{ background: 'var(--cream)', minHeight: '100vh' }}>
+    <PortalShell title="Portal da Incorporadora" accent={accent}
+      navItems={incNavItems} active={tab} onSection={setTab} onNav={onNav}>
 
-      {/* HERO */}
-      <section style={{
-        position: 'relative',
-        background: `linear-gradient(180deg, rgba(15,22,32,0.62) 0%, rgba(15,22,32,0.90) 100%), url(${window.__resources?.img30||'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1800&q=85'})`,
-        backgroundSize: 'cover', backgroundPosition: 'center',
-        color: '#fff', padding: 'clamp(70px, 10vw, 110px) 0 clamp(50px, 7vw, 80px)',
-      }}>
-        <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto' }}>
-          <Eyebrow>Portal da Incorporadora</Eyebrow>
-          <h1 style={{ color: '#fff', margin: '12px 0 16px',
-            fontSize: 'clamp(2.2rem, 4.5vw, 3.2rem)', lineHeight: 1.05 }}>
-            Lance com <em style={{ color: '#D4A857', fontStyle: 'italic' }}>estrutura profissional</em><br/>
-            e alcance os compradores certos.
-          </h1>
-          <p style={{ color: 'rgba(245,248,250,0.85)', fontSize: 16.5, maxWidth: 560, marginBottom: 32 }}>
-            Gerencie empreendimentos, acompanhe leads qualificados e receba notificações de interesse diretamente neste portal.
-          </p>
-          <div style={{ display: 'flex', gap: 36, flexWrap: 'wrap' }}>
-            {[['2','empreendimentos'],['34','leads totais'],['R$ 28M','VGV ativo']].map(([n,l]) => (
-              <div key={l}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 700,
-                  color: '#D4A857', lineHeight: 1 }}>{n}</div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)',
-                  letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'DM Sans', marginTop: 4 }}>{l}</div>
-              </div>
-            ))}
+      {/* Portal header */}
+      <div style={{ background: 'var(--navy)', padding: '22px 32px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.18em',
+            textTransform: 'uppercase', color: accent, marginBottom: 4 }}>
+            {incNavItems.find(n => n.id === tab)?.label}
           </div>
+          <h2 style={{ color: '#fff', margin: 0, fontSize: 22, fontWeight: 700 }}>
+            Portal da Incorporadora
+          </h2>
         </div>
-      </section>
+        <div style={{ display: 'flex', gap: 24 }}>
+          {[['2','Empreendimentos'],['34','Leads'],['R$ 28M','VGV ativo']].map(([n,l]) => (
+            <div key={l} style={{ textAlign: 'center' }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 700,
+                color: accent, lineHeight: 1 }}>{n}</div>
+              <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.60)',
+                letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 3 }}>{l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-      {/* TAB NAV */}
-      <div style={{ background: '#fff', borderBottom: '1px solid var(--border)',
+      {/* TAB NAV (hidden — sidebar handles navigation) */}
+      <div style={{ display: 'none', background: '#fff', borderBottom: '1px solid var(--border)',
         position: 'sticky', top: 0, zIndex: 10 }}>
         <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto',
           display: 'flex', alignItems: 'stretch' }}>
@@ -3265,7 +3563,7 @@ function IncorporadoraPage({ onNav }) {
       </div>
 
       {/* CONTENT */}
-      <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto', padding: '40px 0 80px' }}>
+      <div style={{ padding: '28px 32px' }}>
 
         {/* ── VISÃO GERAL ── */}
         {tab === 'overview' && (
@@ -3549,7 +3847,7 @@ function IncorporadoraPage({ onNav }) {
           </div>
         )}
       </div>
-    </main>
+    </PortalShell>
   );
 }
 
@@ -4122,7 +4420,317 @@ Object.assign(window, { AnunciarPage });
 <script type="text/babel">// Área do Proprietário — landing explicativa antes do cadastro
 // Hero · Benefícios · Serviços · Passo a passo · CTA Anuncie
 
+// ============================================================
+// PORTAL DO PROPRIETÁRIO — dashboard operacional
+// ============================================================
 function ProprietarioPage({ onNav }) {
+  const [sec, setSec] = React.useState('dashboard');
+  const accent = 'var(--gold)';
+
+  const listing = {
+    titulo: 'Cobertura duplex · Belvedere', preco: 'R$ 3.200.000',
+    bairro: 'Belvedere, BH', status: 'Publicado',
+    plano: 'Venda Direta · R$ 297', diasAtivo: 14,
+    views: 847, leads: 12, visitas: 3,
+    img: window.__resources?.img60 || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=80',
+  };
+
+  const leads = [
+    { id: 1, nome: 'Carlos Ferreira', telefone: '(31) 9 8811-3344', interesse: 'Cobertura · Belvedere', data: '11/05', status: 'Novo' },
+    { id: 2, nome: 'Paula Rodrigues', telefone: '(31) 9 9922-4455', interesse: 'Cobertura · Belvedere', data: '10/05', status: 'Contato feito' },
+    { id: 3, nome: 'Marco Neves',     telefone: '(31) 9 7733-5566', interesse: 'Cobertura · Belvedere', data: '09/05', status: 'Visita marcada' },
+    { id: 4, nome: 'Simone Costa',    telefone: '(31) 9 8844-6677', interesse: 'Cobertura · Belvedere', data: '08/05', status: 'Proposta recebida' },
+  ];
+
+  const visitas = [
+    { data: 'Quinta, 15 Mai', hora: '10h00', visitante: 'Marco Neves', status: 'Confirmada' },
+    { data: 'Sábado, 17 Mai', hora: '14h30', visitante: 'Paula Rodrigues', status: 'Pendente' },
+  ];
+
+  const navItems = [
+    { id: 'dashboard', icon: '◈', label: 'Dashboard' },
+    { id: 'anuncio',   icon: '⊞', label: 'Meu anúncio' },
+    { id: 'leads',     icon: '◉', label: 'Leads' },
+    { id: 'visitas',   icon: '▦', label: 'Visitas' },
+    { id: 'plano',     icon: '◎', label: 'Meu plano' },
+  ];
+
+  const statusColor = { 'Novo': '#6B7280', 'Contato feito': '#3B82F6',
+    'Visita marcada': '#F59E0B', 'Proposta recebida': '#8B5CF6' };
+
+  return (
+    <PortalShell title="Portal do Proprietário" accent={accent}
+      navItems={navItems} active={sec} onSection={setSec} onNav={onNav}>
+
+      {/* Portal header */}
+      <div style={{ background: 'var(--navy)', padding: '22px 32px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.18em',
+            textTransform: 'uppercase', color: 'var(--gold-soft)', marginBottom: 4 }}>
+            {navItems.find(n => n.id === sec)?.label}
+          </div>
+          <h2 style={{ color: '#fff', margin: 0, fontSize: 22, fontWeight: 700 }}>
+            Área do Proprietário
+          </h2>
+        </div>
+        <button onClick={() => onNav('anunciar')} style={{
+          padding: '10px 20px', background: 'var(--gradient-gold)', color: 'var(--navy)',
+          border: 'none', borderRadius: 10, fontFamily: 'var(--font-body)',
+          fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+          + Anunciar imóvel
+        </button>
+      </div>
+
+      <div style={{ padding: '28px 32px' }}>
+
+        {/* DASHBOARD */}
+        {sec === 'dashboard' && (
+          <React.Fragment>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+              <PortalStat label="Views no anúncio" value={listing.views} sub={`Últimos ${listing.diasAtivo} dias`} />
+              <PortalStat label="Leads recebidos" value={listing.leads} sub="4 sem resposta" />
+              <PortalStat label="Visitas agendadas" value={listing.visitas} sub="Próx.: 15/05" />
+              <PortalStat label="Dias publicado" value={listing.diasAtivo} sub={`Status: ${listing.status}`} />
+            </div>
+
+            {/* Listing preview */}
+            <PortalSection title="Meu imóvel"
+              action={<button onClick={() => setSec('anuncio')} style={{ background: 'none',
+                border: 'none', color: 'var(--gold-deep)', fontSize: 13, fontWeight: 600,
+                cursor: 'pointer', fontFamily: 'var(--font-body)' }}>Editar anúncio →</button>}>
+              <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+                <div style={{ width: 160, height: 110, borderRadius: 10, flexShrink: 0,
+                  backgroundImage: `url(${listing.img})`, backgroundSize: 'cover',
+                  backgroundPosition: 'center' }} />
+                <div>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>{listing.titulo}</div>
+                  <div style={{ fontSize: 13.5, color: 'var(--fg-2)', marginBottom: 8 }}>{listing.bairro}</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--navy)',
+                    letterSpacing: '-0.025em', marginBottom: 8 }}>{listing.preco}</div>
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <span style={{ padding: '4px 10px', background: '#10B98118', color: '#10B981',
+                      borderRadius: 20, fontSize: 12, fontWeight: 700 }}>{listing.status}</span>
+                    <span style={{ padding: '4px 10px', background: 'rgba(212,168,87,0.12)',
+                      color: 'var(--gold-deep)', borderRadius: 20, fontSize: 12, fontWeight: 600 }}>
+                      {listing.plano}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </PortalSection>
+
+            {/* Leads recentes */}
+            <PortalSection title="Leads recentes"
+              action={<button onClick={() => setSec('leads')} style={{ background: 'none',
+                border: 'none', color: 'var(--gold-deep)', fontSize: 13, fontWeight: 600,
+                cursor: 'pointer', fontFamily: 'var(--font-body)' }}>Ver todos →</button>}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    {['Nome', 'Telefone', 'Data', 'Status'].map(h => (
+                      <th key={h} style={{ padding: '6px 10px', textAlign: 'left', fontSize: 11,
+                        fontWeight: 700, color: 'var(--fg-3)', textTransform: 'uppercase',
+                        letterSpacing: '0.08em' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {leads.slice(0,3).map(l => (
+                    <tr key={l.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={{ padding: '10px', fontWeight: 600, color: 'var(--navy)' }}>{l.nome}</td>
+                      <td style={{ padding: '10px', color: 'var(--fg-2)', fontSize: 13 }}>{l.telefone}</td>
+                      <td style={{ padding: '10px', color: 'var(--fg-3)', fontSize: 13 }}>{l.data}</td>
+                      <td style={{ padding: '10px' }}>
+                        <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11.5, fontWeight: 600,
+                          background: `${statusColor[l.status] || '#6B7280'}18`,
+                          color: statusColor[l.status] || '#6B7280' }}>{l.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </PortalSection>
+
+            {/* Próximas visitas */}
+            <PortalSection title="Próximas visitas">
+              {visitas.map((v, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 16,
+                  padding: '12px 0', borderBottom: i < visitas.length - 1 ? '1px solid var(--border)' : 'none' }}>
+                  <div style={{ width: 4, height: 40, background: 'var(--gold)',
+                    borderRadius: 2, flexShrink: 0 }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12.5, color: 'var(--fg-2)', fontWeight: 600 }}>{v.data} · {v.hora}</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--navy)', marginTop: 2 }}>{v.visitante}</div>
+                  </div>
+                  <span style={{ padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                    background: v.status === 'Confirmada' ? '#10B98118' : '#F59E0B18',
+                    color: v.status === 'Confirmada' ? '#10B981' : '#F59E0B' }}>{v.status}</span>
+                </div>
+              ))}
+            </PortalSection>
+          </React.Fragment>
+        )}
+
+        {/* MEU ANÚNCIO */}
+        {sec === 'anuncio' && (
+          <PortalSection title="Dados do anúncio">
+            <div style={{ display: 'flex', gap: 24, marginBottom: 28 }}>
+              <div style={{ width: 200, height: 140, borderRadius: 12, flexShrink: 0,
+                backgroundImage: `url(${listing.img})`, backgroundSize: 'cover',
+                backgroundPosition: 'center' }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 24px' }}>
+                  {[
+                    ['Título', listing.titulo],
+                    ['Bairro', listing.bairro],
+                    ['Preço pedido', listing.preco],
+                    ['Status', listing.status],
+                    ['Plano', listing.plano],
+                    ['Publicado há', `${listing.diasAtivo} dias`],
+                  ].map(([k, v]) => (
+                    <div key={k}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-3)',
+                        textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 3 }}>{k}</div>
+                      <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--navy)' }}>{v}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button style={{ padding: '10px 20px', background: 'var(--gradient-gold)', color: 'var(--navy)',
+                border: 'none', borderRadius: 10, fontFamily: 'var(--font-body)', fontWeight: 700,
+                fontSize: 14, cursor: 'pointer' }}>Editar anúncio</button>
+              <button style={{ padding: '10px 20px', background: 'var(--cream)', color: 'var(--fg-2)',
+                border: '1.5px solid var(--border)', borderRadius: 10, fontFamily: 'var(--font-body)',
+                fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>Pausar anúncio</button>
+              <button style={{ padding: '10px 20px', background: '#10B98112', color: '#10B981',
+                border: '1.5px solid #10B98130', borderRadius: 10, fontFamily: 'var(--font-body)',
+                fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>Marcar como vendido</button>
+            </div>
+          </PortalSection>
+        )}
+
+        {/* LEADS */}
+        {sec === 'leads' && (
+          <PortalSection title={`Leads recebidos (${leads.length})`}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid var(--border)' }}>
+                  {['Nome', 'Telefone', 'Data', 'Status', 'Ações'].map(h => (
+                    <th key={h} style={{ padding: '8px 10px', textAlign: 'left', fontSize: 11.5,
+                      fontWeight: 700, color: 'var(--fg-2)', textTransform: 'uppercase',
+                      letterSpacing: '0.07em' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {leads.map(l => (
+                  <tr key={l.id} style={{ borderBottom: '1px solid var(--border)' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--cream)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <td style={{ padding: '12px 10px', fontWeight: 600, color: 'var(--navy)' }}>{l.nome}</td>
+                    <td style={{ padding: '12px 10px', color: 'var(--fg-2)', fontSize: 13 }}>{l.telefone}</td>
+                    <td style={{ padding: '12px 10px', color: 'var(--fg-3)', fontSize: 13 }}>{l.data}</td>
+                    <td style={{ padding: '12px 10px' }}>
+                      <span style={{ padding: '4px 10px', borderRadius: 20, fontSize: 11.5, fontWeight: 600,
+                        background: `${statusColor[l.status] || '#6B7280'}18`,
+                        color: statusColor[l.status] || '#6B7280' }}>{l.status}</span>
+                    </td>
+                    <td style={{ padding: '12px 10px' }}>
+                      <button style={{ padding: '5px 12px', background: 'rgba(212,168,87,0.12)',
+                        color: 'var(--gold-deep)', border: 'none', borderRadius: 8,
+                        fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+                        Contatar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </PortalSection>
+        )}
+
+        {/* VISITAS */}
+        {sec === 'visitas' && (
+          <PortalSection title="Agenda de visitas">
+            {visitas.map((v, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 20,
+                padding: '18px 0', borderBottom: i < visitas.length - 1 ? '1px solid var(--border)' : 'none' }}>
+                <div style={{ width: 4, height: 56, background: 'var(--gold)', borderRadius: 2 }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, color: 'var(--fg-2)', fontWeight: 600 }}>{v.data} · {v.hora}</div>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', marginTop: 2 }}>{v.visitante}</div>
+                  <div style={{ fontSize: 13, color: 'var(--fg-2)', marginTop: 2 }}>Cobertura · Belvedere</div>
+                </div>
+                <span style={{ padding: '6px 14px', borderRadius: 20, fontSize: 12.5, fontWeight: 700,
+                  background: v.status === 'Confirmada' ? '#10B98118' : '#F59E0B18',
+                  color: v.status === 'Confirmada' ? '#10B981' : '#F59E0B' }}>{v.status}</span>
+                <button style={{ padding: '8px 16px', background: 'var(--cream)',
+                  border: '1.5px solid var(--border)', borderRadius: 8, fontSize: 13,
+                  fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-body)',
+                  color: 'var(--navy)' }}>Reagendar</button>
+              </div>
+            ))}
+            <button style={{ marginTop: 16, width: '100%', padding: '12px', background: 'transparent',
+              border: '1.5px dashed var(--border)', borderRadius: 10, fontSize: 14,
+              fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-body)', color: 'var(--fg-2)' }}>
+              + Bloquear horário na agenda
+            </button>
+          </PortalSection>
+        )}
+
+        {/* PLANO */}
+        {sec === 'plano' && (
+          <PortalSection title="Meu plano">
+            <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: 240 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-3)',
+                  textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Plano atual</div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--navy)',
+                  marginBottom: 6 }}>Venda Direta</div>
+                <div style={{ fontSize: 14, color: 'var(--fg-2)', marginBottom: 20 }}>
+                  Taxa fixa única de R$ 297 — sem comissão sobre a venda
+                </div>
+                {[
+                  'Sem comissão — 0% sobre a venda',
+                  'Anúncio ativo por 90 dias',
+                  'Gerador de descrição com IA',
+                  'Endereço privado na vitrine',
+                  'Suporte por WhatsApp',
+                ].map(item => (
+                  <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10,
+                    fontSize: 14, color: 'var(--navy)', marginBottom: 8, fontWeight: 500 }}>
+                    <span style={{ color: '#10B981', fontWeight: 700 }}>✓</span> {item}
+                  </div>
+                ))}
+              </div>
+              <div style={{ background: 'var(--cream)', borderRadius: 16, padding: '20px 24px',
+                border: '1px solid var(--border)', minWidth: 240 }}>
+                <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 12 }}>Fazer upgrade</div>
+                <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)',
+                  marginBottom: 4 }}>Venda Assistida · 3%</div>
+                <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 16, lineHeight: 1.5 }}>
+                  Suporte consultivo VN Prime, qualificação ativa de compradores. Só paga se vender.
+                </div>
+                <button onClick={() => onNav('vender')} style={{ width: '100%', padding: '10px',
+                  background: 'var(--gradient-gold)', color: 'var(--navy)', border: 'none',
+                  borderRadius: 10, fontFamily: 'var(--font-body)', fontWeight: 700,
+                  fontSize: 14, cursor: 'pointer' }}>
+                  Ver planos
+                </button>
+              </div>
+            </div>
+          </PortalSection>
+        )}
+
+      </div>
+    </PortalShell>
+  );
+}
+// (dead code marker — replaced marketing page below)
+function _ProprietarioPageOLD({ onNav }) {
   return (
     <main style={{ background: 'var(--cream)', minHeight: '100vh' }}>
       {/* HERO com banner */}
@@ -4255,7 +4863,308 @@ Object.assign(window, { ProprietarioPage });
 // ============================================================
 // CANAL DO FOTÓGRAFO — fotografia profissional + drone + tour 360
 // ============================================================
+// ============================================================
+// PORTAL DO FOTÓGRAFO — dashboard operacional
+// ============================================================
 function FotografoPage({ onNav }) {
+  const [sec, setSec] = React.useState('dashboard');
+  const accent = '#D4A857';
+
+  const jobs = [
+    { id: 1, imovel: 'Cobertura · Belvedere', endereco: 'R. Érico Veríssimo, 450 · BH', data: '14/05/2026', hora: '09h00', pacote: 'Premium · Drone', valor: 'R$ 1.190', status: 'Agendado' },
+    { id: 2, imovel: 'Apto 4 suítes · Savassi', endereco: 'Av. do Contorno, 7800 · BH', data: '16/05/2026', hora: '14h00', pacote: 'Completo', valor: 'R$ 690', status: 'Agendado' },
+    { id: 3, imovel: 'Casa · Alphaville BH', endereco: 'Alameda das Rosas, 22 · Nova Lima', data: '20/05/2026', hora: '10h00', pacote: 'Essencial', valor: 'R$ 390', status: 'Solicitado' },
+    { id: 4, imovel: 'Apto 3 suítes · Mangabeiras', endereco: 'R. Engenheiro Schnyder, 250 · BH', data: '08/05/2026', hora: '11h00', pacote: 'Completo', valor: 'R$ 690', status: 'Entregue' },
+    { id: 5, imovel: 'Cobertura · Lourdes', endereco: 'R. Maranhão, 44 · BH', data: '02/05/2026', hora: '09h00', pacote: 'Premium · Drone', valor: 'R$ 1.190', status: 'Pago' },
+  ];
+
+  const pagamentos = [
+    { mes: 'Maio/2026', jobs: 2, valor: 'R$ 1.880', status: 'Parcial' },
+    { mes: 'Abril/2026', jobs: 5, valor: 'R$ 3.670', status: 'Pago' },
+    { mes: 'Março/2026', jobs: 4, valor: 'R$ 2.960', status: 'Pago' },
+    { mes: 'Fev./2026', jobs: 3, valor: 'R$ 2.270', status: 'Pago' },
+  ];
+
+  const pacotes = [
+    { id: 'essencial', nome: 'Essencial', preco: 'R$ 390', duracao: '60 min',
+      itens: ['25 fotos editadas em alta', 'Tratamento de luz e cor', 'Entrega em 48h', 'Direito de uso comercial'] },
+    { id: 'completo', nome: 'Completo', preco: 'R$ 690', duracao: '90 min', destaque: true,
+      itens: ['40 fotos editadas em alta', 'Tour virtual 360°', 'Vídeo curto (30s vertical)', 'Planta humanizada', 'Entrega em 48h'] },
+    { id: 'premium', nome: 'Premium · com drone', preco: 'R$ 1.190', duracao: '2h',
+      itens: ['60 fotos + drone aéreo', 'Tour 360° + Matterport', 'Vídeo cinematográfico (60s)', 'Plantas + contexto urbano', 'Entrega em 24h'] },
+  ];
+
+  const navItems = [
+    { id: 'dashboard', icon: '◈', label: 'Dashboard' },
+    { id: 'jobs',      icon: '◉', label: 'Jobs' },
+    { id: 'agenda',    icon: '▦', label: 'Agenda' },
+    { id: 'pagamentos',icon: '◎', label: 'Pagamentos' },
+    { id: 'pacotes',   icon: '⊞', label: 'Pacotes' },
+  ];
+
+  const statusColor = { 'Solicitado': '#6B7280', 'Agendado': '#3B82F6',
+    'Entregue': '#8B5CF6', 'Pago': '#10B981' };
+
+  return (
+    <PortalShell title="Portal do Fotógrafo" accent={accent}
+      navItems={navItems} active={sec} onSection={setSec} onNav={onNav}>
+
+      {/* Portal header */}
+      <div style={{ background: 'var(--navy)', padding: '22px 32px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.18em',
+            textTransform: 'uppercase', color: accent, marginBottom: 4 }}>
+            {navItems.find(n => n.id === sec)?.label}
+          </div>
+          <h2 style={{ color: '#fff', margin: 0, fontSize: 22, fontWeight: 700 }}>
+            Portal do Fotógrafo
+          </h2>
+        </div>
+        <button style={{ padding: '9px 18px', background: `${accent}22`, color: accent,
+          border: `1px solid ${accent}44`, borderRadius: 8, fontFamily: 'var(--font-body)',
+          fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+          Aceitar novo job
+        </button>
+      </div>
+
+      <div style={{ padding: '28px 32px' }}>
+
+        {/* DASHBOARD */}
+        {sec === 'dashboard' && (
+          <React.Fragment>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+              <PortalStat label="Jobs pendentes" value="1" sub="Aguardando aceite" accent={accent} />
+              <PortalStat label="Jobs agendados" value="2" sub="Próx.: 14/05 · 09h" accent={accent} />
+              <PortalStat label="Receita (mai)" value="R$ 1.880" sub="2 jobs concluídos" accent={accent} />
+              <PortalStat label="Avaliação média" value="4,9★" sub="Últimos 30 days" accent={accent} />
+            </div>
+
+            {/* Próximos jobs */}
+            <PortalSection title="Próximos jobs"
+              action={<button onClick={() => setSec('jobs')} style={{ background: 'none',
+                border: 'none', color: accent, fontSize: 13, fontWeight: 600,
+                cursor: 'pointer', fontFamily: 'var(--font-body)' }}>Ver todos →</button>}>
+              {jobs.filter(j => ['Solicitado','Agendado'].includes(j.status)).map(j => (
+                <div key={j.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 20,
+                  padding: '14px 0', borderBottom: '1px solid var(--border)' }}>
+                  <div style={{ width: 4, height: 52, background: statusColor[j.status],
+                    borderRadius: 2, flexShrink: 0, marginTop: 2 }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12.5, color: 'var(--fg-2)', fontWeight: 600 }}>{j.data} · {j.hora}</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--navy)', marginTop: 2 }}>{j.imovel}</div>
+                    <div style={{ fontSize: 13, color: 'var(--fg-2)', marginTop: 2 }}>{j.endereco}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--navy)' }}>{j.valor}</div>
+                    <div style={{ fontSize: 12, color: 'var(--fg-2)', marginTop: 2 }}>{j.pacote}</div>
+                    <span style={{ display: 'inline-block', marginTop: 6, padding: '3px 10px',
+                      borderRadius: 20, fontSize: 11.5, fontWeight: 600,
+                      background: `${statusColor[j.status]}18`, color: statusColor[j.status] }}>
+                      {j.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </PortalSection>
+
+            {/* Resumo de pagamentos */}
+            <PortalSection title="Pagamentos recentes"
+              action={<button onClick={() => setSec('pagamentos')} style={{ background: 'none',
+                border: 'none', color: accent, fontSize: 13, fontWeight: 600,
+                cursor: 'pointer', fontFamily: 'var(--font-body)' }}>Ver histórico →</button>}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+                {pagamentos.slice(0,3).map(p => (
+                  <div key={p.mes} style={{ background: 'var(--cream)', borderRadius: 10,
+                    padding: '14px 16px', border: '1px solid var(--border)' }}>
+                    <div style={{ fontSize: 11.5, color: 'var(--fg-2)', marginBottom: 4 }}>{p.mes}</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--navy)',
+                      letterSpacing: '-0.02em' }}>{p.valor}</div>
+                    <div style={{ fontSize: 12, color: 'var(--fg-3)', marginTop: 4 }}>{p.jobs} jobs</div>
+                    <span style={{ display: 'inline-block', marginTop: 8, padding: '3px 10px',
+                      borderRadius: 20, fontSize: 11.5, fontWeight: 600,
+                      background: p.status === 'Pago' ? '#10B98118' : '#F59E0B18',
+                      color: p.status === 'Pago' ? '#10B981' : '#F59E0B' }}>{p.status}</span>
+                  </div>
+                ))}
+              </div>
+            </PortalSection>
+          </React.Fragment>
+        )}
+
+        {/* JOBS */}
+        {sec === 'jobs' && (
+          <PortalSection title={`Todos os jobs (${jobs.length})`}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid var(--border)' }}>
+                  {['Imóvel', 'Data/Hora', 'Pacote', 'Valor', 'Status', 'Ações'].map(h => (
+                    <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 11.5,
+                      fontWeight: 700, color: 'var(--fg-2)', textTransform: 'uppercase',
+                      letterSpacing: '0.07em' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {jobs.map(j => (
+                  <tr key={j.id} style={{ borderBottom: '1px solid var(--border)' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--cream)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <td style={{ padding: '12px 12px' }}>
+                      <div style={{ fontWeight: 600, color: 'var(--navy)' }}>{j.imovel}</div>
+                      <div style={{ fontSize: 12, color: 'var(--fg-3)', marginTop: 2 }}>{j.endereco}</div>
+                    </td>
+                    <td style={{ padding: '12px 12px', color: 'var(--fg-2)', fontSize: 13 }}>{j.data}<br/>{j.hora}</td>
+                    <td style={{ padding: '12px 12px', color: 'var(--fg-1)', fontSize: 13 }}>{j.pacote}</td>
+                    <td style={{ padding: '12px 12px', fontWeight: 700, color: 'var(--navy)' }}>{j.valor}</td>
+                    <td style={{ padding: '12px 12px' }}>
+                      <span style={{ padding: '4px 10px', borderRadius: 20, fontSize: 11.5, fontWeight: 600,
+                        background: `${statusColor[j.status]}18`, color: statusColor[j.status] }}>
+                        {j.status}
+                      </span>
+                    </td>
+                    <td style={{ padding: '12px 12px' }}>
+                      {j.status === 'Solicitado' && (
+                        <button style={{ padding: '5px 12px', background: `${accent}15`,
+                          color: accent, border: `1px solid ${accent}30`, borderRadius: 8,
+                          fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+                          Aceitar
+                        </button>
+                      )}
+                      {j.status === 'Agendado' && (
+                        <button style={{ padding: '5px 12px', background: '#3B82F610',
+                          color: '#3B82F6', border: '1px solid #3B82F630', borderRadius: 8,
+                          fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+                          Enviar fotos
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </PortalSection>
+        )}
+
+        {/* AGENDA */}
+        {sec === 'agenda' && (
+          <PortalSection title="Agenda de jobs">
+            {jobs.filter(j => ['Solicitado','Agendado'].includes(j.status)).map((j, i) => (
+              <div key={j.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 20,
+                padding: '18px 0', borderBottom: i < jobs.length - 1 ? '1px solid var(--border)' : 'none' }}>
+                <div style={{ width: 4, height: 60, background: statusColor[j.status],
+                  borderRadius: 2, flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, color: 'var(--fg-2)', fontWeight: 600, marginBottom: 2 }}>
+                    {j.data} · {j.hora}
+                  </div>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)' }}>{j.imovel}</div>
+                  <div style={{ fontSize: 13, color: 'var(--fg-2)', marginTop: 4 }}>{j.endereco}</div>
+                  <div style={{ fontSize: 13, color: 'var(--fg-2)', marginTop: 2 }}>Pacote: {j.pacote}</div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--navy)' }}>{j.valor}</div>
+                  <span style={{ display: 'inline-block', marginTop: 8, padding: '4px 12px',
+                    borderRadius: 20, fontSize: 12.5, fontWeight: 600,
+                    background: `${statusColor[j.status]}18`, color: statusColor[j.status] }}>
+                    {j.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </PortalSection>
+        )}
+
+        {/* PAGAMENTOS */}
+        {sec === 'pagamentos' && (
+          <React.Fragment>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+              <PortalStat label="Recebido (mai)" value="R$ 1.880" sub="Parcial — 2 jobs" accent={accent} />
+              <PortalStat label="Total 2026" value="R$ 10.780" sub="14 jobs entregues" accent={accent} />
+              <PortalStat label="Próximo pgto." value="20/05" sub="R$ 690 (job Savassi)" accent={accent} />
+            </div>
+            <PortalSection title="Histórico de pagamentos">
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid var(--border)' }}>
+                    {['Mês', 'Jobs', 'Valor', 'Status'].map(h => (
+                      <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 11.5,
+                        fontWeight: 700, color: 'var(--fg-2)', textTransform: 'uppercase',
+                        letterSpacing: '0.07em' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {pagamentos.map((p, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={{ padding: '12px 12px', color: 'var(--fg-2)', fontSize: 13 }}>{p.mes}</td>
+                      <td style={{ padding: '12px 12px', color: 'var(--navy)', fontWeight: 600 }}>{p.jobs} jobs</td>
+                      <td style={{ padding: '12px 12px', fontWeight: 700, color: 'var(--navy)', fontSize: 16 }}>{p.valor}</td>
+                      <td style={{ padding: '12px 12px' }}>
+                        <span style={{ padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                          background: p.status === 'Pago' ? '#10B98118' : '#F59E0B18',
+                          color: p.status === 'Pago' ? '#10B981' : '#F59E0B' }}>{p.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </PortalSection>
+          </React.Fragment>
+        )}
+
+        {/* PACOTES (mantém a informação dos pacotes para referência) */}
+        {sec === 'pacotes' && (
+          <React.Fragment>
+            <div style={{ fontSize: 14, color: 'var(--fg-2)', marginBottom: 20 }}>
+              Tabela de referência dos pacotes VN Prime — valores cobrados ao cliente para cada sessão.
+            </div>
+            <div style={{ display: 'grid', gap: 18,
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
+              {pacotes.map(p => (
+                <div key={p.id} style={{
+                  background: p.destaque ? 'var(--navy-deep)' : '#fff',
+                  color: p.destaque ? '#fff' : 'var(--navy)',
+                  padding: 28, borderRadius: 16,
+                  border: p.destaque ? 'none' : '1px solid var(--border)',
+                  boxShadow: p.destaque ? 'var(--shadow-soft)' : 'none',
+                  position: 'relative',
+                }}>
+                  {p.destaque && <div style={{ position: 'absolute', top: -12, left: 24,
+                    background: 'var(--gold)', color: 'var(--navy-deep)', padding: '4px 12px',
+                    borderRadius: 999, fontSize: 11, fontWeight: 700, letterSpacing: '0.1em',
+                    textTransform: 'uppercase' }}>Mais solicitado</div>}
+                  <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.14em',
+                    textTransform: 'uppercase', color: p.destaque ? accent : 'var(--gold-deep)',
+                    marginBottom: 10 }}>{p.nome}</div>
+                  <div style={{ fontSize: 36, fontWeight: 800, fontFamily: 'var(--font-display)',
+                    letterSpacing: '-0.02em' }}>{p.preco}</div>
+                  <div style={{ fontSize: 13, color: p.destaque ? 'rgba(255,255,255,0.6)' : 'var(--fg-2)',
+                    marginBottom: 18 }}>sessão de {p.duracao}</div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0,
+                    display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {p.itens.map(it => (
+                      <li key={it} style={{ fontSize: 14, display: 'flex', gap: 10 }}>
+                        <span style={{ color: p.destaque ? accent : 'var(--gold-deep)', fontWeight: 700 }}>✓</span>
+                        <span style={{ color: p.destaque ? 'rgba(255,255,255,0.85)' : 'var(--fg-1)' }}>{it}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </React.Fragment>
+        )}
+
+      </div>
+    </PortalShell>
+  );
+}
+
+// ============================================================
+// CANAL DO FOTÓGRAFO (público) — mantido para marketing externo
+// ============================================================
+function _FotografoPageOLD({ onNav }) {
   const pacotes = [
     { id: 'essencial', nome: 'Essencial', preco: 'R$ 390', duracao: '60 min',
       itens: ['25 fotos editadas em alta', 'Tratamento de luz e cor', 'Entrega em 48h', 'Direito de uso comercial'] },
