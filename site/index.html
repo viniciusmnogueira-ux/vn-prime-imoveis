@@ -1535,35 +1535,124 @@ function photoNavStyle(side) {
 
 Object.assign(window, { ListingCard });
 </script>
-<script type="text/babel">// Pages: Home, SearchResults, PropertyDetail
-
-// ============================================================
-// HOME — ImovelWeb-style hero search + featured + neighborhoods
-// ============================================================
+<script type="text/babel">// Pages: Home
 function HomePage({ onNav, density, accentMode }) {
   const [op, setOp] = useState('compra');
   const [filters, setFilters] = useState({ q: '', tipo: '', valorMax: '' });
   const [heroIdx, setHeroIdx] = useState(0);
-  // Vale dos Cristais / Vale do Sereno · Nova Lima · Grande BH vibe
+  const [serviceIdx, setServiceIdx] = useState(0);
+  const [planoIdx, setPlanoIdx] = useState(0);
+
   const heroPhotos = [
-    (window.__resources?.img34||'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=2400&q=85'), // condomínio com vista verde
-    (window.__resources?.img35||'https://images.unsplash.com/photo-1582268611958-ebfd161df9d8?w=2400&q=85'), // arquitetura moderna em vale
-    (window.__resources?.img36||'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=2400&q=85'), // casa contemporânea com piscina
-    (window.__resources?.img37||'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=2400&q=85'), // alphaville-style condomínio
+    (window.__resources?.img34||'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=2400&q=85'),
+    (window.__resources?.img35||'https://images.unsplash.com/photo-1582268611958-ebfd161df9d8?w=2400&q=85'),
+    (window.__resources?.img36||'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=2400&q=85'),
+    (window.__resources?.img37||'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=2400&q=85'),
   ];
   useEffect(() => {
     const t = setInterval(() => setHeroIdx(i => (i + 1) % heroPhotos.length), 7000);
     return () => clearInterval(t);
   }, []);
 
-  const featured = window.VN_CATALOG.filter(l => l.isFeatured).slice(0, 6);
-  const neighborhoods = window.VN_NEIGHBORHOODS;
-
+  const featured = window.VN_CATALOG.filter(l => l.isFeatured).slice(0, 3);
   const onSearch = () => onNav('busca', { op, ...filters });
+
+  const SERVICOS = [
+    {
+      title: 'Área do Proprietário',
+      subtitle: 'Venda com autonomia total',
+      desc: 'Anuncie com taxa fixa ou comissão só no sucesso. Você define o preço, conduz visitas e fecha direto com o comprador. A VN Prime cuida da plataforma, fotos, mídia e suporte jurídico.',
+      bullets: ['Taxa fixa R$ 297 ou 3% sobre a venda', 'Fotografia profissional inclusa', 'Mídia paga em Meta, Google e portais', 'Suporte jurídico até a escritura'],
+      cta: 'Anunciar meu imóvel', route: 'proprietario',
+      img: (window.__resources?.img60||'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=80'),
+      accent: '#D4A857',
+    },
+    {
+      title: 'Portal do Corretor',
+      subtitle: 'Leads qualificados e comissão garantida',
+      desc: 'Acesse o portfólio VN Prime, receba leads com contato completo e gerencie seu funil de vendas com CRM Kanban integrado. Comissão integral em cada venda.',
+      bullets: ['Leads com WhatsApp + e-mail qualificados', 'CRM Kanban de funil de vendas', 'Portfólio premium VN Prime', 'Comissão integral garantida'],
+      cta: 'Acessar portal', route: 'corretor-canal',
+      img: (window.__resources?.img35||'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&q=80'),
+      accent: '#2F8674',
+    },
+    {
+      title: 'Canal do Fotógrafo',
+      subtitle: 'Jobs premium em BH e região',
+      desc: 'Fotografia imobiliária de alto padrão agendada pela plataforma. Receba jobs, fotografe com liberdade e receba com segurança. Drone, Tour 360° e vídeo cinematográfico.',
+      bullets: ['40+ imóveis por mês em carteira', 'R$ 390 a R$ 1.190 por sessão', 'Pagamento garantido por job entregue', 'Drone, Tour 360° e vídeo cinematográfico'],
+      cta: 'Quero ser fotógrafo credenciado', route: 'fotografo-canal',
+      img: (window.__resources?.img67||'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=900&q=80'),
+      accent: '#B8862E',
+    },
+    {
+      title: 'Consórcio Imobiliário',
+      subtitle: 'Compre sem juros, no seu ritmo',
+      desc: 'A forma mais inteligente de adquirir seu imóvel. Sem juros, sem entrada obrigatória. Carta de crédito nominal contemplada por sorteio ou lance mensal.',
+      bullets: ['0% de juros — nunca', 'Prazo de até 12 anos', 'Contemplação por sorteio ou lance', '200+ consorciados em BH e região'],
+      cta: 'Simular meu consórcio', route: 'consorcio',
+      img: (window.__resources?.img68||'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=900&q=80'),
+      accent: '#059669',
+    },
+    {
+      title: 'Due Diligence',
+      subtitle: 'Compre com segurança jurídica total',
+      desc: 'Antes de assinar qualquer contrato, a VN Prime analisa toda a documentação e realiza vistoria técnica. Relatório executivo completo entregue em até 48 horas.',
+      bullets: ['30+ itens verificados', 'Relatório em até 48 horas', 'Análise jurídica + vistoria técnica', 'Sem surpresas no pós-venda'],
+      cta: 'Solicitar análise', route: 'due-diligence',
+      img: (window.__resources?.img69||'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&q=80'),
+      accent: '#6366F1',
+    },
+    {
+      title: 'Lançamentos',
+      subtitle: 'Alta valorização, condições exclusivas',
+      desc: 'Apartamentos, casas em condomínio e lotes no melhor da Grande BH. Compre na planta com entrada facilitada, fluxo baixo durante as obras e financiamento na entrega.',
+      bullets: ['3 empreendimentos exclusivos em carteira', 'Valorização de 50–60% até as chaves', 'Entrada facilitada + financiamento bancário', 'Unidades a partir de R$ 320 mil'],
+      cta: 'Ver lançamentos', route: 'lancamentos',
+      img: (window.__resources?.img34||'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=900&q=80'),
+      accent: '#D4A857',
+    },
+  ];
+
+  const PLANOS = [
+    {
+      name: 'Venda Direta',
+      tag: 'Autonomia total',
+      price: 'R$ 297',
+      priceLabel: 'taxa fixa única — sem comissão',
+      desc: 'Você conduz a venda do início ao fim. Plataforma, vitrine premium, tutorial de fotos, gerador de descrição com IA e suporte para documentação inclusos.',
+      bullets: ['Anúncio por 90 dias na vitrine VN Prime', 'Tutorial profissional de fotografia', 'Gerador de descrição com IA', 'Endereço privado — exibe só o bairro', 'Suporte por WhatsApp'],
+      cta: 'Começar agora',
+      img: (window.__resources?.img38||'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1400&q=85'),
+    },
+    {
+      name: 'Venda Assistida',
+      tag: 'Mais escolhido',
+      price: '3%',
+      priceLabel: 'sobre o valor da venda — só no sucesso',
+      desc: 'Você conduz as visitas, a VN Prime cuida de tudo que envolve tecnologia e divulgação: fotos profissionais, descrição editorial, mídia paga e qualificação de compradores.',
+      bullets: ['Fotografia profissional inclusa', 'Descrição editorial com IA', 'Mídia paga em Meta e Google', 'Qualificação de compradores', 'Time VN Prime nos bastidores'],
+      cta: 'Escolher este plano',
+      img: (window.__resources?.img39||'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1400&q=85'),
+    },
+    {
+      name: 'Venda Completa',
+      tag: 'Mãos livres',
+      price: '6%',
+      priceLabel: 'sobre o valor da venda — só no sucesso',
+      desc: 'Entregue tudo para a VN Prime. Corretor parceiro dedicado, visitas acompanhadas, vídeo cinematográfico, concierge de negociação e suporte jurídico completo.',
+      bullets: ['Corretor parceiro dedicado à sua venda', 'Visitas acompanhadas pelo corretor', 'Vídeo cinematográfico do imóvel', 'Concierge de negociação', 'Suporte jurídico até a escritura'],
+      cta: 'Quero mãos livres',
+      img: (window.__resources?.img40||'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1400&q=85'),
+    },
+  ];
+
+  const totalServicos = SERVICOS.length;
+  const totalPlanos = PLANOS.length;
 
   return (
     <main>
-      {/* HERO with crossfade slideshow */}
+      {/* ── HERO ── */}
       <section style={{ position: 'relative', overflow: 'hidden', minHeight: 580,
         display: 'flex', alignItems: 'center', padding: '4rem 0 6rem' }}>
         <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
@@ -1571,40 +1660,35 @@ function HomePage({ onNav, density, accentMode }) {
             <div key={i} style={{
               position: 'absolute', inset: 0,
               backgroundImage: `url(${src})`, backgroundSize: 'cover', backgroundPosition: 'center',
-              opacity: i === heroIdx ? 1 : 0, transition: 'opacity 1.6s ease, transform 8s ease',
-              transform: i === heroIdx ? 'scale(1)' : 'scale(1.06)',
+              opacity: i === heroIdx ? 1 : 0, transition: 'opacity 1.6s ease',
             }} />
           ))}
           <div style={{ position: 'absolute', inset: 0,
-            background: 'linear-gradient(120deg, rgba(15,34,68,0.78) 0%, rgba(15,34,68,0.50) 45%, rgba(15,34,68,0.65) 100%)' }} />
-          {/* gold radial accent */}
+            background: 'linear-gradient(120deg, rgba(15,34,68,0.80) 0%, rgba(15,34,68,0.52) 45%, rgba(15,34,68,0.68) 100%)' }} />
           <div style={{ position: 'absolute', top: -200, right: -200, width: 600, height: 600,
-            background: 'radial-gradient(circle, rgba(201,150,14,0.25) 0%, transparent 65%)',
-            pointerEvents: 'none' }} />
+            background: 'radial-gradient(circle, rgba(212,168,87,0.22) 0%, transparent 65%)', pointerEvents: 'none' }} />
         </div>
 
-        <div style={{ position: 'relative', zIndex: 1, width: 'min(1280px, 94vw)',
-          margin: '0 auto', textAlign: 'center' }}>
+        <div style={{ position: 'relative', zIndex: 1, width: 'min(1280px, 94vw)', margin: '0 auto', textAlign: 'center' }}>
           <Eyebrow>VN Prime Imóveis · Belo Horizonte e região</Eyebrow>
           <h1 style={{ color: '#fff', fontSize: 'clamp(2rem, 4.4vw, 3.4rem)',
             textShadow: '0 2px 24px rgba(0,0,0,0.4)', margin: '0 0 16px',
             maxWidth: '20ch', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.15 }}>
-            Encontre seu próximo endereço <span style={{
-              background: 'var(--gradient-gold)', WebkitBackgroundClip: 'text',
-              backgroundClip: 'text', color: 'transparent', fontStyle: 'italic',
-            }}>de alto padrão</span>
+            Encontre seu próximo endereço{' '}
+            <em className="italic-accent" style={{ background: 'var(--gradient-gold)',
+              WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>
+              de alto padrão
+            </em>
           </h1>
           <p style={{ color: 'rgba(250,249,246,0.92)', fontSize: 16, maxWidth: 580,
             margin: '0 auto 28px', textShadow: '0 1px 10px rgba(0,0,0,0.3)' }}>
-            Curadoria de residências em Nova Lima, Savassi, Belvedere, Vila da Serra e Alphaville.
+            Imóveis premium em Belo Horizonte e Grande BH, selecionados pelo time VN Prime.
           </p>
 
-          {/* Operation tabs */}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
             <OperationTabs value={op} onChange={setOp} />
           </div>
 
-          {/* Search card — ImovelWeb hero search */}
           <div style={{
             background: '#fff', borderRadius: 18, padding: '1.25rem',
             boxShadow: '0 22px 60px rgba(15,34,68,0.32)',
@@ -1612,7 +1696,7 @@ function HomePage({ onNav, density, accentMode }) {
             gridTemplateColumns: '1.6fr 1fr 1fr auto', alignItems: 'end',
           }}>
             <SearchField label="Onde">
-              <input type="text" placeholder="Bairro, cidade ou código (ex.: Savassi, VN-2048)"
+              <input type="text" placeholder="Cidade, bairro ou código (ex.: Nova Lima, VN-2048)"
                 value={filters.q} onChange={(e) => setFilters({ ...filters, q: e.target.value })}
                 style={inputStyle} />
             </SearchField>
@@ -1636,68 +1720,48 @@ function HomePage({ onNav, density, accentMode }) {
             <Btn variant="accent" size="lg" onClick={onSearch}>Buscar</Btn>
           </div>
 
-          {/* Trust bar */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: 28, marginTop: 36, flexWrap: 'wrap' }}>
-            {[
-              ['142', 'Imóveis curados'],
-              ['R$ 4,2 bi', 'Em portfólio'],
-              ['96%', 'Satisfação'],
-              ['18 dias', 'Tempo médio venda'],
-            ].map(([v, l]) => (
+            {[['142', 'Imóveis disponíveis'], ['R$ 4,2 bi', 'Em portfólio'], ['96%', 'Satisfação'], ['18 dias', 'Tempo médio de venda']].map(([v, l]) => (
               <div key={l} style={{ textAlign: 'center', minWidth: 110 }}>
-                <div style={{ fontFamily: 'Playfair Display', fontSize: 24, fontWeight: 700,
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 700,
                   color: 'var(--gold-soft)', lineHeight: 1 }}>{v}</div>
-                <div style={{ fontFamily: 'DM Sans', fontSize: 11, fontWeight: 600,
-                  letterSpacing: '0.08em', textTransform: 'uppercase',
-                  color: 'rgba(250,249,246,0.8)', marginTop: 6 }}>{l}</div>
+                <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em',
+                  textTransform: 'uppercase', color: 'rgba(250,249,246,0.8)', marginTop: 6 }}>{l}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* QUICK LINKS — type filters chip row */}
-      <section style={{ background: 'var(--white)', borderBottom: '1px solid var(--border)',
-        padding: '20px 0' }}>
+      {/* ── QUICK LINKS ── */}
+      <section style={{ background: 'var(--white)', borderBottom: '1px solid var(--border)', padding: '20px 0' }}>
         <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto',
           display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
-          <span style={{ fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700,
-            letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--fg-2)' }}>
-            Buscas frequentes
-          </span>
-          {['Apartamentos em Lourdes', 'Casas em Nova Lima', 'Coberturas Belvedere',
-            'Lançamentos Vila da Serra', 'Aluguel Funcionários', 'Acima de R$ 5 mi'].map(q => (
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
+            textTransform: 'uppercase', color: 'var(--fg-2)' }}>Buscas frequentes</span>
+          {['Apartamentos em BH', 'Casas Grande BH', 'Coberturas BH', 'Lançamentos Grande BH', 'Aluguel BH', 'Acima de R$ 5 mi'].map(q => (
             <a key={q} onClick={() => onNav('busca', { q })}
-               style={{ fontFamily: 'DM Sans', fontSize: 13, color: 'var(--navy)',
-                 padding: '6px 14px', border: '1px solid var(--border)', borderRadius: 999,
-                 cursor: 'pointer', textDecoration: 'none',
-                 transition: 'border-color 0.15s ease, color 0.15s ease' }}
-               onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--gold)';
-                 e.currentTarget.style.color = 'var(--gold)'; }}
-               onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)';
-                 e.currentTarget.style.color = 'var(--navy)'; }}>{q}</a>
+               style={{ fontSize: 13, color: 'var(--navy)', padding: '6px 14px',
+                 border: '1px solid var(--border)', borderRadius: 999, cursor: 'pointer',
+                 textDecoration: 'none', transition: 'border-color 0.15s, color 0.15s' }}
+               onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--gold)'; e.currentTarget.style.color = 'var(--gold)'; }}
+               onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--navy)'; }}>{q}</a>
           ))}
         </div>
       </section>
 
-      {/* DESTAQUES — featured grid */}
-      <section style={{ padding: 'clamp(3rem, 6vw, 5rem) 0', background: 'var(--cream)' }}>
+      {/* ── DESTAQUES — 3 cards compactos ── */}
+      <section style={{ padding: 'clamp(2.5rem, 5vw, 4rem) 0', background: 'var(--cream)' }}>
         <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between',
-            alignItems: 'flex-end', marginBottom: 32, gap: 24, flexWrap: 'wrap' }}>
+            alignItems: 'flex-end', marginBottom: 24, gap: 24, flexWrap: 'wrap' }}>
             <div>
-              <Eyebrow color="var(--gold)">Curadoria · Em destaque</Eyebrow>
-              <h2 style={{ margin: 0, fontSize: 'clamp(1.6rem, 3vw, 2.2rem)' }}>
-                Endereços que valem a visita
-              </h2>
-              <p style={{ margin: '8px 0 0', maxWidth: 520, color: 'var(--fg-2)' }}>
-                Seis imóveis cuidadosamente selecionados pela nossa curadoria esta semana.
-              </p>
+              <Eyebrow color="var(--gold)">Seleção VN Prime · Em destaque</Eyebrow>
+              <h2 style={{ margin: 0, fontSize: 'clamp(1.4rem, 2.5vw, 1.9rem)' }}>Endereços que valem a visita</h2>
             </div>
             <Btn variant="ghost" onClick={() => onNav('busca')}>Ver todos os {window.VN_CATALOG.length} imóveis →</Btn>
           </div>
-          <div style={{ display: 'grid', gap: 22,
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+          <div style={{ display: 'grid', gap: 18, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
             {featured.map(l => (
               <ListingCard key={l.id} listing={l} onOpen={(x) => onNav('detalhe', { id: x.id })} />
             ))}
@@ -1705,119 +1769,281 @@ function HomePage({ onNav, density, accentMode }) {
         </div>
       </section>
 
-      {/* SERVIÇOS — substitui Bairros */}
-      <section style={{ padding: 'clamp(3rem, 6vw, 5rem) 0', background: 'var(--white)' }}>
+      {/* ── NOSSOS SERVIÇOS — carrossel ── */}
+      <section id="home-servicos" style={{ padding: 'clamp(3rem, 6vw, 5rem) 0', background: 'var(--white)' }}>
         <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto 40px' }}>
-            <Eyebrow color="var(--gold)">Para quem anuncia</Eyebrow>
-            <h2 style={{ margin: 0 }}>Nossos <em className="italic-accent">serviços</em></h2>
-            <p style={{ marginTop: 10, color: 'var(--fg-2)' }}>
-              Quatro frentes integradas para conduzir sua venda do anúncio à entrega das chaves.
+            <Eyebrow color="var(--gold)">Para quem anuncia e compra</Eyebrow>
+            <h2 style={{ margin: '0 0 12px' }}>Nossos <em className="italic-accent">serviços</em></h2>
+            <p style={{ color: 'var(--fg-2)', margin: 0 }}>
+              Soluções completas para vender, comprar, financiar e documentar seu imóvel com segurança.
             </p>
           </div>
-          <div style={{ display: 'grid', gap: 18,
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
-            {[
-              ['Área do Proprietário', 'Você conduz a venda com nossa plataforma. Suporte, documentação e mídia inclusos.', 'Anunciar imóvel', 'vender'],
-              ['Portal do Corretor', 'Catálogo VN Prime, comissão integral e ferramentas pro de captação.', 'Cadastrar como corretor', 'corretor'],
-              ['Canal do Fotógrafo', 'Sessões agendadas via plataforma. Pagamento garantido por imóvel entregue.', 'Sou fotógrafo', 'vender'],
-              ['Due Diligence', 'Análise documental completa. Reduza riscos antes de fechar negócio.', 'Solicitar análise', 'vender'],
-            ].map(([title, desc, cta, route]) => (
-              <a key={title} onClick={() => onNav(route)}
-                 style={{
-                   background: 'var(--white)', borderRadius: 14, padding: '28px 26px', cursor: 'pointer',
-                   border: '1px solid var(--border)', textDecoration: 'none',
-                   boxShadow: 'var(--shadow-card)',
-                   transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s',
-                   display: 'flex', flexDirection: 'column', gap: 14,
-                 }}
-                 onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)';
-                   e.currentTarget.style.boxShadow = 'var(--shadow-soft)';
-                   e.currentTarget.style.borderColor = 'var(--border-gold)'; }}
-                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)';
-                   e.currentTarget.style.boxShadow = 'var(--shadow-card)';
-                   e.currentTarget.style.borderColor = 'var(--border)'; }}>
-                <h3 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: 22, color: 'var(--navy)', fontWeight: 500 }}>{title}</h3>
-                <p style={{ margin: 0, fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.6, flex: 1 }}>{desc}</p>
-                <span style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: 600,
-                  letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--gold-deep)',
-                  borderTop: '1px solid var(--border)', paddingTop: 14, marginTop: 4 }}>
-                  {cta} →
-                </span>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* BANNER · ANUNCIE SEU IMÓVEL */}
-      <section style={{ padding: '0 0 clamp(3rem, 6vw, 5rem)', background: 'var(--white)' }}>
-        <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto' }}>
-          <div style={{ position: 'relative', borderRadius: 22, overflow: 'hidden',
-            background: `linear-gradient(110deg, rgba(27,39,51,0.92) 0%, rgba(27,39,51,0.55) 60%, transparent 100%), url(${window.__resources?.img16||'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80'})`,
-            backgroundSize: 'cover', backgroundPosition: 'center',
-            padding: 'clamp(48px, 6vw, 80px) clamp(32px, 5vw, 64px)',
-            display: 'flex', alignItems: 'center', minHeight: 320 }}>
-            <div style={{ maxWidth: 540, color: '#fff', position: 'relative', zIndex: 1 }}>
-              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.22em',
-                textTransform: 'uppercase', color: 'var(--gold-soft)', marginBottom: 14 }}>VN Prime · Anuncie</div>
-              <h2 style={{ color: '#fff', margin: '0 0 16px', fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', fontWeight: 400 }}>
-                Anuncie seu imóvel com a <em className="italic-accent" style={{ color: 'var(--gold-soft)' }}>maior curadoria</em> da Grande BH
-              </h2>
-              <p style={{ color: 'rgba(245,248,250,0.85)', fontSize: 15.5, lineHeight: 1.7, marginBottom: 24 }}>
-                Fotografia profissional, descrição editorial, mídia paga e curador dedicado. Você só paga quando vende.
-              </p>
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                <Btn variant="accent" size="lg" onClick={() => onNav('vender')}>Anunciar imóvel</Btn>
-                <Btn variant="ghostOnNavy" size="lg" onClick={() => onNav('vender')}>Ver planos</Btn>
+          {/* Carrossel */}
+          <div style={{ position: 'relative' }}>
+            {/* Seta esquerda */}
+            {serviceIdx > 0 && (
+              <button onClick={() => setServiceIdx(i => i - 1)} style={{
+                position: 'absolute', left: -20, top: '50%', transform: 'translateY(-50%)',
+                zIndex: 10, width: 44, height: 44, borderRadius: '50%',
+                background: '#fff', border: '1px solid var(--border)',
+                boxShadow: 'var(--shadow-soft)', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 18, color: 'var(--navy)',
+              }}>‹</button>
+            )}
+            {/* Seta direita */}
+            {serviceIdx < totalServicos - 1 && (
+              <button onClick={() => setServiceIdx(i => i + 1)} style={{
+                position: 'absolute', right: -20, top: '50%', transform: 'translateY(-50%)',
+                zIndex: 10, width: 44, height: 44, borderRadius: '50%',
+                background: '#fff', border: '1px solid var(--border)',
+                boxShadow: 'var(--shadow-soft)', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 18, color: 'var(--navy)',
+              }}>›</button>
+            )}
+
+            <div style={{ overflow: 'hidden', borderRadius: 20 }}>
+              <div style={{
+                display: 'flex',
+                transform: `translateX(-${serviceIdx * 100}%)`,
+                transition: 'transform 0.45s cubic-bezier(0.4,0,0.2,1)',
+              }}>
+                {SERVICOS.map((s, i) => (
+                  <div key={s.title} style={{ minWidth: '100%' }}>
+                    <div style={{
+                      display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0,
+                      borderRadius: 20, overflow: 'hidden',
+                      boxShadow: 'var(--shadow-soft)', minHeight: 420,
+                    }}>
+                      {/* Foto */}
+                      <div style={{
+                        backgroundImage: `linear-gradient(135deg, rgba(15,22,32,0.45) 0%, rgba(15,22,32,0.15) 100%), url(${s.img})`,
+                        backgroundSize: 'cover', backgroundPosition: 'center',
+                        position: 'relative', minHeight: 380,
+                      }}>
+                        <div style={{ position: 'absolute', inset: 0,
+                          background: `linear-gradient(to right, transparent 60%, rgba(255,255,255,1) 100%)` }} />
+                        <div style={{ position: 'absolute', bottom: 32, left: 32 }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
+                            textTransform: 'uppercase', color: '#fff', opacity: 0.8, marginBottom: 8 }}>
+                            {s.subtitle}
+                          </div>
+                          <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.6rem, 2.5vw, 2.2rem)',
+                            fontWeight: 600, color: '#fff', lineHeight: 1.2, maxWidth: '12ch' }}>
+                            {s.title}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Conteúdo */}
+                      <div style={{ background: '#fff', padding: 'clamp(28px, 4vw, 48px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                        <div style={{ width: 40, height: 3, background: s.accent, borderRadius: 2, marginBottom: 20 }} />
+                        <p style={{ fontSize: 15, color: 'var(--fg-2)', lineHeight: 1.75, marginBottom: 24, margin: '0 0 24px' }}>
+                          {s.desc}
+                        </p>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                          {s.bullets.map(b => (
+                            <li key={b} style={{ display: 'flex', alignItems: 'flex-start', gap: 10,
+                              fontSize: 13.5, color: 'var(--fg-1)', lineHeight: 1.5 }}>
+                              <span style={{ color: s.accent, fontWeight: 700, flexShrink: 0 }}>✓</span>
+                              {b}
+                            </li>
+                          ))}
+                        </ul>
+                        <div>
+                          <button onClick={() => onNav(s.route)} style={{
+                            background: s.accent, color: '#fff', border: 'none',
+                            borderRadius: 10, padding: '12px 24px',
+                            fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                            boxShadow: `0 6px 20px ${s.accent}44`,
+                          }}>{s.cta} →</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
+            </div>
+
+            {/* Dots */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 20 }}>
+              {SERVICOS.map((_, i) => (
+                <button key={i} onClick={() => setServiceIdx(i)} style={{
+                  width: i === serviceIdx ? 24 : 8, height: 8, borderRadius: 999,
+                  background: i === serviceIdx ? 'var(--gold)' : 'var(--border)',
+                  border: 'none', cursor: 'pointer', padding: 0,
+                  transition: 'width 0.3s, background 0.3s',
+                }} />
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* PLANOS strip — substitui Modalidades */}
-      <section style={{ padding: 'clamp(3rem, 6vw, 5rem) 0',
-        background: 'var(--gradient-navy-hero)', color: '#fff' }}>
-        <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto', textAlign: 'center' }}>
-          <Eyebrow>Nossos planos</Eyebrow>
-          <h2 style={{ color: '#fff', marginBottom: 16, fontWeight: 400 }}>
-            Escolha o plano que <em className="italic-accent" style={{ color: 'var(--gold-soft)' }}>combina com você</em>
-          </h2>
-          <p style={{ color: 'rgba(245,248,250,0.85)', maxWidth: 600, margin: '0 auto 36px' }}>
-            Você escolhe o nível de envolvimento da plataforma. Sem custo de entrada — só paga se vender.
-          </p>
-          <div style={{ display: 'grid', gap: 18,
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', maxWidth: 1100, margin: '0 auto' }}>
-            {[
-              ['Direta', 'Taxa fixa', 'R$ 297', 'Você conduz a venda. Plataforma, suporte e mídia inclusos.', (window.__resources?.img38||'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&q=80')],
-              ['Assistiva', '3%', 'sobre venda', 'Plataforma VN Prime + corretor parceiro acompanhando.', (window.__resources?.img39||'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=900&q=80')],
-              ['Completa', '6%', 'sobre venda', 'Curadoria total · concierge · vídeo · mídia paga.', (window.__resources?.img40||'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900&q=80')],
-            ].map(([name, big, sub, desc, img], i) => (
-              <div key={name} onClick={() => onNav('vender')} style={{
-                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: 16, overflow: 'hidden', textAlign: 'left', cursor: 'pointer',
-                transition: 'transform 0.25s, border-color 0.25s',
-              }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.borderColor = 'var(--gold)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; }}>
-                <div style={{ height: 140, backgroundImage: `linear-gradient(180deg, rgba(15,22,32,0) 30%, rgba(15,22,32,0.55) 100%), url(${img})`,
-                  backgroundSize: 'cover', backgroundPosition: 'center' }} />
-                <div style={{ padding: '22px 22px 24px' }}>
-                  <div style={{ fontFamily: 'DM Sans', fontSize: 11, fontWeight: 700,
-                    letterSpacing: '0.14em', textTransform: 'uppercase',
-                    color: 'var(--gold-soft)', marginBottom: 8 }}>Venda {name}</div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                    <div style={{ fontFamily: 'Playfair Display', fontSize: 32, fontWeight: 700,
-                      color: '#fff', lineHeight: 1 }}>{big}</div>
-                    <div style={{ fontSize: 12, opacity: 0.7 }}>{sub}</div>
+      {/* ── NOSSOS PLANOS — carrossel banner ── */}
+      <section id="home-planos" style={{ padding: 'clamp(3rem, 6vw, 5rem) 0', background: 'var(--cream)' }}>
+        <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto 40px' }}>
+            <Eyebrow color="var(--gold)">Para quem vende</Eyebrow>
+            <h2 style={{ margin: '0 0 12px' }}>Nossos <em className="italic-accent">planos</em></h2>
+            <p style={{ color: 'var(--fg-2)', margin: 0 }}>
+              Você escolhe o nível de envolvimento da plataforma. Sem custo de entrada — só paga se vender.
+            </p>
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            {planoIdx > 0 && (
+              <button onClick={() => setPlanoIdx(i => i - 1)} style={{
+                position: 'absolute', left: -20, top: '50%', transform: 'translateY(-50%)',
+                zIndex: 10, width: 48, height: 48, borderRadius: '50%',
+                background: '#fff', border: '1px solid var(--border)',
+                boxShadow: 'var(--shadow-soft)', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 20, color: 'var(--navy)',
+              }}>‹</button>
+            )}
+            {planoIdx < totalPlanos - 1 && (
+              <button onClick={() => setPlanoIdx(i => i + 1)} style={{
+                position: 'absolute', right: -20, top: '50%', transform: 'translateY(-50%)',
+                zIndex: 10, width: 48, height: 48, borderRadius: '50%',
+                background: '#fff', border: '1px solid var(--border)',
+                boxShadow: 'var(--shadow-soft)', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 20, color: 'var(--navy)',
+              }}>›</button>
+            )}
+
+            <div style={{ overflow: 'hidden', borderRadius: 22 }}>
+              <div style={{
+                display: 'flex',
+                transform: `translateX(-${planoIdx * 100}%)`,
+                transition: 'transform 0.45s cubic-bezier(0.4,0,0.2,1)',
+              }}>
+                {PLANOS.map((p, i) => (
+                  <div key={p.name} style={{ minWidth: '100%' }}>
+                    <div style={{
+                      position: 'relative', borderRadius: 22, overflow: 'hidden',
+                      minHeight: 440, display: 'flex', alignItems: 'center',
+                      backgroundImage: `linear-gradient(110deg, rgba(15,22,32,0.92) 0%, rgba(15,22,32,0.65) 45%, rgba(15,22,32,0.40) 100%), url(${p.img})`,
+                      backgroundSize: 'cover', backgroundPosition: 'center',
+                    }}>
+                      <div style={{ position: 'relative', zIndex: 1, padding: 'clamp(36px, 5vw, 64px)',
+                        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center',
+                        width: '100%' }}>
+                        {/* Esquerda — preço e info */}
+                        <div>
+                          <div style={{ display: 'inline-block', background: 'var(--gold)', color: 'var(--navy-deep)',
+                            borderRadius: 999, padding: '4px 14px', fontSize: 10.5,
+                            fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
+                            marginBottom: 20 }}>{p.tag}</div>
+                          <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem, 2.5vw, 2rem)',
+                            fontWeight: 600, color: '#fff', marginBottom: 8 }}>Plano {p.name}</div>
+                          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 16 }}>
+                            <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                              fontWeight: 700, color: 'var(--gold-soft)', lineHeight: 1 }}>{p.price}</div>
+                          </div>
+                          <div style={{ fontSize: 13, color: 'rgba(245,248,250,0.7)', marginBottom: 24 }}>{p.priceLabel}</div>
+                          <p style={{ fontSize: 15, color: 'rgba(245,248,250,0.88)', lineHeight: 1.75, margin: '0 0 28px' }}>
+                            {p.desc}
+                          </p>
+                          <button onClick={() => onNav('proprietario')} style={{
+                            background: 'var(--gold)', color: 'var(--navy-deep)',
+                            border: 'none', borderRadius: 10, padding: '14px 28px',
+                            fontWeight: 700, fontSize: 15, cursor: 'pointer',
+                          }}>{p.cta} →</button>
+                        </div>
+                        {/* Direita — bullets */}
+                        <div style={{ background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(12px)',
+                          border: '1px solid rgba(255,255,255,0.12)', borderRadius: 16, padding: '28px 28px' }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
+                            textTransform: 'uppercase', color: 'var(--gold-soft)', marginBottom: 18 }}>
+                            O que está incluso
+                          </div>
+                          <ul style={{ listStyle: 'none', padding: 0, margin: 0,
+                            display: 'flex', flexDirection: 'column', gap: 14 }}>
+                            {p.bullets.map(b => (
+                              <li key={b} style={{ display: 'flex', gap: 12, alignItems: 'flex-start',
+                                fontSize: 14, color: 'rgba(245,248,250,0.92)', lineHeight: 1.5 }}>
+                                <span style={{ color: 'var(--gold)', fontWeight: 700, flexShrink: 0, marginTop: 1 }}>✓</span>
+                                {b}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div style={{ fontSize: 13.5, color: 'rgba(250,249,246,0.85)', marginTop: 14, lineHeight: 1.5 }}>{desc}</div>
-                </div>
+                ))}
               </div>
-            ))}
+            </div>
+
+            {/* Dots planos */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 20 }}>
+              {PLANOS.map((_, i) => (
+                <button key={i} onClick={() => setPlanoIdx(i)} style={{
+                  width: i === planoIdx ? 28 : 8, height: 8, borderRadius: 999,
+                  background: i === planoIdx ? 'var(--gold)' : 'var(--border)',
+                  border: 'none', cursor: 'pointer', padding: 0,
+                  transition: 'width 0.3s, background 0.3s',
+                }} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── VITRINE / BANNER ANUNCIE — ao fundo ── */}
+      <section style={{ padding: 'clamp(3rem, 6vw, 5rem) 0', background: 'var(--white)' }}>
+        <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto' }}>
+          <div style={{ position: 'relative', borderRadius: 22, overflow: 'hidden',
+            background: `linear-gradient(110deg, rgba(15,22,32,0.94) 0%, rgba(15,22,32,0.60) 55%, rgba(15,22,32,0.35) 100%), url(${window.__resources?.img16||'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80'})`,
+            backgroundSize: 'cover', backgroundPosition: 'center',
+            padding: 'clamp(48px, 6vw, 80px) clamp(32px, 5vw, 64px)',
+            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center', minHeight: 340 }}>
+
+            {/* Esquerda — copy */}
+            <div style={{ color: '#fff', position: 'relative', zIndex: 1 }}>
+              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.22em',
+                textTransform: 'uppercase', color: 'var(--gold-soft)', marginBottom: 14 }}>VN Prime · Anuncie</div>
+              <h2 style={{ color: '#fff', margin: '0 0 16px', fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', fontWeight: 400 }}>
+                Anuncie seu imóvel na maior vitrine premium de{' '}
+                <em className="italic-accent" style={{ color: 'var(--gold-soft)' }}>Belo Horizonte e região</em>
+              </h2>
+              <p style={{ color: 'rgba(245,248,250,0.85)', fontSize: 15.5, lineHeight: 1.7, marginBottom: 28 }}>
+                Fotografia profissional, descrição editorial, mídia paga e corretor dedicado. Você só paga quando vende.
+              </p>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <Btn variant="accent" size="lg" onClick={() => onNav('proprietario')}>Anunciar imóvel</Btn>
+                <button onClick={() => {
+                  const el = document.getElementById('home-planos');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }} style={{
+                  background: 'rgba(255,255,255,0.1)', color: '#fff',
+                  border: '1px solid rgba(255,255,255,0.3)', borderRadius: 10,
+                  padding: '0.9rem 1.5rem', fontWeight: 600, fontSize: 15, cursor: 'pointer',
+                }}>Ver planos ↑</button>
+              </div>
+            </div>
+
+            {/* Direita — trust signals */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, position: 'relative', zIndex: 1 }}>
+              {[
+                ['🏆', 'Vitrine premium', 'Imóveis selecionados com rigor técnico e de mercado'],
+                ['📸', 'Fotos profissionais', 'Sessão fotográfica e tour virtual inclusos nos planos'],
+                ['📣', 'Mídia paga inclusa', 'Seu imóvel nos principais portais, Meta e Google'],
+                ['⚖️', 'Suporte jurídico', 'Da minuta até a escritura, o time VN Prime ao seu lado'],
+              ].map(([icon, title, desc]) => (
+                <div key={title} style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(255,255,255,0.12)', borderRadius: 14, padding: '18px 16px' }}>
+                  <div style={{ fontSize: 22, marginBottom: 8 }}>{icon}</div>
+                  <div style={{ fontWeight: 700, fontSize: 13, color: '#fff', marginBottom: 4 }}>{title}</div>
+                  <div style={{ fontSize: 12, color: 'rgba(245,248,250,0.7)', lineHeight: 1.5 }}>{desc}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -1828,15 +2054,15 @@ function HomePage({ onNav, density, accentMode }) {
 function SearchField({ label, children }) {
   return (
     <label style={{ display: 'flex', flexDirection: 'column', gap: 6, textAlign: 'left' }}>
-      <span style={{ fontFamily: 'DM Sans', fontSize: 10.5, fontWeight: 700,
-        letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-2)' }}>{label}</span>
+      <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em',
+        textTransform: 'uppercase', color: 'var(--fg-2)' }}>{label}</span>
       {children}
     </label>
   );
 }
 
 const inputStyle = {
-  fontFamily: 'DM Sans', fontSize: 14, color: 'var(--navy)',
+  fontFamily: 'var(--font-display)', fontSize: 14, color: 'var(--navy)',
   border: '1px solid var(--border)', borderRadius: 8,
   padding: '0.7rem 0.85rem', background: 'var(--cream)', outline: 'none',
   width: '100%',
