@@ -1202,11 +1202,11 @@ function Eyebrow({ children, color }) {
   );
 }
 
-// ImovelWeb-style operation tabs (Comprar / Alugar / Lançamentos)
+// ImovelWeb-style operation tabs (Comprar / Anuncie)
 function OperationTabs({ value, onChange }) {
   const tabs = [
-    { id: 'compra', label: 'Comprar' },
-    { id: 'lancamento', label: 'Lançamentos' },
+    { id: 'compra', label: 'Comprar', anuncie: false },
+    { id: 'anuncie', label: 'Anuncie', anuncie: true },
   ];
   return (
     <div style={{ display: 'inline-flex', background: 'rgba(245,248,250,0.10)',
@@ -1214,14 +1214,17 @@ function OperationTabs({ value, onChange }) {
       borderRadius: 999, padding: 5, gap: 4, border: '1px solid rgba(245,248,250,0.18)' }}>
       {tabs.map(t => {
         const active = value === t.id;
+        const isAnuncie = t.anuncie;
         return (
           <button key={t.id} onClick={() => onChange(t.id)}
             style={{
-              fontFamily: 'Inter, sans-serif', fontSize: 12.5, fontWeight: 500,
+              fontFamily: 'Inter, sans-serif', fontSize: 12.5, fontWeight: isAnuncie ? 700 : 500,
               padding: '0.6rem 1.3rem', borderRadius: 999, cursor: 'pointer', border: 'none',
-              background: active ? 'linear-gradient(135deg,#D4A857 0%,#B8862E 100%)' : 'transparent',
-              color: active ? 'var(--navy)' : 'rgba(245,248,250,0.78)',
-              letterSpacing: '0.04em',
+              background: active
+                ? 'linear-gradient(135deg,#D4A857 0%,#B8862E 100%)'
+                : isAnuncie ? 'rgba(212,168,87,0.18)' : 'transparent',
+              color: active ? 'var(--navy)' : isAnuncie ? '#D4A857' : 'rgba(245,248,250,0.78)',
+              letterSpacing: isAnuncie ? '0.06em' : '0.04em',
               transition: 'background 0.2s ease, color 0.2s ease',
             }}>{t.label}</button>
         );
@@ -1572,6 +1575,9 @@ Object.assign(window, { ListingCard });
 function HomePage({ onNav, density, accentMode }) {
   const [op, setOp] = useState('compra');
   const [filters, setFilters] = useState({ q: '', tipo: '', valorMax: '' });
+  const [showSaveSearch, setShowSaveSearch] = useState(false);
+  const [saveEmail, setSaveEmail] = useState('');
+  const [searchSaved, setSearchSaved] = useState(false);
   const [heroIdx, setHeroIdx] = useState(0);
   const [serviceIdx, setServiceIdx] = useState(0);
   const [planoIdx, setPlanoIdx] = useState(0);
@@ -1719,7 +1725,10 @@ function HomePage({ onNav, density, accentMode }) {
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
-            <OperationTabs value={op} onChange={setOp} />
+            <OperationTabs value={op} onChange={(v) => {
+              if (v === 'anuncie') onNav('vender');
+              else setOp(v);
+            }} />
           </div>
 
           <div style={{
@@ -1751,6 +1760,40 @@ function HomePage({ onNav, density, accentMode }) {
               </select>
             </SearchField>
             <Btn variant="accent" size="lg" onClick={onSearch}>Buscar</Btn>
+          </div>
+
+          {/* Save search by email */}
+          <div style={{ textAlign: 'center', marginTop: 14 }}>
+            {!showSaveSearch && !searchSaved && (
+              <button onClick={() => setShowSaveSearch(true)}
+                style={{ background: 'none', border: 'none', color: 'rgba(245,248,250,0.72)',
+                  fontSize: 13, cursor: 'pointer', textDecoration: 'underline', textDecorationStyle: 'dashed',
+                  fontFamily: 'Inter, sans-serif' }}>
+                ✉ Receber alertas desta busca por e-mail
+              </button>
+            )}
+            {showSaveSearch && !searchSaved && (
+              <div style={{ display: 'inline-flex', gap: 8, alignItems: 'center',
+                background: 'rgba(255,255,255,0.1)', borderRadius: 12,
+                padding: '8px 12px', backdropFilter: 'blur(8px)', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <input type="email" placeholder="seu@email.com" value={saveEmail}
+                  onChange={(e) => setSaveEmail(e.target.value)}
+                  style={{ padding: '7px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.3)',
+                    background: 'rgba(255,255,255,0.12)', color: '#fff', fontSize: 13,
+                    fontFamily: 'Inter, sans-serif', outline: 'none', width: 200 }} />
+                <Btn variant="accent" size="sm" onClick={() => { if (saveEmail.includes('@')) setSearchSaved(true); }}>
+                  Salvar alerta
+                </Btn>
+                <button onClick={() => setShowSaveSearch(false)}
+                  style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.6)',
+                    cursor: 'pointer', fontSize: 18, lineHeight: 1 }}>×</button>
+              </div>
+            )}
+            {searchSaved && (
+              <span style={{ color: '#6EE7B7', fontSize: 13, fontFamily: 'Inter, sans-serif' }}>
+                ✓ Alerta salvo para {saveEmail}
+              </span>
+            )}
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: 28, marginTop: 36, flexWrap: 'wrap' }}>
@@ -2818,6 +2861,17 @@ function PropertyDetailPage({ id, onNav }) {
 }
 
 function ContactModal({ listing, onClose }) {
+  const [nome, setNome] = React.useState('');
+  const [wpp, setWpp] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [msg, setMsg] = React.useState(`Olá, tenho interesse no imóvel ${listing.codigo}...`);
+  const [sent, setSent] = React.useState(false);
+
+  const handleSend = () => {
+    if (!nome.trim() || !wpp.trim()) return;
+    setSent(true);
+  };
+
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200,
       background: 'rgba(15,34,68,0.6)', backdropFilter: 'blur(4px)',
@@ -2826,18 +2880,43 @@ function ContactModal({ listing, onClose }) {
       <div style={{ background: '#fff', borderRadius: 22, padding: '32px',
         maxWidth: 480, width: '100%', boxShadow: '0 18px 50px rgba(15,34,68,0.3)' }}
         onClick={(e) => e.stopPropagation()}>
-        <Eyebrow color="var(--gold)">Falar com curador · {listing.codigo}</Eyebrow>
-        <h3 style={{ margin: '4px 0 16px' }}>Vamos agendar uma conversa?</h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <input placeholder="Seu nome completo" style={{ ...inputStyle, padding: '0.75rem 0.9rem' }} />
-          <input placeholder="WhatsApp" style={{ ...inputStyle, padding: '0.75rem 0.9rem' }} />
-          <input placeholder="E-mail" style={{ ...inputStyle, padding: '0.75rem 0.9rem' }} />
-          <textarea placeholder={`Olá, tenho interesse no imóvel ${listing.codigo}...`}
-            style={{ ...inputStyle, padding: '0.75rem 0.9rem', minHeight: 80, resize: 'vertical' }} />
-          <Btn variant="accent" fullWidth>Enviar mensagem</Btn>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--fg-2)',
-            cursor: 'pointer', fontFamily: 'DM Sans', fontSize: 13, marginTop: 4 }}>Cancelar</button>
-        </div>
+        {sent ? (
+          <div style={{ textAlign: 'center', padding: '12px 0' }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
+            <h3 style={{ margin: '0 0 10px' }}>Mensagem enviada!</h3>
+            <p style={{ color: 'var(--fg-2)', fontSize: 15, marginBottom: 20 }}>
+              Nossa equipe entrará em contato pelo WhatsApp em até 1h útil.
+            </p>
+            <a href={`https://wa.me/5531984144250?text=${encodeURIComponent(`Olá! Tenho interesse no imóvel ${listing.codigo}. ${msg}`)}`}
+               target="_blank" rel="noopener"
+               style={{ display: 'inline-block', background: '#25D366', color: '#fff',
+                 padding: '10px 22px', borderRadius: 999, fontWeight: 700, fontSize: 14,
+                 textDecoration: 'none', marginBottom: 12 }}>Falar agora no WhatsApp</a>
+            <br />
+            <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--fg-2)',
+              cursor: 'pointer', fontSize: 13, marginTop: 8 }}>Fechar</button>
+          </div>
+        ) : (
+          <>
+            <Eyebrow color="var(--gold)">Falar com curador · {listing.codigo}</Eyebrow>
+            <h3 style={{ margin: '4px 0 16px' }}>Vamos agendar uma conversa?</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <input placeholder="Seu nome completo *" value={nome} onChange={(e) => setNome(e.target.value)}
+                style={{ ...inputStyle, padding: '0.75rem 0.9rem' }} />
+              <input placeholder="WhatsApp *" value={wpp} onChange={(e) => setWpp(e.target.value)}
+                style={{ ...inputStyle, padding: '0.75rem 0.9rem' }} />
+              <input placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)}
+                style={{ ...inputStyle, padding: '0.75rem 0.9rem' }} />
+              <textarea placeholder={`Olá, tenho interesse no imóvel ${listing.codigo}...`}
+                value={msg} onChange={(e) => setMsg(e.target.value)}
+                style={{ ...inputStyle, padding: '0.75rem 0.9rem', minHeight: 80, resize: 'vertical' }} />
+              <Btn variant="accent" fullWidth onClick={handleSend}
+                style={{ opacity: (nome.trim() && wpp.trim()) ? 1 : 0.5 }}>Enviar mensagem</Btn>
+              <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--fg-2)',
+                cursor: 'pointer', fontFamily: 'DM Sans', fontSize: 13, marginTop: 4 }}>Cancelar</button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -3060,6 +3139,166 @@ Object.assign(window, { VenderHubPage });
 <script type="text/babel">// Corretor portal & Incorporadora landing — placeholder hi-fi pages
 
 // ============================================================
+// PORTAL LOGIN GATE — tela de entrada para cada portal
+// ============================================================
+function PortalLoginGate({ title, desc, img, accent, role, onAuth, onNav, children }) {
+  const [email, setEmail] = React.useState('');
+  const [senha, setSenha] = React.useState('');
+  const [mode, setMode] = React.useState('login'); // login | cadastro
+
+  const navy = 'var(--navy)';
+  const focusStyle = (e) => { e.target.style.borderColor = accent; e.target.style.boxShadow = `0 0 0 4px ${accent}22`; };
+  const blurStyle = (e) => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'none'; };
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr',
+      minHeight: 'calc(100vh - 80px)' }}>
+
+      {/* LEFT — hero */}
+      <div style={{
+        backgroundImage: `linear-gradient(160deg, rgba(15,22,32,0.88) 0%, rgba(15,22,32,0.65) 100%), url(${img})`,
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        padding: 'clamp(40px, 5vw, 72px)',
+        display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+        color: '#fff',
+      }}>
+        <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.24em',
+          textTransform: 'uppercase', color: accent }}>VN Prime · {title}</div>
+        <div>
+          <h1 style={{ color: '#fff', fontSize: 'clamp(2rem, 3.4vw, 3rem)',
+            margin: '0 0 18px', lineHeight: 1.1, fontWeight: 800, letterSpacing: '-0.03em' }}>
+            {title}
+          </h1>
+          <p style={{ color: 'rgba(245,248,250,0.85)', fontSize: 16, lineHeight: 1.6, margin: 0 }}>
+            {desc}
+          </p>
+          {children && <div style={{ marginTop: 28 }}>{children}</div>}
+        </div>
+        <div style={{ display: 'flex', gap: 28, fontSize: 13,
+          color: 'rgba(245,248,250,0.65)', flexWrap: 'wrap' }}>
+          <span><b style={{ color: '#fff' }}>142</b> imóveis curados</span>
+          <span><b style={{ color: '#fff' }}>R$ 4,2 bi</b> em portfólio</span>
+          <span><b style={{ color: '#fff' }}>96%</b> satisfação</span>
+        </div>
+      </div>
+
+      {/* RIGHT — form */}
+      <div style={{ background: 'var(--white)', padding: 'clamp(40px, 5vw, 72px)',
+        display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div style={{ maxWidth: 400, width: '100%', margin: '0 auto' }}>
+
+          {/* Mode switcher */}
+          <div style={{ display: 'flex', background: 'var(--surface-tint)',
+            borderRadius: 999, padding: 4, marginBottom: 32, gap: 4 }}>
+            {[['login', 'Entrar'], ['cadastro', 'Criar conta']].map(([k, lbl]) => (
+              <button key={k} onClick={() => setMode(k)} style={{
+                flex: 1, padding: '10px 16px', borderRadius: 999, border: 'none',
+                background: mode === k ? 'var(--white)' : 'transparent',
+                color: mode === k ? navy : 'var(--fg-2)',
+                fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14,
+                cursor: 'pointer', boxShadow: mode === k ? 'var(--shadow-card)' : 'none',
+                transition: 'all 0.2s',
+              }}>{lbl}</button>
+            ))}
+          </div>
+
+          <h2 style={{ margin: '0 0 6px', fontSize: 26, fontWeight: 800, letterSpacing: '-0.025em' }}>
+            {mode === 'cadastro' ? 'Crie sua conta' : 'Bem-vindo de volta'}
+          </h2>
+          <p style={{ color: 'var(--fg-2)', fontSize: 14, margin: '0 0 26px' }}>
+            {mode === 'cadastro' ? 'Preencha os dados para acessar o portal.' : `Acesse o ${title}.`}
+          </p>
+
+          {mode === 'cadastro' && (
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700,
+                letterSpacing: '0.07em', textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 6 }}>Nome</label>
+              <input type="text" placeholder="Seu nome completo"
+                style={{ width: '100%', padding: '12px 14px', borderRadius: 10,
+                  border: '1.5px solid var(--border)', fontFamily: 'var(--font-body)',
+                  fontSize: 15, color: navy, outline: 'none', boxSizing: 'border-box' }}
+                onFocus={focusStyle} onBlur={blurStyle} />
+            </div>
+          )}
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700,
+              letterSpacing: '0.07em', textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 6 }}>E-mail</label>
+            <input type="email" placeholder="seu@email.com" value={email} onChange={e => setEmail(e.target.value)}
+              style={{ width: '100%', padding: '12px 14px', borderRadius: 10,
+                border: '1.5px solid var(--border)', fontFamily: 'var(--font-body)',
+                fontSize: 15, color: navy, outline: 'none', boxSizing: 'border-box' }}
+              onFocus={focusStyle} onBlur={blurStyle} />
+          </div>
+          <div style={{ marginBottom: mode === 'login' ? 6 : 22 }}>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700,
+              letterSpacing: '0.07em', textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 6 }}>Senha</label>
+            <input type="password" placeholder="••••••••" value={senha} onChange={e => setSenha(e.target.value)}
+              style={{ width: '100%', padding: '12px 14px', borderRadius: 10,
+                border: '1.5px solid var(--border)', fontFamily: 'var(--font-body)',
+                fontSize: 15, color: navy, outline: 'none', boxSizing: 'border-box' }}
+              onFocus={focusStyle} onBlur={blurStyle} />
+          </div>
+          {mode === 'login' && (
+            <div style={{ textAlign: 'right', marginBottom: 20 }}>
+              <a style={{ fontSize: 12.5, color: 'var(--gold-deep)', fontWeight: 600,
+                cursor: 'pointer' }}>Esqueci minha senha</a>
+            </div>
+          )}
+
+          <button onClick={onAuth} style={{
+            width: '100%', padding: '14px 24px', borderRadius: 10, border: 'none',
+            background: `linear-gradient(135deg, ${accent} 0%, ${accent}cc 100%)`,
+            color: navy, fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 15,
+            cursor: 'pointer', marginBottom: 22, boxShadow: `0 6px 24px ${accent}44`,
+          }}>{mode === 'cadastro' ? 'Criar minha conta' : 'Entrar no portal'}</button>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14,
+            margin: '0 0 20px', color: 'var(--fg-3)', fontSize: 12, fontWeight: 600 }}>
+            <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />OU
+            <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+          </div>
+
+          {/* Social logins */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
+            <button onClick={onAuth} style={{
+              width: '100%', padding: '12px 16px', borderRadius: 10,
+              border: '1.5px solid var(--border)', background: 'var(--white)',
+              fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14,
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+              <svg width="18" height="18" viewBox="0 0 18 18">
+                <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.84 2.08-1.79 2.72v2.26h2.9c1.69-1.56 2.66-3.85 2.66-6.62z"/>
+                <path fill="#34A853" d="M9 18c2.43 0 4.46-.8 5.95-2.18l-2.9-2.26c-.81.54-1.83.86-3.05.86-2.34 0-4.32-1.58-5.03-3.71H1v2.33C2.49 15.98 5.5 18 9 18z"/>
+                <path fill="#FBBC04" d="M3.97 10.71A5.41 5.41 0 0 1 3.68 9c0-.59.1-1.17.29-1.71V4.96H1A8.997 8.997 0 0 0 0 9c0 1.45.35 2.83.96 4.04l3.01-2.33z"/>
+                <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.5 0 2.49 2.02 1 4.96l2.97 2.33C4.68 5.16 6.66 3.58 9 3.58z"/>
+              </svg>
+              Continuar com Google
+            </button>
+            <button onClick={onAuth} style={{
+              width: '100%', padding: '12px 16px', borderRadius: 10,
+              border: '1.5px solid var(--border)', background: 'var(--white)',
+              fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14,
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.07c1.39.07 2.34.74 3.15.8 1.19-.24 2.35-.93 3.64-.84 1.55.12 2.71.72 3.46 1.86-3.19 1.88-2.43 6.06.52 7.21-.61 1.5-1.42 2.94-2.77 4.18M12.03 7c-.16-2.55 1.95-4.7 4.29-4.97.37 2.8-2.32 5.05-4.29 4.97z"/>
+              </svg>
+              Continuar com Apple
+            </button>
+          </div>
+
+          <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--fg-2)' }}>
+            {mode === 'login' ? 'Não tem conta? ' : 'Já tem conta? '}
+            <a onClick={() => setMode(mode === 'login' ? 'cadastro' : 'login')}
+              style={{ color: 'var(--gold-deep)', fontWeight: 700, cursor: 'pointer' }}>
+              {mode === 'login' ? 'Criar conta' : 'Entrar'}
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
 // PORTAL SHELL — layout base compartilhado pelos 4 portais
 // ============================================================
 function PortalShell({ title, accent = 'var(--gold)', navItems, active, onSection, onNav, children }) {
@@ -3141,8 +3380,27 @@ function PortalSection({ title, action, children }) {
 // PORTAL DO CORRETOR — dashboard operacional
 // ============================================================
 function CorretorPage({ onNav }) {
+  const [auth, setAuth] = React.useState(false);
   const [sec, setSec] = React.useState('dashboard');
   const accent = '#10B981';
+
+  if (!auth) return (
+    <PortalLoginGate
+      title="Portal do Corretor"
+      desc="Acesso ao portfólio premium, leads qualificados, CRM e comissões. Para corretores autônomos e imobiliárias parceiras."
+      img={window.__resources?.img70||'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1200&q=85'}
+      accent={accent} role="corretor"
+      onAuth={() => setAuth(true)} onNav={onNav}>
+      <div style={{ display: 'flex', gap: 24 }}>
+        {[['23', 'Leads/mês'], ['82%', 'Fechamento'], ['R$ 49,90', 'Mensalidade']].map(([n, l]) => (
+          <div key={l}>
+            <div style={{ fontSize: 24, fontWeight: 800, color: accent }}>{n}</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{l}</div>
+          </div>
+        ))}
+      </div>
+    </PortalLoginGate>
+  );
 
   const leads = [
     { id: 1, nome: 'André Carvalho', imovel: 'Cobertura · Belvedere', valor: 'R$ 3,2M', status: 'Visita agendada', data: '14/05', telefone: '(31) 9 8811-2234' },
@@ -3200,7 +3458,7 @@ function CorretorPage({ onNav }) {
         <div style={{ display: 'flex', gap: 10 }}>
           <button style={{ padding: '9px 18px', background: `${accent}22`, color: accent,
             border: `1px solid ${accent}44`, borderRadius: 8, fontFamily: 'var(--font-body)',
-            fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Solicitar leads</button>
+            fontSize: 13, fontWeight: 600, cursor: 'pointer' }} onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Solicitar leads</button>
           <button onClick={() => onNav('busca')} style={{ padding: '9px 18px', background: 'rgba(255,255,255,0.08)',
             color: '#fff', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8,
             fontFamily: 'var(--font-body)', fontSize: 13, cursor: 'pointer' }}>Ver portfólio</button>
@@ -3472,6 +3730,7 @@ function CorretorPage({ onNav }) {
 }
 
 function IncorporadoraPage({ onNav }) {
+  const [auth, setAuth] = React.useState(false);
   const [tab, setTab] = React.useState('overview');
   const [formData, setFormData] = React.useState({
     nome: '', bairro: '', tipo: 'Residencial', unidades: '', area: '', preco: '', descricao: '',
@@ -3502,6 +3761,24 @@ function IncorporadoraPage({ onNav }) {
   const statusColor = s => s === 'Novo' ? { bg: '#EBF5FB', fg: '#2563EB' }
     : s === 'Proposta' ? { bg: `${accent}18`, fg: accent }
     : { bg: '#F0FDF4', fg: '#059669' };
+
+  if (!auth) return (
+    <PortalLoginGate
+      title="Portal da Incorporadora"
+      desc="Lance empreendimentos, gerencie leads qualificados e acompanhe o VGV ativo. Portal exclusivo para incorporadoras e construtoras."
+      img={window.__resources?.img30||'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&q=85'}
+      accent={accent} role="incorporadora"
+      onAuth={() => setAuth(true)} onNav={onNav}>
+      <div style={{ display: 'flex', gap: 24 }}>
+        {[['2', 'Empreendimentos'], ['34', 'Leads'], ['R$ 28M', 'VGV ativo']].map(([n, l]) => (
+          <div key={l}>
+            <div style={{ fontSize: 24, fontWeight: 800, color: accent }}>{n}</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{l}</div>
+          </div>
+        ))}
+      </div>
+    </PortalLoginGate>
+  );
 
   const incNavItems = [
     { id: 'overview', icon: '◈', label: 'Visão Geral' },
@@ -4424,8 +4701,27 @@ Object.assign(window, { AnunciarPage });
 // PORTAL DO PROPRIETÁRIO — dashboard operacional
 // ============================================================
 function ProprietarioPage({ onNav }) {
+  const [auth, setAuth] = React.useState(false);
   const [sec, setSec] = React.useState('dashboard');
   const accent = 'var(--gold)';
+
+  if (!auth) return (
+    <PortalLoginGate
+      title="Portal do Proprietário"
+      desc="Anuncie seu imóvel, gerencie leads e visitas, acompanhe o desempenho do anúncio. Você no controle, da publicação ao fechamento."
+      img={window.__resources?.img60||'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=85'}
+      accent="#D4A857" role="proprietario"
+      onAuth={() => setAuth(true)} onNav={onNav}>
+      <div style={{ display: 'flex', gap: 24 }}>
+        {[['R$ 297', 'Taxa fixa'], ['0%', 'Comissão'], ['18 dias', 'Venda média']].map(([n, l]) => (
+          <div key={l}>
+            <div style={{ fontSize: 24, fontWeight: 800, color: '#D4A857' }}>{n}</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{l}</div>
+          </div>
+        ))}
+      </div>
+    </PortalLoginGate>
+  );
 
   const listing = {
     titulo: 'Cobertura duplex · Belvedere', preco: 'R$ 3.200.000',
@@ -4751,7 +5047,7 @@ function _ProprietarioPageOLD({ onNav }) {
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <Btn variant="accent" size="lg" onClick={() => onNav('anunciar')}>Anunciar agora</Btn>
-            <Btn variant="ghost-light" size="lg">Falar com consultor</Btn>
+            <Btn variant="ghost-light" size="lg" onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Falar com consultor</Btn>
           </div>
           <div style={{ marginTop: 36, display: 'flex', gap: 36, flexWrap: 'wrap' }}>
             {[['R$ 297', 'taxa fixa'], ['18 dias', 'venda média'], ['0%', 'comissão']].map(([n,l]) => (
@@ -4867,8 +5163,27 @@ Object.assign(window, { ProprietarioPage });
 // PORTAL DO FOTÓGRAFO — dashboard operacional
 // ============================================================
 function FotografoPage({ onNav }) {
+  const [auth, setAuth] = React.useState(false);
   const [sec, setSec] = React.useState('dashboard');
   const accent = '#D4A857';
+
+  if (!auth) return (
+    <PortalLoginGate
+      title="Portal do Fotógrafo"
+      desc="Gerencie seus jobs, agenda, portfólio e pagamentos. Para fotógrafos credenciados VN Prime em imóveis de alto padrão."
+      img={window.__resources?.img67||'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=85'}
+      accent={accent} role="fotografo"
+      onAuth={() => setAuth(true)} onNav={onNav}>
+      <div style={{ display: 'flex', gap: 24 }}>
+        {[['40+', 'Jobs/mês'], ['R$ 390–1.190', 'Por sessão'], ['48h', 'Entrega']].map(([n, l]) => (
+          <div key={l}>
+            <div style={{ fontSize: 22, fontWeight: 800, color: accent }}>{n}</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{l}</div>
+          </div>
+        ))}
+      </div>
+    </PortalLoginGate>
+  );
 
   const jobs = [
     { id: 1, imovel: 'Cobertura · Belvedere', endereco: 'R. Érico Veríssimo, 450 · BH', data: '14/05/2026', hora: '09h00', pacote: 'Premium · Drone', valor: 'R$ 1.190', status: 'Agendado' },
@@ -5192,8 +5507,8 @@ function _FotografoPageOLD({ onNav }) {
             Equipe especializada em fotografia imobiliária, tour virtual 360°, drone e vídeo cinematográfico. Atendemos toda a Grande BH.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <Btn variant="accent" size="lg" onClick={() => onNav('home')}>Agendar sessão</Btn>
-            <Btn variant="ghost-light" size="lg">Ver portfólio</Btn>
+            <Btn variant="accent" size="lg" onClick={() => onNav('fotografo')}>Agendar sessão</Btn>
+            <Btn variant="ghost-light" size="lg" onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Ver portfólio</Btn>
           </div>
         </div>
       </section>
@@ -5264,7 +5579,7 @@ function _FotografoPageOLD({ onNav }) {
                   ))}
                 </ul>
                 <Btn variant={p.destaque ? 'accent' : 'primary'} size="md"
-                  style={{ width: '100%' }}>Contratar {p.nome}</Btn>
+                  style={{ width: '100%' }} onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Contratar {p.nome}</Btn>
               </div>
             ))}
           </div>
@@ -5278,15 +5593,34 @@ function _FotografoPageOLD({ onNav }) {
 // CONSÓRCIO — carta de crédito imobiliário
 // ============================================================
 function ConsorcioPage({ onNav }) {
-  const planos = [
-    { id: 'p120', credito: 'R$ 120.000', parcela: 'R$ 690', prazo: '180 meses' },
-    { id: 'p250', credito: 'R$ 250.000', parcela: 'R$ 1.420', prazo: '200 meses', destaque: true },
-    { id: 'p500', credito: 'R$ 500.000', parcela: 'R$ 2.790', prazo: '220 meses' },
-    { id: 'p1m', credito: 'R$ 1.000.000', parcela: 'R$ 5.480', prazo: '240 meses' },
-  ];
+  const { useState: useSt } = React;
+  const [credito, setCredito] = useSt(250000);
+  const [prazo, setPrazo] = useSt(200);
+  const [nome, setNome] = useSt('');
+  const [cpf, setCpf] = useSt('');
+  const [tel, setTel] = useSt('');
+  const [email, setEmail] = useSt('');
+  const [enviado, setEnviado] = useSt(false);
+
+  const TAX = 0.17;
+  const totalPagar = credito * (1 + TAX);
+  const parcela = totalPagar / prazo;
+  const economia = credito * 0.38; // economia típica vs financiamento
+
+  const fmt = (n) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+  const pctFmt = (v, max) => `${Math.round((v / max) * 100)}%`;
+
+  const prazos = [120, 150, 180, 200, 220, 240];
+  const canSubmit = nome.trim() && email.trim() && tel.trim();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setEnviado(true);
+  };
 
   return (
     <main style={{ background: 'var(--cream)' }}>
+      {/* HERO */}
       <section style={{
         position: 'relative',
         background: `linear-gradient(180deg, rgba(15,22,32,0.6) 0%, rgba(15,22,32,0.9) 100%), url(${window.__resources?.img68||'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1900&q=85'})`,
@@ -5299,25 +5633,24 @@ function ConsorcioPage({ onNav }) {
             Compre seu imóvel <em className="italic-accent" style={{ color: 'var(--gold-soft)' }}>sem juros</em>.
           </h1>
           <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.88)', maxWidth: 560, marginBottom: 28 }}>
-            Carta de crédito de R$ 120 mil a R$ 1,5 milhão. Use como entrada, lance, ou compra à vista — paga à vista, paga melhor.
+            Carta de crédito de R$ 120 mil a R$ 2 milhões. Use como entrada, lance ou compra à vista — paga à vista, paga melhor.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <Btn variant="accent" size="lg">Simular minha cota</Btn>
-            <Btn variant="ghost-light" size="lg">Falar com consultor</Btn>
+            <Btn variant="accent" size="lg" onClick={() => document.getElementById('simulador-consorcio')?.scrollIntoView({ behavior: 'smooth' })}>Simular minha cota</Btn>
+            <Btn variant="ghost-light" size="lg" onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Falar com consultor</Btn>
           </div>
         </div>
       </section>
 
-      {/* Diferenciais */}
+      {/* DIFERENCIAIS */}
       <section style={{ padding: 'clamp(50px, 7vw, 90px) 0' }}>
         <div style={{ width: 'min(1180px, 92vw)', margin: '0 auto' }}>
-          <div style={{ display: 'grid', gap: 24,
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
+          <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
             {[
-              { t: 'Sem juros', d: 'Apenas taxa de administração. Você não paga juros bancários — economia de até 40% vs financiamento.' },
-              { t: 'Lance livre', d: 'Use FGTS, recursos próprios ou parcelas adiantadas para antecipar a contemplação.' },
-              { t: 'Carta forte', d: 'Compra à vista para o vendedor. Posição de negociação superior a financiamento bancário.' },
-              { t: 'Use como entrada', d: 'Combine sua carta com financiamento para imóveis de maior valor. Sem burocracia adicional.' },
+              { t: 'Sem juros', d: 'Apenas taxa de administração. Economia de até 38% comparado ao financiamento bancário.' },
+              { t: 'Lance livre', d: 'Use FGTS, recursos próprios ou parcelas adiantadas para antecipar sua contemplação.' },
+              { t: 'Carta forte', d: 'Poder de compra à vista para o vendedor — posição de negociação superior ao financiado.' },
+              { t: 'Use como entrada', d: 'Combine carta com financiamento para imóveis de maior valor. Sem burocracia adicional.' },
             ].map(d => (
               <div key={d.t} style={{ padding: '4px 0' }}>
                 <div style={{ width: 36, height: 3, background: 'var(--gold)', marginBottom: 16 }} />
@@ -5329,45 +5662,143 @@ function ConsorcioPage({ onNav }) {
         </div>
       </section>
 
-      {/* Tabela de planos */}
-      <section style={{ padding: 'clamp(50px, 7vw, 90px) 0', background: '#fff' }}>
-        <div style={{ width: 'min(1180px, 92vw)', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <Eyebrow color="var(--gold-deep)">Cartas disponíveis</Eyebrow>
-            <h2 style={{ margin: '8px 0' }}>Simulações de referência</h2>
-            <p style={{ color: 'var(--fg-2)', fontSize: 15, marginTop: 8 }}>
-              Valores aproximados · taxa de administração de 17% · sem juros
-            </p>
+      {/* SIMULADOR INTERATIVO */}
+      <section id="simulador-consorcio" style={{ padding: 'clamp(60px, 8vw, 100px) 0', background: '#fff' }}>
+        <div style={{ width: 'min(1100px, 92vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <Eyebrow color="var(--gold-deep)">Simulador</Eyebrow>
+            <h2 style={{ margin: '8px 0 10px' }}>Quanto você quer de carta de crédito?</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 15 }}>Ajuste os valores e veja sua parcela estimada em tempo real · sem juros</p>
           </div>
-          <div style={{ display: 'grid', gap: 14,
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
-            {planos.map(p => (
-              <div key={p.id} style={{
-                background: p.destaque ? 'var(--gradient-navy-hero)' : 'var(--cream-tint)',
-                color: p.destaque ? '#fff' : 'var(--navy)',
-                padding: 26, borderRadius: 'var(--radius-lg)',
-                border: p.destaque ? 'none' : '1px solid var(--border)',
-                position: 'relative',
-              }}>
-                {p.destaque && <div style={{ position: 'absolute', top: -10, right: 18,
-                  background: 'var(--gold)', color: 'var(--navy-deep)', padding: '3px 10px',
-                  borderRadius: 999, fontSize: 10, fontWeight: 700, letterSpacing: '0.1em',
-                  textTransform: 'uppercase' }}>Popular</div>}
-                <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.14em',
-                  textTransform: 'uppercase', color: p.destaque ? 'var(--gold-soft)' : 'var(--gold-deep)',
-                  marginBottom: 8 }}>Carta de</div>
-                <div style={{ fontSize: 28, fontWeight: 800, fontFamily: 'var(--font-display)',
-                  letterSpacing: '-0.02em', marginBottom: 16 }}>{p.credito}</div>
-                <div style={{ borderTop: p.destaque ? '1px solid rgba(255,255,255,0.15)' : '1px solid var(--border)',
-                  paddingTop: 14, marginBottom: 6, fontSize: 13,
-                  color: p.destaque ? 'rgba(255,255,255,0.7)' : 'var(--fg-2)' }}>parcela a partir de</div>
-                <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>{p.parcela}</div>
-                <div style={{ fontSize: 13, color: p.destaque ? 'rgba(255,255,255,0.7)' : 'var(--fg-2)',
-                  marginBottom: 16 }}>{p.prazo}</div>
-                <Btn variant={p.destaque ? 'accent' : 'primary'} size="sm"
-                  style={{ width: '100%' }}>Quero esta carta</Btn>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'start' }}>
+            {/* COLUNA ESQUERDA — sliders */}
+            <div>
+              {/* Slider crédito */}
+              <div style={{ marginBottom: 32 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-2)' }}>Valor da carta</span>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 800, color: 'var(--navy)', letterSpacing: '-0.02em' }}>{fmt(credito)}</span>
+                </div>
+                <div style={{ position: 'relative', height: 6, background: 'var(--border)', borderRadius: 999, margin: '8px 0 6px' }}>
+                  <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', borderRadius: 999,
+                    background: 'linear-gradient(90deg, #D4A857, #B8862E)',
+                    width: pctFmt(credito - 120000, 2000000 - 120000) }} />
+                </div>
+                <input type="range" min={120000} max={2000000} step={10000} value={credito}
+                  onChange={(e) => setCredito(Number(e.target.value))}
+                  style={{ width: '100%', accentColor: '#D4A857', cursor: 'pointer' }} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginTop: 2 }}>
+                  <span>R$ 120k</span><span>R$ 2M</span>
+                </div>
               </div>
-            ))}
+
+              {/* Prazo */}
+              <div style={{ marginBottom: 32 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-2)' }}>Prazo</span>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--navy)' }}>{prazo} meses</span>
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {prazos.map(p => (
+                    <button key={p} onClick={() => setPrazo(p)}
+                      style={{
+                        padding: '7px 16px', borderRadius: 999, border: '1.5px solid',
+                        borderColor: prazo === p ? 'var(--gold)' : 'var(--border)',
+                        background: prazo === p ? 'linear-gradient(135deg,#D4A857,#B8862E)' : '#fff',
+                        color: prazo === p ? 'var(--navy)' : 'var(--fg-1)',
+                        fontWeight: prazo === p ? 700 : 500, fontSize: 13,
+                        cursor: 'pointer', transition: 'all 0.15s',
+                      }}>{p} m</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Resumo */}
+              <div style={{ background: 'var(--cream-tint)', borderRadius: 'var(--radius-lg)', padding: 22, border: '1px solid var(--border)' }}>
+                {[
+                  ['Carta de crédito', fmt(credito)],
+                  ['Taxa de administração (17%)', fmt(credito * TAX)],
+                  ['Total a pagar', fmt(totalPagar)],
+                  ['Economia vs financiamento', `~${fmt(economia)}`],
+                ].map(([l, v], i) => (
+                  <div key={l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+                    padding: '8px 0', borderBottom: i < 3 ? '1px solid var(--border)' : 'none' }}>
+                    <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>{l}</span>
+                    <span style={{ fontSize: 14, fontWeight: i === 3 ? 700 : 600,
+                      color: i === 3 ? '#059669' : 'var(--navy)' }}>{v}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* COLUNA DIREITA — resultado + formulário */}
+            <div>
+              {/* Card parcela */}
+              <div style={{ background: 'var(--gradient-navy-hero)', borderRadius: 'var(--radius-xl)', padding: '28px 26px 22px', color: '#fff', marginBottom: 24, textAlign: 'center' }}>
+                <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+                  color: 'var(--gold-soft)', marginBottom: 6 }}>Parcela estimada</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.6rem, 5vw, 3.4rem)', fontWeight: 800, letterSpacing: '-0.03em', color: '#fff', lineHeight: 1 }}>
+                  {fmt(parcela)}
+                </div>
+                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', marginTop: 6 }}>por mês · sem juros</div>
+                <div style={{ marginTop: 20, display: 'flex', gap: 16, justifyContent: 'center' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--gold-soft)' }}>{prazo}</div>
+                    <div style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)' }}>meses</div>
+                  </div>
+                  <div style={{ width: 1, background: 'rgba(255,255,255,0.15)' }} />
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--gold-soft)' }}>17%</div>
+                    <div style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)' }}>taxa adm.</div>
+                  </div>
+                  <div style={{ width: 1, background: 'rgba(255,255,255,0.15)' }} />
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: '#34D399' }}>0%</div>
+                    <div style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)' }}>juros</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Formulário */}
+              {enviado ? (
+                <div style={{ background: '#F0FDF4', borderRadius: 'var(--radius-lg)', padding: 28, border: '1px solid #BBF7D0', textAlign: 'center' }}>
+                  <div style={{ fontSize: 28, marginBottom: 8 }}>✓</div>
+                  <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: 17, marginBottom: 8 }}>Simulação enviada!</div>
+                  <div style={{ fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.5 }}>
+                    Um especialista VN Prime entrará em contato em até 2h úteis com sua proposta personalizada.
+                  </div>
+                  <div style={{ marginTop: 20, fontSize: 13, color: 'var(--fg-2)' }}>
+                    Ou fale agora pelo{' '}
+                    <a href={`https://wa.me/5531984144250?text=${encodeURIComponent(`Olá! Simulei um consórcio de ${fmt(credito)} em ${prazo} meses. Quero saber mais.`)}`}
+                       target="_blank" rel="noopener" style={{ color: '#25D366', fontWeight: 700 }}>WhatsApp</a>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>Receba sua proposta personalizada</div>
+                  {[
+                    { ph: 'Nome completo', val: nome, set: setNome, type: 'text' },
+                    { ph: 'CPF', val: cpf, set: setCpf, type: 'text' },
+                    { ph: 'WhatsApp', val: tel, set: setTel, type: 'tel' },
+                    { ph: 'E-mail', val: email, set: setEmail, type: 'email' },
+                  ].map(f => (
+                    <input key={f.ph} type={f.type} placeholder={f.ph} value={f.val}
+                      onChange={(e) => f.set(e.target.value)} required={f.ph !== 'CPF'}
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border)',
+                        fontSize: 14, fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box',
+                        transition: 'border-color 0.15s' }} />
+                  ))}
+                  <Btn variant="accent" size="lg" type="submit"
+                    style={{ opacity: canSubmit ? 1 : 0.5, cursor: canSubmit ? 'pointer' : 'not-allowed' }}>
+                    Quero esta cota — {fmt(parcela)}/mês
+                  </Btn>
+                  <div style={{ fontSize: 11, color: 'var(--fg-3)', textAlign: 'center' }}>
+                    Simulação sem compromisso · valores aproximados · sujeito a aprovação
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -5403,8 +5834,8 @@ function DueDiligencePage({ onNav }) {
             Análise completa de matrícula, certidões, ônus, regularidade técnica e fiscal antes de você assinar o contrato. Conduzido por advogados parceiros especialistas em direito imobiliário.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <Btn variant="accent" size="lg">Solicitar análise</Btn>
-            <Btn variant="ghost-light" size="lg">Ver relatório modelo</Btn>
+            <Btn variant="accent" size="lg" onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Solicitar análise</Btn>
+            <Btn variant="ghost-light" size="lg" onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Ver relatório modelo</Btn>
           </div>
         </div>
       </section>
@@ -5458,7 +5889,7 @@ function DueDiligencePage({ onNav }) {
             maxWidth: 540, margin: '0 auto 28px' }}>
             Análise completa · 4 frentes · relatório com semáforo de risco · suporte do advogado durante toda a transação.
           </p>
-          <Btn variant="accent" size="lg">Contratar due diligence</Btn>
+          <Btn variant="accent" size="lg" onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Contratar due diligence</Btn>
           <div style={{ marginTop: 16, fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
             Cliente VN Prime · 20% de desconto na primeira análise
           </div>
@@ -5582,9 +6013,12 @@ function LancamentosPage({ onNav }) {
               <Btn variant="accent" size="lg" onClick={() => {
                 document.getElementById('empreendimentos')?.scrollIntoView({ behavior: 'smooth' });
               }}>Ver empreendimentos</Btn>
-              <Btn variant="ghostOnNavy" size="lg" onClick={() => onNav('login', { mode: 'cadastro' })}>
-                Falar no WhatsApp
-              </Btn>
+              <a href="https://wa.me/5531984144250?text=Ol%C3%A1%21+Tenho+interesse+em+lan%C3%A7amentos+VN+Prime."
+                 target="_blank" rel="noopener"
+                 style={{ display: 'inline-flex', alignItems: 'center', gap: 8,
+                   padding: '0.75rem 1.6rem', borderRadius: 999, fontWeight: 700, fontSize: 15,
+                   background: '#25D366', color: '#fff', textDecoration: 'none', border: 'none',
+                   fontFamily: 'Inter, sans-serif', cursor: 'pointer' }}>Falar no WhatsApp</a>
             </div>
           </div>
 
@@ -6220,6 +6654,135 @@ Object.assign(window, { LoginPage });
 </script>
 <script type="text/babel">
 // ============================================================
+// CONSULTOR MODAL — login social + whatsapp
+// ============================================================
+const { useState: useStateConsultor } = React;
+
+function ConsultorModal({ onClose, onNav }) {
+  const [sent, setSent] = useStateConsultor(false);
+  const WA_NUM = '5531984144250';
+  const WA_MSG = encodeURIComponent('Olá! Gostaria de falar com um consultor VN Prime.');
+
+  if (sent) return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999,
+      background: 'rgba(15,24,36,0.72)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      onClick={onClose}>
+      <div style={{ background: 'var(--white)', borderRadius: 20, padding: '48px 40px',
+        maxWidth: 400, width: '90%', textAlign: 'center', boxShadow: '0 24px 64px rgba(15,24,36,0.28)' }}
+        onClick={e => e.stopPropagation()}>
+        <div style={{ fontSize: 42, marginBottom: 16 }}>✓</div>
+        <h3 style={{ margin: '0 0 10px', fontSize: 22, fontWeight: 700, color: 'var(--navy)' }}>Solicitação enviada!</h3>
+        <p style={{ color: 'var(--fg-2)', fontSize: 15, margin: '0 0 24px' }}>
+          Um consultor VN Prime entrará em contato em breve.
+        </p>
+        <button onClick={onClose} style={{ padding: '12px 28px', borderRadius: 10,
+          border: 'none', background: 'var(--gradient-gold)', color: 'var(--navy)',
+          fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+          Fechar
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999,
+      background: 'rgba(15,24,36,0.72)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      onClick={onClose}>
+      <div style={{ background: 'var(--white)', borderRadius: 20, padding: '40px 36px',
+        maxWidth: 440, width: '90%', boxShadow: '0 24px 64px rgba(15,24,36,0.28)',
+        position: 'relative' }}
+        onClick={e => e.stopPropagation()}>
+
+        <button onClick={onClose} style={{ position: 'absolute', top: 16, right: 18,
+          background: 'none', border: 'none', fontSize: 22, color: 'var(--fg-3)',
+          cursor: 'pointer', lineHeight: 1 }}>×</button>
+
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.2em',
+          textTransform: 'uppercase', color: 'var(--gold-deep)', marginBottom: 10 }}>
+          VN Prime · Consultor
+        </div>
+        <h2 style={{ margin: '0 0 8px', fontSize: 24, fontWeight: 800,
+          letterSpacing: '-0.025em', color: 'var(--navy)' }}>
+          Fale com um consultor
+        </h2>
+        <p style={{ color: 'var(--fg-2)', fontSize: 14.5, margin: '0 0 28px', lineHeight: 1.6 }}>
+          Entre ou crie sua conta para agendar uma conversa. Consultores disponíveis de seg. a sáb., 8h–20h.
+        </p>
+
+        {/* Login rápido */}
+        <button onClick={() => { onClose(); onNav('login', { mode: 'cadastro' }); }} style={{
+          width: '100%', padding: '13px 16px', borderRadius: 10,
+          border: 'none', background: 'var(--gradient-gold)', color: 'var(--navy)',
+          fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 15,
+          cursor: 'pointer', marginBottom: 12 }}>
+          Criar minha conta e agendar consultor
+        </button>
+        <button onClick={() => { onClose(); onNav('login'); }} style={{
+          width: '100%', padding: '12px 16px', borderRadius: 10,
+          border: '1.5px solid var(--border)', background: 'var(--white)', color: 'var(--navy)',
+          fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14.5,
+          cursor: 'pointer', marginBottom: 20 }}>
+          Já tenho conta · Entrar
+        </button>
+
+        {/* Social */}
+        <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+          <button onClick={() => { onClose(); onNav('login'); }} style={{
+            flex: 1, padding: '11px', borderRadius: 10, border: '1.5px solid var(--border)',
+            background: 'var(--white)', cursor: 'pointer', display: 'flex',
+            alignItems: 'center', justifyContent: 'center', gap: 8,
+            fontFamily: 'var(--font-body)', fontSize: 13.5, fontWeight: 600 }}>
+            <svg width="16" height="16" viewBox="0 0 18 18">
+              <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.84 2.08-1.79 2.72v2.26h2.9c1.69-1.56 2.66-3.85 2.66-6.62z"/>
+              <path fill="#34A853" d="M9 18c2.43 0 4.46-.8 5.95-2.18l-2.9-2.26c-.81.54-1.83.86-3.05.86-2.34 0-4.32-1.58-5.03-3.71H1v2.33C2.49 15.98 5.5 18 9 18z"/>
+              <path fill="#FBBC04" d="M3.97 10.71A5.41 5.41 0 0 1 3.68 9c0-.59.1-1.17.29-1.71V4.96H1A8.997 8.997 0 0 0 0 9c0 1.45.35 2.83.96 4.04l3.01-2.33z"/>
+              <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.5 0 2.49 2.02 1 4.96l2.97 2.33C4.68 5.16 6.66 3.58 9 3.58z"/>
+            </svg>
+            Google
+          </button>
+          <button onClick={() => { onClose(); onNav('login'); }} style={{
+            flex: 1, padding: '11px', borderRadius: 10, border: '1.5px solid var(--border)',
+            background: 'var(--white)', cursor: 'pointer', display: 'flex',
+            alignItems: 'center', justifyContent: 'center', gap: 8,
+            fontFamily: 'var(--font-body)', fontSize: 13.5, fontWeight: 600 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.07c1.39.07 2.34.74 3.15.8 1.19-.24 2.35-.93 3.64-.84 1.55.12 2.71.72 3.46 1.86-3.19 1.88-2.43 6.06.52 7.21-.61 1.5-1.42 2.94-2.77 4.18M12.03 7c-.16-2.55 1.95-4.7 4.29-4.97.37 2.8-2.32 5.05-4.29 4.97z"/>
+            </svg>
+            Apple
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14,
+          margin: '0 0 16px', color: 'var(--fg-3)', fontSize: 12, fontWeight: 600 }}>
+          <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />OU
+          <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+        </div>
+
+        {/* WhatsApp */}
+        <a href={`https://wa.me/${WA_NUM}?text=${WA_MSG}`} target="_blank" rel="noopener"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+            width: '100%', padding: '13px 16px', borderRadius: 10,
+            background: '#25D366', color: '#fff', fontFamily: 'var(--font-body)',
+            fontWeight: 700, fontSize: 14.5, textDecoration: 'none', boxSizing: 'border-box' }}
+          onClick={onClose}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          Falar no WhatsApp
+        </a>
+
+        <p style={{ textAlign: 'center', marginTop: 14, fontSize: 12, color: 'var(--fg-3)' }}>
+          (31) 98414-4250 · seg–sáb 8h–20h
+        </p>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { ConsultorModal });
+</script>
+<script type="text/babel">
+// ============================================================
 // NEWSLETTER MODAL — captura leve (nome + e-mail)
 // Para quem quer acompanhar lançamentos e listagens sem criar conta
 // ============================================================
@@ -6770,11 +7333,18 @@ function App() {
   const [route, setRoute] = React.useState({ name: 'home', params: {} });
   const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const [showNewsletter, setShowNewsletter] = React.useState(false);
+  const [showConsultor, setShowConsultor] = React.useState(false);
 
   const onNav = (name, params = {}) => {
     setRoute({ name, params });
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
+
+  React.useEffect(() => {
+    const handler = () => setShowConsultor(true);
+    window.addEventListener('vnprime:consultor', handler);
+    return () => window.removeEventListener('vnprime:consultor', handler);
+  }, []);
 
   // Apply tweaks to root scope
   React.useEffect(() => {
@@ -6826,6 +7396,7 @@ function App() {
       <SiteFooter onNewsletter={() => setShowNewsletter(true)} />
 
       {showNewsletter && window.NewsletterModal && React.createElement(window.NewsletterModal, { onClose: () => setShowNewsletter(false) })}
+      {showConsultor && window.ConsultorModal && React.createElement(window.ConsultorModal, { onClose: () => setShowConsultor(false), onNav: (name, params) => { setShowConsultor(false); onNav(name, params); } })}
 
       <TweaksPanel title="Tweaks">
         <TweakSection title="Layout">
