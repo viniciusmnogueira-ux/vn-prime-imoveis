@@ -3377,12 +3377,112 @@ function PortalSection({ title, action, children }) {
 }
 
 // ============================================================
+// PORTAL LANDING PAGE — apresentação antes do login (shared)
+// ============================================================
+function PortalLandingPage({ eyebrow, headline, desc, img, accent, stats, features, onEnter, onNav }) {
+  return (
+    <main style={{ background: 'var(--cream)' }}>
+      {/* HERO */}
+      <section style={{
+        position: 'relative',
+        background: `linear-gradient(160deg, rgba(15,22,32,0.72) 0%, rgba(15,22,32,0.88) 60%, rgba(15,22,32,0.96) 100%), url(${img})`,
+        backgroundSize: 'cover', backgroundPosition: 'center top',
+        color: '#fff', padding: 'clamp(90px, 14vw, 160px) 0 clamp(70px, 10vw, 110px)',
+      }}>
+        <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 70% 60% at 80% 40%, ${accent}22 0%, transparent 70%)`, pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', zIndex: 1, width: 'min(1180px, 92vw)', margin: '0 auto', maxWidth: 780 }}>
+          <Eyebrow>{eyebrow}</Eyebrow>
+          <h1 style={{ color: '#fff', fontSize: 'clamp(2.2rem, 4.5vw, 3.6rem)', lineHeight: 1.06,
+            margin: '14px 0 20px', letterSpacing: '-0.02em' }}
+            dangerouslySetInnerHTML={{ __html: headline }} />
+          <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.86)', maxWidth: 600, marginBottom: 32, lineHeight: 1.6 }}>
+            {desc}
+          </p>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 44 }}>
+            <Btn variant="accent" size="lg" onClick={onEnter}>Entrar no portal</Btn>
+            <Btn variant="ghost-light" size="lg" onClick={() => onNav('login', { mode: 'cadastro' })}>Criar conta grátis</Btn>
+          </div>
+          <div style={{ display: 'flex', gap: 40, flexWrap: 'wrap' }}>
+            {stats.map(([v, l]) => (
+              <div key={l}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800, color: accent, lineHeight: 1 }}>{v}</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 5 }}>{l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section style={{ padding: 'clamp(60px, 8vw, 100px) 0' }}>
+        <div style={{ width: 'min(1180px, 92vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 52px' }}>
+            <Eyebrow color="var(--gold-deep)">O que você encontra</Eyebrow>
+            <h2 style={{ margin: '10px 0 12px' }}>Tudo que você precisa em um só lugar</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 15.5 }}>Ferramentas criadas especificamente para o mercado imobiliário premium de Belo Horizonte.</p>
+          </div>
+          <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
+            {features.map(f => (
+              <div key={f.title} style={{
+                background: '#fff', padding: '28px 26px', borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--border)', transition: 'box-shadow 0.2s, transform 0.2s',
+              }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: `${accent}18`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 22, marginBottom: 16 }}>{f.icon}</div>
+                <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', marginBottom: 8 }}>{f.title}</div>
+                <div style={{ fontSize: 14.5, color: 'var(--fg-2)', lineHeight: 1.6 }}>{f.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA BANNER */}
+      <section style={{ padding: 'clamp(60px, 8vw, 100px) 0', background: 'var(--gradient-navy-hero)' }}>
+        <div style={{ width: 'min(860px, 92vw)', margin: '0 auto', textAlign: 'center', color: '#fff' }}>
+          <Eyebrow>Acesso imediato</Eyebrow>
+          <h2 style={{ color: '#fff', fontSize: 'clamp(1.8rem, 3.5vw, 2.6rem)', margin: '14px 0 16px', letterSpacing: '-0.01em' }}>
+            Pronto para começar?
+          </h2>
+          <p style={{ color: 'rgba(245,248,250,0.78)', fontSize: 17, maxWidth: 480, margin: '0 auto 32px', lineHeight: 1.6 }}>
+            Faça login com sua conta VN Prime ou crie uma agora. Configuração em menos de 3 minutos.
+          </p>
+          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Btn variant="accent" size="lg" onClick={onEnter}>Acessar meu portal</Btn>
+            <Btn variant="ghost-light" size="lg" onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Falar com consultor</Btn>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+// ============================================================
 // PORTAL DO CORRETOR — dashboard operacional
 // ============================================================
 function CorretorPage({ onNav }) {
+  const [showGate, setShowGate] = React.useState(false);
   const [auth, setAuth] = React.useState(false);
   const [sec, setSec] = React.useState('dashboard');
   const accent = '#10B981';
+
+  if (!auth && !showGate) return (
+    <PortalLandingPage
+      eyebrow="Portal do Corretor"
+      headline="Leads qualificados, CRM completo e portfólio <em style='color:#6EE7B7'>premium</em> — tudo em um só lugar."
+      desc="Acesse imóveis exclusivos VN Prime, receba leads qualificados diretamente no seu painel e acompanhe comissões em tempo real."
+      img={window.__resources?.img70||'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1400&q=85'}
+      accent={accent}
+      stats={[['23', 'Leads/mês'], ['82%', 'Taxa fechamento'], ['R$ 49,90', 'Mensalidade'], ['48h', 'Ativação']]}
+      features={[
+        { icon: '🎯', title: 'Leads Qualificados', desc: 'Compradores verificados com perfil e orçamento compatível com seu portfólio. Sem spam, sem perda de tempo.' },
+        { icon: '📊', title: 'CRM Visual', desc: 'Pipeline kanban, histórico completo de contatos, agendamento de visitas e alertas automáticos por WhatsApp.' },
+        { icon: '🏠', title: 'Portfólio Exclusivo', desc: 'Acesso antecipado a imóveis premium em BH antes de irem ao mercado público — vantagem competitiva real.' },
+        { icon: '💳', title: 'Comissões Transparentes', desc: 'Extrato mensal detalhado, nota fiscal automatizada e pagamento em D+2 após o fechamento. Sem surpresas.' },
+      ]}
+      onEnter={() => setShowGate(true)} onNav={onNav} />
+  );
 
   if (!auth) return (
     <PortalLoginGate
@@ -3730,6 +3830,7 @@ function CorretorPage({ onNav }) {
 }
 
 function IncorporadoraPage({ onNav }) {
+  const [showGate, setShowGate] = React.useState(false);
   const [auth, setAuth] = React.useState(false);
   const [tab, setTab] = React.useState('overview');
   const [formData, setFormData] = React.useState({
@@ -3761,6 +3862,23 @@ function IncorporadoraPage({ onNav }) {
   const statusColor = s => s === 'Novo' ? { bg: '#EBF5FB', fg: '#2563EB' }
     : s === 'Proposta' ? { bg: `${accent}18`, fg: accent }
     : { bg: '#F0FDF4', fg: '#059669' };
+
+  if (!auth && !showGate) return (
+    <PortalLandingPage
+      eyebrow="Portal da Incorporadora"
+      headline="Lance empreendimentos e gerencie leads qualificados com <em style='color:#F6C95A'>inteligência de mercado</em>."
+      desc="Plataforma completa para incorporadoras: cadastro de lançamentos, captura de leads, acompanhamento de VGV ativo e relatórios de desempenho."
+      img={window.__resources?.img30||'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1400&q=85'}
+      accent={accent}
+      stats={[['2', 'Empreendimentos ativos'], ['34', 'Leads qualificados'], ['R$ 28M', 'VGV ativo'], ['7 dias', 'Para publicar']]}
+      features={[
+        { icon: '🏗️', title: 'Gestão de Lançamentos', desc: 'Cadastre empreendimentos com fotos, planta, memorial descritivo, tabela de preços e status de unidades.' },
+        { icon: '📥', title: 'Captura de Leads', desc: 'Formulários integrados nas páginas de lançamento capturando nome, contato e interesse por unidade.' },
+        { icon: '📈', title: 'Painel de VGV', desc: 'Acompanhe o Valor Geral de Vendas em tempo real com gráficos de evolução e projeções de receita.' },
+        { icon: '📋', title: 'Relatórios Gerenciais', desc: 'Dashboards executivos com taxa de conversão, custo por lead, desempenho por empreendimento e mais.' },
+      ]}
+      onEnter={() => setShowGate(true)} onNav={onNav} />
+  );
 
   if (!auth) return (
     <PortalLoginGate
@@ -4154,7 +4272,7 @@ function IncFieldLabel({ children }) {
   );
 }
 
-Object.assign(window, { CorretorPage, IncorporadoraPage });
+Object.assign(window, { PortalLandingPage, CorretorPage, IncorporadoraPage });
 </script>
 <script type="text/babel">// Anunciar — Proprietário Direto · Wizard de venda direta
 // 5 passos: Identificação → Imóvel → Fotos → Pitch IA → Publicar
@@ -4701,21 +4819,39 @@ Object.assign(window, { AnunciarPage });
 // PORTAL DO PROPRIETÁRIO — dashboard operacional
 // ============================================================
 function ProprietarioPage({ onNav }) {
+  const [showGate, setShowGate] = React.useState(false);
   const [auth, setAuth] = React.useState(false);
   const [sec, setSec] = React.useState('dashboard');
-  const accent = 'var(--gold)';
+  const accent = '#D4A857';
+
+  if (!auth && !showGate) return (
+    <PortalLandingPage
+      eyebrow="Área do Proprietário"
+      headline="Anuncie seu imóvel com <em style='color:#F6D77A'>liberdade total</em> — sem comissão, sem intermediários."
+      desc="Você define o preço, conduz as visitas e fecha direto com o comprador. A VN Prime entra com plataforma, fotos profissionais, mídia paga e suporte jurídico."
+      img={window.__resources?.img60||'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1400&q=85'}
+      accent={accent}
+      stats={[['R$ 297', 'Taxa fixa única'], ['0%', 'De comissão'], ['18 dias', 'Venda média'], ['90 dias', 'De vigência']]}
+      features={[
+        { icon: '📸', title: 'Fotos Profissionais', desc: 'Sessão fotográfica inclusa nos planos Assistida e Completa. Imagens que destacam seu imóvel e aceleram a venda.' },
+        { icon: '📣', title: 'Mídia Paga Gerenciada', desc: 'Anúncios no Google, Meta e portais imobiliários. A VN Prime gerencia o tráfego para você não precisar entender de marketing.' },
+        { icon: '👥', title: 'Leads Qualificados', desc: 'Compradores verificados com perfil compatível com seu imóvel chegam direto no seu painel de controle.' },
+        { icon: '⚖️', title: 'Suporte Jurídico', desc: 'Revisão de contratos, ITBI, cartório e escritura. Profissionais parceiros cuidam da parte burocrática por você.' },
+      ]}
+      onEnter={() => setShowGate(true)} onNav={onNav} />
+  );
 
   if (!auth) return (
     <PortalLoginGate
       title="Portal do Proprietário"
       desc="Anuncie seu imóvel, gerencie leads e visitas, acompanhe o desempenho do anúncio. Você no controle, da publicação ao fechamento."
       img={window.__resources?.img60||'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=85'}
-      accent="#D4A857" role="proprietario"
+      accent={accent} role="proprietario"
       onAuth={() => setAuth(true)} onNav={onNav}>
       <div style={{ display: 'flex', gap: 24 }}>
         {[['R$ 297', 'Taxa fixa'], ['0%', 'Comissão'], ['18 dias', 'Venda média']].map(([n, l]) => (
           <div key={l}>
-            <div style={{ fontSize: 24, fontWeight: 800, color: '#D4A857' }}>{n}</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: accent }}>{n}</div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{l}</div>
           </div>
         ))}
@@ -5163,9 +5299,27 @@ Object.assign(window, { ProprietarioPage });
 // PORTAL DO FOTÓGRAFO — dashboard operacional
 // ============================================================
 function FotografoPage({ onNav }) {
+  const [showGate, setShowGate] = React.useState(false);
   const [auth, setAuth] = React.useState(false);
   const [sec, setSec] = React.useState('dashboard');
   const accent = '#D4A857';
+
+  if (!auth && !showGate) return (
+    <PortalLandingPage
+      eyebrow="Canal do Fotógrafo"
+      headline="Trabalhe com os <em style='color:#F6D77A'>imóveis mais exclusivos</em> de Belo Horizonte."
+      desc="Credenciamento VN Prime: jobs garantidos, pagamento rápido e suporte da equipe. Para fotógrafos especializados em imóveis de alto padrão."
+      img={window.__resources?.img67||'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1400&q=85'}
+      accent={accent}
+      stats={[['40+', 'Jobs/mês disponíveis'], ['R$ 390–1.190', 'Por sessão'], ['48h', 'Prazo de entrega'], ['D+7', 'Pagamento']]}
+      features={[
+        { icon: '📅', title: 'Agenda Organizada', desc: 'Receba jobs diretamente no seu painel com endereço, briefing, horário e informações do imóvel.' },
+        { icon: '💰', title: 'Pagamento Garantido', desc: 'Receba em D+7 após a aprovação das fotos. Sem atrasos, sem burocracia — direto na sua conta.' },
+        { icon: '🏆', title: 'Portfólio Premium', desc: 'Construa um portfólio com imóveis de alto padrão em BH que se destacam e abrem portas no mercado.' },
+        { icon: '📦', title: 'Pacotes Exclusivos', desc: 'Ofereça pacotes de fotografia, drone, tour 360° e vídeo. VN Prime repassa o cliente e cuida da venda.' },
+      ]}
+      onEnter={() => setShowGate(true)} onNav={onNav} />
+  );
 
   if (!auth) return (
     <PortalLoginGate
