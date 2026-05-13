@@ -6225,7 +6225,307 @@ function ConsorcioPage({ onNav }) {
           </div>
         </div>
       </section>
+
+      {/* COMPARATIVO CONSÓRCIO vs FINANCIAMENTO */}
+      {React.createElement(SimuladorComparativo)}
     </main>
+  );
+}
+
+function SimuladorComparativo() {
+  const [valor, setValor] = React.useState(500000);
+  const [entrada, setEntrada] = React.useState(100000);
+  const [prazo, setPrazo] = React.useState(180);
+  const [taxa, setTaxa] = React.useState(12);
+  const [sistema, setSistema] = React.useState('SAC');
+
+  const fmt = (n) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n);
+  const fmtN = (n, d=1) => new Intl.NumberFormat('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
+
+  const financiado = valor - entrada;
+  const taxaMensal = taxa / 100 / 12;
+
+  // Financiamento SAC
+  const amortSAC = financiado / prazo;
+  const jurosPrimeiraSAC = financiado * taxaMensal;
+  const parcelaPrimeiraSAC = amortSAC + jurosPrimeiraSAC;
+  const totalSAC = (() => {
+    let saldo = financiado;
+    let total = 0;
+    for (let i = 0; i < prazo; i++) {
+      const juros = saldo * taxaMensal;
+      total += amortSAC + juros;
+      saldo -= amortSAC;
+    }
+    return total;
+  })();
+
+  // Financiamento PRICE
+  const parcelaPrice = taxaMensal > 0
+    ? financiado * (taxaMensal * Math.pow(1 + taxaMensal, prazo)) / (Math.pow(1 + taxaMensal, prazo) - 1)
+    : financiado / prazo;
+  const totalPrice = parcelaPrice * prazo;
+
+  const totalFin = sistema === 'SAC' ? totalSAC : totalPrice;
+  const parcelaFin = sistema === 'SAC' ? parcelaPrimeiraSAC : parcelaPrice;
+
+  // Consórcio
+  const TAX_ADMI = 0.17;
+  const TAX_FUNDO_RESERVA = 0.03;
+  const totalTaxasConsorc = valor * (TAX_ADMI + TAX_FUNDO_RESERVA);
+  const totalConsorc = valor + totalTaxasConsorc;
+  const parcelaConsorc = totalConsorc / prazo;
+  const economiaBruta = totalFin - totalConsorc;
+
+  const gold = '#D4A857';
+  const navy = '#1B2733';
+  const green = '#059669';
+  const red = '#DC2626';
+
+  const barMax = Math.max(totalFin, totalConsorc);
+  const barFin = (totalFin / barMax) * 100;
+  const barConsorc = (totalConsorc / barMax) * 100;
+
+  return (
+    <section style={{ padding: 'clamp(60px, 8vw, 100px) 0', background: 'var(--cream-tint)' }}>
+      <div style={{ width: 'min(1140px, 92vw)', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase',
+            color: gold, marginBottom: 8 }}>Comparativo</div>
+          <h2 style={{ margin: '0 0 10px', fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', fontWeight: 800,
+            color: navy, letterSpacing: '-0.02em' }}>Consórcio vs Financiamento</h2>
+          <p style={{ color: 'var(--fg-2)', fontSize: 15.5, maxWidth: 520, margin: '0 auto' }}>
+            Simule lado a lado e descubra quanto você economiza comprando sem juros.
+          </p>
+        </div>
+
+        {/* Inputs */}
+        <div style={{ background: '#fff', borderRadius: 16, padding: '28px 30px', marginBottom: 32,
+          border: '1px solid var(--border)', display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 24 }}>
+
+          {/* Valor do imóvel */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--fg-2)' }}>Valor do imóvel</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: navy }}>{fmt(valor)}</span>
+            </div>
+            <input type="range" min={200000} max={3000000} step={10000} value={valor}
+              onChange={e => { setValor(Number(e.target.value)); if (entrada > Number(e.target.value) * 0.9) setEntrada(Math.floor(Number(e.target.value) * 0.2)); }}
+              style={{ width: '100%', accentColor: gold }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginTop: 2 }}>
+              <span>R$ 200k</span><span>R$ 3M</span>
+            </div>
+          </div>
+
+          {/* Entrada */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--fg-2)' }}>Entrada</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: navy }}>{fmt(entrada)} <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--fg-3)' }}>({fmtN(entrada / valor * 100)}%)</span></span>
+            </div>
+            <input type="range" min={0} max={Math.floor(valor * 0.8)} step={5000} value={entrada}
+              onChange={e => setEntrada(Number(e.target.value))}
+              style={{ width: '100%', accentColor: gold }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginTop: 2 }}>
+              <span>R$ 0</span><span>80%</span>
+            </div>
+          </div>
+
+          {/* Prazo */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--fg-2)' }}>Prazo</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: navy }}>{prazo} meses <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--fg-3)' }}>({fmtN(prazo/12,0)} anos)</span></span>
+            </div>
+            <input type="range" min={60} max={360} step={12} value={prazo}
+              onChange={e => setPrazo(Number(e.target.value))}
+              style={{ width: '100%', accentColor: gold }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginTop: 2 }}>
+              <span>5 anos</span><span>30 anos</span>
+            </div>
+          </div>
+
+          {/* Taxa juros */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--fg-2)' }}>Juros financiamento</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: navy }}>{fmtN(taxa)}% a.a.</span>
+            </div>
+            <input type="range" min={6} max={20} step={0.5} value={taxa}
+              onChange={e => setTaxa(Number(e.target.value))}
+              style={{ width: '100%', accentColor: red }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginTop: 2 }}>
+              <span>6%</span><span>20%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Sistema financiamento */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28, justifyContent: 'flex-end' }}>
+          <span style={{ fontSize: 13, color: 'var(--fg-2)', fontWeight: 600 }}>Sistema:</span>
+          {['SAC', 'PRICE'].map(s => (
+            <button key={s} onClick={() => setSistema(s)}
+              style={{ padding: '6px 18px', borderRadius: 999, border: '1.5px solid',
+                borderColor: sistema === s ? navy : 'var(--border)',
+                background: sistema === s ? navy : '#fff',
+                color: sistema === s ? '#fff' : 'var(--fg-1)',
+                fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                fontFamily: 'var(--font-body)', transition: 'all 0.15s' }}>{s}</button>
+          ))}
+        </div>
+
+        {/* Cards de comparação */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 28 }}>
+
+          {/* Consórcio */}
+          <div style={{ background: `linear-gradient(145deg, ${navy}, #0F1824)`, borderRadius: 16,
+            padding: '28px 26px', color: '#fff', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: -20, right: -20, width: 120, height: 120,
+              borderRadius: '50%', background: `${gold}18` }} />
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.18em',
+              textTransform: 'uppercase', color: gold, marginBottom: 6 }}>Consórcio VN Prime</div>
+            <div style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.6rem)', fontWeight: 900,
+              letterSpacing: '-0.03em', color: '#fff', lineHeight: 1 }}>{fmt(parcelaConsorc)}</div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 20 }}>/mês estimado · sem juros</div>
+
+            {[
+              ['Carta de crédito', fmt(valor)],
+              ['Taxa adm. (17%)', fmt(valor * TAX_ADMI)],
+              ['Fundo de reserva (3%)', fmt(valor * TAX_FUNDO_RESERVA)],
+              ['Total a pagar', fmt(totalConsorc)],
+            ].map(([l, v], i) => (
+              <div key={l} style={{ display: 'flex', justifyContent: 'space-between',
+                padding: '7px 0', borderBottom: i < 3 ? '1px solid rgba(255,255,255,0.1)' : 'none' }}>
+                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>{l}</span>
+                <span style={{ fontSize: 13, fontWeight: i === 3 ? 800 : 600,
+                  color: i === 3 ? gold : '#fff' }}>{v}</span>
+              </div>
+            ))}
+
+            <div style={{ marginTop: 16, display: 'flex', gap: 10 }}>
+              <span style={{ padding: '4px 10px', background: `${green}22`, color: '#34D399',
+                borderRadius: 999, fontSize: 12, fontWeight: 700 }}>0% juros</span>
+              <span style={{ padding: '4px 10px', background: `${gold}22`, color: gold,
+                borderRadius: 999, fontSize: 12, fontWeight: 700 }}>Sem entrada obrigatória</span>
+            </div>
+          </div>
+
+          {/* Financiamento */}
+          <div style={{ background: '#fff', borderRadius: 16, padding: '28px 26px',
+            border: '2px solid var(--border)', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: -20, right: -20, width: 120, height: 120,
+              borderRadius: '50%', background: `${red}08` }} />
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.18em',
+              textTransform: 'uppercase', color: red, marginBottom: 6 }}>Financiamento Bancário · {sistema}</div>
+            <div style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.6rem)', fontWeight: 900,
+              letterSpacing: '-0.03em', color: navy, lineHeight: 1 }}>{fmt(parcelaFin)}</div>
+            <div style={{ fontSize: 13, color: 'var(--fg-3)', marginBottom: 20 }}>
+              {sistema === 'SAC' ? '1ª parcela (decresce)' : '/mês fixo'} · {fmtN(taxa)}% a.a.
+            </div>
+
+            {[
+              ['Valor financiado', fmt(financiado)],
+              ['Entrada necessária', fmt(entrada)],
+              [`Juros totais (~${fmtN(taxa)}% a.a.)`, fmt(totalFin - financiado)],
+              ['Total a pagar', fmt(totalFin)],
+            ].map(([l, v], i) => (
+              <div key={l} style={{ display: 'flex', justifyContent: 'space-between',
+                padding: '7px 0', borderBottom: i < 3 ? '1px solid var(--border)' : 'none' }}>
+                <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>{l}</span>
+                <span style={{ fontSize: 13, fontWeight: i === 3 ? 800 : 600,
+                  color: i === 3 ? red : i === 2 ? red : navy }}>{v}</span>
+              </div>
+            ))}
+
+            <div style={{ marginTop: 16, display: 'flex', gap: 10 }}>
+              <span style={{ padding: '4px 10px', background: `${red}12`, color: red,
+                borderRadius: 999, fontSize: 12, fontWeight: 700 }}>{fmtN(taxa)}% a.a.</span>
+              <span style={{ padding: '4px 10px', background: '#FEF3C712', color: '#D97706',
+                borderRadius: 999, fontSize: 12, fontWeight: 700 }}>Entrada: {fmt(entrada)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Barra comparativa + economia */}
+        <div style={{ background: '#fff', borderRadius: 16, padding: '28px 30px',
+          border: '1px solid var(--border)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, alignItems: 'center' }}>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase',
+                letterSpacing: '0.12em', color: 'var(--fg-2)', marginBottom: 16 }}>Custo total comparado</div>
+
+              {/* Barra Consórcio */}
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: navy }}>Consórcio</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: navy }}>{fmt(totalConsorc)}</span>
+                </div>
+                <div style={{ height: 10, background: 'var(--border)', borderRadius: 999, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${barConsorc}%`, borderRadius: 999,
+                    background: `linear-gradient(90deg, ${gold}, #B8862E)`, transition: 'width 0.4s' }} />
+                </div>
+              </div>
+
+              {/* Barra Financiamento */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: navy }}>Financiamento ({sistema})</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: red }}>{fmt(totalFin)}</span>
+                </div>
+                <div style={{ height: 10, background: 'var(--border)', borderRadius: 999, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${barFin}%`, borderRadius: 999,
+                    background: `linear-gradient(90deg, ${red}, #991B1B)`, transition: 'width 0.4s' }} />
+                </div>
+              </div>
+            </div>
+
+            {/* Economia */}
+            <div style={{ textAlign: 'center', padding: '20px 24px',
+              background: economiaBruta > 0 ? 'linear-gradient(135deg,#F0FDF4,#DCFCE7)' : 'var(--cream)',
+              borderRadius: 12, border: `1px solid ${economiaBruta > 0 ? '#BBF7D0' : 'var(--border)'}` }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
+                textTransform: 'uppercase', color: green, marginBottom: 6 }}>
+                {economiaBruta > 0 ? 'Você economiza' : 'Diferença'}
+              </div>
+              <div style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 900,
+                letterSpacing: '-0.03em', color: economiaBruta > 0 ? green : red,
+                lineHeight: 1 }}>{fmt(Math.abs(economiaBruta))}</div>
+              <div style={{ fontSize: 13, color: 'var(--fg-2)', marginTop: 6 }}>
+                {economiaBruta > 0
+                  ? `escolhendo consórcio vs financiamento ${sistema}`
+                  : `financiamento sai mais barato neste cenário`}
+              </div>
+              {economiaBruta > 0 && (
+                <div style={{ marginTop: 12, fontSize: 12, color: green, fontWeight: 600 }}>
+                  Equivale a {fmtN(economiaBruta / valor * 100)}% do valor do imóvel
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Nota de rodapé */}
+          <div style={{ marginTop: 20, padding: '12px 16px', background: 'var(--cream)',
+            borderRadius: 8, fontSize: 12, color: 'var(--fg-3)', lineHeight: 1.5 }}>
+            ⚠️ Simulação educativa · Consórcio não garante contemplação imediata · Financiamento sujeito a aprovação de crédito · FGTS pode reduzir valor financiado · Consulte um especialista VN Prime para análise personalizada.
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div style={{ textAlign: 'center', marginTop: 36 }}>
+          <button onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}
+            style={{ padding: '14px 36px', background: `linear-gradient(135deg, ${gold}, #B8862E)`,
+              color: navy, border: 'none', borderRadius: 999, fontSize: 15, fontWeight: 800,
+              cursor: 'pointer', fontFamily: 'var(--font-body)',
+              boxShadow: `0 4px 20px ${gold}44` }}>
+            Falar com especialista em consórcio
+          </button>
+          <div style={{ marginTop: 10, fontSize: 12, color: 'var(--fg-3)' }}>
+            Resposta em até 2h úteis · sem compromisso
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
