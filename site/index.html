@@ -1318,6 +1318,7 @@ function SiteHeader({ active, onNav, density = 'comfortable' }) {
       { id: 'fotografo', label: 'Canal do Fotógrafo', desc: 'Fotografia e mídias para imóveis de alto padrão' },
       { id: 'consorcio', label: 'Consórcio', desc: 'Compre sem juros com carta de crédito' },
       { id: 'due-diligence', label: 'Due Diligence', desc: 'Análise jurídica e técnica antes de comprar' },
+      { id: 'avaliacao', label: 'Avaliação de Imóveis', desc: 'Laudo judicial, extrajudicial ou estimativa IA' },
     ]},
   ];
   const pad = density === 'compact' ? '14px 0' : '20px 0';
@@ -7819,7 +7820,82 @@ function SimuladorComparativo() {
 // ============================================================
 // DUE DILIGENCE — análise jurídica + técnica antes da compra
 // ============================================================
+// ============================================================
+// CERTIDÕES — dados para a Central de Certidões
+// ============================================================
+const CERTIDOES = [
+  // === GRATUITAS ===
+  { id:'cnd-pf', nome:'CND Federal — Pessoa Física', para:'Débitos com Receita Federal, IR, ITR e Dívida Ativa da União.',
+    sobre:'vendedor', categoria:'fiscal', gratis:true, essencial:true,
+    link:'https://solucoes.receita.fazenda.gov.br/Servicos/certidaointernet/PF/Emitir',
+    instrucao:'Informe CPF e data de nascimento. PDF gerado na hora. Válida 180 dias.' },
+
+  { id:'cnd-pj', nome:'CND Federal — Pessoa Jurídica (CNPJ)', para:'Regularidade fiscal federal de empresa vendedora ou incorporadora.',
+    sobre:'vendedor', categoria:'fiscal', gratis:true, essencial:false,
+    link:'https://solucoes.receita.fazenda.gov.br/Servicos/certidaointernet/PJ/Emitir',
+    instrucao:'Informe o CNPJ da empresa. Emissão imediata em PDF. Válida 180 dias.' },
+
+  { id:'cndt', nome:'CNDT — Débitos Trabalhistas (TST)', para:'Condenações trabalhistas não pagas em nome do vendedor.',
+    sobre:'vendedor', categoria:'trabalhista', gratis:true, essencial:true,
+    link:'https://cndt.tst.jus.br/',
+    instrucao:'Informe CPF (PF) ou CNPJ. Emissão em segundos pelo site do TST.' },
+
+  { id:'crf', nome:'CRF — Regularidade FGTS (Caixa)', para:'Recolhimento regular do FGTS — obrigatório para empresas com empregados.',
+    sobre:'vendedor', categoria:'trabalhista', gratis:true, essencial:false,
+    link:'https://consulta-crf.caixa.gov.br/',
+    instrucao:'Informe o CNPJ da incorporadora ou empresa vendedora. Aplicável apenas a PJ.' },
+
+  { id:'iptu-pbh', nome:'Certidão Negativa de IPTU (PBH)', para:'Ausência de débitos de IPTU junto à Prefeitura de BH.',
+    sobre:'imovel', categoria:'municipal', gratis:true, essencial:true,
+    link:'https://tributacao.pbh.gov.br/',
+    instrucao:'Acesse o portal da PBH, seção "Certidões". Informe o número do imóvel (IPTU) ou CPF do proprietário.' },
+
+  { id:'sefaz-mg', nome:'Certidão Negativa Estadual (SEFAZ-MG)', para:'Ausência de débitos com a Fazenda do Estado de MG.',
+    sobre:'vendedor', categoria:'estadual', gratis:true, essencial:true,
+    link:'https://cnd.fazenda.mg.gov.br/',
+    instrucao:'Informe CPF ou CNPJ do vendedor. Emissão online e gratuita.' },
+
+  // === PAGAS ===
+  { id:'matricula', nome:'Matrícula Atualizada do Imóvel', para:'Documento principal: histórico de proprietários, ônus, hipotecas, penhoras e todas as averbações.',
+    sobre:'imovel', categoria:'cartorio', gratis:false, essencial:true,
+    link:'https://onsv.registradores.org.br/', custo:'R$ 30–80',
+    instrucao:'Acesse o portal ONR ou e-Cartório (ecartorio.org.br). Selecione "Certidão de Matrícula". Informe o número da matrícula ou o endereço completo. Pagamento por Pix ou cartão.',
+    cartorio:'Preciso de uma certidão de matrícula atualizada do imóvel situado em [endereço completo], matrícula nº [X], do Cartório de Registro de Imóveis. Preciso com ônus e averbações atualizados.' },
+
+  { id:'onus', nome:'Certidão de Inteiro Teor / Ônus Reais', para:'Versão completa da matrícula com todos os registros históricos — necessário quando há muitas averbações.',
+    sobre:'imovel', categoria:'cartorio', gratis:false, essencial:false,
+    link:'https://onsv.registradores.org.br/', custo:'R$ 30–80',
+    instrucao:'Mesmo portal ONR ou presencialmente no Cartório de Registro de Imóveis da comarca.',
+    cartorio:'Preciso de uma certidão de inteiro teor do imóvel com matrícula nº [X] para instrução de processo de compra e venda.' },
+
+  { id:'protestos', nome:'Certidão de Protestos', para:'Títulos protestados (cheques, notas promissórias) em nome do vendedor — sinal de inadimplência.',
+    sobre:'vendedor', categoria:'cartorio', gratis:false, essencial:true,
+    link:'https://idcartorio.com.br/', custo:'R$ 15–50',
+    instrucao:'Acesse iDCartório (idcartorio.com.br) ou ANOREG-MG. Informe CPF/CNPJ. Cobertura estadual ou nacional.',
+    cartorio:'Preciso de uma certidão de protestos em nome de [Nome completo], CPF nº [xxx.xxx.xxx-xx], nos cartórios de protesto de [cidade/comarca].' },
+
+  { id:'acoes-civeis', nome:'Certidão de Ações Cíveis (TJMG)', para:'Processos cíveis em nome do vendedor no Tribunal de Justiça de MG.',
+    sobre:'vendedor', categoria:'judicial', gratis:false, essencial:true,
+    link:'https://www.tjmg.jus.br/portal-tjmg/servicos/certidoes.htm', custo:'R$ 4,77',
+    instrucao:'Acesse o portal do TJMG, seção "Certidões". Selecione "Distribuidor Cível". Informe CPF/CNPJ. Pagamento via GRU (Guia de Recolhimento). Download imediato após pagamento.' },
+
+  { id:'acoes-penais', nome:'Certidão de Ações Penais (TJMG)', para:'Processos criminais em nome do vendedor no âmbito estadual de MG.',
+    sobre:'vendedor', categoria:'judicial', gratis:false, essencial:false,
+    link:'https://www.tjmg.jus.br/portal-tjmg/servicos/certidoes.htm', custo:'R$ 4,77',
+    instrucao:'Mesmo portal TJMG, seção "Distribuidor Criminal". Pagamento via GRU.' },
+
+  { id:'habite-se', nome:'Habite-se / Certidão de Conclusão de Obra', para:'Confirma que a construção foi concluída e aprovada pela Prefeitura. Obrigatório para imóveis construídos.',
+    sobre:'imovel', categoria:'municipal', gratis:false, essencial:true,
+    link:'https://prefeitura.pbh.gov.br/obras-e-infraestrutura/servicos/habite-se', custo:'Variável',
+    instrucao:'Acesse o portal da PBH ou compareça na SMARU. Informe o endereço e o número do alvará de construção.',
+    cartorio:'Preciso verificar se o imóvel no endereço [endereço completo] possui Habite-se emitido e se está em conformidade com o projeto aprovado pela Prefeitura.' },
+];
+
+// ============================================================
+// DUE DILIGENCE PAGE — com tabs Due Diligence / Central de Certidões
+// ============================================================
 function DueDiligencePage({ onNav }) {
+  const [tab, setTab] = React.useState('diligencia');
   const checks = [
     { area: 'Jurídico', itens: ['Matrícula do imóvel atualizada', 'Ônus, hipotecas e penhoras', 'Certidões do vendedor (cível, criminal, trabalhista)', 'Protestos e processos em curso', 'Inventário e sucessão (quando aplicável)'] },
     { area: 'Fiscal', itens: ['IPTU em dia · histórico de 5 anos', 'Taxa de condomínio em dia', 'Débitos com concessionárias', 'ITBI e imposto de transmissão'] },
@@ -7827,29 +7903,107 @@ function DueDiligencePage({ onNav }) {
     { area: 'Documental', itens: ['Análise de minuta de compra e venda', 'Negociação de cláusulas críticas', 'Distrato e direito de arrependimento', 'Procurações e poderes especiais'] },
   ];
 
-  return (
-    <main style={{ background: 'var(--cream)' }}>
-      <section style={{
-        position: 'relative',
-        background: `linear-gradient(180deg, rgba(15,22,32,0.65) 0%, rgba(15,22,32,0.92) 100%), url(${window.__resources?.img69||'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1900&q=85'})`,
-        backgroundSize: 'cover', backgroundPosition: 'center',
-        color: '#fff', padding: 'clamp(80px, 12vw, 140px) 0 clamp(60px, 9vw, 100px)',
-      }}>
-        <div style={{ width: 'min(1180px, 92vw)', margin: '0 auto', maxWidth: 720 }}>
-          <Eyebrow>Due Diligence Imobiliária</Eyebrow>
-          <h1 style={{ color: '#fff', margin: '12px 0 18px', fontSize: 'clamp(2.4rem, 5vw, 3.6rem)', lineHeight: 1.05 }}>
-            Compre com <em className="italic-accent" style={{ color: 'var(--gold-soft)' }}>segurança jurídica</em> total.
-          </h1>
-          <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.88)', maxWidth: 560, marginBottom: 28 }}>
-            Análise completa de matrícula, certidões, ônus, regularidade técnica e fiscal antes de você assinar o contrato. Conduzido por advogados parceiros especialistas em direito imobiliário.
-          </p>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <Btn variant="accent" size="lg" onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Solicitar análise</Btn>
-            <Btn variant="ghost-light" size="lg" onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Ver relatório modelo</Btn>
-          </div>
-        </div>
-      </section>
+  // Certidões tab state
+  const [certFilter, setCertFilter] = React.useState({ cat: 'todas', sobre: 'todos', search: '' });
+  const [expandedCert, setExpandedCert] = React.useState(null);
 
+  const catLabels = [
+    { key: 'todas', label: 'Todas' },
+    { key: 'fiscal', label: 'Fiscal' },
+    { key: 'trabalhista', label: 'Trabalhista' },
+    { key: 'judicial', label: 'Judicial' },
+    { key: 'cartorio', label: 'Cartório' },
+    { key: 'municipal', label: 'Municipal' },
+    { key: 'estadual', label: 'Estadual' },
+  ];
+
+  const filteredCerts = CERTIDOES.filter(c => {
+    if (certFilter.cat !== 'todas' && c.categoria !== certFilter.cat) return false;
+    if (certFilter.sobre !== 'todos' && c.sobre !== certFilter.sobre) return false;
+    if (certFilter.search) {
+      const q = certFilter.search.toLowerCase();
+      if (!c.nome.toLowerCase().includes(q) && !c.para.toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
+
+  const essenciais = CERTIDOES.filter(c => c.essencial);
+
+  function handlePrint() {
+    const rows = CERTIDOES.map(c => `
+      <tr>
+        <td style="padding:10px 8px;border-bottom:1px solid #e5e7eb;">
+          <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;">
+            <input type="checkbox" style="margin-top:3px;flex-shrink:0;" />
+            <span>
+              <strong>${c.nome}</strong><br/>
+              <small style="color:#6b7280;">${c.para}</small><br/>
+              <small><a href="${c.link}" target="_blank" style="color:#1d4ed8;">${c.link}</a></small>
+            </span>
+          </label>
+        </td>
+        <td style="padding:10px 8px;border-bottom:1px solid #e5e7eb;white-space:nowrap;">
+          ${c.gratis ? '<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600;">Grátis</span>' : `<span style="background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600;">Paga · ${c.custo||''}</span>`}
+        </td>
+        <td style="padding:10px 8px;border-bottom:1px solid #e5e7eb;">
+          <span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:99px;font-size:11px;">${c.categoria}</span>
+          <span style="background:#eff6ff;color:#1e40af;padding:2px 8px;border-radius:99px;font-size:11px;margin-left:4px;">${c.sobre}</span>
+          ${c.essencial ? '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:99px;font-size:11px;margin-left:4px;">Essencial</span>' : ''}
+        </td>
+      </tr>`).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<title>Checklist de Certidões — VN Prime Imóveis</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 32px; color: #111827; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .sub { color: #6b7280; font-size: 14px; margin-bottom: 24px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #1e293b; color: #fff; padding: 10px 8px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  @media print { .no-print { display: none; } }
+</style>
+</head>
+<body>
+<h1>Checklist de Certidões Imobiliárias</h1>
+<p class="sub">VN Prime Imóveis · Due Diligence · Gerado em ${new Date().toLocaleDateString('pt-BR')}</p>
+<button class="no-print" onclick="window.print()" style="margin-bottom:20px;padding:8px 20px;background:#1e293b;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;">Imprimir / Salvar PDF</button>
+<table>
+  <thead><tr><th>Certidão</th><th>Custo</th><th>Categoria / Sobre</th></tr></thead>
+  <tbody>${rows}</tbody>
+</table>
+</body>
+</html>`;
+    const w = window.open('', '_blank');
+    w.document.write(html);
+    w.document.close();
+    w.print();
+  }
+
+  const tabSwitcher = (
+    <div style={{ background: '#fff', borderBottom: '1px solid var(--border)', position: 'sticky', top: 64, zIndex: 10 }}>
+      <div style={{ width: 'min(1180px, 92vw)', margin: '0 auto', display: 'flex', gap: 0 }}>
+        {[
+          { key: 'diligencia', label: 'Due Diligence' },
+          { key: 'certidoes', label: 'Central de Certidões' },
+        ].map(t => (
+          <button key={t.key} onClick={() => setTab(t.key)}
+            style={{
+              padding: '14px 28px', border: 'none', background: 'none', cursor: 'pointer',
+              fontSize: 15, fontWeight: 600, fontFamily: 'var(--font-body)',
+              color: tab === t.key ? 'var(--navy)' : 'var(--fg-3)',
+              borderBottom: tab === t.key ? '2px solid var(--gold-deep)' : '2px solid transparent',
+              transition: 'all 0.15s',
+            }}>{t.label}</button>
+        ))}
+      </div>
+    </div>
+  );
+
+  const diligenciaContent = (
+    <React.Fragment>
       {/* Checklist 4 áreas */}
       <section style={{ padding: 'clamp(50px, 7vw, 90px) 0' }}>
         <div style={{ width: 'min(1180px, 92vw)', margin: '0 auto' }}>
@@ -7905,11 +8059,406 @@ function DueDiligencePage({ onNav }) {
           </div>
         </div>
       </section>
+    </React.Fragment>
+  );
+
+  const certidoesContent = (
+    <React.Fragment>
+      {/* Banner 5 essenciais */}
+      <section style={{ background: '#fff', borderBottom: '1px solid var(--border)', padding: '18px 0' }}>
+        <div style={{ width: 'min(1180px, 92vw)', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'nowrap', overflowX: 'auto', paddingBottom: 4 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em',
+              color: 'var(--fg-3)', flexShrink: 0 }}>Essenciais:</span>
+            {essenciais.map(c => (
+              <span key={c.id} style={{
+                background: 'var(--gold-soft, #F6D77A)', color: 'var(--navy)',
+                padding: '4px 12px', borderRadius: 99, fontSize: 13, fontWeight: 600,
+                flexShrink: 0, whiteSpace: 'nowrap',
+              }}>{c.nome}</span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Filter bar + print */}
+      <section style={{ background: 'var(--cream)', padding: '24px 0 0' }}>
+        <div style={{ width: 'min(1180px, 92vw)', margin: '0 auto' }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
+            {/* Categoria pills */}
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', flex: '1 1 auto' }}>
+              {catLabels.map(cat => (
+                <button key={cat.key} onClick={() => setCertFilter(f => ({ ...f, cat: cat.key }))}
+                  style={{
+                    padding: '6px 14px', borderRadius: 99, border: '1px solid',
+                    borderColor: certFilter.cat === cat.key ? 'var(--navy)' : 'var(--border)',
+                    background: certFilter.cat === cat.key ? 'var(--navy)' : '#fff',
+                    color: certFilter.cat === cat.key ? '#fff' : 'var(--fg-2)',
+                    fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s',
+                  }}>{cat.label}</button>
+              ))}
+              {/* Sobre filter */}
+              {[['todos','Todos'],['vendedor','Vendedor'],['imovel','Imóvel']].map(([k, l]) => (
+                <button key={k} onClick={() => setCertFilter(f => ({ ...f, sobre: k }))}
+                  style={{
+                    padding: '6px 14px', borderRadius: 99, border: '1px solid',
+                    borderColor: certFilter.sobre === k ? '#3B82F6' : 'var(--border)',
+                    background: certFilter.sobre === k ? '#3B82F6' : '#fff',
+                    color: certFilter.sobre === k ? '#fff' : 'var(--fg-2)',
+                    fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s',
+                  }}>{l}</button>
+              ))}
+            </div>
+            {/* Search */}
+            <input
+              type="text" placeholder="Buscar certidão..."
+              value={certFilter.search}
+              onChange={e => setCertFilter(f => ({ ...f, search: e.target.value }))}
+              style={{
+                padding: '7px 14px', borderRadius: 8, border: '1px solid var(--border)',
+                fontSize: 13, outline: 'none', minWidth: 180,
+              }}
+            />
+            {/* Print button */}
+            <button onClick={handlePrint}
+              style={{
+                padding: '8px 18px', borderRadius: 8, border: '1px solid var(--border)',
+                background: '#fff', color: 'var(--navy)', fontSize: 13, fontWeight: 600,
+                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0,
+              }}>
+              🖨️ Imprimir checklist
+            </button>
+          </div>
+
+          {/* Cards grid */}
+          <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fill, minmax(520px, 1fr))', paddingBottom: 60 }}>
+            {filteredCerts.length === 0 && (
+              <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '48px 0', color: 'var(--fg-3)' }}>
+                Nenhuma certidão encontrada para os filtros selecionados.
+              </div>
+            )}
+            {filteredCerts.map(c => {
+              const isExpanded = expandedCert === c.id;
+              return (
+                <div key={c.id} style={{
+                  background: '#fff', borderRadius: 'var(--radius-lg)',
+                  border: '1px solid var(--border)', overflow: 'hidden',
+                  boxShadow: isExpanded ? '0 4px 20px rgba(0,0,0,0.08)' : 'none',
+                  transition: 'box-shadow 0.2s',
+                }}>
+                  {/* Card main row */}
+                  <div style={{ display: 'flex', gap: 0, alignItems: 'stretch' }}>
+                    {/* Left */}
+                    <div style={{ flex: 1, padding: '18px 20px' }}>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 6 }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--navy)', marginBottom: 3 }}>{c.nome}</div>
+                          <div style={{ fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.5 }}>{c.para}</div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10 }}>
+                        <span style={{ background: '#f3f4f6', color: '#374151', padding: '2px 9px', borderRadius: 99, fontSize: 11, fontWeight: 600 }}>
+                          {catLabels.find(x => x.key === c.categoria)?.label || c.categoria}
+                        </span>
+                        <span style={{ background: '#eff6ff', color: '#1e40af', padding: '2px 9px', borderRadius: 99, fontSize: 11, fontWeight: 600 }}>
+                          {c.sobre === 'vendedor' ? 'Vendedor' : 'Imóvel'}
+                        </span>
+                        {c.essencial && (
+                          <span style={{ background: '#fef3c7', color: '#92400e', padding: '2px 9px', borderRadius: 99, fontSize: 11, fontWeight: 600 }}>
+                            Essencial
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {/* Right */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      gap: 10, padding: '18px 20px', borderLeft: '1px solid var(--border)', minWidth: 150 }}>
+                      {c.gratis
+                        ? <span style={{ background: '#dcfce7', color: '#166534', padding: '4px 12px', borderRadius: 99, fontSize: 13, fontWeight: 700 }}>🟢 Grátis</span>
+                        : <div style={{ textAlign: 'center' }}>
+                            <span style={{ background: '#fee2e2', color: '#991b1b', padding: '4px 12px', borderRadius: 99, fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 4 }}>🔴 Paga</span>
+                            <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>{c.custo}</span>
+                          </div>
+                      }
+                      <a href={c.link} target="_blank" rel="noopener noreferrer"
+                        style={{
+                          display: 'block', textAlign: 'center', padding: '7px 14px', borderRadius: 8,
+                          background: 'var(--navy)', color: '#fff', fontSize: 13, fontWeight: 600,
+                          textDecoration: 'none', transition: 'opacity 0.15s',
+                        }}>Abrir portal →</a>
+                    </div>
+                  </div>
+                  {/* Expand toggle */}
+                  <button onClick={() => setExpandedCert(isExpanded ? null : c.id)}
+                    style={{
+                      width: '100%', padding: '10px 20px', border: 'none', borderTop: '1px solid var(--border)',
+                      background: isExpanded ? '#f8fafc' : 'transparent',
+                      color: 'var(--fg-2)', fontSize: 13, fontWeight: 500,
+                      cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 6,
+                    }}>
+                    <span style={{ transition: 'transform 0.2s', display: 'inline-block', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>▾</span>
+                    {isExpanded ? 'Ocultar detalhes' : 'Ver instruções de emissão'}
+                  </button>
+                  {/* Expandable content */}
+                  {isExpanded && (
+                    <div style={{ padding: '16px 20px 20px', background: '#f8fafc', borderTop: '1px solid var(--border)' }}>
+                      <p style={{ fontSize: 14, color: 'var(--fg-1)', lineHeight: 1.6, margin: '0 0 12px' }}>
+                        {c.instrucao}
+                      </p>
+                      {c.cartorio && (
+                        <div style={{ marginTop: 12 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', marginBottom: 8 }}>
+                            💬 Como falar no cartório:
+                          </div>
+                          <div style={{ background: '#fff', border: '1px solid var(--border)', borderRadius: 8, padding: '12px 16px', position: 'relative' }}>
+                            <p style={{ fontSize: 13, color: 'var(--fg-1)', lineHeight: 1.7, margin: 0, fontStyle: 'italic' }}>
+                              "{c.cartorio}"
+                            </p>
+                            <button
+                              onClick={() => { try { navigator.clipboard.writeText(c.cartorio); } catch(e) {} }}
+                              style={{
+                                position: 'absolute', top: 8, right: 8,
+                                padding: '3px 10px', borderRadius: 6, border: '1px solid var(--border)',
+                                background: '#fff', color: 'var(--fg-2)', fontSize: 11, cursor: 'pointer',
+                              }}>
+                              Copiar
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    </React.Fragment>
+  );
+
+  return (
+    <main style={{ background: 'var(--cream)' }}>
+      <section style={{
+        position: 'relative',
+        background: `linear-gradient(180deg, rgba(15,22,32,0.65) 0%, rgba(15,22,32,0.92) 100%), url(${window.__resources?.img69||'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1900&q=85'})`,
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        color: '#fff', padding: 'clamp(80px, 12vw, 140px) 0 clamp(60px, 9vw, 100px)',
+      }}>
+        <div style={{ width: 'min(1180px, 92vw)', margin: '0 auto', maxWidth: 720 }}>
+          <Eyebrow>Due Diligence Imobiliária</Eyebrow>
+          <h1 style={{ color: '#fff', margin: '12px 0 18px', fontSize: 'clamp(2.4rem, 5vw, 3.6rem)', lineHeight: 1.05 }}>
+            Compre com <em className="italic-accent" style={{ color: 'var(--gold-soft)' }}>segurança jurídica</em> total.
+          </h1>
+          <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.88)', maxWidth: 560, marginBottom: 28 }}>
+            Análise completa de matrícula, certidões, ônus, regularidade técnica e fiscal antes de você assinar o contrato. Conduzido por advogados parceiros especialistas em direito imobiliário.
+          </p>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <Btn variant="accent" size="lg" onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Solicitar análise</Btn>
+            <Btn variant="ghost-light" size="lg" onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Ver relatório modelo</Btn>
+          </div>
+        </div>
+      </section>
+
+      {tabSwitcher}
+      {tab === 'diligencia' && diligenciaContent}
+      {tab === 'certidoes' && certidoesContent}
     </main>
   );
 }
 
-Object.assign(window, { FotografoPage, ConsorcioPage, DueDiligencePage });
+// ============================================================
+// AVALIAÇÃO DE IMÓVEIS — 3 modalidades
+// ============================================================
+function AvaliacaoPage({ onNav }) {
+  const modalidades = [
+    {
+      id: 'judicial',
+      cor: '#8B5CF6',
+      corBg: '#F5F3FF',
+      icone: '⚖️',
+      nome: 'Laudo Judicial',
+      uso: 'Inventários, divórcio, desapropriação e ações judiciais.',
+      executor: 'Perito judicial nomeado (CNAI)',
+      prazo: '30–60 dias úteis',
+      valor: 'A partir de R$ 2.500',
+      quandoUsar: [
+        'Inventário e partilha de bens',
+        'Processo de divórcio com disputa',
+        'Desapropriação pelo poder público',
+        'Ação judicial que exige laudo oficial',
+        'Perícia técnica determinada pelo juiz',
+      ],
+      cta: 'Solicitar laudo judicial',
+    },
+    {
+      id: 'extrajudicial',
+      cor: '#3B82F6',
+      corBg: '#EFF6FF',
+      icone: '📋',
+      nome: 'Laudo Extrajudicial (PTAM)',
+      uso: 'Compra/venda, garantia bancária, financiamento, seguro e herança amigável.',
+      executor: 'Engenheiro avaliador credenciado CNAI',
+      prazo: '7–15 dias úteis',
+      valor: 'A partir de R$ 890',
+      quandoUsar: [
+        'Compra ou venda de imóvel',
+        'Garantia para financiamento bancário',
+        'Seguro de imóvel (ajuste de valor segurado)',
+        'Partilha amigável em herança',
+        'Atualização de valor patrimonial',
+      ],
+      cta: 'Solicitar PTAM',
+    },
+    {
+      id: 'ia',
+      cor: '#D4A857',
+      corBg: '#FFFBEB',
+      icone: '🤖',
+      nome: 'Estimativa IA',
+      uso: 'Referência rápida pré-negociação e check de mercado.',
+      executor: 'Algoritmo VN Prime (comparativos BH/MG)',
+      prazo: 'Instantânea',
+      valor: 'Grátis para clientes VN Prime',
+      quandoUsar: [
+        'Verificar se o preço pedido é justo',
+        'Orientação antes de fazer proposta',
+        'Comparativo rápido com o mercado de BH/MG',
+        'Clientes VN Prime em pré-negociação',
+      ],
+      cta: 'Estimar agora',
+    },
+  ];
+
+  return (
+    <main style={{ background: 'var(--cream)' }}>
+      {/* Hero */}
+      <section style={{
+        position: 'relative',
+        background: `linear-gradient(180deg, rgba(15,22,32,0.70) 0%, rgba(15,22,32,0.94) 100%), url(https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1900&q=85)`,
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        color: '#fff', padding: 'clamp(80px, 12vw, 140px) 0 clamp(60px, 9vw, 100px)',
+      }}>
+        <div style={{ width: 'min(1180px, 92vw)', margin: '0 auto', maxWidth: 720 }}>
+          <Eyebrow>Avaliação de Imóveis</Eyebrow>
+          <h1 style={{ color: '#fff', margin: '12px 0 18px', fontSize: 'clamp(2.4rem, 5vw, 3.6rem)', lineHeight: 1.05 }}>
+            Saiba o valor real do seu <em className="italic-accent" style={{ color: 'var(--gold-soft, #F6D77A)' }}>imóvel.</em>
+          </h1>
+          <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.88)', maxWidth: 560, marginBottom: 28 }}>
+            Três modalidades para cada situação — laudo judicial, extrajudicial ou estimativa instantânea com IA.
+          </p>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <Btn variant="accent" size="lg" onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Solicitar laudo</Btn>
+            <Btn variant="ghost-light" size="lg" onClick={() => {
+              const el = document.getElementById('avaliacao-cards');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}>Estimar agora</Btn>
+          </div>
+        </div>
+      </section>
+
+      {/* Cards 3 modalidades */}
+      <section id="avaliacao-cards" style={{ padding: 'clamp(60px, 8vw, 100px) 0' }}>
+        <div style={{ width: 'min(1180px, 92vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto 52px' }}>
+            <Eyebrow color="var(--gold-deep)">3 modalidades</Eyebrow>
+            <h2 style={{ margin: '8px 0 12px' }}>Escolha o laudo certo para cada situação</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 15.5 }}>
+              De uma estimativa instantânea até um laudo com validade judicial. A VN Prime conecta você ao avaliador adequado.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+            {modalidades.map(m => (
+              <div key={m.id} style={{
+                background: '#fff', borderRadius: 'var(--radius-lg)',
+                border: `1px solid ${m.cor}33`,
+                boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+                display: 'flex', flexDirection: 'column', overflow: 'hidden',
+              }}>
+                {/* Card header */}
+                <div style={{ background: m.corBg, padding: '24px 24px 20px', borderBottom: `1px solid ${m.cor}22` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+                    <span style={{
+                      width: 44, height: 44, borderRadius: 12,
+                      background: m.cor, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 22, flexShrink: 0,
+                    }}>{m.icone}</span>
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: 17, color: 'var(--navy)', lineHeight: 1.2 }}>{m.nome}</div>
+                      <div style={{ fontSize: 12, color: m.cor, fontWeight: 600, marginTop: 2 }}>{m.executor}</div>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: 14, color: 'var(--fg-2)', margin: 0, lineHeight: 1.6 }}>{m.uso}</p>
+                </div>
+                {/* Chips prazo + valor */}
+                <div style={{ display: 'flex', gap: 10, padding: '16px 24px 0', flexWrap: 'wrap' }}>
+                  <span style={{
+                    background: '#f1f5f9', color: 'var(--navy)',
+                    padding: '5px 12px', borderRadius: 99, fontSize: 13, fontWeight: 600,
+                    display: 'flex', alignItems: 'center', gap: 5,
+                  }}>⏱ {m.prazo}</span>
+                  <span style={{
+                    background: m.corBg, color: m.cor,
+                    border: `1px solid ${m.cor}44`,
+                    padding: '5px 12px', borderRadius: 99, fontSize: 13, fontWeight: 700,
+                  }}>{m.valor}</span>
+                </div>
+                {/* Quando usar */}
+                <div style={{ padding: '16px 24px', flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em',
+                    color: 'var(--fg-3)', marginBottom: 10 }}>Quando usar</div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {m.quandoUsar.map(q => (
+                      <li key={q} style={{ fontSize: 13.5, display: 'flex', gap: 8, alignItems: 'flex-start', color: 'var(--fg-1)' }}>
+                        <span style={{ color: m.cor, fontWeight: 700, fontSize: 14, lineHeight: 1.4 }}>✓</span>
+                        <span>{q}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                {/* CTA */}
+                <div style={{ padding: '16px 24px 24px' }}>
+                  <button
+                    onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}
+                    style={{
+                      width: '100%', padding: '12px 20px', borderRadius: 10, border: 'none',
+                      background: m.cor, color: '#fff', fontSize: 14, fontWeight: 700,
+                      cursor: 'pointer', transition: 'opacity 0.15s',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
+                    onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                  >{m.cta}</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Bottom CTA section */}
+      <section style={{ padding: 'clamp(50px, 7vw, 90px) 0', background: '#fff' }}>
+        <div style={{ width: 'min(900px, 92vw)', margin: '0 auto',
+          background: 'var(--gradient-navy-hero)', color: '#fff',
+          padding: 'clamp(36px, 5vw, 56px)', borderRadius: 'var(--radius-xl)',
+          textAlign: 'center', boxShadow: 'var(--shadow-soft)' }}>
+          <Eyebrow>Avaliação VN Prime</Eyebrow>
+          <h2 style={{ color: '#fff', margin: '14px 0 12px', fontSize: 'clamp(1.8rem, 3.5vw, 2.4rem)', fontWeight: 800 }}>
+            Não arrisque comprar ou vender pelo preço errado.
+          </h2>
+          <p style={{ color: 'rgba(245,248,250,0.85)', fontSize: 16, maxWidth: 520, margin: '0 auto 28px' }}>
+            Um laudo profissional protege sua negociação, facilita financiamentos e dá segurança jurídica à transação. Fale com nosso time agora.
+          </p>
+          <Btn variant="accent" size="lg" onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Falar com consultor</Btn>
+          <div style={{ marginTop: 16, fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+            Clientes VN Prime têm acesso gratuito à Estimativa IA
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+Object.assign(window, { FotografoPage, ConsorcioPage, DueDiligencePage, AvaliacaoPage });
 </script>
 <script type="text/babel">const { useState: useStateLanc } = React;
 
@@ -9396,6 +9945,7 @@ function App() {
       {route.name === 'fotografo' && React.createElement(window.FotografoPage, { onNav })}
       {route.name === 'consorcio' && React.createElement(window.ConsorcioPage, { onNav })}
       {route.name === 'due-diligence' && React.createElement(window.DueDiligencePage, { onNav })}
+      {route.name === 'avaliacao' && React.createElement(window.AvaliacaoPage, { onNav })}
       {route.name === 'lancamentos' && React.createElement(window.LancamentosPage, { onNav })}
       {route.name === 'login' && React.createElement(window.LoginPage, { onNav, mode: route.params.mode })}
       {route.name === 'sobre' && <SobrePage onNav={onNav} />}
