@@ -8539,6 +8539,13 @@ const arquitetura = [
 ];
 
 function LancamentosPage({ onNav }) {
+  const [selecionados, setSelecionados] = useStateLanc([]);
+
+  const toggleInteresse = (id) => {
+    setSelecionados(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+    setTimeout(() => document.getElementById('tabela-interesse')?.scrollIntoView({ behavior: 'smooth' }), 80);
+  };
+
   return (
     <main style={{ background: 'var(--cream)' }}>
       {/* HERO */}
@@ -8610,7 +8617,8 @@ function LancamentosPage({ onNav }) {
       <section id="empreendimentos" style={{ padding: 'clamp(50px, 7vw, 90px) 0' }}>
         <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto' }}>
           {empreendimentos.map((emp, i) => (
-            <EmpreendimentoCard key={emp.id} emp={emp} flip={i % 2 === 1} onNav={onNav} />
+            <EmpreendimentoCard key={emp.id} emp={emp} flip={i % 2 === 1} onNav={onNav}
+              selecionado={selecionados.includes(emp.id)} onInteresse={toggleInteresse} />
           ))}
         </div>
       </section>
@@ -8685,98 +8693,208 @@ function LancamentosPage({ onNav }) {
             </div>
           </div>
 
-          {/* Formulário de captura */}
-          <LeadLancamentoForm />
+          {/* Tabela de interesse */}
+          <div id="tabela-interesse">
+            <TabelaInteresse selecionados={selecionados} setSelecionados={setSelecionados} />
+          </div>
         </div>
       </section>
     </main>
   );
 }
 
-function LeadLancamentoForm() {
-  const useStateLead = React.useState.bind(React);
-  const [form, setForm] = useStateLead({ nome: '', email: '', whatsapp: '', telefone: '', interesse: '' });
-  const [sent, setSent] = useStateLead(false);
+function TabelaInteresse({ selecionados, setSelecionados }) {
+  const [form, setForm] = useStateLanc({ nome: '', whatsapp: '', objetivo: '', orcamento: '', prazo: '' });
+  const [enviado, setEnviado] = useStateLanc(false);
 
-  if (sent) return (
-    <div style={{ background: 'var(--cream)', borderRadius: 20, padding: '48px 40px', textAlign: 'center',
-      border: '1px solid var(--border)' }}>
-      <div style={{ fontSize: 44, marginBottom: 16 }}>✓</div>
-      <h3 style={{ margin: '0 0 10px', fontSize: 22, color: 'var(--navy)' }}>Recebemos seu interesse!</h3>
-      <p style={{ color: 'var(--fg-2)', fontSize: 15, maxWidth: 480, margin: '0 auto' }}>
-        Nossa equipe entrará em contato em até 24h com todas as informações sobre o empreendimento de seu interesse.
+  const toggleEmp = (id) =>
+    setSelecionados(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+
+  const inputStyle = { width: '100%', padding: '11px 14px', borderRadius: 10, boxSizing: 'border-box',
+    border: '1.5px solid var(--border)', fontFamily: 'var(--font-body)', fontSize: 14,
+    color: 'var(--navy)', outline: 'none', background: '#fff' };
+
+  const labelStyle = { display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.09em',
+    textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 7 };
+
+  const podeEnviar = form.nome.trim() && form.whatsapp.trim() && selecionados.length > 0;
+
+  const handleEnviar = () => {
+    const nomes = selecionados.map(id => empreendimentos.find(e => e.id === id)?.nome).filter(Boolean);
+    const msg = [
+      'Olá! Tenho interesse nos seguintes lançamentos VN Prime:',
+      nomes.map(n => `• ${n}`).join('\n'),
+      '',
+      `Nome: ${form.nome}`,
+      `WhatsApp: ${form.whatsapp}`,
+      form.objetivo ? `Objetivo: ${form.objetivo}` : '',
+      form.orcamento ? `Orçamento: ${form.orcamento}` : '',
+      form.prazo ? `Prazo para compra: ${form.prazo}` : '',
+    ].filter(l => l !== undefined).join('\n');
+    window.open(`https://wa.me/5531984144250?text=${encodeURIComponent(msg)}`, '_blank');
+    setEnviado(true);
+  };
+
+  if (enviado) return (
+    <div style={{ background: '#fff', borderRadius: 20, padding: '52px 40px', textAlign: 'center',
+      border: '1px solid var(--border)', boxShadow: 'var(--shadow-card)' }}>
+      <div style={{ fontSize: 52, marginBottom: 16 }}>🎉</div>
+      <h3 style={{ margin: '0 0 10px', fontSize: 22, color: 'var(--navy)' }}>Interesse enviado!</h3>
+      <p style={{ color: 'var(--fg-2)', fontSize: 15, maxWidth: 460, margin: '0 auto 24px' }}>
+        Nossa equipe entrará em contato em até 2h com o book completo, tabela de preços e condições exclusivas.
       </p>
+      <button onClick={() => { setEnviado(false); setSelecionados([]); setForm({ nome:'', whatsapp:'', objetivo:'', orcamento:'', prazo:'' }); }}
+        style={{ padding: '10px 24px', borderRadius: 10, border: '1.5px solid var(--border)', background: 'transparent',
+          fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14, cursor: 'pointer', color: 'var(--fg-2)' }}>
+        Registrar novo interesse
+      </button>
     </div>
   );
 
   return (
-    <div style={{ background: 'var(--cream)', borderRadius: 20, padding: 'clamp(28px, 4vw, 48px)',
-      border: '1px solid var(--border)' }}>
-      <div style={{ maxWidth: 680, margin: '0 auto' }}>
-        <Eyebrow color="var(--gold-deep)">Receba informações</Eyebrow>
-        <h3 style={{ margin: '8px 0 10px', fontSize: 24, fontWeight: 800, color: 'var(--navy)' }}>
-          Quero saber mais sobre os lançamentos
+    <div style={{ background: '#fff', borderRadius: 20, border: '1px solid var(--border)',
+      boxShadow: 'var(--shadow-card)', overflow: 'hidden' }}>
+
+      {/* Header */}
+      <div style={{ background: 'var(--navy)', padding: 'clamp(24px, 3vw, 36px) clamp(24px, 3.5vw, 48px)' }}>
+        <Eyebrow style={{ color: 'var(--gold-soft)' }}>Registre seu interesse</Eyebrow>
+        <h3 style={{ color: '#fff', margin: '8px 0 8px', fontSize: 22, fontWeight: 800 }}>
+          Tabela de interesse — Lançamentos VN Prime
         </h3>
-        <p style={{ color: 'var(--fg-2)', fontSize: 14.5, margin: '0 0 32px', lineHeight: 1.6 }}>
-          Preencha seus dados e nossa equipe envia o book completo, tabela de preços e condições de pagamento diretamente para você.
+        <p style={{ color: 'rgba(245,248,250,0.75)', fontSize: 14, margin: 0 }}>
+          Selecione os empreendimentos, preencha seu perfil e receba o book completo com tabela de preços.
         </p>
+      </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 20px' }}>
-          {[
-            ['nome', 'Nome completo', 'text', 'Seu nome'],
-            ['email', 'E-mail', 'email', 'seu@email.com'],
-            ['whatsapp', 'WhatsApp', 'tel', '(31) 9 9999-9999'],
-            ['telefone', 'Telefone (opcional)', 'tel', '(31) 3333-3333'],
-          ].map(([key, lbl, type, ph]) => (
-            <div key={key}>
-              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700,
-                letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 8 }}>
-                {lbl}
-              </label>
-              <input type={type} placeholder={ph} value={form[key]}
-                onChange={e => setForm({ ...form, [key]: e.target.value })}
-                style={{ width: '100%', padding: '12px 14px', borderRadius: 10,
-                  border: '1.5px solid var(--border)', fontFamily: 'var(--font-body)',
-                  fontSize: 14.5, color: 'var(--navy)', outline: 'none', boxSizing: 'border-box' }}
-                onFocus={e => e.target.style.borderColor = 'var(--gold)'}
-                onBlur={e => e.target.style.borderColor = 'var(--border)'} />
-            </div>
-          ))}
+      <div style={{ padding: 'clamp(24px, 3.5vw, 48px)', display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 1fr)', gap: 36, alignItems: 'start' }}>
 
-          <div style={{ gridColumn: '1 / -1' }}>
-            <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700,
-              letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 8 }}>
-              Empreendimento de interesse
-            </label>
-            <select value={form.interesse} onChange={e => setForm({ ...form, interesse: e.target.value })}
-              style={{ width: '100%', padding: '12px 14px', borderRadius: 10,
-                border: '1.5px solid var(--border)', fontFamily: 'var(--font-body)',
-                fontSize: 14.5, color: 'var(--navy)', outline: 'none', background: '#fff' }}>
-              <option value="">Todos — quero ver as opções disponíveis</option>
-              <option>Sereno One — Belvedere</option>
-              <option>Vale dos Cristais — Nova Lima</option>
-              <option>Alphaville Residences</option>
-            </select>
+        {/* Coluna esquerda: tabela de empreendimentos */}
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+            color: 'var(--fg-2)', marginBottom: 14 }}>
+            Selecione os empreendimentos de interesse
+            {selecionados.length > 0 && <span style={{ marginLeft: 8, color: 'var(--gold-deep)' }}>({selecionados.length} selecionado{selecionados.length > 1 ? 's' : ''})</span>}
           </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {empreendimentos.map(emp => {
+              const sel = selecionados.includes(emp.id);
+              return (
+                <div key={emp.id} onClick={() => toggleEmp(emp.id)} style={{
+                  border: sel ? '2px solid var(--gold)' : '1.5px solid var(--border)',
+                  borderRadius: 12, padding: '14px 16px', cursor: 'pointer',
+                  background: sel ? 'rgba(212,168,87,0.06)' : '#fff',
+                  transition: 'all .18s', boxShadow: sel ? '0 0 0 3px rgba(212,168,87,0.15)' : 'none',
+                  display: 'flex', alignItems: 'flex-start', gap: 14,
+                }}>
+                  <div style={{ width: 22, height: 22, borderRadius: 6, flexShrink: 0, marginTop: 1,
+                    border: sel ? '2px solid var(--gold)' : '2px solid var(--border)',
+                    background: sel ? 'var(--gold)' : '#fff',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 13, color: '#fff', fontWeight: 700 }}>
+                    {sel ? '✓' : ''}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--navy)' }}>{emp.nome}</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20,
+                        background: 'var(--gradient-gold)', color: 'var(--navy)', letterSpacing: '0.05em' }}>
+                        {emp.selo}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 12.5, color: 'var(--fg-2)', marginBottom: 6 }}>{emp.bairro}</div>
+                    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 12, color: 'var(--fg-1)', fontWeight: 600 }}>A partir de <strong style={{ color: 'var(--navy)' }}>{emp.precoFrom}</strong></span>
+                      <span style={{ fontSize: 12, color: 'var(--fg-2)' }}>Entrega: {emp.entrega}</span>
+                      <span style={{ fontSize: 12, color: 'var(--fg-2)' }}>{emp.plantas}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {selecionados.length === 0 && (
+            <p style={{ marginTop: 10, fontSize: 12, color: 'var(--fg-3)', fontStyle: 'italic' }}>
+              Selecione pelo menos um empreendimento acima para continuar.
+            </p>
+          )}
         </div>
 
-        <button
-          disabled={!form.nome.trim() || !form.email.trim() || !form.whatsapp.trim()}
-          onClick={() => setSent(true)}
-          style={{ marginTop: 24, width: '100%', padding: '15px 24px', borderRadius: 12,
-            border: 'none',
-            background: (!form.nome.trim() || !form.email.trim() || !form.whatsapp.trim())
-              ? 'var(--border)' : 'var(--gradient-gold)',
-            color: (!form.nome.trim() || !form.email.trim() || !form.whatsapp.trim())
-              ? 'var(--fg-3)' : 'var(--navy)',
-            fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 15.5,
-            cursor: (!form.nome.trim() || !form.email.trim() || !form.whatsapp.trim())
-              ? 'not-allowed' : 'pointer' }}>
-          Quero receber o book e a tabela de preços
-        </button>
-        <p style={{ textAlign: 'center', marginTop: 12, fontSize: 12, color: 'var(--fg-3)' }}>
-          Retorno em até 24h · Sem compromisso
-        </p>
+        {/* Coluna direita: perfil */}
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+            color: 'var(--fg-2)', marginBottom: 14 }}>Seu perfil</div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div>
+              <label style={labelStyle}>Nome completo *</label>
+              <input value={form.nome} onChange={e => setForm({...form, nome: e.target.value})}
+                placeholder="Seu nome" style={inputStyle}
+                onFocus={e => e.target.style.borderColor='var(--gold)'}
+                onBlur={e => e.target.style.borderColor='var(--border)'} />
+            </div>
+            <div>
+              <label style={labelStyle}>WhatsApp *</label>
+              <input value={form.whatsapp} onChange={e => setForm({...form, whatsapp: e.target.value})}
+                placeholder="(31) 9 9999-9999" style={inputStyle}
+                onFocus={e => e.target.style.borderColor='var(--gold)'}
+                onBlur={e => e.target.style.borderColor='var(--border)'} />
+            </div>
+            <div>
+              <label style={labelStyle}>Objetivo</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {['Morar', 'Investir', 'Ambos'].map(op => (
+                  <button key={op} onClick={() => setForm({...form, objetivo: form.objetivo === op ? '' : op})}
+                    style={{ flex: 1, padding: '9px 4px', borderRadius: 9, cursor: 'pointer',
+                      fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600, transition: 'all .15s',
+                      border: form.objetivo === op ? '2px solid var(--gold)' : '1.5px solid var(--border)',
+                      background: form.objetivo === op ? 'rgba(212,168,87,0.1)' : '#fff',
+                      color: form.objetivo === op ? 'var(--gold-deep)' : 'var(--fg-2)' }}>
+                    {op}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label style={labelStyle}>Faixa de orçamento</label>
+              <select value={form.orcamento} onChange={e => setForm({...form, orcamento: e.target.value})}
+                style={{...inputStyle, background: '#fff'}}>
+                <option value="">Selecione</option>
+                <option>Até R$ 500 mil</option>
+                <option>R$ 500 mil – R$ 1 mi</option>
+                <option>R$ 1 mi – R$ 2 mi</option>
+                <option>R$ 2 mi – R$ 4 mi</option>
+                <option>Acima de R$ 4 mi</option>
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Prazo para compra</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                {['Imediato', '3–6 meses', '6–12 meses', 'Mais de 1 ano'].map(op => (
+                  <button key={op} onClick={() => setForm({...form, prazo: form.prazo === op ? '' : op})}
+                    style={{ padding: '9px 6px', borderRadius: 9, cursor: 'pointer', fontSize: 12.5,
+                      fontFamily: 'var(--font-body)', fontWeight: 600, transition: 'all .15s',
+                      border: form.prazo === op ? '2px solid var(--gold)' : '1.5px solid var(--border)',
+                      background: form.prazo === op ? 'rgba(212,168,87,0.1)' : '#fff',
+                      color: form.prazo === op ? 'var(--gold-deep)' : 'var(--fg-2)' }}>
+                    {op}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <button onClick={handleEnviar} disabled={!podeEnviar}
+            style={{ marginTop: 22, width: '100%', padding: '14px', borderRadius: 12, border: 'none',
+              fontFamily: 'var(--font-body)', fontWeight: 800, fontSize: 15, cursor: podeEnviar ? 'pointer' : 'not-allowed',
+              background: podeEnviar ? 'var(--gradient-gold)' : 'var(--border)',
+              color: podeEnviar ? 'var(--navy)' : 'var(--fg-3)', transition: 'all .18s' }}>
+            📲 Enviar interesse via WhatsApp
+          </button>
+          <p style={{ marginTop: 10, fontSize: 11.5, color: 'var(--fg-3)', textAlign: 'center' }}>
+            Retorno em até 2h · Book completo + tabela de preços
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -8785,7 +8903,7 @@ function LeadLancamentoForm() {
 // ============================================================
 // CARD DO EMPREENDIMENTO (com carrossel)
 // ============================================================
-function EmpreendimentoCard({ emp, flip, onNav }) {
+function EmpreendimentoCard({ emp, flip, onNav, selecionado, onInteresse }) {
   const [idx, setIdx] = useStateLanc(0);
   const next = () => setIdx((i) => (i + 1) % emp.fotos.length);
   const prev = () => setIdx((i) => (i - 1 + emp.fotos.length) % emp.fotos.length);
@@ -8916,9 +9034,15 @@ function EmpreendimentoCard({ emp, flip, onNav }) {
 
         {/* CTAs */}
         <div style={{ display: 'flex', gap: 10, marginTop: 'auto', paddingTop: 8, flexWrap: 'wrap' }}>
-          <Btn variant="accent" size="md" onClick={() => onNav('login', { mode: 'cadastro' })}>
-            Quero saber mais
-          </Btn>
+          <button onClick={() => onInteresse && onInteresse(emp.id)} style={{
+            flex: 1, padding: '12px 18px', borderRadius: 10, border: 'none', cursor: 'pointer',
+            fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 14, transition: 'all .18s',
+            background: selecionado ? 'rgba(16,185,129,0.12)' : 'var(--gradient-gold)',
+            color: selecionado ? '#10B981' : 'var(--navy)',
+            outline: selecionado ? '2px solid #10B98140' : 'none',
+          }}>
+            {selecionado ? '✓ Interesse registrado' : 'Tenho interesse →'}
+          </button>
           <Btn variant="ghost" size="md" onClick={() => onNav('login', { mode: 'cadastro' })}>
             Tabela de preços
           </Btn>
