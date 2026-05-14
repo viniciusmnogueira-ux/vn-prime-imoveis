@@ -1311,6 +1311,7 @@ function SiteHeader({ active, onNav, density = 'comfortable' }) {
     { id: 'busca', label: 'Comprar' },
     { id: 'vender', label: 'Anuncie' },
     { id: 'lancamentos', label: 'Lançamentos' },
+    { id: 'conteudo', label: 'Conteúdo' },
     { id: 'sobre', label: 'Sobre' },
     { id: 'servicos', label: 'Serviços', dropdown: [
       { id: 'proprietario', label: 'Proprietário Direto', desc: 'Anuncie seu imóvel · taxa fixa ou comissão' },
@@ -6382,23 +6383,24 @@ function ProprietarioPage({ onNav }) {
   );
 
   const listing = {
-    titulo: 'Cobertura duplex · Belvedere', preco: 'R$ 3.200.000',
-    bairro: 'Belvedere, BH', status: 'Publicado',
-    plano: 'Venda Direta · R$ 297', diasAtivo: 14,
-    views: 847, leads: 12, visitas: 3,
-    img: window.__resources?.img60 || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=80',
+    titulo: 'PH Prime — Centro Betim', preco: 'R$ 780.000',
+    bairro: 'Centro, Betim — MG', status: 'Publicado',
+    plano: 'Venda Direta · R$ 297', diasAtivo: 3,
+    views: 124, leads: 3, visitas: 1,
+    img: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=900&q=80',
+    descricao: 'Cobertura com terraço gourmet e piscina privativa no coração de Betim. 148 m², 3 suítes, 2 vagas.',
+    codigo: 'VN-9001',
   };
 
   const leads = [
-    { id: 1, nome: 'Carlos Ferreira', telefone: '(31) 9 8811-3344', interesse: 'Cobertura · Belvedere', data: '11/05', status: 'Novo' },
-    { id: 2, nome: 'Paula Rodrigues', telefone: '(31) 9 9922-4455', interesse: 'Cobertura · Belvedere', data: '10/05', status: 'Contato feito' },
-    { id: 3, nome: 'Marco Neves',     telefone: '(31) 9 7733-5566', interesse: 'Cobertura · Belvedere', data: '09/05', status: 'Visita marcada' },
-    { id: 4, nome: 'Simone Costa',    telefone: '(31) 9 8844-6677', interesse: 'Cobertura · Belvedere', data: '08/05', status: 'Proposta recebida' },
+    { id: 1, nome: 'Rodrigo Almeida', telefone: '(31) 9 9201-4433', interesse: 'PH Prime · Betim', data: '13/05', status: 'Novo' },
+    { id: 2, nome: 'Fernanda Lima',   telefone: '(31) 9 8833-7712', interesse: 'PH Prime · Betim', data: '12/05', status: 'Contato feito' },
+    { id: 3, nome: 'Bruno Carvalho',  telefone: '(31) 9 7744-9900', interesse: 'PH Prime · Betim', data: '12/05', status: 'Visita marcada' },
   ];
 
   const visitas = [
-    { data: 'Quinta, 15 Mai', hora: '10h00', visitante: 'Marco Neves', status: 'Confirmada' },
-    { data: 'Sábado, 17 Mai', hora: '14h30', visitante: 'Paula Rodrigues', status: 'Pendente' },
+    { data: 'Quinta, 15 Mai', hora: '10h00', visitante: 'Bruno Carvalho', status: 'Confirmada' },
+    { data: 'Sábado, 17 Mai', hora: '15h00', visitante: 'Fernanda Lima',  status: 'Pendente' },
   ];
 
   const navItems = [
@@ -10072,6 +10074,7 @@ function App() {
       {route.name === 'avaliacao' && React.createElement(window.AvaliacaoPage, { onNav })}
       {route.name === 'lancamentos' && React.createElement(window.LancamentosPage, { onNav })}
       {route.name === 'login' && React.createElement(window.LoginPage, { onNav, mode: route.params.mode })}
+      {route.name === 'conteudo' && <ConteudoPage onNav={onNav} />}
       {route.name === 'sobre' && <SobrePage onNav={onNav} />}
       {route.name === 'aluguel' && (
         <PlaceholderPage name={route.name} onNav={onNav} />
@@ -10112,6 +10115,170 @@ function App() {
         </TweakSection>
       </TweaksPanel>
     </React.Fragment>
+  );
+}
+
+// ============================================================
+// CONTEÚDO — Vídeos e artigos
+// ============================================================
+const VIDEOS = [
+  { id:'v1', cat:'tour',     titulo:'Tour exclusivo — PH Prime Centro Betim',           dur:'4:12', thumb:'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&q=80',  desc:'Cobertura de 148 m² com terraço gourmet, piscina privativa e vista panorâmica. Disponível por R$ 780.000.',    ytId:'dQw4w9WgXcQ' },
+  { id:'v2', cat:'mercado',  titulo:'Comprar na planta vale a pena em 2025?',           dur:'8:34', thumb:'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80',  desc:'Análise do mercado imobiliário de BH e Grande BH: valorização, taxas e melhores regiões para investir.',     ytId:'dQw4w9WgXcQ' },
+  { id:'v3', cat:'juridico', titulo:'5 certidões que você PRECISA antes de comprar',   dur:'6:50', thumb:'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80',  desc:'Guia completo: quais documentos exigir do vendedor, onde emitir e o que cada uma significa.',                ytId:'dQw4w9WgXcQ' },
+  { id:'v4', cat:'mercado',  titulo:'Consórcio vs Financiamento — comparativo real',   dur:'7:20', thumb:'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80',  desc:'Simulamos dois cenários reais com R$ 500k e R$ 1,2 mi. Qual custa menos no total?',                          ytId:'dQw4w9WgXcQ' },
+  { id:'v5', cat:'vendas',   titulo:'SPIN Selling aplicado a imóveis de alto padrão',  dur:'11:05',thumb:'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80',  desc:'Como usar as 4 perguntas do SPIN para qualificar compradores e fechar mais rápido.',                          ytId:'dQw4w9WgXcQ' },
+  { id:'v6', cat:'tour',     titulo:'Tour — Reserva Belvedere · Vale dos Cristais',    dur:'5:48', thumb:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80',  desc:'Casa de 4 suítes em condomínio fechado. Lotes de 460–800 m² com mata nativa.',                               ytId:'dQw4w9WgXcQ' },
+  { id:'v7', cat:'dicas',    titulo:'Fotografia imobiliária: o que faz um imóvel vender', dur:'9:15', thumb:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80', desc:'Ângulos, luz natural, drone e tour virtual. Tudo que você precisa saber para apresentar bem o imóvel.',        ytId:'dQw4w9WgXcQ' },
+  { id:'v8', cat:'juridico', titulo:'Due Diligence: como proteger sua compra',         dur:'10:30',thumb:'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80',  desc:'Advogado especialista explica os riscos mais comuns e como uma análise prévia evita prejuízos.',              ytId:'dQw4w9WgXcQ' },
+  { id:'v9', cat:'vendas',   titulo:'Como responder "está muito caro" sem ceder',       dur:'6:05', thumb:'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80',  desc:'Técnica de ancoragem e resumo de valor. Scripts prontos para as 3 objeções de preço mais comuns.',            ytId:'dQw4w9WgXcQ' },
+];
+
+const CAT_LABELS = { todos:'Todos', tour:'Tour de Imóveis', mercado:'Mercado', juridico:'Jurídico', vendas:'Vendas', dicas:'Dicas' };
+const CAT_COLORS = { tour:'#D4A857', mercado:'#3B82F6', juridico:'#8B5CF6', vendas:'#10B981', dicas:'#F59E0B' };
+
+function ConteudoPage({ onNav }) {
+  const [cat, setCat] = React.useState('todos');
+  const [playing, setPlaying] = React.useState(null);
+
+  const filtrados = cat === 'todos' ? VIDEOS : VIDEOS.filter(v => v.cat === cat);
+
+  return (
+    <main style={{ background: 'var(--cream)', minHeight: '100vh' }}>
+
+      {/* HERO */}
+      <section style={{ background: 'var(--navy)', padding: 'clamp(56px, 7vw, 90px) 0 clamp(40px, 5vw, 64px)' }}>
+        <div style={{ width: 'min(1180px, 92vw)', margin: '0 auto' }}>
+          <Eyebrow style={{ color: 'var(--gold-soft)' }}>VN Prime · Conteúdo</Eyebrow>
+          <h1 style={{ color: '#fff', margin: '12px 0 16px', fontSize: 'clamp(2rem, 4vw, 3rem)',
+            fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+            Vídeos e guias para <em className="italic-accent" style={{ color: 'var(--gold-soft)' }}>comprar, vender e investir</em> melhor.
+          </h1>
+          <p style={{ color: 'rgba(245,248,250,0.78)', fontSize: 16, maxWidth: 560, margin: 0 }}>
+            Tours de imóveis, análises de mercado, guias jurídicos e técnicas de venda. Tudo produzido pela equipe VN Prime.
+          </p>
+        </div>
+      </section>
+
+      {/* FILTROS */}
+      <div style={{ background: '#fff', borderBottom: '1px solid var(--border)', position: 'sticky', top: 64, zIndex: 10 }}>
+        <div style={{ width: 'min(1180px, 92vw)', margin: '0 auto', padding: '0 0', display: 'flex', gap: 0, overflowX: 'auto' }}>
+          {Object.entries(CAT_LABELS).map(([key, label]) => (
+            <button key={key} onClick={() => setCat(key)} style={{
+              padding: '14px 20px', background: 'none', border: 'none', cursor: 'pointer',
+              fontFamily: 'var(--font-body)', fontSize: 13.5, fontWeight: 700, whiteSpace: 'nowrap',
+              color: cat === key ? 'var(--navy)' : 'var(--fg-2)',
+              borderBottom: cat === key ? '3px solid var(--gold)' : '3px solid transparent',
+              transition: 'all 0.15s', marginBottom: -1,
+            }}>{label}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* GRID */}
+      <section style={{ padding: 'clamp(40px, 5vw, 70px) 0' }}>
+        <div style={{ width: 'min(1180px, 92vw)', margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 24 }}>
+            {filtrados.map(v => {
+              const cor = CAT_COLORS[v.cat] || 'var(--gold)';
+              const isPlaying = playing === v.id;
+              return (
+                <div key={v.id} style={{ background: '#fff', borderRadius: 'var(--radius-lg)',
+                  border: '1px solid var(--border)', overflow: 'hidden',
+                  boxShadow: 'var(--shadow-card)', transition: 'transform .18s, box-shadow .18s' }}
+                  onMouseEnter={e => { e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.boxShadow='0 12px 32px rgba(27,39,51,0.13)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform='none'; e.currentTarget.style.boxShadow='var(--shadow-card)'; }}>
+
+                  {/* Thumbnail */}
+                  <div style={{ position: 'relative', paddingTop: '56.25%', cursor: 'pointer',
+                    backgroundImage: `url(${v.thumb})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                    onClick={() => setPlaying(isPlaying ? null : v.id)}>
+                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,22,32,0.35)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'background .2s' }}>
+                      <div style={{ width: 52, height: 52, borderRadius: '50%',
+                        background: 'rgba(255,255,255,0.92)', display: 'flex', alignItems: 'center',
+                        justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.3)' }}>
+                        <span style={{ fontSize: 20, marginLeft: 3 }}>▶</span>
+                      </div>
+                    </div>
+                    <div style={{ position: 'absolute', bottom: 10, right: 10,
+                      background: 'rgba(15,22,32,0.78)', color: '#fff', padding: '3px 8px',
+                      borderRadius: 6, fontSize: 11.5, fontWeight: 600, backdropFilter: 'blur(4px)' }}>
+                      {v.dur}
+                    </div>
+                    <div style={{ position: 'absolute', top: 10, left: 10, padding: '3px 10px',
+                      borderRadius: 20, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.06em',
+                      background: `${cor}dd`, color: '#fff', textTransform: 'uppercase' }}>
+                      {CAT_LABELS[v.cat]}
+                    </div>
+                  </div>
+
+                  {/* YouTube embed modal-like (inline) */}
+                  {isPlaying && (
+                    <div style={{ background: '#000', paddingTop: '56.25%', position: 'relative' }}>
+                      <iframe
+                        src={`https://www.youtube.com/embed/${v.ytId}?autoplay=1`}
+                        allow="autoplay; encrypted-media"
+                        allowFullScreen
+                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+                      />
+                    </div>
+                  )}
+
+                  {/* Info */}
+                  <div style={{ padding: '16px 18px 20px' }}>
+                    <h3 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700, color: 'var(--navy)',
+                      lineHeight: 1.35 }}>{v.titulo}</h3>
+                    <p style={{ margin: '0 0 14px', fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.55 }}>
+                      {v.desc}
+                    </p>
+                    <button onClick={() => setPlaying(isPlaying ? null : v.id)}
+                      style={{ padding: '8px 18px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                        fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 13,
+                        background: `${cor}18`, color: cor, transition: 'all .15s' }}>
+                      {isPlaying ? '⏹ Fechar' : '▶ Assistir'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {filtrados.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--fg-3)' }}>
+              Nenhum vídeo nessa categoria ainda.
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* CTA newsletter */}
+      <section style={{ padding: 'clamp(40px, 5vw, 64px) 0', background: '#fff' }}>
+        <div style={{ width: 'min(640px, 92vw)', margin: '0 auto', textAlign: 'center' }}>
+          <Eyebrow color="var(--gold-deep)">Fique por dentro</Eyebrow>
+          <h2 style={{ margin: '10px 0 12px', fontSize: 'clamp(1.5rem, 3vw, 2rem)' }}>
+            Novos vídeos toda semana
+          </h2>
+          <p style={{ color: 'var(--fg-2)', fontSize: 15, marginBottom: 28 }}>
+            Tour de imóveis exclusivos, análises de mercado e guias práticos. Siga o canal VN Prime.
+          </p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <a href="https://www.youtube.com/@vnprimeimoveis" target="_blank" rel="noopener"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px',
+                borderRadius: 10, background: '#FF0000', color: '#fff', textDecoration: 'none',
+                fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 14 }}>
+              <span style={{ fontSize: 18 }}>▶</span> Seguir no YouTube
+            </a>
+            <a href="https://wa.me/5531984144250?text=Quero+receber+conteúdo+VN+Prime" target="_blank" rel="noopener"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px',
+                borderRadius: 10, background: '#25D366', color: '#fff', textDecoration: 'none',
+                fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 14 }}>
+              <span>💬</span> Receber no WhatsApp
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
 
