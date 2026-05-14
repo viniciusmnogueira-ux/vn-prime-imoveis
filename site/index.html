@@ -6197,6 +6197,146 @@ Object.assign(window, { AnunciarPage });
 // Hero · Benefícios · Serviços · Passo a passo · CTA Anuncie
 
 // ============================================================
+// ─── BOOSTER SECTION ─────────────────────────────────────────
+function BoosterSection({ accent, onSec }) {
+  const [selected, setSelected] = React.useState(null);
+  const [activated, setActivated] = React.useState(false);
+
+  const tiers = [
+    {
+      id: 'basico',
+      emoji: '⚡',
+      name: 'Booster',
+      price: 'R$ 49,90',
+      period: 'por 15 dias',
+      tag: null,
+      color: '#D4A857',
+      colorBg: 'rgba(212,168,87,0.08)',
+      colorBorder: 'rgba(212,168,87,0.28)',
+      benefits: [
+        'Anúncio no topo das buscas por 15 dias',
+        'Badge "Em Destaque" no card do imóvel',
+        '+40% de visibilidade estimada',
+        'Notificação push para compradores do perfil',
+      ],
+    },
+    {
+      id: 'premium',
+      emoji: '🔥',
+      name: 'Booster Premium',
+      price: 'R$ 99',
+      period: 'por 30 dias',
+      tag: 'Mais completo',
+      color: '#E8A020',
+      colorBg: 'rgba(232,160,32,0.1)',
+      colorBorder: 'rgba(232,160,32,0.4)',
+      benefits: [
+        'Tudo do Booster por 30 dias',
+        'Destaque na vitrine da home VN Prime',
+        'Impulsionamento em Instagram e Facebook',
+        'Badge "Prime Destaque" exclusivo',
+        'Relatório de performance ao final',
+      ],
+    },
+  ];
+
+  const handleActivate = () => {
+    if (!selected) return;
+    setActivated(true);
+    setTimeout(() => { setActivated(false); setSelected(null); }, 3000);
+  };
+
+  return (
+    <React.Fragment>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase',
+          color: accent, marginBottom: 6 }}>Exclusivo para assinantes</div>
+        <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: 'var(--navy)', lineHeight: 1.2 }}>
+          ⚡ Booster de Destaque
+        </h2>
+        <p style={{ margin: '6px 0 0', fontSize: 14, color: 'var(--fg-2)', maxWidth: 540 }}>
+          Apareça antes dos concorrentes nas buscas e na vitrine VN Prime. Pague só quando quiser impulsionar.
+        </p>
+      </div>
+
+      {activated && (
+        <div style={{ marginBottom: 20, padding: '14px 20px', borderRadius: 12,
+          background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)',
+          color: '#10B981', fontSize: 14, fontWeight: 600 }}>
+          ✓ Booster ativado! Seu anúncio já está em destaque. Você receberá uma confirmação por WhatsApp.
+        </div>
+      )}
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18, marginBottom: 28 }}>
+        {tiers.map(t => (
+          <div key={t.id} onClick={() => setSelected(selected === t.id ? null : t.id)}
+            style={{ borderRadius: 16, padding: '24px 24px', cursor: 'pointer', transition: 'all 0.18s',
+              background: selected === t.id ? t.colorBg : 'var(--cream)',
+              border: selected === t.id ? `2px solid ${t.color}` : '2px solid var(--border)',
+              position: 'relative', boxShadow: selected === t.id ? `0 0 0 4px ${t.color}15` : 'none' }}>
+            {t.tag && (
+              <div style={{ position: 'absolute', top: -11, left: 20,
+                background: t.color, color: '#fff', fontSize: 11, fontWeight: 700,
+                padding: '3px 12px', borderRadius: 20, letterSpacing: 0.5 }}>{t.tag}</div>
+            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12,
+                background: `${t.color}18`, display: 'flex', alignItems: 'center',
+                justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>{t.emoji}</div>
+              <div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--navy)' }}>{t.name}</div>
+                <div style={{ fontSize: 12, color: 'var(--fg-2)', marginTop: 1 }}>{t.period}</div>
+              </div>
+              <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
+                <div style={{ fontSize: 22, fontWeight: 800, color: t.color, lineHeight: 1 }}>{t.price}</div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {t.benefits.map((b, i) => (
+                <div key={i} style={{ display: 'flex', gap: 9, alignItems: 'flex-start' }}>
+                  <span style={{ color: t.color, fontWeight: 700, flexShrink: 0, marginTop: 1 }}>✓</span>
+                  <span style={{ fontSize: 13, color: 'var(--fg-1)', lineHeight: 1.5 }}>{b}</span>
+                </div>
+              ))}
+            </div>
+            {selected === t.id && (
+              <div style={{ marginTop: 16, padding: '8px 14px', borderRadius: 8,
+                background: `${t.color}20`, border: `1px solid ${t.color}40`,
+                fontSize: 12, fontWeight: 600, color: t.color, textAlign: 'center' }}>
+                ✓ Selecionado
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        <button onClick={handleActivate} disabled={!selected}
+          style={{ padding: '13px 32px', borderRadius: 12, border: 'none', cursor: selected ? 'pointer' : 'not-allowed',
+            background: selected ? 'var(--gradient-gold)' : 'var(--border)',
+            color: selected ? 'var(--navy)' : 'var(--fg-3)',
+            fontFamily: 'var(--font-body)', fontWeight: 800, fontSize: 15,
+            opacity: selected ? 1 : 0.5, transition: 'all 0.18s' }}>
+          {selected ? `Ativar ${tiers.find(t => t.id === selected)?.name}` : 'Selecione um plano acima'}
+        </button>
+        <button onClick={() => onSec('dashboard')}
+          style={{ padding: '13px 20px', borderRadius: 12, background: 'transparent',
+            border: '1.5px solid var(--border)', color: 'var(--fg-2)',
+            fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
+          Voltar
+        </button>
+      </div>
+
+      <div style={{ marginTop: 20, padding: '14px 18px', borderRadius: 10,
+        background: 'var(--cream)', border: '1px solid var(--border)',
+        fontSize: 12, color: 'var(--fg-3)', lineHeight: 1.6 }}>
+        💳 Pagamento via Pix ou cartão de crédito. O destaque é ativado em até 1h após a confirmação.
+        Disponível apenas para anúncios ativos na plataforma VN Prime.
+      </div>
+    </React.Fragment>
+  );
+}
+
 // PORTAL DO PROPRIETÁRIO — dashboard operacional
 // ============================================================
 function ProprietarioPage({ onNav }) {
@@ -6265,6 +6405,7 @@ function ProprietarioPage({ onNav }) {
     { id: 'anuncio',   icon: '⊞', label: 'Meu anúncio' },
     { id: 'leads',     icon: '◉', label: 'Leads' },
     { id: 'visitas',   icon: '▦', label: 'Visitas' },
+    { id: 'booster',   icon: '⚡', label: 'Booster' },
     { id: 'scripts',   icon: '📋', label: 'Scripts' },
     { id: 'plano',     icon: '◎', label: 'Meu plano' },
   ];
@@ -6306,6 +6447,33 @@ function ProprietarioPage({ onNav }) {
               <PortalStat label="Leads recebidos" value={listing.leads} sub="4 sem resposta" />
               <PortalStat label="Visitas agendadas" value={listing.visitas} sub="Próx.: 15/05" />
               <PortalStat label="Dias publicado" value={listing.diasAtivo} sub={`Status: ${listing.status}`} />
+            </div>
+
+            {/* BOOSTER teaser */}
+            <div onClick={() => setSec('booster')} style={{ cursor: 'pointer', marginBottom: 24,
+              background: 'linear-gradient(120deg, #0F1824 0%, #1B2733 60%, rgba(212,168,87,0.08) 100%)',
+              border: '1px solid rgba(212,168,87,0.3)', borderRadius: 14, padding: '16px 22px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                  background: 'linear-gradient(135deg, #D4A857, #F2C96A)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>⚡</div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: '#F2C96A', letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                    Booster — Destaque seu anúncio
+                  </div>
+                  <div style={{ fontSize: 12.5, color: 'rgba(245,248,250,0.65)', marginTop: 2 }}>
+                    Apareça no topo das buscas e na vitrine VN Prime · a partir de R$&nbsp;49,90
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
+                  background: 'rgba(212,168,87,0.15)', color: '#F2C96A', border: '1px solid rgba(212,168,87,0.3)' }}>
+                  Exclusivo assinante
+                </span>
+                <span style={{ color: 'rgba(245,248,250,0.4)', fontSize: 18 }}>›</span>
+              </div>
             </div>
 
             {/* Listing preview */}
@@ -6494,6 +6662,9 @@ function ProprietarioPage({ onNav }) {
             </button>
           </PortalSection>
         )}
+
+        {/* BOOSTER */}
+        {sec === 'booster' && React.createElement(BoosterSection, { accent, onSec: setSec })}
 
         {/* SCRIPTS */}
         {sec === 'scripts' && React.createElement(SalesScriptsSection, { accent, initialPersona: 'vendedor' })}
