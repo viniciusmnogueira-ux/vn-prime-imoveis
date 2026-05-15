@@ -8,6 +8,8 @@
 <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <style>/* ==========================================================================
    VN Prime Imóveis — Colors & Type Tokens (Coastal Mist · v2)
    Display: Cormorant Garamond  ·  Body: Inter  ·  Brand: Cormorant Italic
@@ -922,6 +924,21 @@ code {
   /* modal/overlay: full screen on mobile */
   .vnp-modal { width: 100vw !important; max-width: 100vw !important; border-radius: 20px 20px 0 0 !important; bottom: 0 !important; top: auto !important; max-height: 90vh !important; overflow-y: auto; }
 }
+</style>
+<style>
+/* ─── Leaflet map overrides ─── */
+.leaflet-container { font-family: inherit; border-radius: 14px; }
+.leaflet-popup-content-wrapper { border-radius: 10px; box-shadow: 0 6px 24px rgba(15,34,68,0.18); }
+.leaflet-popup-content { font-family: 'DM Sans', 'Inter', sans-serif; font-size: 13px; line-height: 1.55; }
+.vnp-map-pin {
+  background: #D4A857; color: #0F1824; border: 2px solid #fff;
+  border-radius: 999px; padding: 5px 11px;
+  font-family: 'DM Sans', 'Inter', sans-serif; font-size: 12px; font-weight: 700;
+  white-space: nowrap; box-shadow: 0 4px 14px rgba(15,34,68,0.25);
+  cursor: pointer; transition: background 0.15s, color 0.15s;
+}
+.vnp-map-pin.active { background: #1B2733; color: #D4A857; }
+.leaflet-div-icon { background: none; border: none; }
 </style>
 </head>
 <body>
@@ -2726,67 +2743,80 @@ function EmptyState({ onClear }) {
 
 // Map view — stylized abstract map (no real tiles)
 function MapResults({ listings, onOpen }) {
-  const [hovered, setHovered] = useState(null);
+  const mapDivRef = useRef(null);
+  const mapRef = useRef(null);
+  const markersRef = useRef([]);
+  const [activeId, setActiveId] = useState(null);
+
+  useEffect(() => {
+    if (!mapDivRef.current || mapRef.current || !window.L) return;
+    const L = window.L;
+
+    const map = L.map(mapDivRef.current, {
+      center: [-19.963, -43.950],
+      zoom: 12,
+      zoomControl: true,
+      attributionControl: true,
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
+      maxZoom: 19,
+    }).addTo(map);
+
+    listings.forEach(l => {
+      if (!l.coords) return;
+      const makeIcon = (active) => L.divIcon({
+        html: `<div class="vnp-map-pin${active ? ' active' : ''}">${fmtBRLshort(l.price)}</div>`,
+        iconAnchor: [0, 40],
+        className: '',
+      });
+
+      const marker = L.marker(l.coords, { icon: makeIcon(false) });
+      marker.addTo(map);
+      marker.bindPopup(
+        `<div style="min-width:180px">` +
+        `<div style="font-weight:700;font-size:14px;margin-bottom:4px">${l.title}</div>` +
+        `<div style="color:#555;font-size:12px;margin-bottom:6px">${l.neighborhood}, ${l.city}</div>` +
+        `<div style="font-weight:800;font-size:16px;color:#1B2733">${fmtBRL(l.price)}</div>` +
+        `<div style="margin-top:8px"><a href="#" onclick="return false;" style="color:#D4A857;font-weight:700;font-size:13px" data-lid="${l.id}">Ver imóvel →</a></div>` +
+        `</div>`,
+        { maxWidth: 220 }
+      );
+      marker.on('mouseover', () => {
+        marker.setIcon(makeIcon(true));
+        setActiveId(l.id);
+      });
+      marker.on('mouseout', () => {
+        marker.setIcon(makeIcon(false));
+        setActiveId(null);
+      });
+      marker.on('click', () => onOpen(l));
+      markersRef.current.push({ id: l.id, marker });
+    });
+
+    mapRef.current = map;
+    setTimeout(() => map.invalidateSize(), 120);
+
+    // delegate popup link clicks
+    map.getContainer().addEventListener('click', (e) => {
+      const a = e.target.closest('a[data-lid]');
+      if (a) { e.preventDefault(); const l = listings.find(x => x.id === a.dataset.lid); if (l) onOpen(l); }
+    });
+
+    return () => { map.remove(); mapRef.current = null; markersRef.current = []; };
+  }, []);
+
   return (
-    <div style={{
-      display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 18,
-      height: 'calc(100vh - 200px)', minHeight: 400,
-    }}>
-      {/* Faux map */}
-      <div style={{
-        position: 'relative', borderRadius: 14, overflow: 'hidden',
-        background: 'linear-gradient(135deg, #E8EEF6 0%, #D6DEE8 100%)',
-        border: '1px solid var(--border)',
-      }}>
-        {/* abstract grid lines */}
-        <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0, opacity: 0.5 }}>
-          <defs>
-            <pattern id="map-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M40 0 L0 0 0 40" fill="none" stroke="rgba(15,34,68,0.08)" strokeWidth="1"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#map-grid)" />
-          {/* fake roads */}
-          <path d="M0 240 Q300 200 600 280 T1200 250" stroke="rgba(255,255,255,0.7)" strokeWidth="6" fill="none"/>
-          <path d="M180 0 Q200 200 280 400 T380 800" stroke="rgba(255,255,255,0.6)" strokeWidth="5" fill="none"/>
-          <path d="M0 460 L600 480" stroke="rgba(255,255,255,0.5)" strokeWidth="4" fill="none"/>
-        </svg>
-        {/* pins */}
-        {listings.slice(0, 12).map((l, i) => {
-          const x = 12 + ((i * 137) % 78);
-          const y = 14 + ((i * 59) % 72);
-          const active = hovered === l.id;
-          return (
-            <button key={l.id}
-              onMouseEnter={() => setHovered(l.id)}
-              onMouseLeave={() => setHovered(null)}
-              onClick={() => onOpen(l)}
-              style={{
-                position: 'absolute', left: `${x}%`, top: `${y}%`,
-                transform: 'translate(-50%, -100%)',
-                background: active ? 'var(--navy)' : 'var(--gold)',
-                color: active ? 'var(--gold)' : 'var(--navy)',
-                border: '2px solid #fff', borderRadius: 999, padding: '5px 11px',
-                fontFamily: 'DM Sans', fontSize: 12, fontWeight: 700,
-                cursor: 'pointer', whiteSpace: 'nowrap',
-                boxShadow: '0 4px 14px rgba(15,34,68,0.25)',
-                transition: 'all 0.18s ease', zIndex: active ? 10 : 1,
-              }}>{fmtBRLshort(l.price)}</button>
-          );
-        })}
-        <div style={{ position: 'absolute', bottom: 14, left: 14,
-          background: 'rgba(255,255,255,0.95)', padding: '6px 12px', borderRadius: 6,
-          fontFamily: 'DM Sans', fontSize: 11, color: 'var(--fg-2)',
-          backdropFilter: 'blur(6px)' }}>
-          BH · Nova Lima · Região metropolitana
-        </div>
-      </div>
-      {/* List on side */}
-      <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14, paddingRight: 4 }}>
-        {listings.slice(0, 12).map(l => (
-          <div key={l.id}
-            onMouseEnter={() => setHovered(l.id)}
-            onMouseLeave={() => setHovered(null)}>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 18,
+      height: 'calc(100vh - 200px)', minHeight: 460 }}>
+      <div ref={mapDivRef} style={{ borderRadius: 14, overflow: 'hidden',
+        border: '1px solid var(--border)', minHeight: 460, zIndex: 0 }} />
+      <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column',
+        gap: 14, paddingRight: 4 }}>
+        {listings.map(l => (
+          <div key={l.id} style={{ outline: activeId === l.id ? '2px solid var(--gold)' : 'none',
+            borderRadius: 14, transition: 'outline 0.15s' }}>
             <ListingCard listing={l} onOpen={onOpen} layout="horizontal" />
           </div>
         ))}
@@ -3063,8 +3093,139 @@ function PropertyDetailPage({ id, onNav }) {
         </section>
       )}
 
+      {/* ITBI / Custos de compra */}
+      <CalculadoraITBI precoBase={price} />
+
       {showContact && <ContactModal listing={listing} onClose={() => setShowContact(false)} />}
     </main>
+  );
+}
+
+function CalculadoraITBI({ precoBase }) {
+  const [open, setOpen] = useState(false);
+  const [valor, setValor] = useState(precoBase || 1000000);
+  const [taxaItbi, setTaxaItbi] = useState(3);
+
+  const getEmolumentos = (v) => {
+    const faixas = [
+      { max:  100000, reg:  350, esc:  720 },
+      { max:  300000, reg:  680, esc: 1250 },
+      { max:  500000, reg: 1050, esc: 1850 },
+      { max:  800000, reg: 1450, esc: 2600 },
+      { max: 1200000, reg: 1950, esc: 3400 },
+      { max: 2000000, reg: 2900, esc: 4900 },
+      { max: 4000000, reg: 4600, esc: 7600 },
+      { max: 6000000, reg: 7200, esc:10200 },
+      { max: Infinity, reg: 9500, esc:13000 },
+    ];
+    return faixas.find(f => v <= f.max) || faixas[faixas.length - 1];
+  };
+
+  const itbi = Math.round(valor * taxaItbi / 100);
+  const em = getEmolumentos(valor);
+  const registro = em.reg;
+  const escritura = em.esc;
+  const total = itbi + registro + escritura;
+  const pct = ((total / valor) * 100).toFixed(1);
+
+  const items = [
+    { label: 'ITBI', hint: `${taxaItbi}% sobre o valor do imóvel`, value: itbi, accent: true },
+    { label: 'Escritura pública', hint: 'Tabela TJMG · Tabelionato de Notas', value: escritura },
+    { label: 'Registro de Imóveis', hint: 'Tabela TJMG · Cartório de Registro', value: registro },
+  ];
+
+  return (
+    <section style={{ padding: 'clamp(28px,4vw,48px) 0', background: 'var(--cream)',
+      borderTop: '1px solid var(--border)' }}>
+      <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto' }}>
+        <button onClick={() => setOpen(o => !o)}
+          style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'none', border: 'none',
+            cursor: 'pointer', padding: 0, width: '100%', textAlign: 'left' }}>
+          <div style={{ width: 44, height: 44, borderRadius: 12, background: '#1B2733',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4A857" strokeWidth="2" strokeLinecap="round">
+              <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)' }}>Calculadora de custos de compra</div>
+            <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>ITBI · Escritura · Registro — estimativa baseada na Tabela TJMG</div>
+          </div>
+          <div style={{ fontSize: 22, color: 'var(--navy)', transition: 'transform 0.2s',
+            transform: open ? 'rotate(180deg)' : 'none' }}>⌄</div>
+        </button>
+
+        {open && (
+          <div style={{ marginTop: 24, display: 'grid', gap: 24,
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))' }}>
+            {/* Left: inputs */}
+            <div style={{ background: '#fff', borderRadius: 16, padding: '24px 22px',
+              border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.1em',
+                textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 18 }}>Parâmetros</div>
+
+              <label style={{ display: 'block', marginBottom: 16 }}>
+                <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 6 }}>Valor do imóvel</div>
+                <input type="number" value={valor}
+                  onChange={(e) => setValor(Math.max(0, Number(e.target.value)))}
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid var(--border)',
+                    borderRadius: 8, fontSize: 16, fontWeight: 700, color: 'var(--navy)',
+                    fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                <div style={{ fontSize: 12, color: 'var(--fg-3)', marginTop: 5 }}>
+                  {fmtBRL(valor)}
+                </div>
+              </label>
+
+              <label style={{ display: 'block', marginBottom: 8 }}>
+                <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 6 }}>
+                  Alíquota ITBI — {taxaItbi}%
+                </div>
+                <input type="range" min="0.5" max="5" step="0.5" value={taxaItbi}
+                  onChange={(e) => setTaxaItbi(Number(e.target.value))}
+                  style={{ width: '100%', accentColor: '#D4A857' }} />
+                <div style={{ display: 'flex', justifyContent: 'space-between',
+                  fontSize: 11, color: 'var(--fg-3)', marginTop: 4 }}>
+                  <span>BH: 3% · Nova Lima: 2% · Contagem: 2,5%</span>
+                </div>
+              </label>
+            </div>
+
+            {/* Right: results */}
+            <div style={{ background: 'var(--navy)', borderRadius: 16, padding: '24px 22px', color: '#fff' }}>
+              <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.1em',
+                textTransform: 'uppercase', color: '#D4A857', marginBottom: 18 }}>Estimativa de custos</div>
+              {items.map(it => (
+                <div key={it.label} style={{ display: 'flex', justifyContent: 'space-between',
+                  alignItems: 'flex-start', padding: '12px 0',
+                  borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: it.accent ? '#D4A857' : '#fff' }}>{it.label}</div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{it.hint}</div>
+                  </div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: it.accent ? '#D4A857' : '#fff',
+                    textAlign: 'right', flexShrink: 0, marginLeft: 12 }}>{fmtBRL(it.value)}</div>
+                </div>
+              ))}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '16px 0 0' }}>
+                <div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Total de custos</div>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
+                    {pct}% do valor do imóvel
+                  </div>
+                </div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 26,
+                  fontWeight: 800, color: '#D4A857' }}>{fmtBRL(total)}</div>
+              </div>
+              <div style={{ marginTop: 14, padding: '12px 14px', background: 'rgba(255,255,255,0.06)',
+                borderRadius: 10, fontSize: 11.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
+                Valores estimados com base na Tabela de Emolumentos TJMG 2024. Não inclui honorários de advogado, assessoria imobiliária ou certidões. Consulte um cartório para valores exatos.
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -9033,14 +9194,13 @@ function AvaliacaoPage({ onNav }) {
   const modalidades = [
     {
       id: 'judicial',
-      cor: '#8B5CF6',
-      corBg: '#F5F3FF',
-      icone: '⚖️',
+      badge: 'Validade judicial',
       nome: 'Laudo Judicial',
       uso: 'Inventários, divórcio, desapropriação e ações judiciais.',
       executor: 'Perito judicial nomeado (CNAI)',
       prazo: '30–60 dias úteis',
       valor: 'A partir de R$ 2.500',
+      destaque: false,
       quandoUsar: [
         'Inventário e partilha de bens',
         'Processo de divórcio com disputa',
@@ -9049,17 +9209,17 @@ function AvaliacaoPage({ onNav }) {
         'Perícia técnica determinada pelo juiz',
       ],
       cta: 'Solicitar laudo judicial',
+      svgPath: 'M12 3l9 4.5v5c0 4.5-3.5 8.7-9 10-5.5-1.3-9-5.5-9-10V7.5L12 3z',
     },
     {
       id: 'extrajudicial',
-      cor: '#3B82F6',
-      corBg: '#EFF6FF',
-      icone: '📋',
+      badge: 'Mais solicitado',
       nome: 'Laudo Extrajudicial (PTAM)',
       uso: 'Compra/venda, garantia bancária, financiamento, seguro e herança amigável.',
       executor: 'Engenheiro avaliador credenciado CNAI',
       prazo: '7–15 dias úteis',
       valor: 'A partir de R$ 890',
+      destaque: true,
       quandoUsar: [
         'Compra ou venda de imóvel',
         'Garantia para financiamento bancário',
@@ -9068,17 +9228,17 @@ function AvaliacaoPage({ onNav }) {
         'Atualização de valor patrimonial',
       ],
       cta: 'Solicitar PTAM',
+      svgPath: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
     },
     {
       id: 'ia',
-      cor: '#D4A857',
-      corBg: '#FFFBEB',
-      icone: '🤖',
+      badge: 'Grátis clientes VN',
       nome: 'Estimativa IA',
       uso: 'Referência rápida pré-negociação e check de mercado.',
       executor: 'Algoritmo VN Prime (comparativos BH/MG)',
       prazo: 'Instantânea',
       valor: 'Grátis para clientes VN Prime',
+      destaque: false,
       quandoUsar: [
         'Verificar se o preço pedido é justo',
         'Orientação antes de fazer proposta',
@@ -9086,6 +9246,7 @@ function AvaliacaoPage({ onNav }) {
         'Clientes VN Prime em pré-negociação',
       ],
       cta: 'Estimar agora',
+      svgPath: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
     },
   ];
 
@@ -9129,59 +9290,86 @@ function AvaliacaoPage({ onNav }) {
           <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
             {modalidades.map(m => (
               <div key={m.id} style={{
-                background: '#fff', borderRadius: 'var(--radius-lg)',
-                border: `1px solid ${m.cor}33`,
-                boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+                background: m.destaque ? 'var(--navy-deep, #0F1824)' : '#fff',
+                borderRadius: 20,
+                border: m.destaque ? 'none' : '1px solid var(--border)',
+                boxShadow: m.destaque ? '0 12px 40px rgba(15,22,32,0.22)' : '0 2px 12px rgba(0,0,0,0.06)',
                 display: 'flex', flexDirection: 'column', overflow: 'hidden',
+                position: 'relative',
               }}>
+                {/* Badge */}
+                <div style={{ position: 'absolute', top: -1, right: 24,
+                  background: m.destaque ? '#D4A857' : 'var(--navy)',
+                  color: m.destaque ? '#0F1824' : '#fff',
+                  padding: '4px 14px', borderRadius: '0 0 8px 8px',
+                  fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                  {m.badge}
+                </div>
+
                 {/* Card header */}
-                <div style={{ background: m.corBg, padding: '24px 24px 20px', borderBottom: `1px solid ${m.cor}22` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-                    <span style={{
-                      width: 44, height: 44, borderRadius: 12,
-                      background: m.cor, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 22, flexShrink: 0,
-                    }}>{m.icone}</span>
+                <div style={{ padding: '32px 28px 20px',
+                  borderBottom: m.destaque ? '1px solid rgba(255,255,255,0.08)' : '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                      background: m.destaque ? 'rgba(212,168,87,0.18)' : '#1B2733',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke={m.destaque ? '#D4A857' : '#D4A857'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d={m.svgPath}/>
+                      </svg>
+                    </div>
                     <div>
-                      <div style={{ fontWeight: 800, fontSize: 17, color: 'var(--navy)', lineHeight: 1.2 }}>{m.nome}</div>
-                      <div style={{ fontSize: 12, color: m.cor, fontWeight: 600, marginTop: 2 }}>{m.executor}</div>
+                      <div style={{ fontWeight: 800, fontSize: 17,
+                        color: m.destaque ? '#fff' : 'var(--navy)', lineHeight: 1.2 }}>{m.nome}</div>
+                      <div style={{ fontSize: 12,
+                        color: m.destaque ? 'rgba(255,255,255,0.55)' : 'var(--fg-3)',
+                        fontWeight: 500, marginTop: 3 }}>{m.executor}</div>
                     </div>
                   </div>
-                  <p style={{ fontSize: 14, color: 'var(--fg-2)', margin: 0, lineHeight: 1.6 }}>{m.uso}</p>
+                  <p style={{ fontSize: 14, color: m.destaque ? 'rgba(255,255,255,0.72)' : 'var(--fg-2)',
+                    margin: 0, lineHeight: 1.65 }}>{m.uso}</p>
                 </div>
-                {/* Chips prazo + valor */}
-                <div style={{ display: 'flex', gap: 10, padding: '16px 24px 0', flexWrap: 'wrap' }}>
-                  <span style={{
-                    background: '#f1f5f9', color: 'var(--navy)',
-                    padding: '5px 12px', borderRadius: 99, fontSize: 13, fontWeight: 600,
-                    display: 'flex', alignItems: 'center', gap: 5,
-                  }}>⏱ {m.prazo}</span>
-                  <span style={{
-                    background: m.corBg, color: m.cor,
-                    border: `1px solid ${m.cor}44`,
-                    padding: '5px 12px', borderRadius: 99, fontSize: 13, fontWeight: 700,
-                  }}>{m.valor}</span>
+
+                {/* Prazo + valor */}
+                <div style={{ display: 'flex', gap: 10, padding: '18px 28px 0', flexWrap: 'wrap' }}>
+                  <span style={{ background: m.destaque ? 'rgba(255,255,255,0.08)' : 'var(--cream)',
+                    color: m.destaque ? 'rgba(255,255,255,0.75)' : 'var(--navy)',
+                    padding: '5px 12px', borderRadius: 99, fontSize: 12.5, fontWeight: 600 }}>
+                    {m.prazo}
+                  </span>
+                  <span style={{ background: m.destaque ? 'rgba(212,168,87,0.15)' : '#D4A85714',
+                    color: '#D4A857', border: m.destaque ? 'none' : '1px solid #D4A85730',
+                    padding: '5px 12px', borderRadius: 99, fontSize: 12.5, fontWeight: 700 }}>
+                    {m.valor}
+                  </span>
                 </div>
+
                 {/* Quando usar */}
-                <div style={{ padding: '16px 24px', flex: 1 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em',
-                    color: 'var(--fg-3)', marginBottom: 10 }}>Quando usar</div>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ padding: '18px 28px', flex: 1 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em',
+                    color: m.destaque ? 'rgba(255,255,255,0.35)' : 'var(--fg-3)', marginBottom: 12 }}>
+                    Quando usar
+                  </div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 9 }}>
                     {m.quandoUsar.map(q => (
-                      <li key={q} style={{ fontSize: 13.5, display: 'flex', gap: 8, alignItems: 'flex-start', color: 'var(--fg-1)' }}>
-                        <span style={{ color: m.cor, fontWeight: 700, fontSize: 14, lineHeight: 1.4 }}>✓</span>
-                        <span>{q}</span>
+                      <li key={q} style={{ fontSize: 13.5, display: 'flex', gap: 9, alignItems: 'flex-start',
+                        color: m.destaque ? 'rgba(255,255,255,0.82)' : 'var(--fg-1)' }}>
+                        <span style={{ color: '#D4A857', fontWeight: 700, flexShrink: 0 }}>✓</span>
+                        {q}
                       </li>
                     ))}
                   </ul>
                 </div>
+
                 {/* CTA */}
-                <div style={{ padding: '16px 24px 24px' }}>
+                <div style={{ padding: '16px 28px 28px' }}>
                   <button
                     onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}
                     style={{
-                      width: '100%', padding: '12px 20px', borderRadius: 10, border: 'none',
-                      background: m.cor, color: '#fff', fontSize: 14, fontWeight: 700,
+                      width: '100%', padding: '13px 20px', borderRadius: 10, border: 'none',
+                      background: m.destaque ? '#D4A857' : 'var(--navy)',
+                      color: m.destaque ? '#0F1824' : '#fff',
+                      fontSize: 14, fontWeight: 700,
                       cursor: 'pointer', transition: 'opacity 0.15s',
                     }}
                     onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
@@ -9194,7 +9382,7 @@ function AvaliacaoPage({ onNav }) {
         </div>
       </section>
 
-      {/* Bottom CTA section */}
+      {/* Bottom CTA */}
       <section style={{ padding: 'clamp(50px, 7vw, 90px) 0', background: '#fff' }}>
         <div style={{ width: 'min(900px, 92vw)', margin: '0 auto',
           background: 'var(--gradient-navy-hero)', color: '#fff',
@@ -9205,7 +9393,7 @@ function AvaliacaoPage({ onNav }) {
             Não arrisque comprar ou vender pelo preço errado.
           </h2>
           <p style={{ color: 'rgba(245,248,250,0.85)', fontSize: 16, maxWidth: 520, margin: '0 auto 28px' }}>
-            Um laudo profissional protege sua negociação, facilita financiamentos e dá segurança jurídica à transação. Fale com nosso time agora.
+            Um laudo profissional protege sua negociação, facilita financiamentos e dá segurança jurídica à transação.
           </p>
           <Btn variant="accent" size="lg" onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Falar com consultor</Btn>
           <div style={{ marginTop: 16, fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
