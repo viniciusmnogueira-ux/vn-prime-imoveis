@@ -888,6 +888,41 @@ code {
   .kpi-cell:last-child { border-right: none !important; }
   a { color: inherit; }
 </style>
+<style>
+/* ── Mobile overrides (≤ 768px) ───────────────────────────────── */
+@media (max-width: 768px) {
+  /* tighter section padding */
+  .vnp-section { padding: 48px 0 !important; }
+
+  /* 2-col grids → 1 col */
+  .vnp-grid-2 { grid-template-columns: 1fr !important; }
+
+  /* plan comparison side-by-side → stacked */
+  .vnp-plans-row { flex-direction: column !important; gap: 16px !important; }
+
+  /* search page: sidebar + results → stack */
+  .vnp-search-layout { grid-template-columns: 1fr !important; }
+  .vnp-search-sidebar { display: none !important; }
+  .vnp-search-sidebar.open { display: block !important; }
+
+  /* hero text scaling */
+  h1 { font-size: clamp(1.8rem, 6.5vw, 2.6rem) !important; }
+  h2 { font-size: clamp(1.4rem, 5vw, 2rem) !important; }
+
+  /* portal stat cards: 2 per row */
+  .vnp-stats-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* full-width CTAs on mobile */
+  .vnp-cta-row { flex-direction: column !important; align-items: stretch !important; }
+  .vnp-cta-row > * { width: 100% !important; text-align: center !important; }
+
+  /* table horizontal scroll */
+  .vnp-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+
+  /* modal/overlay: full screen on mobile */
+  .vnp-modal { width: 100vw !important; max-width: 100vw !important; border-radius: 20px 20px 0 0 !important; bottom: 0 !important; top: auto !important; max-height: 90vh !important; overflow-y: auto; }
+}
+</style>
 </head>
 <body>
 <div id="root"></div>
@@ -1167,6 +1202,16 @@ window.VN_NEIGHBORHOODS = [
 <script type="text/babel">// Shared chrome — header, footer, brand mark, buttons, pills, formatters
 const { useState, useEffect, useRef, useMemo } = React;
 
+function useIsMobile(bp = 768) {
+  const [m, setM] = React.useState(() => typeof window !== 'undefined' && window.innerWidth < bp);
+  React.useEffect(() => {
+    const h = () => setM(window.innerWidth < bp);
+    window.addEventListener('resize', h);
+    return () => window.removeEventListener('resize', h);
+  }, [bp]);
+  return m;
+}
+
 const fmtBRL = (n) => 'R$ ' + new Intl.NumberFormat('pt-BR').format(n);
 const fmtBRLshort = (n) => {
   if (n >= 1_000_000) return 'R$ ' + (n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1).replace('.', ',') + ' mi';
@@ -1306,6 +1351,8 @@ function Pill({ children, tone = 'gold', solid = false, style = {} }) {
 // Site header — sticky w/ blur
 function SiteHeader({ active, onNav, density = 'comfortable' }) {
   const [openMenu, setOpenMenu] = React.useState(null);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const isMobile = useIsMobile();
   const items = [
     { id: 'home', label: 'Início' },
     { id: 'busca', label: 'Comprar' },
@@ -1322,6 +1369,7 @@ function SiteHeader({ active, onNav, density = 'comfortable' }) {
       { id: 'avaliacao', label: 'Avaliação de Imóveis', desc: 'Laudo judicial, extrajudicial ou estimativa IA' },
     ]},
   ];
+  const navTo = (id, params) => { setMobileOpen(false); setOpenMenu(null); onNav(id, params); };
   const pad = density === 'compact' ? '14px 0' : '20px 0';
   return (
     <header style={{
@@ -1331,62 +1379,139 @@ function SiteHeader({ active, onNav, density = 'comfortable' }) {
     }}>
       <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto', display: 'flex',
         alignItems: 'center', justifyContent: 'space-between', padding: pad, gap: 24 }}>
-        <a onClick={(e) => { e.preventDefault(); onNav('home'); }}
+        <a onClick={(e) => { e.preventDefault(); navTo('home'); }}
            style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', cursor: 'pointer' }}>
           <BrandLockup />
         </a>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 22 }}>
-          {items.map(it => (
-            <div key={it.id} style={{ position: 'relative' }}
-                 onMouseEnter={() => it.dropdown && setOpenMenu(it.id)}
-                 onMouseLeave={() => it.dropdown && setOpenMenu(null)}>
-              <a onClick={(e) => { e.preventDefault(); !it.dropdown && onNav(it.id); }}
-                 style={{
-                   fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
-                   color: it.id === 'vender'
-                     ? 'var(--gold-deep)'
-                     : active === it.id ? 'var(--navy)' : 'var(--navy-muted)',
-                   borderBottom: it.id === 'vender'
-                     ? '2px solid var(--gold)'
-                     : active === it.id ? '2px solid var(--gold)' : '2px solid transparent',
-                   background: it.id === 'vender' ? 'rgba(212,168,87,0.10)' : 'transparent',
-                   padding: it.id === 'vender' ? '6px 14px' : '8px 0',
-                   borderRadius: it.id === 'vender' ? 8 : 0,
-                   textDecoration: 'none',
-                   display: 'inline-flex', alignItems: 'center', gap: 4,
-                   transition: 'background 0.15s',
-                 }}>
-                {it.label}
-                {it.dropdown && <span style={{ fontSize: 9, opacity: 0.6 }}>▼</span>}
-              </a>
-              {it.dropdown && openMenu === it.id && (
-                <div style={{
-                  position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)',
-                  background: '#fff', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-soft)',
-                  border: '1px solid var(--border)', padding: 10, marginTop: 4,
-                  minWidth: 320, zIndex: 200,
-                }}>
-                  {it.dropdown.map(d => (
-                    <a key={d.id} onClick={(e) => { e.preventDefault(); setOpenMenu(null); onNav(d.id); }}
-                       style={{ display: 'block', padding: '12px 14px', borderRadius: 'var(--radius-md)',
-                         cursor: 'pointer', textDecoration: 'none', transition: 'background 0.12s' }}
-                       onMouseEnter={(e) => e.currentTarget.style.background = 'var(--surface-tint)'}
-                       onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{d.label}</div>
-                      <div style={{ fontSize: 12.5, color: 'var(--fg-2)', marginTop: 2 }}>{d.desc}</div>
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-          <span style={{ width: 1, height: 22, background: 'var(--border)' }} />
-          <a onClick={(e) => { e.preventDefault(); onNav('login'); }}
-             style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 13.5, color: 'var(--navy)',
-            cursor: 'pointer', letterSpacing: '0', fontWeight: 600 }}>Entrar</a>
-          <Btn size="sm" variant="accent" onClick={() => onNav('login', { mode: 'cadastro' })}>Anunciar grátis</Btn>
-        </nav>
+
+        {/* Desktop nav */}
+        {!isMobile && (
+          <nav style={{ display: 'flex', alignItems: 'center', gap: 22 }}>
+            {items.map(it => (
+              <div key={it.id} style={{ position: 'relative' }}
+                   onMouseEnter={() => it.dropdown && setOpenMenu(it.id)}
+                   onMouseLeave={() => it.dropdown && setOpenMenu(null)}>
+                <a onClick={(e) => { e.preventDefault(); !it.dropdown && navTo(it.id); }}
+                   style={{
+                     fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
+                     color: it.id === 'vender'
+                       ? 'var(--gold-deep)'
+                       : active === it.id ? 'var(--navy)' : 'var(--navy-muted)',
+                     borderBottom: it.id === 'vender'
+                       ? '2px solid var(--gold)'
+                       : active === it.id ? '2px solid var(--gold)' : '2px solid transparent',
+                     background: it.id === 'vender' ? 'rgba(212,168,87,0.10)' : 'transparent',
+                     padding: it.id === 'vender' ? '6px 14px' : '8px 0',
+                     borderRadius: it.id === 'vender' ? 8 : 0,
+                     textDecoration: 'none',
+                     display: 'inline-flex', alignItems: 'center', gap: 4,
+                     transition: 'background 0.15s',
+                   }}>
+                  {it.label}
+                  {it.dropdown && <span style={{ fontSize: 9, opacity: 0.6 }}>▼</span>}
+                </a>
+                {it.dropdown && openMenu === it.id && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)',
+                    background: '#fff', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-soft)',
+                    border: '1px solid var(--border)', padding: 10, marginTop: 4,
+                    minWidth: 320, zIndex: 200,
+                  }}>
+                    {it.dropdown.map(d => (
+                      <a key={d.id} onClick={(e) => { e.preventDefault(); navTo(d.id); }}
+                         style={{ display: 'block', padding: '12px 14px', borderRadius: 'var(--radius-md)',
+                           cursor: 'pointer', textDecoration: 'none', transition: 'background 0.12s' }}
+                         onMouseEnter={(e) => e.currentTarget.style.background = 'var(--surface-tint)'}
+                         onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{d.label}</div>
+                        <div style={{ fontSize: 12.5, color: 'var(--fg-2)', marginTop: 2 }}>{d.desc}</div>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+            <span style={{ width: 1, height: 22, background: 'var(--border)' }} />
+            <a onClick={(e) => { e.preventDefault(); navTo('login'); }}
+               style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 13.5, color: 'var(--navy)',
+              cursor: 'pointer', letterSpacing: '0', fontWeight: 600 }}>Entrar</a>
+            <Btn size="sm" variant="accent" onClick={() => navTo('login', { mode: 'cadastro' })}>Anunciar grátis</Btn>
+          </nav>
+        )}
+
+        {/* Mobile: Anunciar CTA + hamburger */}
+        {isMobile && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Btn size="sm" variant="accent" onClick={() => navTo('vender')}>Anunciar</Btn>
+            <button onClick={() => setMobileOpen(true)} aria-label="Menu" style={{
+              background: 'none', border: 'none', cursor: 'pointer', padding: '6px 4px',
+              display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5,
+            }}>
+              <span style={{ width: 22, height: 2, background: 'var(--navy)', borderRadius: 2, display: 'block' }} />
+              <span style={{ width: 22, height: 2, background: 'var(--navy)', borderRadius: 2, display: 'block' }} />
+              <span style={{ width: 16, height: 2, background: 'var(--navy)', borderRadius: 2, display: 'block' }} />
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Mobile drawer */}
+      {isMobile && mobileOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 999 }}>
+          <div onClick={() => setMobileOpen(false)} style={{
+            position: 'absolute', inset: 0, background: 'rgba(15,24,36,0.5)', backdropFilter: 'blur(2px)',
+          }} />
+          <div style={{
+            position: 'absolute', top: 0, right: 0, bottom: 0, width: 285,
+            background: '#fff', overflowY: 'auto',
+            boxShadow: '-4px 0 28px rgba(15,24,36,0.20)',
+            display: 'flex', flexDirection: 'column',
+          }}>
+            <div style={{ padding: '18px 20px 14px', borderBottom: '1px solid var(--border)',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <BrandLockup />
+              <button onClick={() => setMobileOpen(false)} style={{
+                background: 'none', border: 'none', cursor: 'pointer', fontSize: 18,
+                color: 'var(--navy)', padding: 4, lineHeight: 1,
+              }}>✕</button>
+            </div>
+            <nav style={{ padding: '10px 10px', flex: 1 }}>
+              {items.map(it => (
+                <div key={it.id}>
+                  <a onClick={(e) => { e.preventDefault(); if (!it.dropdown) navTo(it.id); }}
+                     style={{ display: 'block', padding: '11px 12px', borderRadius: 10,
+                       fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 15, fontWeight: 700,
+                       color: it.id === 'vender' ? 'var(--gold-deep)' : 'var(--navy)',
+                       background: active === it.id ? 'rgba(212,168,87,0.12)' : 'transparent',
+                       cursor: 'pointer', textDecoration: 'none',
+                     }}>
+                    {it.label}
+                    {it.dropdown && <span style={{ fontSize: 10, opacity: 0.45, marginLeft: 6 }}>▼</span>}
+                  </a>
+                  {it.dropdown && (
+                    <div style={{ paddingLeft: 16, marginBottom: 4 }}>
+                      {it.dropdown.map(d => (
+                        <a key={d.id} onClick={(e) => { e.preventDefault(); navTo(d.id); }}
+                           style={{ display: 'block', padding: '8px 12px', borderRadius: 8,
+                             fontSize: 13.5, color: 'var(--fg-2)', cursor: 'pointer',
+                             textDecoration: 'none', fontFamily: 'var(--font-body)',
+                           }}>
+                          {d.label}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </nav>
+            <div style={{ padding: '14px 12px', borderTop: '1px solid var(--border)',
+              display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <Btn fullWidth variant="ghost" onClick={() => navTo('login')}>Entrar</Btn>
+              <Btn fullWidth variant="accent" onClick={() => navTo('login', { mode: 'cadastro' })}>Anunciar grátis</Btn>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
@@ -1943,9 +2068,9 @@ function HomePage({ onNav, density, accentMode }) {
                 {SERVICOS.map((s, i) => (
                   <div key={s.title} style={{ minWidth: '100%' }}>
                     <div style={{
-                      display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0,
+                      display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 0,
                       borderRadius: 20, overflow: 'hidden',
-                      boxShadow: 'var(--shadow-soft)', minHeight: 420,
+                      boxShadow: 'var(--shadow-soft)', minHeight: 320,
                     }}>
                       {/* Foto */}
                       <div style={{
@@ -2060,7 +2185,7 @@ function HomePage({ onNav, density, accentMode }) {
                       backgroundSize: 'cover', backgroundPosition: 'center',
                     }}>
                       <div style={{ position: 'relative', zIndex: 1, padding: 'clamp(36px, 5vw, 64px)',
-                        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center',
+                        display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 'clamp(24px, 4vw, 48px)', alignItems: 'center',
                         width: '100%' }}>
                         {/* Esquerda — preço e info */}
                         <div>
@@ -2131,7 +2256,7 @@ function HomePage({ onNav, density, accentMode }) {
             background: `linear-gradient(110deg, rgba(15,22,32,0.94) 0%, rgba(15,22,32,0.60) 55%, rgba(15,22,32,0.35) 100%), url(${window.__resources?.img16||'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80'})`,
             backgroundSize: 'cover', backgroundPosition: 'center',
             padding: 'clamp(48px, 6vw, 80px) clamp(32px, 5vw, 64px)',
-            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center', minHeight: 340 }}>
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 'clamp(24px, 4vw, 48px)', alignItems: 'center', minHeight: 280 }}>
 
             {/* Esquerda — copy */}
             <div style={{ color: '#fff', position: 'relative', zIndex: 1 }}>
@@ -2158,7 +2283,7 @@ function HomePage({ onNav, density, accentMode }) {
             </div>
 
             {/* Direita — trust signals */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, position: 'relative', zIndex: 1 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: 14, position: 'relative', zIndex: 1 }}>
               {[
                 ['🏆', 'Vitrine premium', 'Imóveis selecionados com rigor técnico e de mercado'],
                 ['📸', 'Fotos profissionais', 'Sessão fotográfica e tour virtual inclusos nos planos'],
@@ -2227,6 +2352,8 @@ function SearchResultsPage({ onNav, initial = {}, density = 'comfortable' }) {
   const [sort, setSort] = useState('relevance');
   const [layout, setLayout] = useState('grid'); // grid | list | map
   const [page, setPage] = useState(1);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const isMobile = useIsMobile();
   const PER_PAGE = 9;
 
   const results = useMemo(() => {
@@ -2290,7 +2417,20 @@ function SearchResultsPage({ onNav, initial = {}, density = 'comfortable' }) {
         backdropFilter: 'blur(8px)' }}>
         <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto', display: 'flex',
           alignItems: 'center', gap: 14, flexWrap: 'wrap', justifyContent: 'space-between' }}>
-          <OperationTabsLight value={filters.op} onChange={(v) => setFilters({ ...filters, op: v })} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <OperationTabsLight value={filters.op} onChange={(v) => setFilters({ ...filters, op: v })} />
+            {isMobile && (
+              <button onClick={() => setMobileFiltersOpen(o => !o)} style={{
+                display: 'flex', alignItems: 'center', gap: 6, padding: '0.5rem 0.9rem',
+                border: mobileFiltersOpen ? '1px solid var(--gold)' : '1px solid var(--border)',
+                borderRadius: 8, background: mobileFiltersOpen ? 'rgba(212,168,87,0.12)' : '#fff',
+                color: mobileFiltersOpen ? 'var(--gold-deep)' : 'var(--navy)',
+                fontFamily: 'DM Sans', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              }}>
+                ⊞ Filtros
+              </button>
+            )}
+          </div>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             <select value={sort} onChange={(e) => setSort(e.target.value)}
               style={{ ...inputStyle, padding: '0.5rem 0.7rem', fontSize: 13 }}>
@@ -2300,18 +2440,20 @@ function SearchResultsPage({ onNav, initial = {}, density = 'comfortable' }) {
               <option value="area_desc">Maior área</option>
               <option value="newest">Recém adicionados</option>
             </select>
-            <div style={{ display: 'inline-flex', border: '1px solid var(--border)',
-              borderRadius: 8, overflow: 'hidden' }}>
-              {[['grid', '▦'], ['list', '☰'], ['map', '◉']].map(([id, icon]) => (
-                <button key={id} onClick={() => setLayout(id)}
-                  style={{
-                    border: 'none', cursor: 'pointer', padding: '0.5rem 0.85rem',
-                    background: layout === id ? 'var(--navy)' : 'transparent',
-                    color: layout === id ? 'var(--gold)' : 'var(--navy)',
-                    fontSize: 14, fontFamily: 'DM Sans', fontWeight: 600,
-                  }}>{icon}</button>
-              ))}
-            </div>
+            {!isMobile && (
+              <div style={{ display: 'inline-flex', border: '1px solid var(--border)',
+                borderRadius: 8, overflow: 'hidden' }}>
+                {[['grid', '▦'], ['list', '☰'], ['map', '◉']].map(([id, icon]) => (
+                  <button key={id} onClick={() => setLayout(id)}
+                    style={{
+                      border: 'none', cursor: 'pointer', padding: '0.5rem 0.85rem',
+                      background: layout === id ? 'var(--navy)' : 'transparent',
+                      color: layout === id ? 'var(--gold)' : 'var(--navy)',
+                      fontSize: 14, fontFamily: 'DM Sans', fontWeight: 600,
+                    }}>{icon}</button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -2319,13 +2461,14 @@ function SearchResultsPage({ onNav, initial = {}, density = 'comfortable' }) {
       {/* Body */}
       <section style={{ padding: '24px 0 60px' }}>
         <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto', display: 'grid',
-          gap: 24, gridTemplateColumns: layout === 'map' ? '280px 1fr' : '280px 1fr' }}>
+          gap: 24, gridTemplateColumns: isMobile ? '1fr' : '280px 1fr' }}>
 
-          {/* Sidebar filters */}
-          <aside style={{ position: 'sticky', top: 130, alignSelf: 'start',
+          {/* Sidebar filters — hidden on mobile unless toggled */}
+          <aside style={{ position: isMobile ? 'static' : 'sticky', top: 130, alignSelf: 'start',
             background: '#fff', borderRadius: 14, border: '1px solid var(--border)',
             padding: '20px', boxShadow: '0 8px 32px rgba(15,34,68,0.06)',
-            maxHeight: 'calc(100vh - 150px)', overflowY: 'auto' }}>
+            maxHeight: isMobile ? 'none' : 'calc(100vh - 150px)', overflowY: 'auto',
+            display: isMobile && !mobileFiltersOpen ? 'none' : 'block' }}>
             <div style={{ fontFamily: 'Playfair Display', fontSize: 17, fontWeight: 600,
               color: 'var(--navy)', marginBottom: 4 }}>Refinar busca</div>
             <button onClick={() => setFilters({ op: filters.op, q: '', tipo: '', bairros: [],
@@ -2574,8 +2717,8 @@ function MapResults({ listings, onOpen }) {
   const [hovered, setHovered] = useState(null);
   return (
     <div style={{
-      display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18,
-      height: 'calc(100vh - 200px)', minHeight: 600,
+      display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 18,
+      height: 'calc(100vh - 200px)', minHeight: 400,
     }}>
       {/* Faux map */}
       <div style={{
@@ -3082,7 +3225,8 @@ function VenderHubPage({ onNav }) {
               borderTop: '1px solid var(--border)',
             }}>
               <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto',
-                display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(32px, 5vw, 64px)',
+                display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))',
+                gap: 'clamp(28px, 5vw, 64px)',
                 alignItems: 'center',
                 direction: reverse ? 'rtl' : 'ltr',
               }}>
@@ -3204,16 +3348,16 @@ function PortalLoginGate({ title, desc, img, accent, role, onAuth, onNav, childr
   const blurStyle = (e) => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'none'; };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr',
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))',
       minHeight: 'calc(100vh - 80px)' }}>
 
       {/* LEFT — hero */}
       <div style={{
         backgroundImage: `linear-gradient(160deg, rgba(15,22,32,0.88) 0%, rgba(15,22,32,0.65) 100%), url(${img})`,
         backgroundSize: 'cover', backgroundPosition: 'center',
-        padding: 'clamp(40px, 5vw, 72px)',
+        padding: 'clamp(32px, 5vw, 72px)',
         display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-        color: '#fff',
+        color: '#fff', minHeight: 240,
       }}>
         <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.24em',
           textTransform: 'uppercase', color: accent }}>VN Prime · {title}</div>
@@ -3355,6 +3499,49 @@ function PortalLoginGate({ title, desc, img, accent, role, onAuth, onNav, childr
 // PORTAL SHELL — layout base compartilhado pelos 4 portais
 // ============================================================
 function PortalShell({ title, accent = 'var(--gold)', navItems, active, onSection, onNav, children }) {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 60px)' }}>
+        <main style={{ flex: 1, background: 'var(--cream)', overflowX: 'hidden', paddingBottom: 68 }}>
+          {children}
+        </main>
+        {/* Bottom tab bar */}
+        <nav style={{
+          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
+          background: 'var(--navy-deep)', borderTop: '1px solid rgba(255,255,255,0.08)',
+          display: 'flex', alignItems: 'stretch', height: 62,
+        }}>
+          {navItems.map(item => (
+            <button key={item.id} onClick={() => onSection(item.id)} style={{
+              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+              justifyContent: 'center', gap: 2, border: 'none', background: 'transparent',
+              cursor: 'pointer', minWidth: 0, padding: '0 2px',
+              color: active === item.id ? accent : 'rgba(245,248,250,0.42)',
+              borderTop: active === item.id ? `2px solid ${accent}` : '2px solid transparent',
+              fontFamily: 'var(--font-body)', fontSize: 9, fontWeight: active === item.id ? 700 : 400,
+              transition: 'all 0.12s',
+            }}>
+              <span style={{ fontSize: 15, lineHeight: 1 }}>{item.icon}</span>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', padding: '0 2px' }}>{item.label}</span>
+            </button>
+          ))}
+          <button onClick={() => onNav('home')} style={{
+            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+            justifyContent: 'center', gap: 2, border: 'none', background: 'transparent',
+            cursor: 'pointer', minWidth: 0, padding: '0 2px',
+            color: 'rgba(245,248,250,0.32)', fontFamily: 'var(--font-body)', fontSize: 9,
+            borderTop: '2px solid transparent',
+          }}>
+            <span style={{ fontSize: 15, lineHeight: 1 }}>←</span>
+            <span>Site</span>
+          </button>
+        </nav>
+      </div>
+    );
+  }
+
   return (
     <div style={{ display: 'flex', minHeight: 'calc(100vh - 80px)' }}>
       {/* Sidebar */}
@@ -5518,7 +5705,7 @@ function IncorporadoraPage({ onNav }) {
                 {/* Materiais */}
                 <div style={{ marginBottom: 32 }}>
                   <IncSectionHeader label="Materiais" />
-                  <div style={{ display: 'grid', gap: 14, gridTemplateColumns: '1fr 1fr' }}>
+                  <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))' }}>
                     {[
                       ['Fotos do empreendimento',  'JPG/PNG · até 30 arquivos · máx 5 MB cada'],
                       ['Plantas baixas',           'PDF ou imagem · por tipologia'],
@@ -5641,7 +5828,7 @@ function IncSection({ label, children }) {
   return (
     <div style={{ marginBottom: 26 }}>
       <IncSectionHeader label={label} />
-      <div style={{ display: 'grid', gap: 14, gridTemplateColumns: '1fr 1fr' }}>
+      <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))' }}>
         {children}
       </div>
     </div>
@@ -5767,7 +5954,7 @@ function StepYou({ data, update }) {
         <input value={data.nome} onChange={(e) => update({ nome: e.target.value })}
           placeholder="Como aparecerá no anúncio" style={fullInput} />
       </FieldLabel>
-      <div style={{ display: 'grid', gap: 14, gridTemplateColumns: '1fr 1fr' }}>
+      <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))' }}>
         <FieldLabel label="WhatsApp">
           <input value={data.whatsapp} onChange={(e) => update({ whatsapp: e.target.value })}
             placeholder="(31) 9..." style={fullInput} />
@@ -5811,7 +5998,7 @@ function StepProperty({ data, update }) {
           <input value={data.cidade} onChange={(e) => update({ cidade: e.target.value })} style={fullInput} />
         </FieldLabel>
       </div>
-      <div style={{ display: 'grid', gap: 14, gridTemplateColumns: '1fr 1fr' }}>
+      <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))' }}>
         <FieldLabel label="Preço de venda (R$)">
           <input type="number" value={data.preco} onChange={(e) => update({ preco: e.target.value })}
             placeholder="Ex.: 1850000" style={fullInput} />
@@ -6565,7 +6752,7 @@ function ProprietarioPage({ onNav }) {
                 backgroundImage: `url(${listing.img})`, backgroundSize: 'cover',
                 backgroundPosition: 'center' }} />
               <div style={{ flex: 1 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 24px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '10px 20px' }}>
                   {[
                     ['Título', listing.titulo],
                     ['Bairro', listing.bairro],
@@ -7384,7 +7571,7 @@ function ConsorcioPage({ onNav }) {
             <p style={{ color: 'var(--fg-2)', fontSize: 15 }}>Ajuste os valores e veja sua parcela estimada em tempo real · sem juros</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 32, alignItems: 'start' }}>
             {/* COLUNA ESQUERDA — sliders */}
             <div>
               {/* Slider crédito */}
@@ -7666,7 +7853,7 @@ function SimuladorComparativo() {
         </div>
 
         {/* Cards de comparação */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 28 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: 20, marginBottom: 28 }}>
 
           {/* Consórcio */}
           <div style={{ background: `linear-gradient(145deg, ${navy}, #0F1824)`, borderRadius: 16,
@@ -7740,7 +7927,7 @@ function SimuladorComparativo() {
         {/* Barra comparativa + economia */}
         <div style={{ background: '#fff', borderRadius: 16, padding: '28px 30px',
           border: '1px solid var(--border)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 28, alignItems: 'center' }}>
             <div>
               <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase',
                 letterSpacing: '0.12em', color: 'var(--fg-2)', marginBottom: 16 }}>Custo total comparado</div>
