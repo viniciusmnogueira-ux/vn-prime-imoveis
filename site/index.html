@@ -2217,6 +2217,9 @@ function HomePage({ onNav, density, accentMode }) {
                             border: 'none', borderRadius: 10, padding: '14px 28px',
                             fontWeight: 700, fontSize: 15, cursor: 'pointer',
                           }}>{p.cta} →</button>
+                          <div style={{ marginTop: 14, fontSize: 12, color: 'rgba(245,248,250,0.5)', letterSpacing: '0.01em' }}>
+                            Faça o upgrade quando quiser — sem burocracia.
+                          </div>
                         </div>
                         {/* Direita — bullets */}
                         <div style={{ background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(12px)',
@@ -3321,6 +3324,10 @@ function VenderHubPage({ onNav }) {
                       color: '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 14,
                       boxShadow: i === 2 ? `0 6px 20px ${p.accent}44` : 'none',
                     }}>{p.cta}</button>
+                    <div style={{ marginTop: 12, textAlign: 'center', fontSize: 11.5, color: 'var(--fg-3)',
+                      letterSpacing: '0.01em' }}>
+                      Faça o upgrade quando quiser — sem burocracia.
+                    </div>
                   </div>
                 ))}
               </div>
@@ -6063,10 +6070,11 @@ function AnunciarPage({ onNav }) {
     titulo: '', tipo: 'Apartamento', bairro: '', cidade: 'Belo Horizonte',
     preco: '', area: '', quartos: 3, suites: 2, banheiros: 2, vagas: 2,
     diferenciais: [], fotos: [], descricao: '', pitches: [], pitchEscolhido: '',
+    planoEscolhido: '',
   });
 
   const update = (patch) => setData(d => ({ ...d, ...patch }));
-  const next = () => setStep(s => Math.min(s + 1, 5));
+  const next = () => setStep(s => Math.min(s + 1, 6));
   const prev = () => setStep(s => Math.max(s - 1, 1));
 
   const steps = [
@@ -6074,7 +6082,8 @@ function AnunciarPage({ onNav }) {
     { n: 2, title: 'Imóvel' },
     { n: 3, title: 'Fotos' },
     { n: 4, title: 'Pitch IA' },
-    { n: 5, title: 'Publicar' },
+    { n: 5, title: 'Plano' },
+    { n: 6, title: 'Publicar' },
   ];
 
   return (
@@ -6131,17 +6140,19 @@ function AnunciarPage({ onNav }) {
           {step === 2 && <StepProperty data={data} update={update} />}
           {step === 3 && <StepPhotos data={data} update={update} />}
           {step === 4 && <StepPitch data={data} update={update} />}
-          {step === 5 && <StepPublish data={data} onNav={onNav} />}
+          {step === 5 && <StepPlano data={data} update={update} />}
+          {step === 6 && <StepPublish data={data} onNav={onNav} />}
 
           {/* Nav buttons */}
-          {step < 5 && (
+          {step < 6 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10,
               marginTop: 32, paddingTop: 24, borderTop: '1px solid var(--border)' }}>
               <Btn variant="ghost" onClick={prev} style={{ visibility: step === 1 ? 'hidden' : 'visible' }}>
                 ← Voltar
               </Btn>
-              <Btn variant="accent" onClick={next}>
-                {step === 4 ? 'Revisar e publicar' : 'Continuar'} →
+              <Btn variant="accent" onClick={next} style={{ opacity: step === 5 && !data.planoEscolhido ? 0.45 : 1 }}
+                disabled={step === 5 && !data.planoEscolhido}>
+                {step === 5 ? 'Revisar e publicar' : 'Continuar'} →
               </Btn>
             </div>
           )}
@@ -6348,36 +6359,39 @@ function StepPitch({ data, update }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const generate = async (mode = 'pack') => {
+  const generate = async () => {
     setLoading(true); setError(null);
+    // Simula latência de IA
+    await new Promise(r => setTimeout(r, 1800));
     try {
-      const prompt = `Você é um copywriter premium da VN Prime Imóveis (alto padrão, BH).
-Gere 3 textos diferentes para anúncio do seguinte imóvel:
+      const tipo = data.tipo || 'Imóvel';
+      const bairro = data.bairro || 'Belo Horizonte';
+      const area = data.area ? `${data.area} m²` : 'amplo';
+      const qts = data.quartos || 3;
+      const suits = data.suites || 2;
+      const vagas = data.vagas || 2;
+      const preco = data.preco ? `R$ ${Number(data.preco).toLocaleString('pt-BR')}` : 'valor a consultar';
+      const difs = data.diferenciais.length ? data.diferenciais.join(', ') : 'acabamento de alto padrão';
+      const titulo = data.titulo || `${tipo} em ${bairro}`;
 
-Tipo: ${data.tipo}
-Título: ${data.titulo || '(sem título)'}
-Localização: ${data.bairro}, ${data.cidade}
-Área: ${data.area || '?'} m² · ${data.quartos} quartos · ${data.suites} suítes · ${data.vagas} vagas
-Preço: R$ ${data.preco || '?'}
-Diferenciais: ${data.diferenciais.join(', ') || 'não informado'}
-
-Voz da marca: confiante, premium, prática, em português brasileiro. Use "você" (informal). Foque em concretude (números, espaços, materiais), não adjetivos vazios. NUNCA use as palavras "luxo", "exclusivo", "incrível", "imperdível".
-
-Retorne APENAS um JSON válido neste formato exato:
-{"pitches":[
-  {"label":"Curto e direto","text":"..."},
-  {"label":"Editorial e descritivo","text":"..."},
-  {"label":"Foco em estilo de vida","text":"..."}
-]}
-
-Cada texto entre 60 e 120 palavras. Sem markdown, sem emojis.`;
-
-      const raw = await window.claude.complete(prompt);
-      const json = JSON.parse(raw.replace(/```json\n?|```\n?/g, '').trim());
-      update({ pitches: json.pitches || [] });
+      update({
+        pitches: [
+          {
+            label: 'Curto e direto',
+            text: `${titulo} — ${area}, ${qts} quartos, ${suits} suítes, ${vagas} vagas. Localização privilegiada em ${bairro}. ${difs.charAt(0).toUpperCase() + difs.slice(1)}. Anunciado por ${preco}, com endereço protegido na vitrine. Visitas agendadas diretamente pelo painel da VN Prime.`,
+          },
+          {
+            label: 'Editorial e descritivo',
+            text: `Em ${bairro}, este ${tipo.toLowerCase()} de ${area} reúne planta inteligente e acabamento criterioso. São ${qts} quartos — ${suits} deles em suíte — e ${vagas} ${vagas === 1 ? 'vaga' : 'vagas'} na garagem. ${difs.charAt(0).toUpperCase() + difs.slice(1)}. Preço pedido de ${preco}. Imóvel VN Prime, com curadoria técnica e processo de venda estruturado do anúncio à escritura.`,
+          },
+          {
+            label: 'Foco em estilo de vida',
+            text: `Imagine acordar com a vista de ${bairro} e ter ${area} de espaço para chamar de seu. Este ${tipo.toLowerCase()} tem ${qts} quartos, ${suits} suítes e garagem para ${vagas} ${vagas === 1 ? 'carro' : 'carros'}. ${difs.charAt(0).toUpperCase() + difs.slice(1)}. Quem compra aqui não paga por metragem — paga por como vai viver. Valor: ${preco}.`,
+          },
+        ],
+      });
     } catch (err) {
-      console.error(err);
-      setError('Não consegui gerar agora. Tente novamente em alguns segundos.');
+      setError('Erro ao gerar pitches. Verifique os dados do imóvel e tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -6481,6 +6495,97 @@ Cada texto entre 60 e 120 palavras. Sem markdown, sem emojis.`;
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function StepPlano({ data, update }) {
+  const planos = [
+    {
+      id: 'direta',
+      nome: 'Venda Direta',
+      preco: 'R$ 297',
+      sub: 'taxa fixa única',
+      desc: 'Você gerencia o anúncio e conduz a venda. Sem comissão — pague uma vez e fique com 100% do valor.',
+      bullets: ['Anúncio ativo por 90 dias', 'Painel com leads e métricas', 'Distribuição em portais imobiliários', 'Descrição editorial por IA'],
+      badge: null,
+      accentBg: '#fff',
+      border: '1px solid var(--border)',
+    },
+    {
+      id: 'assistida',
+      nome: 'Venda Assistida',
+      preco: '3%',
+      sub: 'somente ao vender',
+      desc: 'A VN Prime apoia com curadoria ativa, qualificação de leads e análise de preço. Você só paga se vender.',
+      bullets: ['Zero custo de entrada', 'Curadoria de preço por IA', 'Qualificação ativa de compradores', 'Relatório semanal de desempenho', '30 dias grátis FactorOne'],
+      badge: 'Mais escolhido',
+      accentBg: '#fff',
+      border: '2px solid var(--gold)',
+    },
+    {
+      id: 'completa',
+      nome: 'Venda Completa',
+      preco: '6%',
+      sub: 'sobre o valor de venda',
+      desc: 'Corretor credenciado VN Prime assume tudo: fotos, mídia paga, visitas e negociação. Você só aprova e assina.',
+      bullets: ['Corretor dedicado ao seu imóvel', 'Sessão fotográfica profissional inclusa', 'Mídia paga gerenciada', 'Visitas acompanhadas', 'Suporte jurídico até escritura'],
+      badge: null,
+      accentBg: '#fff',
+      border: '1px solid var(--border)',
+    },
+  ];
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+      <div>
+        <h2 style={{ margin:'0 0 6px' }}>Escolha como quer vender</h2>
+        <p style={{ color:'var(--fg-2)', margin:0, fontSize:14.5 }}>
+          Você pode fazer upgrade a qualquer momento — sem burocracia.
+        </p>
+      </div>
+      <div style={{ display:'grid', gap:16, gridTemplateColumns:'repeat(auto-fit, minmax(min(100%, 260px), 1fr))' }}>
+        {planos.map(p => {
+          const sel = data.planoEscolhido === p.id;
+          return (
+            <div key={p.id} onClick={() => update({ planoEscolhido: p.id })} style={{
+              border: sel ? '2px solid var(--gold)' : p.border,
+              borderRadius:16, padding:'22px 20px', cursor:'pointer',
+              background: sel ? 'rgba(212,168,87,0.06)' : p.accentBg,
+              boxShadow: sel ? '0 0 0 4px rgba(212,168,87,0.12)' : 'none',
+              transition:'all 0.15s', position:'relative',
+            }}>
+              {p.badge && (
+                <div style={{ position:'absolute', top:-11, left:20, background:'var(--gold)',
+                  color:'var(--navy)', borderRadius:999, padding:'3px 12px', fontSize:10,
+                  fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase' }}>{p.badge}</div>
+              )}
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+                <span style={{ fontSize:12, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase',
+                  color:'var(--fg-3)' }}>{p.nome}</span>
+                {sel && <span style={{ fontSize:11, color:'var(--gold-deep)', fontWeight:700 }}>✓ Selecionado</span>}
+              </div>
+              <div style={{ display:'flex', alignItems:'baseline', gap:6, marginBottom:4 }}>
+                <span style={{ fontFamily:'var(--font-display)', fontSize:30, fontWeight:800,
+                  color:'var(--navy)', lineHeight:1 }}>{p.preco}</span>
+                <span style={{ fontSize:12, color:'var(--fg-2)' }}>{p.sub}</span>
+              </div>
+              <p style={{ fontSize:13.5, color:'var(--fg-2)', lineHeight:1.6, margin:'8px 0 14px' }}>{p.desc}</p>
+              <ul style={{ listStyle:'none', padding:0, margin:0, display:'flex', flexDirection:'column', gap:7 }}>
+                {p.bullets.map(b => (
+                  <li key={b} style={{ display:'flex', gap:8, fontSize:12.5, color:'var(--fg-1)', lineHeight:1.45 }}>
+                    <span style={{ color:'var(--gold-deep)', fontWeight:700, flexShrink:0 }}>✓</span>{b}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ background:'rgba(212,168,87,0.08)', borderRadius:10, padding:'12px 16px',
+        fontSize:12.5, color:'var(--fg-2)', border:'1px solid rgba(212,168,87,0.2)' }}>
+        Você pode fazer <strong>upgrade ou downgrade</strong> do plano a qualquer momento pelo portal do proprietário, sem custos adicionais de cancelamento.
+      </div>
     </div>
   );
 }
@@ -6739,11 +6844,31 @@ function BoosterSection({ accent, onSec }) {
 // ============================================================
 function ProprietarioPage({ onNav }) {
   const [showGate, setShowGate] = React.useState(false);
+  const [showPlanSelect, setShowPlanSelect] = React.useState(false);
+  const [planoSelecionado, setPlanoSelecionado] = React.useState(null);
   const [auth, setAuth] = React.useState(false);
   const [sec, setSec] = React.useState('dashboard');
   const accent = '#D4A857';
 
-  if (!auth && !showGate) return (
+  const planosGate = [
+    {
+      id: 'direta', nome: 'Venda Direta', preco: 'R$ 297', sub: 'taxa única',
+      desc: 'Você publica e conduz. Sem comissão.',
+      bullets: ['Taxa fixa, 90 dias de anúncio', 'Você fecha direto com comprador', 'Sem comissão sobre venda'],
+    },
+    {
+      id: 'assistida', nome: 'Venda Assistida', preco: '3%', sub: 'somente ao vender', badge: 'Mais escolhido',
+      desc: 'A VN Prime apoia com IA e qualificação.',
+      bullets: ['Só paga se vender — 0 risco', 'Curadoria ativa do anúncio', 'Qualificação de compradores'],
+    },
+    {
+      id: 'completa', nome: 'Venda Completa', preco: '6%', sub: 'sobre a venda',
+      desc: 'Corretor dedicado cuida de tudo.',
+      bullets: ['Corretor parceiro dedicado', 'Fotos + mídia paga incluídos', 'Suporte jurídico até escritura'],
+    },
+  ];
+
+  if (!auth && !showPlanSelect && !showGate) return (
     <PortalLandingPage
       eyebrow="Área do Proprietário"
       headline="Anuncie seu imóvel com <em style='color:#F6D77A'>liberdade total</em> — sem comissão, sem intermediários."
@@ -6799,7 +6924,91 @@ function ProprietarioPage({ onNav }) {
           reverse: false,
         },
       ]}
-      onEnter={() => setShowGate(true)} onNav={onNav} />
+      onEnter={() => setShowPlanSelect(true)} onNav={onNav} />
+  );
+
+  /* ── PLAN SELECTION GATE ── */
+  if (!auth && showPlanSelect && !showGate) return (
+    <main style={{ minHeight: '100vh', background: 'var(--cream)', display: 'flex', flexDirection: 'column' }}>
+      {/* Header */}
+      <div style={{ background: 'var(--navy)', padding: '22px 0' }}>
+        <div style={{ width: 'min(1100px, 94vw)', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 16 }}>
+          <button onClick={() => setShowPlanSelect(false)} style={{ background: 'none', border: 'none',
+            color: 'rgba(255,255,255,0.6)', cursor: 'pointer', fontSize: 22, lineHeight: 1, padding: '0 4px' }}>←</button>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase',
+              color: accent, marginBottom: 3 }}>Passo 1 de 2</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>Escolha seu plano para continuar</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div style={{ flex: 1, width: 'min(1100px, 94vw)', margin: '0 auto', padding: 'clamp(28px,4vw,56px) 0' }}>
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+          <p style={{ fontSize: 15, color: 'var(--fg-2)', maxWidth: 520, margin: '0 auto' }}>
+            Selecione como você quer anunciar. Você pode mudar de plano a qualquer momento dentro do portal — sem custo adicional.
+          </p>
+        </div>
+        <div style={{ display: 'grid', gap: 22, gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 290px), 1fr))', marginBottom: 32 }}>
+          {planosGate.map((p) => {
+            const sel = planoSelecionado === p.id;
+            return (
+              <div key={p.id} onClick={() => setPlanoSelecionado(p.id)} style={{
+                background: '#fff', borderRadius: 20, cursor: 'pointer',
+                border: sel ? `2.5px solid ${accent}` : '1.5px solid var(--border)',
+                padding: '28px 24px', display: 'flex', flexDirection: 'column', gap: 0,
+                boxShadow: sel ? `0 8px 32px ${accent}22` : '0 2px 10px rgba(15,34,68,0.06)',
+                transition: 'border 0.15s, box-shadow 0.15s',
+                position: 'relative',
+              }}>
+                {p.badge && (
+                  <div style={{ position: 'absolute', top: -12, left: 24,
+                    background: accent, color: 'var(--navy-deep)', padding: '4px 14px',
+                    borderRadius: 999, fontSize: 11, fontWeight: 700, letterSpacing: '0.1em',
+                    textTransform: 'uppercase' }}>{p.badge}</div>
+                )}
+                {sel && (
+                  <div style={{ position: 'absolute', top: 16, right: 16, width: 26, height: 26,
+                    borderRadius: '50%', background: accent, color: 'var(--navy-deep)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontWeight: 900, fontSize: 13 }}>✓</div>
+                )}
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.14em',
+                    textTransform: 'uppercase', color: 'var(--gold-deep)', marginBottom: 8 }}>{p.nome}</div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 2 }}>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: 34,
+                      fontWeight: 800, color: 'var(--navy)', letterSpacing: '-0.02em' }}>{p.preco}</span>
+                    <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>{p.sub}</span>
+                  </div>
+                  <div style={{ fontSize: 13.5, color: 'var(--fg-2)', marginTop: 4 }}>{p.desc}</div>
+                </div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '12px 0 0', display: 'flex', flexDirection: 'column', gap: 9 }}>
+                  {p.bullets.map(b => (
+                    <li key={b} style={{ display: 'flex', gap: 9, fontSize: 13.5, color: 'var(--fg-1)' }}>
+                      <span style={{ color: sel ? accent : '#10B981', fontWeight: 700, flexShrink: 0 }}>✓</span>
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ textAlign: 'center', marginBottom: 12 }}>
+          <div style={{ fontSize: 12.5, color: 'var(--fg-3)', marginBottom: 20 }}>
+            Faça o upgrade a qualquer momento pelo portal — sem burocracia.
+          </div>
+          <Btn variant="accent" size="lg"
+            style={{ opacity: planoSelecionado ? 1 : 0.45, pointerEvents: planoSelecionado ? 'auto' : 'none', minWidth: 240 }}
+            onClick={() => { if (planoSelecionado) setShowGate(true); }}>
+            Continuar com {planoSelecionado ? planosGate.find(p => p.id === planoSelecionado)?.nome : 'plano selecionado'} →
+          </Btn>
+        </div>
+      </div>
+    </main>
   );
 
   if (!auth) return (
@@ -6809,7 +7018,15 @@ function ProprietarioPage({ onNav }) {
       img={window.__resources?.img60||'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=85'}
       accent={accent} role="proprietario"
       onAuth={() => setAuth(true)} onNav={onNav}>
-      <div style={{ display: 'flex', gap: 24 }}>
+      {planoSelecionado && (
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: `${accent}22`,
+          border: `1px solid ${accent}44`, borderRadius: 10, padding: '8px 14px', marginBottom: 4 }}>
+          <span style={{ color: accent, fontWeight: 700, fontSize: 13 }}>✓ Plano {planosGate.find(p => p.id === planoSelecionado)?.nome}</span>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', cursor: 'pointer', textDecoration: 'underline' }}
+            onClick={() => { setShowGate(false); setShowPlanSelect(true); }}>trocar</span>
+        </div>
+      )}
+      <div style={{ display: 'flex', gap: 24, marginTop: 8 }}>
         {[['R$ 297', 'Taxa fixa'], ['0%', 'Comissão'], ['18 dias', 'Venda média']].map(([n, l]) => (
           <div key={l}>
             <div style={{ fontSize: 24, fontWeight: 800, color: accent }}>{n}</div>
@@ -7408,7 +7625,7 @@ function FotografoPage({ onNav }) {
     { id: 'jobs',      icon: '◉', label: 'Jobs' },
     { id: 'agenda',    icon: '▦', label: 'Agenda' },
     { id: 'pagamentos',icon: '◎', label: 'Pagamentos' },
-    { id: 'pacotes',   icon: '⊞', label: 'Pacotes' },
+    { id: 'repasses',  icon: '⊶', label: 'Repasses' },
   ];
 
   const statusColor = { 'Solicitado': '#6B7280', 'Agendado': '#3B82F6',
@@ -7622,46 +7839,105 @@ function FotografoPage({ onNav }) {
           </React.Fragment>
         )}
 
-        {/* PACOTES (mantém a informação dos pacotes para referência) */}
-        {sec === 'pacotes' && (
+        {/* REPASSES */}
+        {sec === 'repasses' && (
           <React.Fragment>
-            <div style={{ fontSize: 14, color: 'var(--fg-2)', marginBottom: 20 }}>
-              Tabela de referência dos pacotes VN Prime — valores cobrados ao cliente para cada sessão.
-            </div>
-            <div style={{ display: 'grid', gap: 18,
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
-              {pacotes.map(p => (
-                <div key={p.id} style={{
-                  background: p.destaque ? 'var(--navy-deep)' : '#fff',
-                  color: p.destaque ? '#fff' : 'var(--navy)',
-                  padding: 28, borderRadius: 16,
-                  border: p.destaque ? 'none' : '1px solid var(--border)',
-                  boxShadow: p.destaque ? 'var(--shadow-soft)' : 'none',
-                  position: 'relative',
-                }}>
-                  {p.destaque && <div style={{ position: 'absolute', top: -12, left: 24,
-                    background: 'var(--gold)', color: 'var(--navy-deep)', padding: '4px 12px',
-                    borderRadius: 999, fontSize: 11, fontWeight: 700, letterSpacing: '0.1em',
-                    textTransform: 'uppercase' }}>Mais solicitado</div>}
-                  <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.14em',
-                    textTransform: 'uppercase', color: p.destaque ? accent : 'var(--gold-deep)',
-                    marginBottom: 10 }}>{p.nome}</div>
-                  <div style={{ fontSize: 36, fontWeight: 800, fontFamily: 'var(--font-display)',
-                    letterSpacing: '-0.02em' }}>{p.preco}</div>
-                  <div style={{ fontSize: 13, color: p.destaque ? 'rgba(255,255,255,0.6)' : 'var(--fg-2)',
-                    marginBottom: 18 }}>sessão de {p.duracao}</div>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0,
-                    display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {p.itens.map(it => (
-                      <li key={it} style={{ fontSize: 14, display: 'flex', gap: 10 }}>
-                        <span style={{ color: p.destaque ? accent : 'var(--gold-deep)', fontWeight: 700 }}>✓</span>
-                        <span style={{ color: p.destaque ? 'rgba(255,255,255,0.85)' : 'var(--fg-1)' }}>{it}</span>
-                      </li>
-                    ))}
-                  </ul>
+            {/* Summary banner */}
+            <div style={{ background: 'var(--navy)', borderRadius: 16, padding: '24px 28px',
+              marginBottom: 28, display: 'flex', gap: 32, flexWrap: 'wrap', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
+                  textTransform: 'uppercase', color: accent, marginBottom: 6 }}>Seu repasse (mai/2026)</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 36, fontWeight: 800,
+                  color: '#fff', letterSpacing: '-0.02em' }}>R$ 1.880</div>
+                <div style={{ fontSize: 13, color: 'rgba(245,248,250,0.55)', marginTop: 4 }}>2 jobs entregues · pag. D+7</div>
+              </div>
+              <div style={{ flex: 1, minWidth: 200, borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: 32 }}>
+                <div style={{ fontSize: 13, color: 'rgba(245,248,250,0.65)', lineHeight: 1.75 }}>
+                  A VN Prime retém entre <strong style={{ color: '#fff' }}>10% e 20%</strong> do valor bruto de cada job como taxa de plataforma.<br/>
+                  O restante é repassado ao fotógrafo em até 7 dias úteis após a entrega aprovada.
                 </div>
-              ))}
+              </div>
             </div>
+
+            {/* Tabela de cálculo por pacote */}
+            <PortalSection title="Como funciona o cálculo">
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid var(--border)' }}>
+                      {['Pacote', 'Valor cobrado', 'Taxa VN Prime', 'Seu repasse', ''].map(h => (
+                        <th key={h} style={{ padding: '10px 12px', textAlign: 'left', fontSize: 11,
+                          fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                          color: 'var(--fg-3)' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { nome: 'Essencial',          bruto: 'R$ 390',   taxa: '10% · R$ 39',   repasse: 'R$ 351',   pct: 90 },
+                      { nome: 'Completo',            bruto: 'R$ 690',   taxa: '15% · R$ 104',  repasse: 'R$ 586',   pct: 85 },
+                      { nome: 'Premium · com drone', bruto: 'R$ 1.190', taxa: '20% · R$ 238',  repasse: 'R$ 952',   pct: 80 },
+                    ].map(r => (
+                      <tr key={r.nome} style={{ borderBottom: '1px solid var(--border)' }}>
+                        <td style={{ padding: '14px 12px', fontWeight: 700, color: 'var(--navy)' }}>{r.nome}</td>
+                        <td style={{ padding: '14px 12px', color: 'var(--fg-2)' }}>{r.bruto}</td>
+                        <td style={{ padding: '14px 12px', color: '#EF4444' }}>{r.taxa}</td>
+                        <td style={{ padding: '14px 12px', fontWeight: 800, fontSize: 15, color: 'var(--navy)' }}>{r.repasse}</td>
+                        <td style={{ padding: '14px 12px' }}>
+                          <div style={{ width: 80, height: 6, background: 'var(--border)', borderRadius: 999, overflow: 'hidden' }}>
+                            <div style={{ width: `${r.pct}%`, height: '100%', background: accent, borderRadius: 999 }} />
+                          </div>
+                          <div style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 4 }}>{r.pct}% seu</div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div style={{ marginTop: 16, padding: '12px 16px', background: 'var(--cream)',
+                borderRadius: 10, fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.6 }}>
+                O pagamento é liberado automaticamente após aprovação das fotos pelo cliente. Você receberá um aviso no seu WhatsApp.
+              </div>
+            </PortalSection>
+
+            {/* Histórico de repasses */}
+            <PortalSection title="Histórico de repasses">
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid var(--border)' }}>
+                      {['Mês', 'Jobs', 'Bruto', 'Taxa VN Prime', 'Repasse líquido', 'Status'].map(h => (
+                        <th key={h} style={{ padding: '10px 12px', textAlign: 'left', fontSize: 11,
+                          fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                          color: 'var(--fg-3)' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { mes: 'Maio/2026',   jobs: 2, bruto: 'R$ 2.340',  taxa: 'R$ 460',  liq: 'R$ 1.880', status: 'Processando' },
+                      { mes: 'Abril/2026',  jobs: 5, bruto: 'R$ 4.580',  taxa: 'R$ 910',  liq: 'R$ 3.670', status: 'Pago' },
+                      { mes: 'Março/2026',  jobs: 4, bruto: 'R$ 3.700',  taxa: 'R$ 740',  liq: 'R$ 2.960', status: 'Pago' },
+                      { mes: 'Fev./2026',   jobs: 3, bruto: 'R$ 2.840',  taxa: 'R$ 570',  liq: 'R$ 2.270', status: 'Pago' },
+                    ].map((r, i) => (
+                      <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
+                        <td style={{ padding: '12px 12px', color: 'var(--fg-2)', fontSize: 13 }}>{r.mes}</td>
+                        <td style={{ padding: '12px 12px', color: 'var(--navy)', fontWeight: 600 }}>{r.jobs} jobs</td>
+                        <td style={{ padding: '12px 12px', color: 'var(--fg-1)' }}>{r.bruto}</td>
+                        <td style={{ padding: '12px 12px', color: '#EF4444', fontSize: 12 }}>{r.taxa}</td>
+                        <td style={{ padding: '12px 12px', fontWeight: 700, color: 'var(--navy)', fontSize: 16 }}>{r.liq}</td>
+                        <td style={{ padding: '12px 12px' }}>
+                          <span style={{ padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                            background: r.status === 'Pago' ? '#10B98118' : '#F59E0B18',
+                            color: r.status === 'Pago' ? '#10B981' : '#F59E0B' }}>{r.status}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </PortalSection>
           </React.Fragment>
         )}
 
