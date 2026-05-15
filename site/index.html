@@ -3122,199 +3122,292 @@ Object.assign(window, { PropertyDetailPage });
 </script>
 <script type="text/babel">// Vender Hub — 3 caminhos para anunciar
 function VenderHubPage({ onNav }) {
-  const caminhos = [
+  const [perfil, setPerfil] = React.useState(null); // null | 'proprietario' | 'corretor'
+
+  const planosProprietario = [
     {
-      id: 'proprietario',
-      tag: 'Proprietário Direto',
-      title: 'Você conduz a venda.',
-      highlight: 'Do anúncio ao fechamento.',
-      desc: 'Publique seu imóvel na vitrine VN Prime com taxa fixa de R$ 297 ou comissão de 3% apenas quando vender. Você cadastra, define o preço e conduz a venda. No plano 3% a VN Prime apoia como venda assistida — fotografia e mídia são pacotes à parte.',
+      id: 'direta',
+      tag: 'Venda Direta',
+      tagColor: '#D4A857',
+      title: 'Você no comando.',
+      sub: 'Taxa fixa R$ 297',
+      desc: 'Você publica, define o preço e conduz a negociação. A VN Prime entra com a vitrine, a distribuição em portais e o suporte de plataforma.',
       bullets: [
-        'R$ 297 taxa fixa · ou 3% somente ao vender',
-        'Você cadastra e gerencia seu anúncio',
+        'Taxa fixa R$ 297 — vigência de 90 dias',
+        'Cadastro e gestão de anúncio pelo portal do proprietário',
         'Descrição editorial gerada por IA',
-        'Visitas agendadas pelo app — sem intermediários',
-        'Endereço privado · exibe só o bairro na vitrine',
+        'Agenda de visitas e leads pelo painel',
+        'Endereço protegido — exibe só o bairro na vitrine',
         'Pacotes de fotografia e mídia disponíveis à parte',
       ],
-      cta: 'Acessar portal do proprietário',
-      route: 'proprietario',
-      img: (window.__resources?.img60||'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=85'),
+      cta: 'Anunciar agora — R$ 297',
+      img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=80',
       accent: '#D4A857',
-      accentLight: '#F2DDA9',
-      stat: [['R$ 297', 'taxa fixa'], ['3%', 'comissão s/ venda'], ['24h', 'aprovação']],
     },
     {
-      id: 'corretor',
-      tag: 'Corretor Parceiro',
-      title: 'Corretor conduz.',
-      highlight: 'Você aprova e assina.',
-      desc: 'No plano 6% — Venda Completa — um corretor credenciado VN Prime cuida de tudo: sessão fotográfica profissional inclusa, mídia paga gerenciada, qualificação de compradores, visitas acompanhadas e negociação. Você só precisa aprovar a proposta e assinar.',
+      id: 'assistida',
+      tag: 'Venda Assistida',
+      tagColor: '#2F8674',
+      title: 'A VN Prime apoia.',
+      sub: '3% somente ao vender',
+      desc: 'Você continua à frente, mas a VN Prime entra com IA de curadoria, sugestões de preço, análise de leads e acompanhamento ativo do anúncio.',
       bullets: [
-        'Corretor parceiro credenciado dedicado ao seu imóvel',
-        'Fotos do imóvel incluídas',
-        'Mídia paga em Meta, Google e portais',
-        'Qualificação de compradores antes das visitas',
-        'Visitas acompanhadas pelo corretor',
-        'Negociação e suporte jurídico até a escritura',
-        '6% de comissão — 3% corretor + 3% VN Prime',
+        '3% de comissão — você paga somente ao vender',
+        'Análise de precificação por IA com comparativos da região',
+        'Curadoria ativa do anúncio e sugestões de melhoria',
+        'Qualificação de leads antes de chegar até você',
+        'Relatório semanal de desempenho e benchmarks',
+        '30 dias grátis de FactorOne incluso',
       ],
-      cta: 'Acessar portal do corretor',
-      route: 'corretor',
-      img: (window.__resources?.img70||'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1600&q=85'),
+      cta: 'Começar — sem custo inicial',
+      img: 'https://images.unsplash.com/photo-1560472355-536de3962603?w=900&q=80',
       accent: '#2F8674',
-      accentLight: '#6ee7b7',
-      stat: [['6%', 'sobre a venda'], ['Mãos livres', 'você aprova'], ['Corretor', 'dedicado']],
     },
     {
-      id: 'incorporadora',
-      tag: 'Incorporadora / Construtora',
-      title: 'Lance seu empreendimento.',
-      highlight: 'Alcance qualificado e alto padrão.',
-      desc: 'Plano enterprise para incorporadoras e construtoras. Vitrine exclusiva, página dedicada do empreendimento com plantas interativas, equipe de plantão VN Prime, mídia paga gerenciada e gestão de leads de compradores qualificados.',
+      id: 'completa',
+      tag: 'Venda Completa',
+      tagColor: '#B8862E',
+      title: 'Corretor dedicado.',
+      sub: '6% sobre a venda',
+      desc: 'Um corretor credenciado VN Prime assume tudo: fotos profissionais, mídia paga, visitas acompanhadas, negociação e suporte jurídico até a escritura.',
       bullets: [
-        'Página dedicada do empreendimento na vitrine VN Prime',
-        'Plantas interativas e tour virtual 3D',
-        'Equipe de plantão VN Prime exclusiva',
-        'Mídia paga em Meta, Google e portais parceiros',
-        'Leads de compradores qualificados com contato direto',
-        'Relatórios de performance e funil de vendas',
+        '6% de comissão — 3% corretor + 3% VN Prime',
+        'Corretor parceiro credenciado e dedicado ao seu imóvel',
+        'Sessão fotográfica profissional inclusa',
+        'Mídia paga gerenciada em Meta, Google e portais',
+        'Visitas acompanhadas e compradores qualificados',
+        'Suporte jurídico da minuta até a escritura',
       ],
-      cta: 'Acessar portal da incorporadora',
-      route: 'incorporadora',
-      img: (window.__resources?.img34||'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=85'),
+      cta: 'Contratar corretor',
+      img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=900&q=80',
       accent: '#B8862E',
-      accentLight: '#F2DDA9',
-      stat: [['Sob consulta', 'plano dedicado'], ['Plantão', 'exclusivo'], ['Leads', 'qualificados']],
     },
+  ];
+
+  const beneficiosCorretor = [
+    { icon: '🎯', title: 'Leads qualificados direto no painel', desc: 'Compradores verificados com perfil e orçamento confirmados. Alerta imediato por WhatsApp.' },
+    { icon: '📊', title: 'CRM visual completo', desc: 'Pipeline kanban, histórico de contatos, agendamento de visitas e relatório de comissões.' },
+    { icon: '🏠', title: 'Portfólio exclusivo VN Prime', desc: 'Acesso antecipado a imóveis premium em BH 72h antes do mercado público.' },
+    { icon: '💳', title: 'Comissão 3% + pagamento D+2', desc: 'Extrato detalhado, NF automática e pagamento em até 2 dias úteis após o fechamento.' },
   ];
 
   return (
     <main style={{ background: 'var(--cream)', minHeight: '100vh' }}>
-      {/* Hero */}
+
+      {/* HERO — Seletor de perfil */}
       <section style={{
         position: 'relative', overflow: 'hidden',
         background: 'var(--gradient-navy-hero)', color: '#fff',
-        padding: 'clamp(3.5rem, 7vw, 5.5rem) 0 clamp(3rem, 5vw, 4rem)',
+        padding: 'clamp(3.5rem, 7vw, 5.5rem) 0 clamp(2.5rem, 4vw, 3.5rem)',
       }}>
         <div style={{ position: 'absolute', top: -200, right: -200, width: 600, height: 600,
-          background: 'radial-gradient(circle, rgba(212,168,87,0.22) 0%, transparent 65%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'relative', zIndex: 1, width: 'min(1080px, 92vw)', margin: '0 auto', textAlign: 'center' }}>
-          <Eyebrow>Anuncie com VN Prime</Eyebrow>
-          <h1 style={{ color: '#fff', margin: '8px 0 16px', fontSize: 'clamp(2rem, 4vw, 2.9rem)', lineHeight: 1.15 }}>
-            Qual o seu{' '}
-            <em className="italic-accent" style={{ background: 'var(--gradient-gold)',
-              WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>
-              caminho para vender?
-            </em>
+          background: 'radial-gradient(circle, rgba(212,168,87,0.18) 0%, transparent 65%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', zIndex: 1, width: 'min(1100px, 92vw)', margin: '0 auto', textAlign: 'center' }}>
+          <Eyebrow>VN Prime · Anuncie</Eyebrow>
+          <h1 style={{ color: '#fff', margin: '8px 0 14px', fontSize: 'clamp(1.9rem, 4vw, 2.8rem)', lineHeight: 1.15 }}>
+            Qual é o seu perfil?
           </h1>
-          <p style={{ color: 'rgba(245,248,250,0.85)', maxWidth: 560, margin: '0 auto', fontSize: 16, lineHeight: 1.7 }}>
-            Escolha o modelo que combina com você. Cada caminho tem sua estrutura, suas ferramentas e seu plano — todos com o padrão VN Prime.
+          <p style={{ color: 'rgba(245,248,250,0.78)', maxWidth: 500, margin: '0 auto 36px', fontSize: 16, lineHeight: 1.7 }}>
+            Caminhos diferentes, padrão VN Prime em todos.
           </p>
+
+          {/* Dois cards de seleção */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+            gap: 20, maxWidth: 700, margin: '0 auto' }}>
+            {[
+              {
+                id: 'proprietario',
+                label: 'Sou proprietário',
+                sub: 'Quero vender meu imóvel',
+                icon: '🏠',
+                accent: '#D4A857',
+                detail: 'Taxa fixa R$ 297 · 3% assistida · 6% completa',
+              },
+              {
+                id: 'corretor',
+                label: 'Sou corretor',
+                sub: 'Quero trabalhar com a VN Prime',
+                icon: '🤝',
+                accent: '#10B981',
+                detail: 'Leve sua carteira · receba leads · R$ 49,90/mês',
+              },
+            ].map(p => (
+              <button key={p.id} onClick={() => setPerfil(p.id === perfil ? null : p.id)} style={{
+                border: perfil === p.id ? `2px solid ${p.accent}` : '2px solid rgba(255,255,255,0.15)',
+                borderRadius: 18, padding: '28px 24px', textAlign: 'left', cursor: 'pointer',
+                background: perfil === p.id ? `${p.accent}18` : 'rgba(255,255,255,0.06)',
+                backdropFilter: 'blur(10px)',
+                transition: 'all 0.2s', color: '#fff',
+              }}>
+                <div style={{ fontSize: 30, marginBottom: 12 }}>{p.icon}</div>
+                <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 5 }}>{p.label}</div>
+                <div style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.72)', marginBottom: 10 }}>{p.sub}</div>
+                <div style={{ fontSize: 11.5, color: p.accent, fontWeight: 600, letterSpacing: '0.04em' }}>{p.detail}</div>
+                {perfil === p.id && (
+                  <div style={{ marginTop: 14, fontSize: 11, fontWeight: 700, color: p.accent, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                    Selecionado ✓
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {perfil && (
+            <p style={{ marginTop: 20, fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>
+              Role para baixo para ver as opções
+            </p>
+          )}
         </div>
       </section>
 
-      {/* 3 Caminhos */}
-      <div style={{ background: 'var(--cream)' }}>
-        {caminhos.map((c, idx) => {
-          const reverse = idx % 2 === 1;
-          return (
-            <section key={c.id} style={{
-              padding: 'clamp(3rem, 6vw, 5rem) 0',
-              background: idx % 2 === 0 ? 'var(--cream)' : 'var(--white)',
-              borderTop: '1px solid var(--border)',
-            }}>
-              <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto',
-                display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))',
-                gap: 'clamp(28px, 5vw, 64px)',
-                alignItems: 'center',
-                direction: reverse ? 'rtl' : 'ltr',
-              }}>
-                {/* Foto */}
-                <div style={{ direction: 'ltr', position: 'relative', borderRadius: 20, overflow: 'hidden',
-                  boxShadow: '0 24px 64px rgba(27,39,51,0.18)', aspectRatio: '4/3' }}>
-                  <img src={c.img} alt={c.tag}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                  <div style={{ position: 'absolute', inset: 0,
-                    background: `linear-gradient(180deg, transparent 40%, rgba(15,22,32,0.72) 100%)` }} />
-                  {/* Stats overlay */}
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0,
-                    padding: '20px 24px', display: 'flex', gap: 0 }}>
-                    {c.stat.map((s, i) => (
-                      <div key={i} style={{
-                        flex: 1, textAlign: 'center',
-                        borderRight: i < c.stat.length - 1 ? '1px solid rgba(255,255,255,0.15)' : 'none',
-                        padding: '0 12px',
-                      }}>
-                        <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1rem, 2vw, 1.4rem)',
-                          fontWeight: 700, color: c.accentLight, lineHeight: 1 }}>{s[0]}</div>
-                        <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em',
-                          textTransform: 'uppercase', color: 'rgba(255,255,255,0.65)', marginTop: 4 }}>{s[1]}</div>
+      {/* ── BLOCO PROPRIETÁRIO ── */}
+      {(!perfil || perfil === 'proprietario') && (
+        <div>
+          <section style={{ padding: 'clamp(3rem, 5vw, 4.5rem) 0',
+            borderTop: '1px solid var(--border)', background: '#fff' }}>
+            <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: 36 }}>
+                <Eyebrow>Para proprietários</Eyebrow>
+                <h2 style={{ margin: '8px 0 12px' }}>Escolha o seu plano</h2>
+                <p style={{ color: 'var(--fg-2)', fontSize: 15.5, maxWidth: 520, margin: '0 auto' }}>
+                  Todos os planos incluem vitrine VN Prime, distribuição em portais e suporte de plataforma.
+                </p>
+              </div>
+              <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))' }}>
+                {planosProprietario.map((p, i) => (
+                  <div key={p.id} style={{
+                    background: '#fff', borderRadius: 20,
+                    border: i === 2 ? `2px solid ${p.accent}` : '1px solid var(--border)',
+                    padding: '28px 26px', display: 'flex', flexDirection: 'column',
+                    boxShadow: i === 2 ? `0 8px 32px ${p.accent}22` : '0 2px 12px rgba(15,34,68,0.06)',
+                    position: 'relative', overflow: 'hidden',
+                  }}>
+                    {i === 2 && (
+                      <div style={{ position: 'absolute', top: 16, right: 16,
+                        background: p.accent, color: '#fff', borderRadius: 999,
+                        padding: '3px 12px', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                        Mais vendido
                       </div>
-                    ))}
+                    )}
+                    <div style={{ marginBottom: 4 }}>
+                      <span style={{ background: `${p.accent}18`, color: p.accent, borderRadius: 999,
+                        padding: '4px 12px', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                        {p.tag}
+                      </span>
+                    </div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800,
+                      color: 'var(--navy)', margin: '14px 0 4px', letterSpacing: '-0.02em' }}>{p.sub}</div>
+                    <p style={{ fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.65, margin: '0 0 20px', flex: 1 }}>{p.desc}</p>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 9 }}>
+                      {p.bullets.map(b => (
+                        <li key={b} style={{ display: 'flex', gap: 9, alignItems: 'flex-start', fontSize: 13.5, color: 'var(--fg-1)', lineHeight: 1.5 }}>
+                          <span style={{ color: p.accent, fontWeight: 700, flexShrink: 0, marginTop: 1 }}>✓</span>
+                          {b}
+                        </li>
+                      ))}
+                    </ul>
+                    <button onClick={() => onNav('anunciar')} style={{
+                      width: '100%', padding: '13px 0', borderRadius: 10, border: 'none', cursor: 'pointer',
+                      background: i === 2 ? p.accent : 'var(--navy)',
+                      color: '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 14,
+                      boxShadow: i === 2 ? `0 6px 20px ${p.accent}44` : 'none',
+                    }}>{p.cta}</button>
                   </div>
-                  {/* Tag badge */}
-                  <div style={{ position: 'absolute', top: 18, left: 18,
-                    background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(10px)',
-                    border: `1px solid ${c.accent}66`,
-                    borderRadius: 999, padding: '5px 14px' }}>
-                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em',
-                      textTransform: 'uppercase', color: '#fff' }}>{c.tag}</span>
-                  </div>
-                </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
 
-                {/* Conteúdo */}
-                <div style={{ direction: 'ltr' }}>
-                  <div style={{ width: 40, height: 3, background: c.accent, borderRadius: 2, marginBottom: 22 }} />
-                  <h2 style={{ margin: '0 0 6px', fontSize: 'clamp(1.7rem, 3vw, 2.3rem)', lineHeight: 1.15, fontWeight: 400 }}>
-                    {c.title}{' '}
-                    <em className="italic-accent" style={{ color: c.accent }}>{c.highlight}</em>
-                  </h2>
-                  <p style={{ fontSize: 15.5, color: 'var(--fg-2)', lineHeight: 1.75, margin: '16px 0 24px' }}>
-                    {c.desc}
-                  </p>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px',
-                    display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {c.bullets.map(b => (
-                      <li key={b} style={{ display: 'flex', alignItems: 'flex-start', gap: 10,
-                        fontSize: 14, color: 'var(--fg-1)', lineHeight: 1.55 }}>
-                        <span style={{ width: 18, height: 18, borderRadius: '50%',
-                          background: `${c.accent}18`, border: `1.5px solid ${c.accent}44`,
-                          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                          color: c.accent, fontSize: 10, fontWeight: 800, flexShrink: 0, marginTop: 1 }}>✓</span>
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                  <button onClick={() => onNav(c.route)} style={{
-                    background: c.accent, color: '#fff', border: 'none',
-                    borderRadius: 10, padding: '14px 28px',
-                    fontFamily: 'inherit', fontWeight: 700, fontSize: 15, cursor: 'pointer',
-                    boxShadow: `0 8px 24px ${c.accent}44`,
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                  }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 12px 32px ${c.accent}55`; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = `0 8px 24px ${c.accent}44`; }}>
-                    {c.cta} →
-                  </button>
+      {/* ── BLOCO CORRETOR ── */}
+      {(!perfil || perfil === 'corretor') && (
+        <section style={{ padding: 'clamp(3rem, 5vw, 4.5rem) 0',
+          borderTop: '1px solid var(--border)', background: 'var(--cream)' }}>
+          <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))',
+              gap: 'clamp(32px, 5vw, 64px)', alignItems: 'center' }}>
+
+              {/* Esquerda — copy */}
+              <div>
+                <Eyebrow>Para corretores</Eyebrow>
+                <h2 style={{ margin: '10px 0 16px' }}>
+                  Traga sua carteira.{' '}
+                  <em className="italic-accent">Receba leads qualificados.</em>
+                </h2>
+                <p style={{ fontSize: 15.5, color: 'var(--fg-2)', lineHeight: 1.75, marginBottom: 28 }}>
+                  Na VN Prime o corretor parceiro trabalha com a melhor base de imóveis de alto padrão de BH, recebe leads verificados e usa CRM profissional — por R$ 49,90/mês.
+                </p>
+                <div style={{ display: 'grid', gap: 18, gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', marginBottom: 32 }}>
+                  {beneficiosCorretor.map(b => (
+                    <div key={b.title} style={{ background: '#fff', borderRadius: 14, padding: '20px 18px',
+                      border: '1px solid var(--border)', boxShadow: '0 2px 8px rgba(15,34,68,0.05)' }}>
+                      <div style={{ fontSize: 24, marginBottom: 10 }}>{b.icon}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 6 }}>{b.title}</div>
+                      <div style={{ fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.55 }}>{b.desc}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  <button onClick={() => onNav('corretor')} style={{
+                    padding: '14px 28px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                    background: '#10B981', color: '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 15,
+                    boxShadow: '0 6px 20px #10B98144',
+                  }}>Acessar Portal do Corretor</button>
+                  <button onClick={() => onNav('login', { mode: 'cadastro' })} style={{
+                    padding: '14px 24px', borderRadius: 10, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600,
+                    fontSize: 14, background: 'transparent', border: '1.5px solid var(--border)', color: 'var(--navy)',
+                  }}>Criar conta grátis</button>
                 </div>
               </div>
-            </section>
-          );
-        })}
-      </div>
+
+              {/* Direita — preço + destaque */}
+              <div style={{ background: 'var(--navy)', borderRadius: 24, padding: 'clamp(28px, 4vw, 48px)',
+                color: '#fff', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200,
+                  background: 'radial-gradient(circle, rgba(16,185,129,0.25) 0%, transparent 65%)' }} />
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase',
+                    color: '#10B981', marginBottom: 18 }}>Portal do Corretor</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.5rem, 5vw, 3.8rem)',
+                    fontWeight: 800, lineHeight: 1, color: '#fff', marginBottom: 6 }}>R$ 49,90</div>
+                  <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', marginBottom: 28 }}>/mês · cancele quando quiser</div>
+                  {[
+                    '30 dias grátis para começar',
+                    'Leads qualificados incluídos',
+                    'CRM e agenda de visitas',
+                    'Portfólio exclusivo VN Prime',
+                    '3% de comissão garantida em contrato',
+                    'Suporte direto da equipe VN Prime',
+                  ].map(item => (
+                    <div key={item} style={{ display: 'flex', gap: 10, alignItems: 'flex-start',
+                      marginBottom: 12, fontSize: 14, color: 'rgba(255,255,255,0.82)' }}>
+                      <span style={{ color: '#10B981', fontWeight: 700, flexShrink: 0 }}>✓</span>
+                      {item}
+                    </div>
+                  ))}
+                  <button onClick={() => onNav('corretor')} style={{
+                    width: '100%', marginTop: 8, padding: '14px 0', borderRadius: 10, border: 'none', cursor: 'pointer',
+                    background: '#10B981', color: '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 15,
+                  }}>Começar 30 dias grátis</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Trust strip */}
       <section style={{ padding: 'clamp(3rem, 5vw, 4rem) 0', background: 'var(--navy)', color: '#fff' }}>
         <div style={{ width: 'min(1180px, 94vw)', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 36 }}>
             <Eyebrow>Padrão VN Prime</Eyebrow>
-            <h2 style={{ color: '#fff', margin: '8px 0 0', fontWeight: 400 }}>Por que anunciar conosco?</h2>
+            <h2 style={{ color: '#fff', margin: '8px 0 0', fontWeight: 400 }}>Por que trabalhar conosco?</h2>
           </div>
           <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
             {[
               ['Vitrine de alto padrão', 'Imóveis selecionados com rigor técnico e posicionamento de mercado. Não somos um classificado.'],
-              ['Só paga se vender', 'Sem custo de entrada — taxa fixa de publicação ou comissão sobre o valor da venda.'],
+              ['Só paga ao vender', 'Taxa fixa de publicação ou comissão sobre o valor de venda — nenhum risco de entrada.'],
               ['Inteligência de mercado', 'Comparativos de preço da região, tempo médio de venda e análise de demanda por localização.'],
               ['Suporte do início ao fim', 'Time VN Prime acompanha da publicação do anúncio até a assinatura da escritura.'],
             ].map(([t, d]) => (
@@ -3619,7 +3712,7 @@ function PortalSection({ title, action, children }) {
 // ============================================================
 // PORTAL LANDING PAGE — apresentação antes do login (shared)
 // ============================================================
-function PortalLandingPage({ eyebrow, headline, desc, img, accent, stats, features, onEnter, onNav }) {
+function PortalLandingPage({ eyebrow, headline, desc, img, accent, stats, features, benefits, ctaLabel, onEnter, onNav }) {
   return (
     <main style={{ background: 'var(--cream)' }}>
       {/* HERO */}
@@ -3639,7 +3732,7 @@ function PortalLandingPage({ eyebrow, headline, desc, img, accent, stats, featur
             {desc}
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 44 }}>
-            <Btn variant="accent" size="lg" onClick={onEnter}>Entrar no portal</Btn>
+            <Btn variant="accent" size="lg" onClick={onEnter}>{ctaLabel || 'Entrar no portal'}</Btn>
             <Btn variant="ghost-light" size="lg" onClick={() => onNav('login', { mode: 'cadastro' })}>Criar conta grátis</Btn>
           </div>
           <div style={{ display: 'flex', gap: 40, flexWrap: 'wrap' }}>
@@ -3678,6 +3771,57 @@ function PortalLandingPage({ eyebrow, headline, desc, img, accent, stats, featur
         </div>
       </section>
 
+      {/* BENEFIT SECTIONS — alternating photo + text */}
+      {benefits && benefits.map((b, idx) => (
+        <section key={b.title} style={{
+          padding: 'clamp(60px, 8vw, 96px) 0',
+          background: idx % 2 === 0 ? '#fff' : 'var(--cream)',
+          borderTop: '1px solid var(--border)',
+        }}>
+          <div style={{ width: 'min(1180px, 92vw)', margin: '0 auto',
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))',
+            gap: 'clamp(32px, 5vw, 72px)', alignItems: 'center',
+            direction: b.reverse ? 'rtl' : 'ltr',
+          }}>
+            {/* Photo */}
+            <div style={{ direction: 'ltr', position: 'relative', borderRadius: 20, overflow: 'hidden',
+              boxShadow: '0 20px 56px rgba(27,39,51,0.14)', aspectRatio: '4/3' }}>
+              <img src={b.img} alt={b.title}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <div style={{ position: 'absolute', inset: 0,
+                background: `linear-gradient(180deg, transparent 50%, rgba(15,22,32,0.60) 100%)` }} />
+              <div style={{ position: 'absolute', bottom: 20, left: 24,
+                background: `${accent}EE`, color: '#fff', borderRadius: 8,
+                padding: '6px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                {b.tag}
+              </div>
+            </div>
+            {/* Content */}
+            <div style={{ direction: 'ltr' }}>
+              <div style={{ width: 40, height: 3, background: accent, borderRadius: 2, marginBottom: 20 }} />
+              <h2 style={{ margin: '0 0 16px', fontSize: 'clamp(1.5rem, 2.8vw, 2.1rem)' }}>{b.title}</h2>
+              <p style={{ fontSize: 16, color: 'var(--fg-2)', lineHeight: 1.75, marginBottom: 24 }}>{b.desc}</p>
+              {b.points && (
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {b.points.map(pt => (
+                    <li key={pt} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                      <span style={{ width: 20, height: 20, borderRadius: 99, background: `${accent}22`,
+                        color: accent, fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center',
+                        justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>✓</span>
+                      <span style={{ fontSize: 14.5, color: 'var(--fg-1)', lineHeight: 1.55 }}>{pt}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {b.cta && (
+                <Btn variant="accent" style={{ background: accent, boxShadow: `0 4px 18px ${accent}44` }}
+                  onClick={onEnter}>{b.cta}</Btn>
+              )}
+            </div>
+          </div>
+        </section>
+      ))}
+
       {/* CTA BANNER */}
       <section style={{ padding: 'clamp(60px, 8vw, 100px) 0', background: 'var(--gradient-navy-hero)' }}>
         <div style={{ width: 'min(860px, 92vw)', margin: '0 auto', textAlign: 'center', color: '#fff' }}>
@@ -3689,7 +3833,7 @@ function PortalLandingPage({ eyebrow, headline, desc, img, accent, stats, featur
             Faça login com sua conta VN Prime ou crie uma agora. Configuração em menos de 3 minutos.
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Btn variant="accent" size="lg" onClick={onEnter}>Acessar meu portal</Btn>
+            <Btn variant="accent" size="lg" onClick={onEnter}>{ctaLabel || 'Acessar meu portal'}</Btn>
             <Btn variant="ghost-light" size="lg" onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}>Falar com consultor</Btn>
           </div>
         </div>
@@ -3720,6 +3864,62 @@ function CorretorPage({ onNav }) {
         { icon: '📊', title: 'CRM Visual', desc: 'Pipeline kanban, histórico completo de contatos, agendamento de visitas e alertas automáticos por WhatsApp.' },
         { icon: '🏠', title: 'Portfólio Exclusivo', desc: 'Acesso antecipado a imóveis premium em BH antes de irem ao mercado público — vantagem competitiva real.' },
         { icon: '💳', title: 'Comissões Transparentes', desc: 'Extrato mensal detalhado, nota fiscal automatizada e pagamento em D+2 após o fechamento. Sem surpresas.' },
+      ]}
+      benefits={[
+        {
+          tag: 'Leads',
+          img: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=900&q=80',
+          title: 'Leads qualificados direto no seu painel',
+          desc: 'Cada lead recebido já passou por um filtro de intenção real: perfil de comprador, faixa de preço e urgência confirmados antes de chegarem até você.',
+          points: [
+            'Ficha completa com orçamento, tipologia desejada e prazo de decisão',
+            'Alerta imediato via WhatsApp — você atende primeiro',
+            'Sem leads duplicados: cada lead vai para apenas 1 corretor',
+            'Histórico de interações centralizado no CRM',
+          ],
+          cta: 'Ver meu painel de leads',
+          reverse: false,
+        },
+        {
+          tag: 'CRM',
+          img: 'https://images.unsplash.com/photo-1531538606174-0f90ff5dce83?w=900&q=80',
+          title: 'CRM visual — do contato ao contrato',
+          desc: 'Pipeline kanban que acompanha cada cliente do primeiro contato até a assinatura, com alertas automáticos para não deixar nenhuma oportunidade esfriar.',
+          points: [
+            'Pipeline com 5 etapas personalizáveis',
+            'Agendamento de visitas integrado ao Google Calendar',
+            'Templates de mensagem WhatsApp prontos para cada fase',
+            'Relatório mensal de conversão e comissões previstas',
+          ],
+          reverse: true,
+        },
+        {
+          tag: 'Portfólio',
+          img: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=900&q=80',
+          title: 'Portfólio exclusivo antes do mercado',
+          desc: 'Imóveis VN Prime são liberados para corretores parceiros 72h antes de aparecerem em portais públicos. Você fecha antes que a concorrência saiba que existe.',
+          points: [
+            'Acesso antecipado a lançamentos e imóveis de alto padrão',
+            'Fotos profissionais e tour virtual prontos para apresentação',
+            'Código VN exclusivo para rastrear seus negócios',
+            'Suporte de curadoria: equipe VN Prime disponível para dúvidas técnicas',
+          ],
+          reverse: false,
+        },
+        {
+          tag: 'Comissão',
+          img: 'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=900&q=80',
+          title: 'Comissões claras, pagamento rápido',
+          desc: 'Sem surpresas, sem atrasos. Você acompanha cada etapa do pagamento em tempo real e recebe em até 2 dias úteis após o fechamento.',
+          points: [
+            '3% de comissão sobre o valor de venda — garantida em contrato',
+            'Extrato detalhado com status por negócio',
+            'Nota fiscal automática emitida pela VN Prime',
+            'Pagamento D+2 após escritura assinada',
+          ],
+          cta: 'Entrar no portal',
+          reverse: true,
+        },
       ]}
       onEnter={() => setShowGate(true)} onNav={onNav} />
   );
@@ -6548,6 +6748,48 @@ function ProprietarioPage({ onNav }) {
         { icon: '👥', title: 'Leads Qualificados', desc: 'Compradores verificados com perfil compatível com seu imóvel chegam direto no seu painel de controle.' },
         { icon: '⚖️', title: 'Suporte Jurídico', desc: 'Revisão de contratos, ITBI, cartório e escritura. Profissionais parceiros cuidam da parte burocrática por você.' },
       ]}
+      benefits={[
+        {
+          tag: '0% Comissão',
+          img: 'https://images.unsplash.com/photo-1611095973763-414019e72400?w=900&q=80',
+          title: 'Você vende sem pagar comissão',
+          desc: 'Na VN Prime, o proprietário direto paga apenas uma taxa fixa de R$ 297 — e fica com 100% do valor de venda. Sem percentual, sem surpresa no fechamento.',
+          points: [
+            'Taxa fixa R$ 297 — vigência de 90 dias',
+            'Você define o preço e as condições de negociação',
+            'Nenhum corretor entre você e o comprador',
+            'Para o plano 3%: você paga somente ao vender — zero adiantado',
+          ],
+          cta: 'Anunciar meu imóvel',
+          reverse: false,
+        },
+        {
+          tag: 'Você no controle',
+          img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=80',
+          title: 'Gerencie tudo pelo seu painel',
+          desc: 'Acompanhe visualizações, leads e visitas em tempo real. Você decide quem visita, quando visita, e como conduz a negociação.',
+          points: [
+            'Painel com métricas de desempenho do anúncio',
+            'Gestão de agenda de visitas integrada',
+            'Scripts de venda para cada etapa da negociação',
+            'Booster para aumentar visibilidade na hora certa',
+          ],
+          reverse: true,
+        },
+        {
+          tag: 'Visibilidade',
+          img: 'https://images.unsplash.com/photo-1560472355-536de3962603?w=900&q=80',
+          title: 'Seu imóvel na maior vitrine premium de BH',
+          desc: 'A VN Prime distribui seu anúncio nos principais portais, Google, Meta e na base qualificada de compradores ativos — gerando leads reais, não visitantes curiosos.',
+          points: [
+            'Distribuição automática em ZAP, Viva Real e OLX',
+            'Campanha de mídia paga gerenciada pela VN Prime',
+            'Fotos profissionais que aumentam em 3× o interesse',
+            'Código exclusivo VN para rastreabilidade do anúncio',
+          ],
+          reverse: false,
+        },
+      ]}
       onEnter={() => setShowGate(true)} onNav={onNav} />
   );
 
@@ -7062,8 +7304,51 @@ function FotografoPage({ onNav }) {
         { icon: '📅', title: 'Agenda Organizada', desc: 'Receba jobs diretamente no seu painel com endereço, briefing, horário e informações do imóvel.' },
         { icon: '💰', title: 'Pagamento Garantido', desc: 'Receba em D+7 após a aprovação das fotos. Sem atrasos, sem burocracia — direto na sua conta.' },
         { icon: '🏆', title: 'Portfólio Premium', desc: 'Construa um portfólio com imóveis de alto padrão em BH que se destacam e abrem portas no mercado.' },
-        { icon: '📦', title: 'Pacotes Exclusivos', desc: 'Ofereça pacotes de fotografia, drone, tour 360° e vídeo. VN Prime repassa o cliente e cuida da venda.' },
+        { icon: '📦', title: 'Pacotes por Tipologia', desc: 'Preços definidos por quartos e metragem. Drone, tour 360° e vídeo disponíveis como add-ons.' },
       ]}
+      benefits={[
+        {
+          tag: 'Pacotes',
+          img: 'https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=900&q=80',
+          title: 'Pacotes definidos por tipologia do imóvel',
+          desc: 'Preços claros e justos baseados na complexidade de cada sessão — não no tempo que você gasta negociando.',
+          points: [
+            'Até 2 quartos — Essencial: R$ 390 · fotos internas e externas',
+            '3–4 quartos — Completo: R$ 690 · fotos + drone + 1h de edição',
+            '5+ quartos ou cobertura — Premium: R$ 1.190 · pacote completo',
+            'Add-on Tour 360°: + R$ 290 · Add-on Vídeo cinematic: + R$ 490',
+          ],
+          cta: 'Ver disponibilidade de jobs',
+          reverse: false,
+        },
+        {
+          tag: 'Jobs Garantidos',
+          img: 'https://images.unsplash.com/photo-1554080353-a576cf803bda?w=900&q=80',
+          title: 'Jobs prontos, sem prospecção',
+          desc: 'VN Prime capta os clientes, organiza o briefing e agenda a visita. Você só precisa aparecer no horário e fazer o que faz de melhor.',
+          points: [
+            'Briefing completo entregue 24h antes do job',
+            'Endereço, tipo de imóvel e lista de ângulos prioritários',
+            'Suporte da equipe VN Prime em caso de imprevisto',
+            'Sem necessidade de vender ou negociar diretamente com o proprietário',
+          ],
+          reverse: true,
+        },
+        {
+          tag: 'Pagamento',
+          img: 'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=900&q=80',
+          title: 'Pagamento em D+7, sem risco',
+          desc: 'A VN Prime garante o pagamento após aprovação das fotos. Você entrega, a equipe valida, e o valor cai na sua conta em até 7 dias úteis.',
+          points: [
+            'VN Prime retém 10–20% por job como taxa de plataforma',
+            'Extrato mensal disponível no painel com histórico completo',
+            'Notas fiscais gerenciadas pela plataforma',
+            'Bonificação por avaliação acima de 4,8 estrelas',
+          ],
+          reverse: false,
+        },
+      ]}
+      ctaLabel="Quero me credenciar"
       onEnter={() => setShowGate(true)} onNav={onNav} />
   );
 
