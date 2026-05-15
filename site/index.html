@@ -1516,7 +1516,7 @@ function SiteHeader({ active, onNav, density = 'comfortable' }) {
   );
 }
 
-function SiteFooter({ onNewsletter }) {
+function SiteFooter({ onNewsletter, onNav }) {
   return (
     <footer style={{ background: 'var(--navy)', color: 'rgba(245,248,250,0.72)', padding: '64px 0 32px', marginTop: 60 }}>
       <div style={{ width: 'min(1280px, 94vw)', margin: '0 auto' }}>
@@ -1561,10 +1561,19 @@ function SiteFooter({ onNewsletter }) {
           display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12, fontSize: 12,
           fontFamily: 'Inter, sans-serif' }}>
           <span>© 2026 VN Prime Imóveis · CRECI-MG 12.345-J</span>
-          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic',
-            color: 'var(--gold-soft)', fontSize: 14, letterSpacing: '0.04em' }}>
-            Curadoria silenciosa
-          </span>
+          <div style={{ display:'flex', gap:16, alignItems:'center' }}>
+            <span style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic',
+              color: 'var(--gold-soft)', fontSize: 14, letterSpacing: '0.04em' }}>
+              Curadoria silenciosa
+            </span>
+            {onNav && (
+              <a onClick={(e)=>{ e.preventDefault(); onNav('admin'); }}
+                style={{ fontSize:11, color:'rgba(245,248,250,0.20)', cursor:'pointer',
+                  textDecoration:'none', letterSpacing:'0.1em', fontFamily:'Inter,sans-serif' }}>
+                admin
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </footer>
@@ -10522,6 +10531,8 @@ function App() {
     : route.name === 'busca' ? (route.params.op === 'aluguel' ? 'aluguel' : route.params.op === 'lancamento' ? 'lancamentos' : 'busca')
     : route.name;
 
+  if (route.name === 'admin') return React.createElement(window.AdminPage, { onNav });
+
   return (
     <React.Fragment>
       <SiteHeader active={headerActive} onNav={onNav} density={tweaks.density} onNewsletter={() => setShowNewsletter(true)} />
@@ -10552,7 +10563,7 @@ function App() {
         <PlaceholderPage name={route.name} onNav={onNav} />
       )}
 
-      <SiteFooter onNewsletter={() => setShowNewsletter(true)} />
+      <SiteFooter onNewsletter={() => setShowNewsletter(true)} onNav={onNav} />
 
       {showNewsletter && window.NewsletterModal && React.createElement(window.NewsletterModal, { onClose: () => setShowNewsletter(false) })}
       {showConsultor && window.ConsultorModal && React.createElement(window.ConsultorModal, { onClose: () => setShowConsultor(false), onNav: (name, params) => { setShowConsultor(false); onNav(name, params); } })}
@@ -10916,6 +10927,512 @@ function PlaceholderPage({ name, onNav }) {
   );
 }
 
+
+</script>
+
+<script type="text/babel">
+// ============================================================
+// ADMIN PORTAL — Curadoria VN Prime
+// Acesso: admin@vnprime.com.br / vnprime2026!
+// ============================================================
+
+const ADMIN_EMAIL = 'admin@vnprime.com.br';
+const ADMIN_PASS  = 'vnprime2026!';
+const ADMIN_KEY   = 'vnp_admin_auth';
+
+// ── Mock data ────────────────────────────────────────────────
+const MOCK_IMOVEIS = [
+  { id:'VN-9001', proprietario:'Carlos M. Silva',    email:'carlos@email.com',   telefone:'(31) 9 9811-2234', tipo:'Cobertura',  bairro:'Centro, Betim',      preco:'R$ 780.000', plano:'Venda Direta · R$ 297',    fotos:12, status:'aprovado',  data:'13/05/2026', views:124, leads:3 },
+  { id:'VN-9002', proprietario:'Ana Paula Ferreira', email:'ana@email.com',      telefone:'(31) 9 8822-5501', tipo:'Apto 3 suítes', bairro:'Savassi, BH',      preco:'R$ 1.350.000', plano:'Venda Assistida · 3%',  fotos:18, status:'pendente', data:'14/05/2026', views:0,   leads:0 },
+  { id:'VN-9003', proprietario:'Roberto Lins',        email:'roberto@email.com',  telefone:'(31) 9 9955-8801', tipo:'Casa',       bairro:'Alphaville, Nova Lima', preco:'R$ 4.200.000', plano:'Venda Completa · 6%', fotos:24, status:'pendente', data:'14/05/2026', views:0,   leads:0 },
+  { id:'VN-9004', proprietario:'Fernanda Costa',     email:'fer@email.com',      telefone:'(31) 9 7733-1120', tipo:'Apto 2q',    bairro:'Buritis, BH',         preco:'R$ 620.000', plano:'Venda Direta · R$ 297',    fotos:8,  status:'aprovado',  data:'10/05/2026', views:87,  leads:1 },
+  { id:'VN-9005', proprietario:'Marcelo Teixeira',   email:'marcelo@email.com',  telefone:'(31) 9 8844-6612', tipo:'Casa cond.', bairro:'Cond. Pq. Verde, BH', preco:'R$ 2.800.000', plano:'Venda Completa · 6%', fotos:30, status:'rejeitado', data:'09/05/2026', views:0,   leads:0 },
+  { id:'VN-9006', proprietario:'Luciana Ramos',      email:'luc@email.com',      telefone:'(31) 9 9900-3344', tipo:'Cobertura',  bairro:'Lourdes, BH',         preco:'R$ 3.100.000', plano:'Venda Assistida · 3%', fotos:21, status:'pendente', data:'15/05/2026', views:0,   leads:0 },
+];
+
+const MOCK_LEADS = [
+  { id:'L001', nome:'André Carvalho',  tel:'(31) 9 8811-2234', email:'andre@email.com', interesse:'Cobertura · Belvedere', orcamento:'R$ 3–5M',     origem:'Busca',    status:'novo',        data:'14/05' },
+  { id:'L002', nome:'Camila Torres',   tel:'(31) 9 8833-6612', email:'cam@email.com',   interesse:'Apto 3 suítes · Savassi', orcamento:'R$ 1–2M',  origem:'WhatsApp', status:'em_contato',  data:'14/05' },
+  { id:'L003', nome:'Paulo Meireles',  tel:'(31) 9 9955-0012', email:'paulo@email.com', interesse:'Casa · Nova Lima',       orcamento:'R$ 2–4M',   origem:'Busca',    status:'visita',      data:'13/05' },
+  { id:'L004', nome:'Mariana Lopes',   tel:'(31) 9 7722-9900', email:'mari@email.com',  interesse:'Lançamento · Betim',     orcamento:'Até R$ 1M', origem:'Landing',  status:'novo',        data:'13/05' },
+  { id:'L005', nome:'Diego Moura',     tel:'(31) 9 8866-1122', email:'diego@email.com', interesse:'Cobertura · Lourdes',    orcamento:'R$ 3–5M',   origem:'Busca',    status:'qualificado', data:'12/05' },
+  { id:'L006', nome:'Renata Cunha',    tel:'(31) 9 9900-5566', email:'re@email.com',    interesse:'Casa · Alphaville',      orcamento:'R$ 4–6M',   origem:'Indicação',status:'proposta',    data:'10/05' },
+  { id:'L007', nome:'Felipe Santos',   tel:'(31) 9 8811-7788', email:'fel@email.com',   interesse:'Apto 2q · Buritis',      orcamento:'Até R$ 800k',origem:'Busca',   status:'novo',        data:'09/05' },
+];
+
+const MOCK_JOBS = [
+  { id:'JB001', fotografo:'Thiago Alves',   imovel:'Cobertura · Centro Betim',   data:'17/05/2026', pacote:'Premium + Drone',   valor:'R$ 1.190', status:'agendado',   pago:false },
+  { id:'JB002', fotografo:'Camila Vieira',  imovel:'Apto 3s · Savassi',          data:'16/05/2026', pacote:'Completo',           valor:'R$ 690',   status:'agendado',   pago:false },
+  { id:'JB003', fotografo:'Thiago Alves',   imovel:'Casa · Alphaville',          data:'12/05/2026', pacote:'Premium + 360°',     valor:'R$ 1.480', status:'concluido',  pago:false },
+  { id:'JB004', fotografo:'Lucas Mendes',   imovel:'Apto 2q · Buritis',          data:'10/05/2026', pacote:'Essencial',          valor:'R$ 390',   status:'concluido',  pago:true  },
+  { id:'JB005', fotografo:'Camila Vieira',  imovel:'Casa cond. · Pq. Verde',     data:'08/05/2026', pacote:'Completo + Vídeo',   valor:'R$ 1.180', status:'concluido',  pago:true  },
+];
+
+const MOCK_USUARIOS = [
+  { id:'U001', nome:'Carlos M. Silva',    email:'carlos@email.com',   tipo:'Proprietário', plano:'Venda Direta',    cadastro:'01/05/2026', status:'ativo'    },
+  { id:'U002', nome:'Ana Paula Ferreira', email:'ana@email.com',      tipo:'Proprietário', plano:'Venda Assistida', cadastro:'14/05/2026', status:'pendente' },
+  { id:'U003', nome:'João Corretor',      email:'joao@imob.com',      tipo:'Corretor',     plano:'R$ 49,90/mês',   cadastro:'05/04/2026', status:'ativo'    },
+  { id:'U004', nome:'Maria Corretora',    email:'maria@imob.com',     tipo:'Corretor',     plano:'R$ 49,90/mês',   cadastro:'12/04/2026', status:'ativo'    },
+  { id:'U005', nome:'Thiago Alves',       email:'thiago@foto.com',    tipo:'Fotógrafo',    plano:'Credenciado',     cadastro:'10/03/2026', status:'ativo'    },
+  { id:'U006', nome:'Camila Vieira',      email:'camila@foto.com',    tipo:'Fotógrafo',    plano:'Credenciado',     cadastro:'15/03/2026', status:'ativo'    },
+  { id:'U007', nome:'Roberto Lins',       email:'roberto@email.com',  tipo:'Proprietário', plano:'Venda Completa',  cadastro:'14/05/2026', status:'pendente' },
+  { id:'U008', nome:'Luciana Ramos',      email:'luc@email.com',      tipo:'Proprietário', plano:'Venda Assistida', cadastro:'15/05/2026', status:'pendente' },
+];
+
+// ── AdminPage ─────────────────────────────────────────────────
+function AdminPage({ onNav }) {
+  const [auth, setAuth] = React.useState(() => localStorage.getItem(ADMIN_KEY) === '1');
+  const [email, setEmail] = React.useState('');
+  const [senha, setSenha] = React.useState('');
+  const [loginErr, setLoginErr] = React.useState('');
+  const [sec, setSec] = React.useState('dashboard');
+  const isMobile = useIsMobile();
+
+  // Live state for curadoria
+  const [imoveis, setImoveis] = React.useState(MOCK_IMOVEIS);
+  const [jobs, setJobs] = React.useState(MOCK_JOBS);
+
+  const handleLogin = () => {
+    if (email === ADMIN_EMAIL && senha === ADMIN_PASS) {
+      localStorage.setItem(ADMIN_KEY, '1');
+      setAuth(true);
+    } else {
+      setLoginErr('Email ou senha incorretos.');
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem(ADMIN_KEY);
+    setAuth(false);
+    onNav('home');
+  };
+
+  const aprovar  = (id) => setImoveis(prev => prev.map(i => i.id === id ? { ...i, status:'aprovado' } : i));
+  const rejeitar = (id) => setImoveis(prev => prev.map(i => i.id === id ? { ...i, status:'rejeitado' } : i));
+  const pagarJob = (id) => setJobs(prev => prev.map(j => j.id === id ? { ...j, pago: true } : j));
+
+  // ── Login ──────────────────────────────────────────────────
+  if (!auth) return (
+    <div style={{ minHeight: '100vh', background: 'var(--navy-deep)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div style={{ background: '#fff', borderRadius: 20, padding: 'clamp(28px,5vw,48px)',
+        width: '100%', maxWidth: 400, boxShadow: '0 24px 64px rgba(0,0,0,0.32)' }}>
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <ShieldMark size={36} />
+          <div style={{ fontFamily: 'Cinzel,serif', fontWeight: 700, fontSize: 13,
+            letterSpacing: '0.22em', color: 'var(--navy)', marginTop: 10 }}>VN PRIME · ADMIN</div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <input value={email} onChange={e => setEmail(e.target.value)}
+            placeholder="admin@vnprime.com.br" type="email" style={{ width:'100%' }}
+            onKeyDown={e => e.key === 'Enter' && handleLogin()} />
+          <input value={senha} onChange={e => setSenha(e.target.value)}
+            placeholder="Senha" type="password" style={{ width:'100%' }}
+            onKeyDown={e => e.key === 'Enter' && handleLogin()} />
+          {loginErr && <div style={{ color:'#EF4444', fontSize:13 }}>{loginErr}</div>}
+          <Btn fullWidth variant="accent" onClick={handleLogin}>Entrar</Btn>
+          <button onClick={() => onNav('home')} style={{ background:'none', border:'none',
+            color:'var(--fg-2)', fontSize:13, cursor:'pointer', textAlign:'center' }}>
+            ← Voltar ao site
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── Nav items ──────────────────────────────────────────────
+  const navItems = [
+    { id:'dashboard',  icon:'◈', label:'Dashboard' },
+    { id:'imoveis',    icon:'🏠', label:'Imóveis' },
+    { id:'leads',      icon:'◉', label:'Leads' },
+    { id:'fotografos', icon:'📸', label:'Fotógrafos' },
+    { id:'usuarios',   icon:'👤', label:'Usuários' },
+  ];
+
+  const accent = '#D4A857';
+  const pending = imoveis.filter(i => i.status === 'pendente').length;
+  const leadsNovos = MOCK_LEADS.filter(l => l.status === 'novo').length;
+  const jobsPendentes = jobs.filter(j => j.status === 'concluido' && !j.pago).length;
+
+  // Badge helper
+  const Badge = ({ n, color = '#EF4444' }) => n > 0 ? (
+    <span style={{ background: color, color:'#fff', borderRadius:999,
+      fontSize:9, fontWeight:700, padding:'1px 6px', marginLeft:6 }}>{n}</span>
+  ) : null;
+
+  // Status pill
+  const StatusPill = ({ s }) => {
+    const map = {
+      aprovado:    { bg:'#D1FAE5', fg:'#065F46', label:'Aprovado' },
+      pendente:    { bg:'#FEF3C7', fg:'#92400E', label:'Pendente' },
+      rejeitado:   { bg:'#FEE2E2', fg:'#991B1B', label:'Rejeitado' },
+      novo:        { bg:'#EDE9FE', fg:'#5B21B6', label:'Novo' },
+      em_contato:  { bg:'#DBEAFE', fg:'#1E40AF', label:'Em contato' },
+      qualificado: { bg:'#D1FAE5', fg:'#065F46', label:'Qualificado' },
+      visita:      { bg:'#FEF3C7', fg:'#92400E', label:'Visita marcada' },
+      proposta:    { bg:'#FCE7F3', fg:'#9D174D', label:'Proposta' },
+      agendado:    { bg:'#FEF3C7', fg:'#92400E', label:'Agendado' },
+      concluido:   { bg:'#D1FAE5', fg:'#065F46', label:'Concluído' },
+      ativo:       { bg:'#D1FAE5', fg:'#065F46', label:'Ativo' },
+      inativo:     { bg:'#F3F4F6', fg:'#6B7280', label:'Inativo' },
+    };
+    const c = map[s] || { bg:'#F3F4F6', fg:'#6B7280', label: s };
+    return <span style={{ background:c.bg, color:c.fg, borderRadius:999,
+      padding:'3px 10px', fontSize:11, fontWeight:700 }}>{c.label}</span>;
+  };
+
+  // Table styles
+  const th = { padding:'10px 14px', fontSize:11, fontWeight:700, letterSpacing:'0.08em',
+    textTransform:'uppercase', color:'var(--fg-3)', borderBottom:'2px solid var(--border)',
+    background:'#F9FAFB', whiteSpace:'nowrap' };
+  const td = { padding:'12px 14px', fontSize:13.5, color:'var(--fg-1)', borderBottom:'1px solid var(--border)', verticalAlign:'middle' };
+
+  // ── Section render ─────────────────────────────────────────
+  const renderSection = () => {
+    if (sec === 'dashboard') return (
+      <div style={{ padding:'clamp(24px,3vw,40px)' }}>
+        <div style={{ marginBottom:28 }}>
+          <div style={{ fontSize:11, fontWeight:700, letterSpacing:'0.18em', textTransform:'uppercase', color:accent, marginBottom:4 }}>VN Prime · Admin</div>
+          <h2 style={{ margin:'0 0 4px' }}>Visão geral</h2>
+          <p style={{ color:'var(--fg-2)', fontSize:14, margin:0 }}>Hoje, {new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</p>
+        </div>
+        <div style={{ display:'grid', gap:16, gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', marginBottom:32 }}>
+          {[
+            { label:'Imóveis ativos',      v: imoveis.filter(i=>i.status==='aprovado').length,  color:'#10B981' },
+            { label:'Pendentes curadoria', v: pending,                                          color:'#F59E0B', alert: pending > 0 },
+            { label:'Leads novos',         v: leadsNovos,                                       color:'#6366F1', alert: leadsNovos > 0 },
+            { label:'Jobs a pagar',        v: jobsPendentes,                                    color:'#EF4444', alert: jobsPendentes > 0 },
+            { label:'Total usuários',      v: MOCK_USUARIOS.length,                             color:accent },
+            { label:'Total leads',         v: MOCK_LEADS.length,                                color:'#3B82F6' },
+          ].map(s => (
+            <div key={s.label} style={{ background:'#fff', borderRadius:14, padding:'18px 20px',
+              border: s.alert ? `1.5px solid ${s.color}44` : '1px solid var(--border)',
+              boxShadow: s.alert ? `0 4px 16px ${s.color}18` : '0 2px 8px rgba(15,34,68,0.05)' }}>
+              <div style={{ fontSize:11, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--fg-3)', marginBottom:8 }}>{s.label}</div>
+              <div style={{ fontSize:30, fontWeight:800, color:s.color, letterSpacing:'-0.02em', lineHeight:1 }}>{s.v}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Pendentes rápidos */}
+        {pending > 0 && (
+          <div style={{ background:'#fff', borderRadius:16, border:'1px solid var(--border)', overflow:'hidden', marginBottom:24 }}>
+            <div style={{ padding:'16px 20px', borderBottom:'1px solid var(--border)',
+              display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div style={{ fontWeight:700, fontSize:15 }}>Imóveis aguardando curadoria</div>
+              <button onClick={() => setSec('imoveis')} style={{ background:'none', border:'none',
+                color:accent, fontWeight:600, cursor:'pointer', fontSize:13 }}>Ver todos →</button>
+            </div>
+            {imoveis.filter(i=>i.status==='pendente').map(i => (
+              <div key={i.id} style={{ padding:'14px 20px', borderBottom:'1px solid var(--border)',
+                display:'flex', flexWrap:'wrap', alignItems:'center', gap:12, justifyContent:'space-between' }}>
+                <div>
+                  <div style={{ fontWeight:700, color:'var(--navy)', fontSize:14 }}>{i.id} · {i.tipo}</div>
+                  <div style={{ fontSize:12.5, color:'var(--fg-2)' }}>{i.bairro} · {i.preco} · {i.plano}</div>
+                  <div style={{ fontSize:12, color:'var(--fg-3)' }}>{i.proprietario} · {i.email}</div>
+                </div>
+                <div style={{ display:'flex', gap:8, flexShrink:0 }}>
+                  <button onClick={() => aprovar(i.id)} style={{
+                    padding:'7px 16px', borderRadius:8, border:'none', cursor:'pointer',
+                    background:'#10B981', color:'#fff', fontWeight:700, fontSize:12.5 }}>Aprovar</button>
+                  <button onClick={() => rejeitar(i.id)} style={{
+                    padding:'7px 14px', borderRadius:8, border:'1px solid #EF4444', cursor:'pointer',
+                    background:'transparent', color:'#EF4444', fontWeight:700, fontSize:12.5 }}>Rejeitar</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Jobs a pagar */}
+        {jobsPendentes > 0 && (
+          <div style={{ background:'#fff', borderRadius:16, border:'1px solid var(--border)', overflow:'hidden' }}>
+            <div style={{ padding:'16px 20px', borderBottom:'1px solid var(--border)',
+              display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div style={{ fontWeight:700, fontSize:15 }}>Pagamentos pendentes — Fotógrafos</div>
+              <button onClick={() => setSec('fotografos')} style={{ background:'none', border:'none',
+                color:accent, fontWeight:600, cursor:'pointer', fontSize:13 }}>Ver todos →</button>
+            </div>
+            {jobs.filter(j=>j.status==='concluido'&&!j.pago).map(j => (
+              <div key={j.id} style={{ padding:'14px 20px', borderBottom:'1px solid var(--border)',
+                display:'flex', flexWrap:'wrap', alignItems:'center', gap:12, justifyContent:'space-between' }}>
+                <div>
+                  <div style={{ fontWeight:700, color:'var(--navy)', fontSize:14 }}>{j.fotografo}</div>
+                  <div style={{ fontSize:12.5, color:'var(--fg-2)' }}>{j.imovel} · {j.pacote} · {j.data}</div>
+                </div>
+                <div style={{ display:'flex', gap:10, alignItems:'center', flexShrink:0 }}>
+                  <span style={{ fontWeight:800, fontSize:16, color:'var(--navy)' }}>{j.valor}</span>
+                  <button onClick={() => pagarJob(j.id)} style={{
+                    padding:'7px 16px', borderRadius:8, border:'none', cursor:'pointer',
+                    background:accent, color:'var(--navy)', fontWeight:700, fontSize:12.5 }}>Autorizar pagamento</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+
+    if (sec === 'imoveis') return (
+      <div style={{ padding:'clamp(24px,3vw,40px)' }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:24, flexWrap:'wrap', gap:12 }}>
+          <div>
+            <h2 style={{ margin:'0 0 4px' }}>Imóveis</h2>
+            <p style={{ color:'var(--fg-2)', fontSize:14, margin:0 }}>Curadoria · aprovação e rejeição de anúncios</p>
+          </div>
+          <div style={{ display:'flex', gap:8 }}>
+            {[['todos','Todos',imoveis.length],['pendente','Pendentes',pending],['aprovado','Aprovados',imoveis.filter(i=>i.status==='aprovado').length],['rejeitado','Rejeitados',imoveis.filter(i=>i.status==='rejeitado').length]].map(([k,l,c])=>(
+              <span key={k} style={{ padding:'5px 12px', borderRadius:999, fontSize:11.5, fontWeight:700, cursor:'pointer',
+                background:k==='todos'?'var(--navy)':'var(--cream)', color:k==='todos'?'#fff':'var(--fg-2)',
+                border:'1px solid var(--border)' }}>{l} ({c})</span>
+            ))}
+          </div>
+        </div>
+        <div style={{ background:'#fff', borderRadius:16, border:'1px solid var(--border)', overflow:'hidden' }}>
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse' }}>
+              <thead>
+                <tr>
+                  {['Código','Proprietário','Tipo · Bairro','Preço','Plano','Fotos','Data','Status','Ações'].map(h=>(
+                    <th key={h} style={th}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {imoveis.map(i => (
+                  <tr key={i.id} style={{ background: i.status==='pendente' ? '#FFFBEB' : '#fff' }}>
+                    <td style={{...td, fontWeight:700, color:accent}}>{i.id}</td>
+                    <td style={td}>
+                      <div style={{ fontWeight:600 }}>{i.proprietario}</div>
+                      <div style={{ fontSize:12, color:'var(--fg-3)' }}>{i.email}</div>
+                    </td>
+                    <td style={td}>
+                      <div>{i.tipo}</div>
+                      <div style={{ fontSize:12, color:'var(--fg-3)' }}>{i.bairro}</div>
+                    </td>
+                    <td style={{...td, fontWeight:700}}>{i.preco}</td>
+                    <td style={{...td, fontSize:12.5, color:'var(--fg-2)'}}>{i.plano}</td>
+                    <td style={{...td, textAlign:'center'}}>{i.fotos}</td>
+                    <td style={{...td, whiteSpace:'nowrap'}}>{i.data}</td>
+                    <td style={td}><StatusPill s={i.status} /></td>
+                    <td style={td}>
+                      {i.status === 'pendente' && (
+                        <div style={{ display:'flex', gap:6 }}>
+                          <button onClick={() => aprovar(i.id)} style={{ padding:'5px 12px', borderRadius:6, border:'none', cursor:'pointer', background:'#10B981', color:'#fff', fontWeight:700, fontSize:11.5 }}>Aprovar</button>
+                          <button onClick={() => rejeitar(i.id)} style={{ padding:'5px 10px', borderRadius:6, border:'1px solid #EF4444', cursor:'pointer', background:'transparent', color:'#EF4444', fontWeight:700, fontSize:11.5 }}>Rejeitar</button>
+                        </div>
+                      )}
+                      {i.status !== 'pendente' && (
+                        <button onClick={() => setImoveis(prev=>prev.map(x=>x.id===i.id?{...x,status:'pendente'}:x))}
+                          style={{ padding:'5px 10px', borderRadius:6, border:'1px solid var(--border)', cursor:'pointer', background:'transparent', color:'var(--fg-2)', fontSize:11.5 }}>Reverter</button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+
+    if (sec === 'leads') return (
+      <div style={{ padding:'clamp(24px,3vw,40px)' }}>
+        <div style={{ marginBottom:24 }}>
+          <h2 style={{ margin:'0 0 4px' }}>Leads</h2>
+          <p style={{ color:'var(--fg-2)', fontSize:14, margin:0 }}>Todos os contatos capturados na plataforma</p>
+        </div>
+        <div style={{ background:'#fff', borderRadius:16, border:'1px solid var(--border)', overflow:'hidden' }}>
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse' }}>
+              <thead>
+                <tr>{['ID','Nome','Contato','Interesse','Orçamento','Origem','Status','Data'].map(h=><th key={h} style={th}>{h}</th>)}</tr>
+              </thead>
+              <tbody>
+                {MOCK_LEADS.map(l => (
+                  <tr key={l.id}>
+                    <td style={{...td, color:'var(--fg-3)', fontSize:12}}>{l.id}</td>
+                    <td style={{...td, fontWeight:600}}>{l.nome}</td>
+                    <td style={td}>
+                      <div style={{ fontSize:12.5 }}>{l.tel}</div>
+                      <div style={{ fontSize:12, color:'var(--fg-3)' }}>{l.email}</div>
+                    </td>
+                    <td style={{...td, fontSize:12.5}}>{l.interesse}</td>
+                    <td style={{...td, fontSize:12.5, color:'var(--fg-2)'}}>{l.orcamento}</td>
+                    <td style={{...td, fontSize:12.5}}>{l.origem}</td>
+                    <td style={td}><StatusPill s={l.status} /></td>
+                    <td style={{...td, whiteSpace:'nowrap', fontSize:12.5}}>{l.data}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+
+    if (sec === 'fotografos') return (
+      <div style={{ padding:'clamp(24px,3vw,40px)' }}>
+        <div style={{ marginBottom:24 }}>
+          <h2 style={{ margin:'0 0 4px' }}>Fotógrafos</h2>
+          <p style={{ color:'var(--fg-2)', fontSize:14, margin:0 }}>Jobs e pagamentos dos fotógrafos credenciados</p>
+        </div>
+        <div style={{ background:'#fff', borderRadius:16, border:'1px solid var(--border)', overflow:'hidden' }}>
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse' }}>
+              <thead>
+                <tr>{['Job','Fotógrafo','Imóvel','Data','Pacote','Valor','Status','Pagamento'].map(h=><th key={h} style={th}>{h}</th>)}</tr>
+              </thead>
+              <tbody>
+                {jobs.map(j => (
+                  <tr key={j.id} style={{ background: j.status==='concluido'&&!j.pago ? '#FFFBEB' : '#fff' }}>
+                    <td style={{...td, color:'var(--fg-3)', fontSize:12}}>{j.id}</td>
+                    <td style={{...td, fontWeight:600}}>{j.fotografo}</td>
+                    <td style={{...td, fontSize:12.5}}>{j.imovel}</td>
+                    <td style={{...td, whiteSpace:'nowrap', fontSize:12.5}}>{j.data}</td>
+                    <td style={{...td, fontSize:12.5}}>{j.pacote}</td>
+                    <td style={{...td, fontWeight:700}}>{j.valor}</td>
+                    <td style={td}><StatusPill s={j.status} /></td>
+                    <td style={td}>
+                      {j.pago ? (
+                        <span style={{ color:'#10B981', fontWeight:700, fontSize:12.5 }}>✓ Pago</span>
+                      ) : j.status === 'concluido' ? (
+                        <button onClick={() => pagarJob(j.id)} style={{ padding:'6px 14px', borderRadius:6, border:'none', cursor:'pointer', background:accent, color:'var(--navy)', fontWeight:700, fontSize:12 }}>Autorizar pagto.</button>
+                      ) : (
+                        <span style={{ color:'var(--fg-3)', fontSize:12.5 }}>Aguardando</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+
+    if (sec === 'usuarios') return (
+      <div style={{ padding:'clamp(24px,3vw,40px)' }}>
+        <div style={{ marginBottom:24 }}>
+          <h2 style={{ margin:'0 0 4px' }}>Usuários</h2>
+          <p style={{ color:'var(--fg-2)', fontSize:14, margin:0 }}>Proprietários, corretores e fotógrafos cadastrados</p>
+        </div>
+        <div style={{ background:'#fff', borderRadius:16, border:'1px solid var(--border)', overflow:'hidden' }}>
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse' }}>
+              <thead>
+                <tr>{['ID','Nome','Email','Tipo','Plano','Cadastro','Status'].map(h=><th key={h} style={th}>{h}</th>)}</tr>
+              </thead>
+              <tbody>
+                {MOCK_USUARIOS.map(u => (
+                  <tr key={u.id}>
+                    <td style={{...td, color:'var(--fg-3)', fontSize:12}}>{u.id}</td>
+                    <td style={{...td, fontWeight:600}}>{u.nome}</td>
+                    <td style={{...td, fontSize:12.5, color:'var(--fg-2)'}}>{u.email}</td>
+                    <td style={td}>
+                      <span style={{ background: u.tipo==='Corretor'?'#DBEAFE':u.tipo==='Fotógrafo'?'#FCE7F3':'#FEF3C7',
+                        color: u.tipo==='Corretor'?'#1E40AF':u.tipo==='Fotógrafo'?'#9D174D':'#92400E',
+                        borderRadius:999, padding:'3px 10px', fontSize:11, fontWeight:700 }}>{u.tipo}</span>
+                    </td>
+                    <td style={{...td, fontSize:12.5}}>{u.plano}</td>
+                    <td style={{...td, whiteSpace:'nowrap', fontSize:12.5}}>{u.cadastro}</td>
+                    <td style={td}><StatusPill s={u.status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ── Dashboard shell ────────────────────────────────────────
+  if (isMobile) return (
+    <div style={{ minHeight:'100vh', background:'var(--cream)', paddingBottom:68 }}>
+      <div style={{ background:'var(--navy-deep)', padding:'16px 20px',
+        display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+        <div>
+          <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:accent }}>VN Prime</div>
+          <div style={{ fontSize:14, fontWeight:700, color:'#fff' }}>Admin</div>
+        </div>
+        <button onClick={handleLogout} style={{ background:'transparent', border:'1px solid rgba(255,255,255,0.2)',
+          color:'rgba(255,255,255,0.55)', borderRadius:8, padding:'6px 12px', cursor:'pointer', fontSize:12 }}>Sair</button>
+      </div>
+      <div style={{ overflowX:'auto' }}>{renderSection()}</div>
+      <nav style={{ position:'fixed', bottom:0, left:0, right:0, height:62,
+        background:'var(--navy-deep)', borderTop:'1px solid rgba(255,255,255,0.08)',
+        display:'flex', alignItems:'stretch' }}>
+        {navItems.map(item => (
+          <button key={item.id} onClick={() => setSec(item.id)} style={{
+            flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+            gap:2, border:'none', background:'transparent', cursor:'pointer', minWidth:0,
+            color: sec===item.id ? accent : 'rgba(245,248,250,0.42)',
+            borderTop: sec===item.id ? `2px solid ${accent}` : '2px solid transparent',
+            fontFamily:'var(--font-body)', fontSize:9, fontWeight: sec===item.id?700:400,
+          }}>
+            <span style={{ fontSize:15 }}>{item.icon}</span>
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
+    </div>
+  );
+
+  return (
+    <div style={{ display:'flex', minHeight:'100vh' }}>
+      {/* Sidebar */}
+      <aside style={{ width:230, flexShrink:0, background:'var(--navy-deep)',
+        position:'sticky', top:0, height:'100vh', overflowY:'auto',
+        display:'flex', flexDirection:'column' }}>
+        <div style={{ padding:'24px 20px 16px', borderBottom:'1px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ fontSize:9.5, fontWeight:700, letterSpacing:'0.22em', textTransform:'uppercase', color:accent, marginBottom:5 }}>VN Prime</div>
+          <div style={{ fontSize:16, fontWeight:700, color:'#fff' }}>Admin</div>
+          <div style={{ fontSize:11, color:'rgba(255,255,255,0.38)', marginTop:2 }}>Curadoria & Gestão</div>
+        </div>
+        <nav style={{ padding:'12px 10px', flex:1 }}>
+          {navItems.map(item => (
+            <button key={item.id} onClick={() => setSec(item.id)} style={{
+              width:'100%', display:'flex', alignItems:'center', gap:10,
+              padding:'9px 10px', borderRadius:8, border:'none', marginBottom:2,
+              background: sec===item.id ? `${accent}22` : 'transparent',
+              color: sec===item.id ? accent : 'rgba(245,248,250,0.60)',
+              fontFamily:'var(--font-body)', fontSize:13.5,
+              fontWeight: sec===item.id ? 700 : 400, cursor:'pointer', textAlign:'left',
+            }}>
+              <span style={{ fontSize:16, width:20, textAlign:'center', flexShrink:0 }}>{item.icon}</span>
+              {item.label}
+              {item.id==='imoveis'    && <Badge n={pending} />}
+              {item.id==='leads'      && <Badge n={leadsNovos} color='#6366F1' />}
+              {item.id==='fotografos' && <Badge n={jobsPendentes} />}
+            </button>
+          ))}
+        </nav>
+        <div style={{ padding:'12px 10px', borderTop:'1px solid rgba(255,255,255,0.08)' }}>
+          <button onClick={handleLogout} style={{ width:'100%', display:'flex', alignItems:'center', gap:8,
+            padding:'8px 10px', borderRadius:8, border:'none', background:'transparent',
+            color:'rgba(245,248,250,0.38)', fontFamily:'var(--font-body)', fontSize:12.5, cursor:'pointer' }}>
+            ← Sair
+          </button>
+          <button onClick={() => onNav('home')} style={{ width:'100%', display:'flex', alignItems:'center', gap:8,
+            padding:'8px 10px', borderRadius:8, border:'none', background:'transparent',
+            color:'rgba(245,248,250,0.25)', fontFamily:'var(--font-body)', fontSize:11.5, cursor:'pointer' }}>
+            Ver site público
+          </button>
+        </div>
+      </aside>
+      {/* Main */}
+      <main style={{ flex:1, minWidth:0, background:'var(--cream)', overflowX:'hidden' }}>
+        {renderSection()}
+      </main>
+    </div>
+  );
+}
+
+Object.assign(window, { AdminPage });
+</script>
+
+<script type="text/babel">
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
 </body>
