@@ -3,6 +3,11 @@ Thumbs.db
 *.zip
 .cursor/
 node_modules/
+.next/
+out/
+*.tsbuildinfo
 
 .env
 .env.*
+.env.local
+.vercel
