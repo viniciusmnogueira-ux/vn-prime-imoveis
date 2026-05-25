@@ -1397,7 +1397,6 @@ function SiteHeader({ active, onNav, density = 'comfortable' }) {
     { id: 'busca', label: 'Comprar' },
     { id: 'vender', label: 'Anuncie' },
     { id: 'lancamentos', label: 'Lançamentos' },
-    { id: 'conteudo', label: 'Conteúdo' },
     { id: 'sobre', label: 'Sobre' },
     { id: 'servicos', label: 'Serviços', dropdown: [
       { id: 'proprietario', label: 'Proprietário Direto', desc: 'Anuncie seu imóvel · taxa fixa ou comissão' },
@@ -11465,7 +11464,6 @@ function App() {
       {route.name === 'calculadora' && React.createElement(window.CalculadoraPage, { onNav })}
       {route.name === 'lancamentos' && React.createElement(window.LancamentosPage, { onNav })}
       {route.name === 'login' && React.createElement(window.LoginPage, { onNav, mode: route.params.mode })}
-      {route.name === 'conteudo' && <ConteudoPage onNav={onNav} />}
       {route.name === 'sobre' && <SobrePage onNav={onNav} />}
       {route.name === 'aluguel' && (
         <PlaceholderPage name={route.name} onNav={onNav} />
