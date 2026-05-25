@@ -49,8 +49,8 @@ export default function SobrePage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {[
                 { icon: '📱', label: 'WhatsApp', value: '(31) 98414-4250', href: 'https://wa.me/5531984144250' },
-                { icon: '✉️', label: 'E-mail', value: 'contato@vnprimeimoveis.com.br', href: 'mailto:contato@vnprimeimoveis.com.br' },
-                { icon: '🌐', label: 'Site', value: 'vnprimeimoveis.com.br', href: 'https://vnprimeimoveis.com.br' },
+                { icon: '✉️', label: 'E-mail', value: 'contato@vnprimeimoveis.com', href: 'mailto:contato@vnprimeimoveis.com' },
+                { icon: '🌐', label: 'Site', value: 'vnprimeimoveis.com', href: 'https://vnprimeimoveis.com' },
               ].map(c => (
                 <a key={c.href} href={c.href} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', gap: 12, alignItems: 'center', textDecoration: 'none' }}>
                   <span style={{ fontSize: 18 }}>{c.icon}</span>

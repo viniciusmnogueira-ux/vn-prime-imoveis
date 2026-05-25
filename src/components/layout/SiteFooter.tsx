@@ -26,7 +26,7 @@ export default function SiteFooter() {
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 16 }}>Contato</div>
             <a href="https://wa.me/5531984144250" style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.6)', marginBottom: 10, textDecoration: 'none' }}>(31) 98414-4250</a>
-            <a href="mailto:contato@vnprimeimoveis.com.br" style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.6)', marginBottom: 10, textDecoration: 'none' }}>contato@vnprimeimoveis.com.br</a>
+            <a href="mailto:contato@vnprimeimoveis.com" style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.6)', marginBottom: 10, textDecoration: 'none' }}>contato@vnprimeimoveis.com</a>
             <Link href="/sobre" style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.6)', marginBottom: 10, textDecoration: 'none' }}>Sobre nós</Link>
             <Link href="/admin" style={{ display: 'block', fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 24, textDecoration: 'none' }}>Admin</Link>
           </div>
