@@ -1402,7 +1402,6 @@ function SiteHeader({ active, onNav, density = 'comfortable' }) {
     { id: 'servicos', label: 'Serviços', dropdown: [
       { id: 'proprietario', label: 'Proprietário Direto', desc: 'Anuncie seu imóvel · taxa fixa ou comissão' },
       { id: 'corretor', label: 'Portal do Corretor', desc: 'Leads, CRM e portfólio premium de BH' },
-      { id: 'fotografo', label: 'Canal do Fotógrafo', desc: 'Fotografia e mídias para imóveis de alto padrão' },
       { id: 'consorcio', label: 'Consórcio', desc: 'Compre sem juros com carta de crédito' },
       { id: 'due-diligence', label: 'Due Diligence', desc: 'Análise jurídica e técnica antes de comprar' },
       { id: 'avaliacao', label: 'Avaliação de Imóveis', desc: 'Laudo judicial, extrajudicial ou estimativa IA' },
@@ -1842,15 +1841,6 @@ function HomePage({ onNav, density, accentMode }) {
       accent: '#2F8674',
     },
     {
-      title: 'Canal do Fotógrafo',
-      subtitle: 'Jobs premium em BH e região',
-      desc: 'Fotografia imobiliária de alto padrão agendada pela plataforma. Receba jobs, fotografe com liberdade e receba com segurança. Drone, Tour 360° e vídeo cinematográfico.',
-      bullets: ['40+ imóveis por mês em carteira', 'R$ 390 a R$ 1.190 por sessão', 'Pagamento garantido por job entregue', 'Drone, Tour 360° e vídeo cinematográfico'],
-      cta: 'Quero ser fotógrafo credenciado', route: 'fotografo',
-      img: (window.__resources?.img67||'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=900&q=80'),
-      accent: '#B8862E',
-    },
-    {
       title: 'Consórcio Imobiliário',
       subtitle: 'Compre sem juros, no seu ritmo',
       desc: 'A forma mais inteligente de adquirir seu imóvel. Sem juros, sem entrada obrigatória. Carta de crédito nominal contemplada por sorteio ou lance mensal.',
@@ -2043,7 +2033,6 @@ function HomePage({ onNav, density, accentMode }) {
               {[
                 { label: 'Proprietário', route: 'proprietario', accent: '#D4A857' },
                 { label: 'Corretor Parceiro', route: 'corretor', accent: '#2F8674' },
-                { label: 'Canal do Fotógrafo', route: 'fotografo', accent: '#B8862E' },
                 { label: 'Consórcio', route: 'consorcio', accent: '#059669' },
                 { label: 'Due Diligence', route: 'due-diligence', accent: '#4B5563' },
                 { label: 'Lançamentos', route: 'lancamentos', accent: '#D4A857' },
@@ -9860,7 +9849,7 @@ function AvaliacaoPage({ onNav }) {
   );
 }
 
-Object.assign(window, { FotografoPage, ConsorcioPage, DueDiligencePage, AvaliacaoPage });
+Object.assign(window, { ConsorcioPage, DueDiligencePage, AvaliacaoPage });
 </script>
 <script type="text/babel">const { useState: useStateLanc } = React;
 
@@ -11470,7 +11459,6 @@ function App() {
       {route.name === 'proprietario' && React.createElement(window.ProprietarioPage, { onNav })}
       {route.name === 'corretor' && React.createElement(window.CorretorPage, { onNav })}
       {route.name === 'incorporadora' && React.createElement(window.IncorporadoraPage, { onNav })}
-      {route.name === 'fotografo' && React.createElement(window.FotografoPage, { onNav })}
       {route.name === 'consorcio' && React.createElement(window.ConsorcioPage, { onNav })}
       {route.name === 'due-diligence' && React.createElement(window.DueDiligencePage, { onNav })}
       {route.name === 'avaliacao' && React.createElement(window.AvaliacaoPage, { onNav })}
