@@ -1,3 +1,4 @@
+'use client'
 import Link from 'next/link'
 import Eyebrow from '@/components/ui/Eyebrow'
 import Btn from '@/components/ui/Btn'
