@@ -1,0 +1,1187 @@
+import { useState } from "react";
+
+/* ─── PALETA VN PRIME ───────────────────────────────────────── */
+const C = {
+  bg: "#09152a",
+  navy: "#1B3A6B",
+  navyMid: "#1e3f72",
+  navyLight: "rgba(27,58,107,0.25)",
+  gold: "#C9960E",
+  goldLight: "#e8b012",
+  goldPale: "rgba(201,150,14,0.10)",
+  goldBorder: "rgba(201,150,14,0.22)",
+  border: "rgba(255,255,255,0.07)",
+  text: "#eaedf4",
+  muted: "rgba(234,237,244,0.52)",
+  sub: "rgba(234,237,244,0.78)",
+};
+
+/* ─── TÉCNICAS MAPEADAS ────────────────────────────────────── */
+const TECNICAS = {
+  spin: { label: "SPIN Selling", color: "#60a5fa", desc: "Situação → Problema → Implicação → Necessidade" },
+  ancora: { label: "Ancoragem", color: "#a78bfa", desc: "Referência de valor que faz o preço parecer justo" },
+  espelho: { label: "Espelhamento", color: "#34d399", desc: "Repete palavras do cliente para gerar conexão" },
+  escassez: { label: "Escassez Real", color: "#fb923c", desc: "Urgência genuína, nunca inventada" },
+  futuro: { label: "Projeção de Futuro", color: "#f472b6", desc: "Faz o cliente se ver morando/usando o imóvel" },
+  silencio: { label: "Silêncio Estratégico", color: "#94a3b8", desc: "Pausa após pergunta de fechamento — quem fala primeiro perde" },
+  triade: { label: "Tríade de Sim", color: "#fbbf24", desc: "3 perguntas com resposta 'sim' antes do fechamento" },
+  resumo: { label: "Resumo de Valor", color: "#4ade80", desc: "Recapitula tudo que o cliente disse que importa" },
+};
+
+/* ─── FUNIL CORRETOR ────────────────────────────────────────── */
+const FUNIL_CORRETOR = [
+  {
+    id: "c1",
+    num: "01",
+    etapa: "Primeiro Contato",
+    gatilho: "Lead chega por qualquer canal",
+    objetivo: "Criar vínculo, mostrar presença e abrir a qualificação",
+    icon: "📥",
+    tecnicas: ["espelho", "spin"],
+    scripts: {
+      whatsapp: {
+        texto: `Olá, [Nome]! Aqui é o [Seu Nome], da VN Prime Imóveis. 👋
+
+Vi que você entrou em contato sobre o [imóvel/região]. Fico feliz em te atender.
+
+Me conta — o que chamou sua atenção nesse imóvel?`,
+        tecnica: "espelho",
+        nota: "A pergunta 'o que chamou sua atenção' faz o cliente verbalizar o próprio desejo. Você vai espelhar as palavras dele na etapa seguinte.",
+      },
+      portal: {
+        texto: `Olá, [Nome]! Obrigado pelo contato.
+
+Sou o [Seu Nome], corretor parceiro da VN Prime Imóveis e responsável por esse imóvel.
+
+Antes de te mandar as informações completas, quero entender o que você está buscando de verdade — pra não perder seu tempo com o que não faz sentido pra você.
+
+O que mais importa pra você num imóvel agora?`,
+        tecnica: "spin",
+        nota: "Essa pergunta abre a fase de Situação do SPIN. Deixe o cliente falar — não interrompa.",
+      },
+      indicacao: {
+        texto: `[Nome], que bom falar com você! O [quem indicou] me falou muito bem de você.
+
+Sou o [Seu Nome]. Trabalho com imóveis em [regiões] e costumo ajudar as pessoas a encontrarem não só o imóvel certo, mas o negócio certo.
+
+Me conta — você já tem alguma ideia do que busca ou ainda está no começo da pesquisa?`,
+        tecnica: "espelho",
+        nota: "Validar a indicação cria rapport instantâneo. 'Negócio certo' já posiciona você como consultor, não vendedor.",
+      },
+      email: {
+        texto: `Assunto: Seu contato — [imóvel/região] | VN Prime Imóveis
+
+Olá, [Nome],
+
+Obrigado pelo interesse. Sou o [Seu Nome], corretor parceiro da VN Prime Imóveis.
+
+Antes de te enviar qualquer material, prefiro entender o que você realmente busca — dessa forma apresento apenas o que faz sentido para o seu momento.
+
+Uma pergunta simples: o que está motivando essa busca agora?
+
+Pode responder por aqui ou, se preferir uma conversa mais rápida, me chama no WhatsApp: (31) 98414-4250.
+
+[Seu Nome] | Corretor Parceiro VN Prime Imóveis`,
+        tecnica: "spin",
+        nota: "E-mail curto gera mais resposta. A pergunta aberta no final é o gancho — evite mandar catálogo sem antes ouvir a resposta.",
+      },
+    },
+    dicas: [
+      "Responda em até 2h — a probabilidade de conversão cai 80% depois disso",
+      "Nunca mande catálogo no primeiro contato. Faça a pergunta antes",
+      "Use o nome da pessoa desde a primeira mensagem",
+      "Áudio apenas se o cliente mandar áudio primeiro",
+    ],
+    objecoes: [],
+  },
+  {
+    id: "c2",
+    num: "02",
+    etapa: "Qualificação",
+    gatilho: "Após primeira resposta do cliente",
+    objetivo: "Descobrir necessidade real, orçamento e quem decide",
+    icon: "🔍",
+    tecnicas: ["spin", "espelho"],
+    scripts: {
+      whatsapp: {
+        texto: `[Nome], perfeito! Então me conta um pouco mais.
+
+Você disse que busca [repita com as palavras do cliente]. Isso é exatamente o perfil que eu trabalho.
+
+3 perguntas rápidas pra eu montar a seleção certa:
+
+→ Qual faixa de valor você considera? (pode ser aproximado)
+→ Vai financiar, usar consórcio ou tem recurso disponível?
+→ Você decide sozinho ou tem alguém que também vai ver o imóvel?
+
+Com isso já consigo te filtrar o que realmente encaixa. 🎯`,
+        tecnica: "espelho",
+        nota: "Espelhe exatamente as palavras que o cliente usou — isso cria sensação de que você 'entendeu'. Não reformule.",
+      },
+      portal: {
+        texto: `[Nome], ótimo ponto de partida!
+
+Me fala: o que seria o imóvel *ideal* pra você — se você pudesse escolher sem nenhuma restrição?
+
+[Deixe o cliente responder]
+
+E agora — o que desse ideal é inegociável e o que é um bônus se aparecer?`,
+        tecnica: "spin",
+        nota: "Essa sequência separa 'must have' de 'nice to have'. Você vai usar isso na apresentação do imóvel para mostrar que achou exatamente o que ele precisa.",
+      },
+      indicacao: {
+        texto: `[Nome], me conta mais sobre o que você está vivendo hoje na moradia atual — o que te incomoda ou o que está faltando?
+
+Pergunto isso porque o melhor imóvel não é o mais bonito — é o que resolve o problema certo.`,
+        tecnica: "spin",
+        nota: "Essa é a fase de Problema no SPIN. Quando o cliente verbaliza o próprio incômodo, a necessidade de mudança vira dele — não sua.",
+      },
+      email: {
+        texto: `Assunto: Entendendo seu perfil — próximo passo
+
+Olá, [Nome],
+
+Para não perder seu tempo com opções fora do perfil, preciso de algumas informações rápidas:
+
+1. O que é absolutamente inegociável no imóvel que você busca?
+2. Qual faixa de valor você considera — mesmo que aproximada?
+3. A decisão é sua ou envolve mais alguém?
+
+Pode responder de forma bem direta — com essas três respostas já consigo montar uma seleção personalizada.
+
+[Seu Nome] | VN Prime Imóveis`,
+        tecnica: "spin",
+        nota: "Três perguntas é o máximo por mensagem. Mais que isso paralisa o cliente.",
+      },
+    },
+    dicas: [
+      "Descubra sempre quem decide — cônjuge, sócio, pai. Convide todos para a visita",
+      "Orçamento declarado ≠ orçamento real. Pergunte de ângulos diferentes",
+      "Se não há urgência, explore o custo de adiar: aluguel jogado fora, valorização perdida",
+      "Jamais mande catálogo antes de ter o perfil qualificado",
+    ],
+    objecoes: [
+      {
+        obj: "Estou só pesquisando por enquanto",
+        resp: `Faz todo sentido — toda boa compra começa assim. Na verdade, quem pesquisa bem compra melhor.
+
+Me conta então — o que te faria *parar de pesquisar* e dizer 'é esse'? Qual seria o imóvel que fecha a busca pra você?`,
+        tecnica: "spin",
+      },
+      {
+        obj: "Ainda não sei o orçamento",
+        resp: `Sem problema. Me fala o que você *não* abre mão no imóvel — localização, tamanho, padrão. Com isso eu já consigo te mostrar o que existe no mercado e a gente vai chegando num número juntos.`,
+        tecnica: "espelho",
+      },
+    ],
+  },
+  {
+    id: "c3",
+    num: "03",
+    etapa: "Apresentação",
+    gatilho: "Perfil qualificado — hora de apresentar o imóvel",
+    objetivo: "Despertar desejo e criar imagem mental do cliente no imóvel",
+    icon: "🏡",
+    tecnicas: ["futuro", "ancora", "espelho"],
+    scripts: {
+      whatsapp: {
+        texto: `[Nome], com base no que você me contou — [repita os critérios com as palavras do cliente] — separei uma opção que se encaixa bem.
+
+*[Nome do imóvel]* — [Bairro]
+📐 [X]m² | 🛏 [X] quartos | 🚗 [X] vagas | 💰 R$ [valor]
+
+O que me chamou atenção *especificamente pra você*: [detalhe personalizado — ex: "fica a 4 minutos da escola que você mencionou"].
+
+Posso te mandar as fotos e o vídeo?`,
+        tecnica: "espelho",
+        nota: "Mande 1 imóvel primeiro, não 10. Quem apresenta muitas opções transmite insegurança e sobrecarrega o cliente.",
+      },
+      portal: {
+        texto: `[Nome], encontrei algo que encaixa bem no que você descreveu.
+
+Antes de mandar o link, deixa eu te contar o que me fez pensar em você pra esse imóvel especificamente: [conexão com o que o cliente disse].
+
+Esse tipo de imóvel na [região] costuma sair rápido — o mercado aqui tem movimentado bastante.
+
+Quer ver o material completo?`,
+        tecnica: "escassez",
+        nota: "A escassez deve ser real — não invente. Se o imóvel realmente tem movimento, diga. Se não tem, não use essa abordagem.",
+      },
+      indicacao: {
+        texto: `[Nome], preparei uma seleção, mas tem um imóvel que quero que você veja primeiro — antes dos outros.
+
+É o [imóvel] em [bairro]. Ele tem [característica 1] e [característica 2] — que são exatamente os pontos que você disse que não abre mão.
+
+Imagina você chegando em casa todo dia por essa [vista/rua/localização]. Vale pelo menos você ver.
+
+Posso te mandar agora?`,
+        tecnica: "futuro",
+        nota: "A frase 'imagina você chegando em casa' ativa a projeção de futuro — o cliente começa a se ver no imóvel antes de visitar.",
+      },
+      email: {
+        texto: `Assunto: Seleção personalizada — encontrei algo alinhado ao seu perfil
+
+Olá, [Nome],
+
+Com base no que você me descreveu, destaco uma opção que se encaixa nos seus critérios principais:
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+[NOME DO IMÓVEL] — [BAIRRO]
+━━━━━━━━━━━━━━━━━━━━━━━━
+Área: [X]m² | Quartos: [X] | Vagas: [X]
+Valor: R$ [X]
+Por que pensei em você: [motivo personalizado]
+
+Link com fotos, vídeo e planta: [link]
+
+Se quiser ver mais opções da seleção ou tiver alguma dúvida, é só me responder.
+
+[Seu Nome] | VN Prime Imóveis`,
+        tecnica: "espelho",
+        nota: "O campo 'Por que pensei em você' é o mais importante do e-mail. Personalize sempre — nunca deixe genérico.",
+      },
+    },
+    dicas: [
+      "Apresente no máximo 3 opções. Acima disso gera paralisia de decisão",
+      "Sempre conecte uma característica do imóvel a algo que o cliente disse",
+      "Nunca antecipe objeções — apresente e espere a reação",
+      "Fotos de qualidade valem mais que descrição extensa",
+    ],
+    objecoes: [
+      {
+        obj: "Achei caro",
+        resp: `Entendo. Me conta — você está comparando com algum imóvel similar que viu? Às vezes o preço por m² aqui é mais competitivo do que parece à primeira vista. Posso te mostrar a comparação.`,
+        tecnica: "ancora",
+      },
+      {
+        obj: "Não gostei das fotos",
+        resp: `Faz sentido — foto nem sempre faz jus. Tem imóvel que você entra e é completamente diferente do que parece nas imagens. Valeria uma visita rápida? Se não gostar pessoalmente, a gente passa pra próxima opção.`,
+        tecnica: "futuro",
+      },
+    ],
+  },
+  {
+    id: "c4",
+    num: "04",
+    etapa: "Visita",
+    gatilho: "Cliente confirmou interesse — agendar e conduzir a visita",
+    objetivo: "Criar experiência emocional no imóvel e avançar para proposta",
+    icon: "🗝️",
+    tecnicas: ["futuro", "silencio", "espelho"],
+    scripts: {
+      whatsapp: {
+        texto: `[Nome], ótimo! Então vamos marcar.
+
+Você prefere durante a semana ou no final de semana? Manhã ou tarde?
+
+[Após resposta:]
+
+Perfeito — [data e hora]. Vou confirmar com o proprietário e te aviso em seguida.
+
+Ah, uma coisa: se possível, traz a pessoa que vai decidir junto com você. Visita em dois é sempre mais produtiva. 😊`,
+        tecnica: "espelho",
+        nota: "Perguntar 'semana ou fim de semana' é uma escolha entre dois 'sins' — técnica de alternativas positivas. Nunca pergunte 'você quer visitar?'",
+      },
+      portal: {
+        texto: `[Nome], que tal a gente visitar essa semana?
+
+Tenho horário disponível [opção 1] ou [opção 2]. Qual funciona melhor pra você?
+
+Se puder trazer alguém que também vai opinar na decisão, melhor ainda — visita em família sempre clareia as ideias.`,
+        tecnica: "triade",
+        nota: "Oferecer duas opções de horário reduz o atrito. O cliente escolhe entre os dois — não entre 'ir ou não ir'.",
+      },
+      indicacao: {
+        texto: `[Nome], foto é foto — o imóvel precisa ser sentido pessoalmente.
+
+Me fala quando você tem uma hora livre essa semana que eu marco a visita. Não precisa ser longo — em 20, 30 minutos você já tem o feeling do lugar.`,
+        tecnica: "futuro",
+        nota: "Minimizar o tempo da visita reduz a resistência. '20 minutos' parece pouco compromisso.",
+      },
+      email: {
+        texto: `Assunto: Próximo passo — visita ao [imóvel]
+
+Olá, [Nome],
+
+Que tal agendarmos a visita essa semana?
+
+Tenho disponibilidade em:
+• [Opção 1 — dia e horário]
+• [Opção 2 — dia e horário]
+
+Se possível, convide quem vai decidir junto com você — facilita muito a conversa no local.
+
+Confirma qual horário funciona melhor?
+
+[Seu Nome] | VN Prime Imóveis`,
+        tecnica: "triade",
+        nota: "E-mail de agendamento deve ter CTA claro e único: confirmar o horário. Nada mais.",
+      },
+    },
+    dicas: [
+      "Chegue 10 minutos antes — nunca faça o cliente esperar",
+      "Na visita: faça perguntas, não discursos. Deixe o cliente falar",
+      "Mostre o imóvel na ordem: área social → quarto principal → cozinha → área externa",
+      "No final: 'O que você mais gostou?' — deixe o silêncio depois",
+    ],
+    objecoes: [
+      {
+        obj: "Não tenho tempo essa semana",
+        resp: `Sem problema. E na semana que vem — qual seria o melhor dia pra você? Prefiro agendar com antecedência pra garantir o horário.`,
+        tecnica: "silencio",
+      },
+      {
+        obj: "Minha esposa/marido não pode ir",
+        resp: `Entendo. E se a gente fizer um final de semana — quando os dois estão mais livres? Visitar junto evita aquele vai-e-vem de depois.`,
+        tecnica: "espelho",
+      },
+    ],
+  },
+  {
+    id: "c5",
+    num: "05",
+    etapa: "Pós-visita",
+    gatilho: "Imediatamente após a visita — janela de 2h",
+    objetivo: "Consolidar a experiência emocional e abrir caminho para proposta",
+    icon: "💬",
+    tecnicas: ["resumo", "futuro", "spin"],
+    scripts: {
+      whatsapp: {
+        texto: `[Nome], foi um prazer te acompanhar hoje!
+
+Me conta — de tudo que você viu, o que ficou com você?
+
+[Após resposta:]
+
+Exatamente o que eu pensei. [Espelhe o que o cliente disse.]
+
+Você mencionou antes que [necessidade que o cliente revelou na qualificação] — e esse imóvel tem isso. O que falta agora pra você avançar?`,
+        tecnica: "resumo",
+        nota: "A pergunta 'o que ficou com você?' faz o cliente defender o imóvel pra si mesmo. Você não precisa vender — ele já está fazendo isso.",
+      },
+      portal: {
+        texto: `[Nome], obrigado pela visita!
+
+Só pra registrar: dos pontos que você disse que eram importantes — [lista o que o cliente citou] — o imóvel atende?
+
+O que você achou que não esperava?`,
+        tecnica: "resumo",
+        nota: "Perguntar o que 'não esperava' captura surpresas positivas — o cliente revela sozinho o que o encantou.",
+      },
+      indicacao: {
+        texto: `[Nome], gostei muito da nossa conversa hoje.
+
+Me diz uma coisa com sinceridade: em qual posição esse imóvel está na sua lista agora?
+
+[Após resposta — qualquer que seja:]
+
+O que precisaria mudar pra ele subir uma posição?`,
+        tecnica: "spin",
+        nota: "Essa pergunta é puro SPIN — revela a implicação. Se o cliente diz 'está em segundo lugar', ele já revelou o que falta para fechar.",
+      },
+      email: {
+        texto: `Assunto: Depois da visita — o que você achou?
+
+Olá, [Nome],
+
+Foi ótimo te acompanhar hoje.
+
+Queria saber sua impressão: dos critérios que você me descreveu lá no começo — [liste 2 ou 3 critérios que o cliente citou] — o imóvel atende?
+
+E tem alguma dúvida ou ponto que ficou aberto que eu possa esclarecer?
+
+[Seu Nome] | VN Prime Imóveis`,
+        tecnica: "resumo",
+        nota: "Listar os critérios do próprio cliente é o resumo de valor — mostra que você ouviu e reforça o alinhamento.",
+      },
+    },
+    dicas: [
+      "Contato pós-visita deve ser feito em até 2 horas",
+      "Nunca pergunte 'o que achou?' — pergunte algo específico",
+      "Se o cliente gostou mas hesita, descubra o que falta — é sempre uma objeção escondida",
+      "Se gostou de mais de um imóvel, ajude a comparar — não decida por ele",
+    ],
+    objecoes: [
+      {
+        obj: "Vou pensar",
+        resp: `Claro, faz sentido. Me ajuda a entender: o que ainda não está claro pra você? Às vezes é uma dúvida pequena que a gente resolve rápido.`,
+        tecnica: "spin",
+      },
+      {
+        obj: "Quero ver mais opções antes",
+        resp: `Com certeza. Me conta — o que esse imóvel teria que ter que esse não tem? Assim eu já filtro antes de marcar mais visitas e não perdemos tempo dos dois.`,
+        tecnica: "spin",
+      },
+    ],
+  },
+  {
+    id: "c6",
+    num: "06",
+    etapa: "Proposta e Fechamento",
+    gatilho: "Cliente sinalizou interesse — hora de avançar naturalmente",
+    objetivo: "Chegar ao fechamento sem pressão, pelo caminho da lógica e da emoção",
+    icon: "🤝",
+    tecnicas: ["triade", "resumo", "silencio", "ancora"],
+    scripts: {
+      whatsapp: {
+        texto: `[Nome], com base em tudo que você me contou — [resumo dos critérios do cliente com as próprias palavras dele] — esse imóvel atende o que você buscava, certo?
+
+[Espere a resposta — não continue antes]
+
+E a forma de pagamento que você mencionou [à vista / financiamento / consórcio] está dentro do que o proprietário aceita.
+
+O que falta pra gente formalizar uma proposta?`,
+        tecnica: "triade",
+        nota: "A tríade de sim: você faz afirmações que o cliente confirma, uma a uma. Quando ele diz 'sim' três vezes, o 'sim' no fechamento vem naturalmente.",
+      },
+      portal: {
+        texto: `[Nome], você me disse desde o começo que buscava [critério 1], [critério 2] e [critério 3].
+
+Esse imóvel tem os três.
+
+Faz sentido a gente ver as condições de proposta?`,
+        tecnica: "resumo",
+        nota: "Resumo de valor + pergunta simples. Sem pressão. O cliente já fez o trabalho lógico — você só está confirmando.",
+      },
+      indicacao: {
+        texto: `[Nome], você deixou claro o que precisava. Eu ouvi. E esse imóvel encaixa.
+
+Não vou te pressionar pra nada. O que eu quero é que você tome a decisão certa — seja esse imóvel ou não.
+
+Mas pra você tomar essa decisão com segurança, faz sentido a gente montar uma proposta e ver como fica no papel?`,
+        tecnica: "silencio",
+        nota: "Dizer 'não vou te pressionar' derruba a guarda do cliente. A proposta agora é percebida como um passo de análise, não de compromisso.",
+      },
+      email: {
+        texto: `Assunto: Próximo passo — proposta para [imóvel]
+
+Olá, [Nome],
+
+Recapitulando o que você me disse que era essencial:
+→ [Critério 1 — palavras do cliente]
+→ [Critério 2 — palavras do cliente]
+→ [Critério 3 — palavras do cliente]
+
+O imóvel atende os três pontos. A forma de pagamento está alinhada.
+
+O próximo passo natural seria formalizar uma proposta para o proprietário avaliar. Isso não é um compromisso — é o caminho pra você saber se consegue as condições que quer.
+
+Posso montar isso pra você?
+
+[Seu Nome] | VN Prime Imóveis`,
+        tecnica: "resumo",
+        nota: "'Isso não é um compromisso' reduz o peso da proposta. O cliente se sente seguro pra avançar.",
+      },
+    },
+    dicas: [
+      "Nunca use a palavra 'fechar' antes do cliente usar. Prefira 'formalizar', 'avançar', 'ver as condições'",
+      "Após a pergunta de fechamento: silêncio total. Quem fala primeiro cede",
+      "Se o cliente hesitar, descubra a última objeção — geralmente é só uma",
+      "Proposta não é compromisso — reforce isso se o cliente parecer travado",
+    ],
+    objecoes: [
+      {
+        obj: "Preciso falar com minha esposa/marido primeiro",
+        resp: `Com certeza — e faz todo sentido. Que tal a gente marcar uma conversa rápida com os dois juntos? Assim você não precisa repassar tudo — eu explico pessoalmente e vocês decidem com as mesmas informações.`,
+        tecnica: "triade",
+      },
+      {
+        obj: "Ainda está caro pra mim",
+        resp: `Entendo. Me conta — qual seria o valor que faria sentido pra você? Com isso eu já sei se tem margem de negociação ou se preciso buscar outra opção.`,
+        tecnica: "ancora",
+      },
+      {
+        obj: "Deixa eu pensar mais um pouco",
+        resp: `Claro. Só quero garantir que você está tomando uma decisão com todas as informações. Tem alguma dúvida ainda aberta que eu possa esclarecer agora?`,
+        tecnica: "spin",
+      },
+    ],
+  },
+  {
+    id: "c7",
+    num: "07",
+    etapa: "Cliente Sumiu",
+    gatilho: "Sem resposta há 3+ dias após contato ou visita",
+    objetivo: "Reativar sem pressão, com curiosidade genuína",
+    icon: "🔄",
+    tecnicas: ["espelho", "spin"],
+    scripts: {
+      whatsapp: {
+        texto: `[Nome], tudo bem com você?
+
+Sei que a rotina aperta. Só passando pra saber se surgiu alguma dúvida que eu possa ajudar — ou se o caminho mudou.
+
+Sem compromisso nenhum. 😊`,
+        tecnica: "espelho",
+        nota: "Curto, leve, sem cobrança. A frase 'se o caminho mudou' mostra respeito pela decisão do cliente e às vezes provoca uma resposta honesta.",
+      },
+      portal: {
+        texto: `[Nome], passei pra te avisar que o [imóvel] ainda está disponível.
+
+Mas independente disso — você ainda está buscando um imóvel ou as prioridades mudaram?`,
+        tecnica: "spin",
+        nota: "Informação útil + pergunta aberta. Não é cobrança — é um check-in genuíno.",
+      },
+      indicacao: {
+        texto: `[Nome], faz um tempo que não nos falamos. Espero que esteja tudo bem.
+
+Surgiu alguma coisa que mudou seus planos? Ou ainda está na busca?`,
+        tecnica: "espelho",
+        nota: "Com cliente por indicação, a abordagem é mais pessoal. Perguntar sobre os planos abre uma conversa honesta.",
+      },
+      email: {
+        texto: `Assunto: Ainda posso te ajudar?
+
+Olá, [Nome],
+
+Há alguns dias não nos falamos e queria só fazer um check-in rápido.
+
+Você ainda está buscando um imóvel ou as circunstâncias mudaram?
+
+Se mudou — sem problema, fico à disposição quando fizer sentido voltar.
+Se continua buscando — me atualiza e eu retomo a busca pra você.
+
+[Seu Nome] | VN Prime Imóveis`,
+        tecnica: "spin",
+        nota: "Dar a opção de 'desistir sem culpa' paradoxalmente aumenta a resposta. O cliente se sente respeitado e costuma responder.",
+      },
+    },
+    dicas: [
+      "Máximo 3 tentativas de reativação com intervalo de 3 a 5 dias",
+      "Nunca comece com 'Você sumiu!' ou 'Cadê você?'",
+      "Mude o canal: se tentou WhatsApp, tente e-mail ou ligação",
+      "Na terceira tentativa, use a 'mensagem de despedida' — alta taxa de resposta",
+    ],
+    objecoes: [
+      {
+        obj: "Desisti por enquanto",
+        resp: `Entendo completamente. Obrigado pela sinceridade. Quando o momento voltar, pode me chamar — fico à disposição. Cuida-se!`,
+        tecnica: "silencio",
+      },
+      {
+        obj: "Achei um imóvel com outro corretor",
+        resp: `Que ótima notícia! Fico feliz que tenha encontrado. Se precisar de alguma análise do contrato ou documento antes de assinar, estou aqui.`,
+        tecnica: "espelho",
+      },
+    ],
+  },
+];
+
+/* ─── FUNIL VENDEDOR ────────────────────────────────────────── */
+const FUNIL_VENDEDOR = [
+  {
+    id: "v1",
+    num: "01",
+    etapa: "Comprador Pede Informações",
+    gatilho: "Primeiro contato do interessado com o proprietário",
+    objetivo: "Responder com confiança, qualificar o interesse e criar rapport",
+    icon: "📩",
+    tecnicas: ["spin", "espelho"],
+    scripts: {
+      whatsapp: {
+        texto: `Olá, [Nome]! Que bom seu contato. Sou o [Seu Nome], proprietário do imóvel.
+
+Fico feliz em conversar. Antes de te mandar todas as informações — me conta: o que chamou sua atenção no anúncio?`,
+        tecnica: "spin",
+        nota: "O proprietário raramente faz essa pergunta. Quem faz, se diferencia. A resposta do comprador revela o que ele mais valoriza.",
+      },
+      portal: {
+        texto: `Olá, [Nome]! Aqui é o proprietário do imóvel.
+
+Posso te passar todas as informações. Mas primeiro — você está buscando pra morar ou é um investimento?
+
+Pergunto porque dependendo do objetivo, tenho detalhes diferentes que podem ser relevantes pra você.`,
+        tecnica: "spin",
+        nota: "Essa distinção posiciona o proprietário como alguém que pensa no interesse do comprador — não apenas em vender.",
+      },
+      indicacao: {
+        texto: `[Nome], que bom! O [quem indicou] me falou que você estava procurando.
+
+Me conta o que você está buscando — tamanho, localização, uso. Assim eu já sei se o meu imóvel faz sentido pra você ou se posso te indicar outro caminho.`,
+        tecnica: "espelho",
+        nota: "Oferecer 'indicar outro caminho' gera confiança. O comprador percebe que o vendedor não está desesperado para fechar.",
+      },
+      email: {
+        texto: `Assunto: Seu interesse no imóvel — [endereço/bairro]
+
+Olá, [Nome],
+
+Obrigado pelo contato. Sou o proprietário do imóvel.
+
+Para te passar as informações mais relevantes, me conta rapidamente: o imóvel seria para moradia própria ou investimento?
+
+Com isso já consigo direcionar melhor o que você precisa saber.
+
+[Seu Nome]`,
+        tecnica: "spin",
+        nota: "E-mail curto aumenta resposta. Uma pergunta por vez.",
+      },
+    },
+    dicas: [
+      "Você é o proprietário — seja confiante, não ansioso",
+      "Não despeje todas as informações de uma vez: deixe o comprador guiar",
+      "Valorize o imóvel pelo que ele resolve, não pelo que ele tem",
+      "Nunca demonstre urgência para vender",
+    ],
+    objecoes: [],
+  },
+  {
+    id: "v2",
+    num: "02",
+    etapa: "Agendou Visita mas Sumiu",
+    gatilho: "Confirmou visita e não apareceu ou parou de responder",
+    objetivo: "Resgatar o contato com leveza, sem cobrança",
+    icon: "📅",
+    tecnicas: ["espelho", "spin"],
+    scripts: {
+      whatsapp: {
+        texto: `[Nome], tudo bem? 
+
+Só passando pra saber se está tudo certo com você. Fica à vontade pra me dizer se os planos mudaram — sem problema nenhum.
+
+Se ainda tiver interesse em ver o imóvel, é só falar que a gente remarca na hora que for melhor pra você.`,
+        tecnica: "espelho",
+        nota: "Nenhuma cobrança. A frase 'sem problema nenhum' libera o comprador da culpa de ter sumido e abre espaço para ele responder honestamente.",
+      },
+      portal: {
+        texto: `[Nome], olá! Passando pra avisar que o imóvel ainda está disponível.
+
+Caso queira remarcar a visita, fico à disposição. Se os planos mudaram, tudo bem também — só me avisa pra eu não deixar o horário reservado.`,
+        tecnica: "spin",
+        nota: "Informação útil + abertura para desistir sem culpa. Essa combinação tem alta taxa de resposta.",
+      },
+      indicacao: {
+        texto: `[Nome], faz uns dias que não nos falamos. Espero que esteja tudo bem.
+
+Se ainda tiver interesse no imóvel, estou aqui. Se mudou algo, me avisa — sem cerimônia.`,
+        tecnica: "espelho",
+        nota: "Abordagem pessoal para quem veio por indicação. Curto e respeitoso.",
+      },
+      email: {
+        texto: `Assunto: Visita ao imóvel — posso remarcar?
+
+Olá, [Nome],
+
+Percebi que não conseguimos nos encontrar na data combinada. Fica sem preocupação.
+
+Se ainda tiver interesse em conhecer o imóvel, estou disponível para remarcar na data que funcionar melhor pra você.
+
+Se os planos mudaram, pode me avisar também — entendo completamente.
+
+[Seu Nome]`,
+        tecnica: "espelho",
+        nota: "Sem tom de cobrança. Duas saídas claras para o comprador — remarcar ou encerrar. Isso gera resposta.",
+      },
+    },
+    dicas: [
+      "Espere 24h antes de entrar em contato após a visita perdida",
+      "Máximo 2 tentativas de reativação para esse caso",
+      "Não demonstre frustração — seja sempre acolhedor",
+      "Se remarcar, confirme 1h antes da nova visita",
+    ],
+    objecoes: [
+      {
+        obj: "Me esqueci / tive um imprevisto",
+        resp: `Fica sem preocupação, acontece com todo mundo. Quando você tiver um horário, é só me falar que a gente remarca.`,
+        tecnica: "espelho",
+      },
+    ],
+  },
+  {
+    id: "v3",
+    num: "03",
+    etapa: "Visitou e Não Deu Retorno",
+    gatilho: "Visita realizada — sem resposta há 2+ dias",
+    objetivo: "Retomar a conversa e descobrir o que ficou em aberto",
+    icon: "🚪",
+    tecnicas: ["spin", "resumo"],
+    scripts: {
+      whatsapp: {
+        texto: `[Nome], foi muito bom te receber aqui!
+
+Queria saber sua impressão — o imóvel ficou próximo do que você imaginava?
+
+Qualquer dúvida que tenha ficado em aberto, pode me perguntar à vontade.`,
+        tecnica: "spin",
+        nota: "'Ficou próximo do que imaginava?' é uma pergunta de Problema no SPIN. Se a resposta for 'não', você descobre exatamente o que faltou.",
+      },
+      portal: {
+        texto: `[Nome], obrigado pela visita!
+
+O que você achou? Tem algo que você queira saber mais sobre o imóvel ou sobre as condições?`,
+        tecnica: "spin",
+        nota: "Simples e aberto. Deixe o comprador falar primeiro.",
+      },
+      indicacao: {
+        texto: `[Nome], foi ótimo te receber. Espero que tenha gostado.
+
+Me conta — de tudo que você viu, o que ficou com você?`,
+        tecnica: "resumo",
+        nota: "Essa pergunta faz o comprador verbalizar os pontos positivos — ele está vendendo o imóvel para si mesmo.",
+      },
+      email: {
+        texto: `Assunto: Depois da visita — o que achou?
+
+Olá, [Nome],
+
+Foi um prazer te receber.
+
+Queria saber sua impressão: o imóvel atendeu o que você buscava? Tem alguma dúvida ou ponto que ficou em aberto?
+
+Fico à disposição para esclarecer qualquer coisa.
+
+[Seu Nome]`,
+        tecnica: "spin",
+        nota: "Curto e direto. A pergunta sobre 'ponto em aberto' convida o comprador a revelar a objeção real.",
+      },
+    },
+    dicas: [
+      "Contato pós-visita: ideal nas primeiras 24 horas",
+      "Nunca pergunte 'gostou?' — pergunte algo específico",
+      "Se o comprador hesita, há uma objeção escondida — descubra qual",
+      "Não antecipe objeções: deixe o comprador levantar",
+    ],
+    objecoes: [
+      {
+        obj: "Estou vendo outros imóveis ainda",
+        resp: `Faz todo sentido — é importante comparar. Me conta — o que esse teria que ter que os outros não têm pra você escolher? Assim eu sei se posso te ajudar ou indicar outro caminho.`,
+        tecnica: "spin",
+      },
+      {
+        obj: "Achei um pouco diferente do que esperava",
+        resp: `Entendo. O que especificamente ficou diferente? Às vezes é algo que a gente consegue resolver — ou então eu entendo melhor o que você busca.`,
+        tecnica: "spin",
+      },
+    ],
+  },
+  {
+    id: "v4",
+    num: "04",
+    etapa: "Proposta Abaixo do Esperado",
+    gatilho: "Comprador fez proposta — valor não agrada",
+    objetivo: "Negociar com segurança sem desvalorizar o imóvel",
+    icon: "💰",
+    tecnicas: ["ancora", "resumo", "silencio"],
+    scripts: {
+      whatsapp: {
+        texto: `[Nome], obrigado pela proposta. Fico feliz que tenha chegado até aqui.
+
+O valor que você propôs está um pouco abaixo do que consigo aceitar. O imóvel está em [R$ X] e, analisando o mercado da região, esse valor está justo para o padrão que ele oferece.
+
+Você teria margem para chegar em [valor intermediário]? Consigo pensar em facilitadores que podem tornar o negócio mais viável pra você.`,
+        tecnica: "ancora",
+        nota: "Sempre mencione um valor intermediário, não o valor cheio. Isso abre a negociação sem ceder demais. A palavra 'facilitadores' sugere flexibilidade em condições sem mexer no preço.",
+      },
+      portal: {
+        texto: `[Nome], recebi a proposta com atenção.
+
+Vou ser direto: não consigo aceitar nesse valor. Mas também não quero encerrar a conversa.
+
+Me conta — tem alguma condição de pagamento que tornaria mais viável pra você chegar mais próximo do valor do imóvel?`,
+        tecnica: "ancora",
+        nota: "Rejeitar a proposta com clareza e imediatamente abrir espaço para negociação mostra segurança. Compradores respeitam vendedores que não desaparecem.",
+      },
+      indicacao: {
+        texto: `[Nome], obrigado pela proposta. Vejo que você tem interesse real — e isso vale muito.
+
+O valor está [R$ X] abaixo do que preciso. Mas antes de encerrar, me conta: tem alguma condição — prazo, entrada, forma de pagamento — que mudaria a equação pra você?`,
+        tecnica: "resumo",
+        nota: "Valorizar o interesse do comprador antes de rejeitar a proposta mantém a temperatura da negociação.",
+      },
+      email: {
+        texto: `Assunto: Proposta recebida — minha posição
+
+Olá, [Nome],
+
+Obrigado pela proposta. Fico feliz que tenha chegado até aqui.
+
+Sendo direto: o valor está abaixo do que consigo aceitar. O imóvel está anunciado em R$ [X] e, considerando o padrão e a localização, entendo que esse valor está alinhado ao mercado.
+
+Dito isso, não quero encerrar a conversa. Se houver alguma condição de pagamento ou prazo que ajude a equilibrar a proposta, estou disposto a ouvir.
+
+[Seu Nome]`,
+        tecnica: "ancora",
+        nota: "Tom direto, respeitoso e sem encerrar a conversa. Mencionar a lógica de mercado dá sustentação ao valor sem parecer teimosia.",
+      },
+    },
+    dicas: [
+      "Nunca aceite a primeira proposta — mesmo que seja boa",
+      "Não demonstre alívio ou empolgação com a proposta",
+      "Silêncio após contraproposta: quem fala primeiro, cede",
+      "Flexibilidade em condições (prazo, entrada) é menos dolorosa que reduzir preço",
+    ],
+    objecoes: [
+      {
+        obj: "É o máximo que consigo",
+        resp: `Entendo. Me ajuda a entender melhor: tem algum facilitador de condição — entrada maior, prazo menor — que consiga trazer? Assim eu analiso se consigo fazer o negócio funcionar.`,
+        tecnica: "ancora",
+      },
+      {
+        obj: "Vi imóveis mais baratos na região",
+        resp: `Faz sentido comparar. Me conta — esses imóveis tinham [característica 1] e [característica 2]? Às vezes a diferença de preço reflete diferença de padrão que não aparece nas fotos.`,
+        tecnica: "ancora",
+      },
+    ],
+  },
+  {
+    id: "v5",
+    num: "05",
+    etapa: "Comprador em Dúvida",
+    gatilho: "Comprador gostou mas está indeciso ou comparando opções",
+    objetivo: "Ajudar o comprador a decidir — pelo raciocínio dele, não pela pressão sua",
+    icon: "⚖️",
+    tecnicas: ["spin", "futuro", "resumo"],
+    scripts: {
+      whatsapp: {
+        texto: `[Nome], entendo que você está avaliando opções — é o certo a fazer.
+
+Me faz uma pergunta: o que você sentiria se amanhã esse imóvel fosse vendido para outra pessoa?
+
+[Espere a resposta]`,
+        tecnica: "futuro",
+        nota: "Essa pergunta ativa a projeção de perda — mais poderosa que a projeção de ganho. Se o comprador disser 'ficaria com pena', ele está pronto para avançar.",
+      },
+      portal: {
+        texto: `[Nome], você está comparando com outros imóveis — o que falta nesse pra ele ser o escolhido?
+
+Me conta com sinceridade — se tiver algo que eu possa esclarecer ou resolver, prefiro saber agora.`,
+        tecnica: "spin",
+        nota: "Pergunta de Implicação no SPIN. O comprador revela a última objeção real.",
+      },
+      indicacao: {
+        texto: `[Nome], vou ser honesto com você: não vou te pressionar.
+
+O que eu quero é que você tome a decisão certa pra você — seja esse imóvel ou outro.
+
+Me conta: quais são os pontos que ainda estão te segurando?`,
+        tecnica: "resumo",
+        nota: "Declarar que não vai pressionar derruba a resistência. O comprador se abre porque sente que não está sendo manipulado.",
+      },
+      email: {
+        texto: `Assunto: Posso te ajudar a decidir?
+
+Olá, [Nome],
+
+Sei que comparar imóveis toma tempo — e é a coisa certa a fazer.
+
+Se quiser, posso te ajudar nessa análise: me conta o que os outros imóveis têm que esse não tem, e o que esse tem que os outros não têm. Às vezes colocar no papel clareia a decisão.
+
+Sem pressão nenhuma — só quero te ajudar a escolher o que faz mais sentido.
+
+[Seu Nome]`,
+        tecnica: "resumo",
+        nota: "Posicionar-se como consultor da decisão — não como vendedor — é a abordagem mais eficaz nessa etapa.",
+      },
+    },
+    dicas: [
+      "Nunca fale mal de outros imóveis que o comprador está vendo",
+      "Ajude o comprador a estruturar a comparação — ele vai concluir sozinho",
+      "Se o comprador disser que outro está mais barato, pergunte o que justifica a diferença",
+      "A decisão final deve parecer do comprador — nunca sua",
+    ],
+    objecoes: [
+      {
+        obj: "Vou pensar mais um pouco",
+        resp: `Com certeza. Me conta — o que ainda está em aberto pra você? Às vezes é uma dúvida simples que a gente resolve em 5 minutos.`,
+        tecnica: "spin",
+      },
+      {
+        obj: "Tem um outro imóvel que estou gostando também",
+        resp: `Faz sentido comparar. O que esse outro tem que esse não tem? E o que esse tem que o outro não tem? Se você quiser, posso te ajudar a fazer essa comparação de forma objetiva.`,
+        tecnica: "resumo",
+      },
+    ],
+  },
+  {
+    id: "v6",
+    num: "06",
+    etapa: "Fechamento Natural",
+    gatilho: "Comprador sinalizou decisão — formalizar sem pressão",
+    objetivo: "Conduzir para a proposta formal de forma leve e segura",
+    icon: "✅",
+    tecnicas: ["triade", "resumo", "silencio"],
+    scripts: {
+      whatsapp: {
+        texto: `[Nome], com base em tudo que a gente conversou — você estava buscando [critério 1], [critério 2] e [critério 3]. O imóvel atende os três pontos.
+
+A forma de pagamento que você mencionou funciona pra mim.
+
+O que você precisa pra gente dar o próximo passo?`,
+        tecnica: "triade",
+        nota: "Resumo dos critérios do próprio comprador + confirmação de condições + pergunta aberta. Nenhuma pressão — o próximo passo vem do comprador.",
+      },
+      portal: {
+        texto: `[Nome], chegamos num ponto muito bom dessa conversa.
+
+Você me disse o que precisava. O imóvel tem. As condições estão alinhadas.
+
+Faz sentido a gente formalizar uma proposta?`,
+        tecnica: "resumo",
+        nota: "Três afirmações curtas antes da pergunta. Estrutura de tríade de sim — o 'sim' final vem naturalmente.",
+      },
+      indicacao: {
+        texto: `[Nome], não vou complicar o que está simples.
+
+Você gostou do imóvel. As condições funcionam pra você. Só falta o papel.
+
+Me fala como você quer proceder e eu cuido do restante.`,
+        tecnica: "silencio",
+        nota: "Direto, confiante, sem pressão. Depois de 'me fala como quer proceder' — silêncio total.",
+      },
+      email: {
+        texto: `Assunto: Próximo passo — formalizar a proposta
+
+Olá, [Nome],
+
+Chegamos num ponto de alinhamento muito bom.
+
+Recapitulando:
+→ [Critério 1 do comprador] ✓
+→ [Critério 2 do comprador] ✓
+→ Condições de pagamento alinhadas ✓
+
+O próximo passo natural seria formalizar a proposta para seguirmos com a documentação. Isso não é um compromisso irreversível — é o caminho para garantir as condições que acordamos.
+
+Posso encaminhar o documento de proposta?
+
+[Seu Nome]`,
+        tecnica: "resumo",
+        nota: "'Não é um compromisso irreversível' reduz o peso do passo. O comprador avança com segurança.",
+      },
+    },
+    dicas: [
+      "Use 'formalizar' em vez de 'fechar' — soa menos definitivo e menos assustador",
+      "Silêncio após a pergunta de fechamento — não preencha o vazio",
+      "Se o comprador hesitar, há uma última objeção: descubra qual",
+      "Parabenize a decisão — reforce que foi uma boa escolha",
+    ],
+    objecoes: [
+      {
+        obj: "Preciso falar com minha esposa/marido",
+        resp: `Claro — e é o certo. Você prefere marcar uma conversa rápida com os dois juntos? Assim não precisa repassar tudo — eu explico e vocês decidem com as mesmas informações.`,
+        tecnica: "triade",
+      },
+      {
+        obj: "Ainda está um pouco acima do que planejei",
+        resp: `Entendo. Me conta — qual seria o valor que fecharia pra você? Quero ver se consigo fazer o negócio funcionar.`,
+        tecnica: "ancora",
+      },
+    ],
+  },
+];
+
+/* ─── ESTILOS ───────────────────────────────────────────────── */
+const css = `
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:${C.bg};font-family:'Outfit',sans-serif;color:${C.text};min-height:100vh;}
+  ::-webkit-scrollbar{width:4px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:${C.navyMid};border-radius:4px;}
+`;
+
+/* ─── APP ───────────────────────────────────────────────────── */
+export default function App() {
+  const [persona, setPersona] = useState("corretor"); // corretor | vendedor
+  const [etapaIdx, setEtapaIdx] = useState(0);
+  const [canal, setCanal] = useState("whatsapp");
+  const [showObjecao, setShowObjecao] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  const funil = persona === "corretor" ? FUNIL_CORRETOR : FUNIL_VENDEDOR;
+  const etapa = funil[etapaIdx];
+  const script = etapa?.scripts?.[canal];
+
+  const canais = [
+    { key: "whatsapp", label: "WhatsApp", emoji: "💬" },
+    { key: "portal", label: "Portal / Site", emoji: "🖥️" },
+    { key: "indicacao", label: "Indicação", emoji: "🤝" },
+    { key: "email", label: "E-mail", emoji: "✉️" },
+  ];
+
+  const handleCopy = () => {
+    if (!script) return;
+    navigator.clipboard.writeText(script.texto);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleWpp = () => {
+    if (!script) return;
+    window.open(`https://wa.me/?text=${encodeURIComponent(script.texto)}`, "_blank");
+  };
+
+  return (
+    <>
+      <style>{css}</style>
+      <div style={{ minHeight: "100vh", background: `linear-gradient(160deg, #07111f 0%, ${C.bg} 50%, #0c1a30 100%)` }}>
+
+        {/* HEADER */}
+        <div style={{ borderBottom: `1px solid ${C.goldBorder}`, background: "rgba(9,21,42,0.95)", backdropFilter: "blur(20px)", padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 34, height: 34, borderRadius: 8, background: `linear-gradient(135deg, ${C.gold}, ${C.goldLight})`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Cormorant Garamond',serif", fontWeight: 700, fontSize: 15, color: "#0a1628" }}>VN</div>
+            <div>
+              <div style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 600, fontSize: 16, color: "#fff", letterSpacing: 0.3 }}>VN Prime Imóveis</div>
+              <div style={{ fontSize: 10, color: C.gold, fontWeight: 600, letterSpacing: 1.5, textTransform: "uppercase" }}>Scripts de Venda Consultiva</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 6 }}>
+            {["corretor","vendedor"].map(p => (
+              <button key={p} onClick={() => { setPersona(p); setEtapaIdx(0); setShowObjecao(null); }} style={{ padding: "7px 16px", borderRadius: 8, border: persona === p ? `1px solid ${C.goldBorder}` : `1px solid ${C.border}`, background: persona === p ? C.goldPale : "transparent", color: persona === p ? C.goldLight : C.muted, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Outfit',sans-serif", textTransform: "capitalize", transition: "all .2s" }}>
+                {p === "corretor" ? "🏢 Corretor" : "🏡 Vendedor"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: "flex", height: "calc(100vh - 61px)" }}>
+
+          {/* SIDEBAR — ETAPAS */}
+          <div style={{ width: 220, flexShrink: 0, borderRight: `1px solid ${C.border}`, overflowY: "auto", padding: "16px 12px", display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: C.muted, letterSpacing: 1.2, textTransform: "uppercase", padding: "0 6px 10px" }}>Funil de Vendas</div>
+            {funil.map((e, i) => (
+              <button key={e.id} onClick={() => { setEtapaIdx(i); setShowObjecao(null); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 10px", borderRadius: 9, border: etapaIdx === i ? `1px solid ${C.goldBorder}` : "1px solid transparent", background: etapaIdx === i ? C.goldPale : "transparent", cursor: "pointer", textAlign: "left", transition: "all .18s", width: "100%" }}>
+                <div style={{ width: 26, height: 26, borderRadius: 6, background: etapaIdx === i ? C.gold : C.navyLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{e.icon}</div>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: etapaIdx === i ? C.goldLight : C.sub, lineHeight: 1.3 }}>{e.etapa}</div>
+                  <div style={{ fontSize: 10, color: C.muted, marginTop: 1 }}>{e.num}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* MAIN */}
+          <div style={{ flex: 1, overflowY: "auto", padding: "28px 32px" }}>
+
+            {/* CABEÇALHO DA ETAPA */}
+            <div style={{ marginBottom: 24 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                <span style={{ fontSize: 22 }}>{etapa.icon}</span>
+                <div>
+                  <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 22, fontWeight: 600, color: "#fff", letterSpacing: 0.3 }}>{etapa.etapa}</div>
+                  <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>Gatilho: {etapa.gatilho}</div>
+                </div>
+              </div>
+              <div style={{ background: C.navyLight, border: `1px solid ${C.border}`, borderLeft: `3px solid ${C.gold}`, borderRadius: 8, padding: "10px 14px", fontSize: 12, color: C.sub }}>
+                🎯 <strong style={{ color: C.goldLight }}>Objetivo:</strong> {etapa.objetivo}
+              </div>
+            </div>
+
+            {/* TÉCNICAS USADAS */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 22 }}>
+              {etapa.tecnicas.map(t => {
+                const tec = TECNICAS[t];
+                return (
+                  <div key={t} style={{ padding: "4px 12px", borderRadius: 20, background: `${tec.color}15`, border: `1px solid ${tec.color}35`, fontSize: 11, fontWeight: 600, color: tec.color }}>
+                    {tec.label}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* SELETOR DE CANAL */}
+            <div style={{ display: "flex", gap: 6, marginBottom: 20, background: "rgba(27,58,107,0.15)", border: `1px solid ${C.border}`, borderRadius: 12, padding: 5 }}>
+              {canais.map(c => (
+                <button key={c.key} onClick={() => setCanal(c.key)} style={{ flex: 1, padding: "8px 6px", borderRadius: 8, border: canal === c.key ? `1px solid ${C.goldBorder}` : "1px solid transparent", background: canal === c.key ? C.goldPale : "transparent", color: canal === c.key ? C.goldLight : C.muted, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Outfit',sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 4, transition: "all .18s" }}>
+                  {c.emoji} {c.label}
+                </button>
+              ))}
+            </div>
+
+            {/* SCRIPT */}
+            {script && (
+              <div style={{ background: "rgba(27,58,107,0.12)", border: `1px solid ${C.border}`, borderRadius: 14, overflow: "hidden", marginBottom: 20 }}>
+                {/* técnica badge */}
+                <div style={{ background: `${TECNICAS[script.tecnica]?.color}12`, borderBottom: `1px solid ${C.border}`, padding: "10px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: TECNICAS[script.tecnica]?.color }}>
+                    ✦ Técnica: {TECNICAS[script.tecnica]?.label} — {TECNICAS[script.tecnica]?.desc}
+                  </div>
+                </div>
+
+                {/* texto do script */}
+                <div style={{ padding: "20px 22px", fontFamily: "'Outfit',sans-serif", fontSize: 13.5, lineHeight: 1.85, color: C.sub, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                  {script.texto}
+                </div>
+
+                {/* nota de diretor */}
+                <div style={{ background: "rgba(201,150,14,0.06)", borderTop: `1px solid ${C.goldBorder}`, padding: "12px 18px", fontSize: 11.5, color: "rgba(232,210,120,0.8)", lineHeight: 1.6 }}>
+                  📌 <em>{script.nota}</em>
+                </div>
+
+                {/* ações */}
+                <div style={{ padding: "12px 18px", borderTop: `1px solid ${C.border}`, display: "flex", gap: 8 }}>
+                  <button onClick={handleCopy} style={{ flex: 1, padding: "10px", borderRadius: 8, border: `1px solid ${copied ? "rgba(74,222,128,0.4)" : C.goldBorder}`, background: copied ? "rgba(74,222,128,0.1)" : C.goldPale, color: copied ? "#4ade80" : C.goldLight, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Outfit',sans-serif", transition: "all .2s" }}>
+                    {copied ? "✓ Copiado!" : "Copiar Script"}
+                  </button>
+                  {canal === "whatsapp" && (
+                    <button onClick={handleWpp} style={{ flex: 1, padding: "10px", borderRadius: 8, border: "1px solid rgba(37,211,102,0.3)", background: "rgba(37,211,102,0.1)", color: "#25d366", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Outfit',sans-serif" }}>
+                      📲 Abrir no WhatsApp
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* DICAS */}
+            {etapa.dicas.length > 0 && (
+              <div style={{ background: "rgba(27,58,107,0.12)", border: `1px solid ${C.border}`, borderRadius: 12, padding: "16px 20px", marginBottom: 20 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: C.gold, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Dicas da Etapa</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {etapa.dicas.map((d, i) => (
+                    <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                      <div style={{ width: 5, height: 5, borderRadius: "50%", background: C.gold, flexShrink: 0, marginTop: 6 }} />
+                      <span style={{ fontSize: 12.5, color: C.sub, lineHeight: 1.6 }}>{d}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* OBJEÇÕES */}
+            {etapa.objecoes.length > 0 && (
+              <div style={{ background: "rgba(27,58,107,0.10)", border: `1px solid ${C.border}`, borderRadius: 12, overflow: "hidden" }}>
+                <div style={{ padding: "14px 20px", borderBottom: `1px solid ${C.border}` }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#fb923c", letterSpacing: 1, textTransform: "uppercase" }}>Como Responder Objeções</div>
+                </div>
+                {etapa.objecoes.map((ob, i) => (
+                  <div key={i} style={{ borderBottom: i < etapa.objecoes.length - 1 ? `1px solid ${C.border}` : "none" }}>
+                    <button onClick={() => setShowObjecao(showObjecao === i ? null : i)} style={{ width: "100%", padding: "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ fontSize: 13, color: "#fb923c" }}>❝</span>
+                        <span style={{ fontSize: 13, fontWeight: 500, color: C.sub }}>{ob.obj}</span>
+                      </div>
+                      <span style={{ color: C.muted, fontSize: 12, transform: showObjecao === i ? "rotate(180deg)" : "none", transition: "transform .2s" }}>▾</span>
+                    </button>
+                    {showObjecao === i && (
+                      <div style={{ padding: "0 20px 18px", animation: "fadeIn .2s ease" }}>
+                        <div style={{ background: "rgba(27,58,107,0.2)", border: `1px solid ${C.border}`, borderRadius: 10, padding: "14px 16px" }}>
+                          <div style={{ fontSize: 10, fontWeight: 600, color: TECNICAS[ob.tecnica]?.color, marginBottom: 8, letterSpacing: 0.8, textTransform: "uppercase" }}>
+                            Técnica: {TECNICAS[ob.tecnica]?.label}
+                          </div>
+                          <div style={{ fontSize: 13, color: C.sub, lineHeight: 1.75, whiteSpace: "pre-wrap" }}>{ob.resp}</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* NAVEGAÇÃO ENTRE ETAPAS */}
+            <div style={{ display: "flex", gap: 10, marginTop: 28 }}>
+              <button onClick={() => { setEtapaIdx(Math.max(0, etapaIdx - 1)); setShowObjecao(null); }} disabled={etapaIdx === 0} style={{ flex: 1, padding: "12px", borderRadius: 10, border: `1px solid ${C.border}`, background: "transparent", color: etapaIdx === 0 ? C.muted : C.sub, fontSize: 13, fontWeight: 600, cursor: etapaIdx === 0 ? "not-allowed" : "pointer", fontFamily: "'Outfit',sans-serif", opacity: etapaIdx === 0 ? 0.4 : 1 }}>
+                ← Etapa anterior
+              </button>
+              <button onClick={() => { setEtapaIdx(Math.min(funil.length - 1, etapaIdx + 1)); setShowObjecao(null); }} disabled={etapaIdx === funil.length - 1} style={{ flex: 1, padding: "12px", borderRadius: 10, border: `1px solid ${C.goldBorder}`, background: C.goldPale, color: etapaIdx === funil.length - 1 ? C.muted : C.goldLight, fontSize: 13, fontWeight: 600, cursor: etapaIdx === funil.length - 1 ? "not-allowed" : "pointer", fontFamily: "'Outfit',sans-serif", opacity: etapaIdx === funil.length - 1 ? 0.4 : 1 }}>
+                Próxima etapa →
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}`}</style>
+      </div>
+    </>
+  );
+}

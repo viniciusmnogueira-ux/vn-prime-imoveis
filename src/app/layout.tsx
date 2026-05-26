@@ -31,9 +31,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <SiteHeader />
-        <main style={{ minHeight: 'calc(100vh - var(--header-h))' }}>
+        <div style={{ minHeight: 'calc(100vh - var(--header-h))' }}>
           {children}
-        </main>
+        </div>
         <SiteFooter />
       </body>
     </html>

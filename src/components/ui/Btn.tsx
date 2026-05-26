@@ -14,7 +14,7 @@ interface BtnProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const base: React.CSSProperties = {
   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-  gap: 8, fontFamily: "'DM Sans', sans-serif", fontWeight: 700,
+  gap: 8, fontFamily: "var(--font-body)", fontWeight: 700,
   borderRadius: 10, border: 'none', cursor: 'pointer',
   transition: 'opacity 0.15s, transform 0.15s', textDecoration: 'none',
   whiteSpace: 'nowrap',
