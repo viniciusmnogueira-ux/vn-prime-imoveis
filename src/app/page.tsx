@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Btn from '@/components/ui/Btn'
+import Eyebrow from '@/components/ui/Eyebrow'
+import { createClient } from '@/lib/supabase/client'
 
 const HERO_PHOTOS = [
   'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=2400&q=85',
@@ -11,6 +13,94 @@ const HERO_PHOTOS = [
 ]
 
 const SERVICOS = [
+  {
+    title: 'Área do Proprietário',
+    subtitle: 'Venda com autonomia total',
+    desc: 'Você define o preço, cadastra seu imóvel e conduz a venda. A VN Prime cuida da plataforma, suporte e qualificação de compradores. Fotografia e mídia são pacotes adicionais.',
+    bullets: ['R$ 297 taxa fixa · ou 3% somente ao vender', 'Cadastro e gestão do anúncio pelo proprietário', 'Qualificação de compradores pela plataforma', 'Pacotes de fotografia e mídia à parte'],
+    cta: 'Anunciar meu imóvel', href: '/proprietario',
+    img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=80',
+    accent: '#D4A857',
+  },
+  {
+    title: 'Portal do Corretor',
+    subtitle: 'Leads qualificados e comissão garantida',
+    desc: 'Acesse o portfólio VN Prime, receba leads com contato completo e gerencie seu funil de vendas com CRM Kanban integrado. Comissão integral em cada venda.',
+    bullets: ['Leads com WhatsApp + e-mail qualificados', 'CRM Kanban de funil de vendas', 'Portfólio premium VN Prime', 'Comissão integral garantida'],
+    cta: 'Acessar portal', href: '/corretor',
+    img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&q=80',
+    accent: '#2F8674',
+  },
+  {
+    title: 'Consórcio Imobiliário',
+    subtitle: 'Compre sem juros, no seu ritmo',
+    desc: 'A forma mais inteligente de adquirir seu imóvel. Sem juros, sem entrada obrigatória. Carta de crédito nominal contemplada por sorteio ou lance mensal.',
+    bullets: ['0% de juros — nunca', 'Prazo de até 12 anos', 'Contemplação por sorteio ou lance', '200+ consorciados em BH e região'],
+    cta: 'Simular meu consórcio', href: '/consorcio',
+    img: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=900&q=80',
+    accent: '#059669',
+  },
+  {
+    title: 'Due Diligence',
+    subtitle: 'Compre com segurança jurídica total',
+    desc: 'Antes de assinar qualquer contrato, a VN Prime analisa toda a documentação e realiza vistoria técnica. Relatório executivo completo entregue em até 48 horas.',
+    bullets: ['30+ itens verificados', 'Relatório em até 48 horas', 'Análise jurídica + vistoria técnica', 'Sem surpresas no pós-venda'],
+    cta: 'Solicitar análise', href: '/due-diligence',
+    img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&q=80',
+    accent: '#6366F1',
+  },
+  {
+    title: 'Lançamentos',
+    subtitle: 'Alta valorização, condições exclusivas',
+    desc: 'Apartamentos, casas em condomínio e lotes no melhor da Grande BH. Compre na planta com entrada facilitada, fluxo baixo durante as obras e financiamento na entrega.',
+    bullets: ['3 empreendimentos exclusivos em carteira', 'Valorização de 50–60% até as chaves', 'Entrada facilitada + financiamento bancário', 'Unidades a partir de R$ 320 mil'],
+    cta: 'Ver lançamentos', href: '/lancamentos',
+    img: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=900&q=80',
+    accent: '#D4A857',
+  },
+]
+
+const PLANOS = [
+  {
+    name: 'Venda Direta',
+    tag: 'Sem comissão',
+    price: 'R$ 297',
+    priceLabel: 'taxa única — você fica com 100% da venda',
+    desc: 'Anuncie na maior vitrine premium de BH e venda mais sem pagar comissão. Você define o preço, conduz as visitas e fecha direto com o comprador.',
+    bullets: ['Sem comissão — 0% sobre a venda', 'Anúncio por 90 dias na vitrine VN Prime', 'Gerador de descrição editorial com IA', 'Endereço privado — exibe só o bairro', 'Suporte por WhatsApp'],
+    cta: 'Começar agora',
+    img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1400&q=85',
+  },
+  {
+    name: 'Venda Assistida',
+    tag: 'Mais escolhido · Venda garantida',
+    price: '3%',
+    priceLabel: 'você paga apenas quando vender — zero risco',
+    desc: 'Venda mais rápido com o apoio da VN Prime. Você cadastra o imóvel e conduz o processo; a equipe VN Prime qualifica compradores, cuida do anúncio e mantém tudo otimizado até fechar o negócio.',
+    bullets: ['Só paga se vender — 0 risco', 'Curadoria e descrição editorial com IA', 'Qualificação ativa de compradores', 'Time VN Prime nos bastidores', 'Pacotes de fotografia e mídia à parte'],
+    cta: 'Escolher este plano',
+    img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1400&q=85',
+  },
+  {
+    name: 'Venda Completa',
+    tag: 'Mãos livres · Venda garantida',
+    price: '6%',
+    priceLabel: 'você paga apenas quando vender — você aprova a proposta e assina',
+    desc: 'A VN Prime cuida de tudo. Corretor dedicado, fotos profissionais, mídia paga gerenciada, visitas conduzidas e negociação. Você só precisa aprovar a proposta e assinar a escritura.',
+    bullets: ['Corretor parceiro dedicado à sua venda', 'Fotos do imóvel incluídas', 'Mídia paga em Meta, Google e portais', 'Visitas acompanhadas pelo corretor', 'Concierge de negociação', 'Suporte jurídico até a escritura'],
+    cta: 'Quero mãos livres',
+    img: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1400&q=85',
+  },
+]
+
+const STATS = [
+  { value: '142', label: 'Imóveis disponíveis' },
+  { value: 'R$ 4,2 bi', label: 'Em portfólio' },
+  { value: '96%', label: 'Satisfação' },
+  { value: '18 dias', label: 'Tempo médio de venda' },
+]
+
+const SERVICE_PILLS = [
   { label: 'Proprietário',      href: '/proprietario',  accent: '#D4A857' },
   { label: 'Corretor Parceiro', href: '/corretor',       accent: '#2F8674' },
   { label: 'Consórcio',         href: '/consorcio',      accent: '#059669' },
@@ -20,484 +110,400 @@ const SERVICOS = [
   { label: 'Calculadora ITBI',  href: '/calculadora',    accent: '#6B7280' },
 ]
 
-const STATS = [
-  { value: '142',      label: 'Imóveis disponíveis' },
-  { value: 'R$ 4,2 bi', label: 'Em portfólio' },
-  { value: '96%',      label: 'Satisfação' },
-  { value: '18 dias',  label: 'Tempo médio de venda' },
-]
+const QUICK_LINKS = ['Apartamentos em BH', 'Casas Grande BH', 'Coberturas BH', 'Lançamentos Grande BH', 'Aluguel BH', 'Acima de R$ 5 mi']
 
-const QUICK_LINKS = [
-  'Apartamentos em BH',
-  'Casas Grande BH',
-  'Coberturas BH',
-  'Lançamentos Grande BH',
-  'Aluguel BH',
-  'Acima de R$ 5 mi',
-]
+const fmt = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
 
-const SERVICE_CARDS = [
-  {
-    title: 'Área do Proprietário',
-    subtitle: 'Anuncie sem burocracia',
-    desc: 'Publique seu imóvel com taxa fixa ou comissão somente ao vender. Painel completo para acompanhar visitas e propostas.',
-    bullets: ['Taxa fixa R$ 297 por 90 dias', 'Comissão de 3% só ao vender', 'Painel em tempo real'],
-    cta: 'Anunciar meu imóvel',
-    href: '/proprietario',
-    accent: '#D4A857',
-    img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80',
-  },
-  {
-    title: 'Portal do Corretor',
-    subtitle: 'Mais negócios, menos esforço',
-    desc: 'Acesse portfólio exclusivo, receba leads qualificados e use scripts de venda prontos para fechar mais em BH.',
-    bullets: ['Leads qualificados', 'CRM e agenda integrados', 'Scripts de venda prontos'],
-    cta: 'Acessar portal',
-    href: '/corretor',
-    accent: '#2F8674',
-    img: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=80',
-  },
-  {
-    title: 'Consórcio Imobiliário',
-    subtitle: 'Compre sem juros',
-    desc: 'Adquira seu imóvel com carta de crédito. Zero juros, contemplação por sorteio ou lance, parcelas que cabem no bolso.',
-    bullets: ['0% de juros', 'Contemplação por sorteio ou lance', 'Simule em segundos'],
-    cta: 'Simular consórcio',
-    href: '/consorcio',
-    accent: '#059669',
-    img: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&q=80',
-  },
-  {
-    title: 'Due Diligence',
-    subtitle: 'Segurança jurídica total',
-    desc: 'Análise completa da documentação antes de fechar negócio. Evite surpresas e compre com total tranquilidade.',
-    bullets: ['Análise de matrícula e certidões', 'Relatório em até 5 dias úteis', 'Consultoria jurídica inclusa'],
-    cta: 'Solicitar análise',
-    href: '/due-diligence',
-    accent: '#6366F1',
-    img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80',
-  },
-  {
-    title: 'Lançamentos',
-    subtitle: 'Primeiros na fila',
-    desc: 'Acesso antecipado aos melhores lançamentos de BH e Grande BH. Condições exclusivas e plantões presenciais.',
-    bullets: ['Pré-lançamentos exclusivos', 'Condições especiais de pré-venda', 'Atendimento presencial'],
-    cta: 'Ver lançamentos',
-    href: '/lancamentos',
-    accent: '#D4A857',
-    img: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80',
-  },
-]
-
-const PLANS = [
-  {
-    name: 'Venda Direta',
-    price: 'R$ 297',
-    priceNote: 'taxa única',
-    desc: 'Publique seu imóvel e gerencie as negociações com suporte básico da plataforma.',
-    features: ['Anúncio por 90 dias', 'Fotos profissionais (opcional)', 'Painel do proprietário', 'Suporte por chat'],
-    cta: 'Começar agora',
-    href: '/anunciar?plano=direto',
-    featured: false,
-  },
-  {
-    name: 'Venda Assistida',
-    price: '3%',
-    priceNote: 'somente ao vender',
-    desc: 'Nossa equipe cuida de tudo: fotos, visitas, negociação e documentação.',
-    features: ['Tudo do plano Direta', 'Corretor dedicado VN Prime', 'Fotos e vídeo profissional', 'Gestão completa de visitas', 'Negociação e proposta'],
-    cta: 'Falar com consultor',
-    href: '/anunciar?plano=assistida',
-    featured: true,
-  },
-  {
-    name: 'Venda Completa',
-    price: '6%',
-    priceNote: 'somente ao vender',
-    desc: 'O serviço mais completo: marketing premium, home staging, due diligence e acompanhamento jurídico.',
-    features: ['Tudo do plano Assistida', 'Home staging incluso', 'Due diligence jurídica', 'Marketing em portais premium', 'Acompanhamento até o cartório'],
-    cta: 'Falar com consultor',
-    href: '/anunciar?plano=completa',
-    featured: false,
-  },
-]
+function ArrowBtn({ dir, onClick }: { dir: 'left' | 'right'; onClick: () => void }) {
+  return (
+    <button onClick={onClick} style={{
+      position: 'absolute', [dir]: -20, top: '50%', transform: 'translateY(-50%)',
+      zIndex: 10, width: 44, height: 44, borderRadius: '50%',
+      background: '#fff', border: '1px solid var(--border)',
+      boxShadow: 'var(--shadow-soft)', cursor: 'pointer',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: 20, color: 'var(--navy)', lineHeight: 1,
+    }}>
+      {dir === 'left' ? '‹' : '›'}
+    </button>
+  )
+}
 
 export default function HomePage() {
   const [slide, setSlide] = useState(0)
+  const [serviceIdx, setServiceIdx] = useState(0)
+  const [planoIdx, setPlanoIdx] = useState(0)
   const [searchQ, setSearchQ] = useState('')
   const [searchTipo, setSearchTipo] = useState('')
   const [searchValor, setSearchValor] = useState('')
+  const [featured, setFeatured] = useState<any[]>([])
 
   useEffect(() => {
-    const timer = setInterval(() => setSlide(s => (s + 1) % HERO_PHOTOS.length), 7000)
-    return () => clearInterval(timer)
+    const t = setInterval(() => setSlide(s => (s + 1) % HERO_PHOTOS.length), 7000)
+    return () => clearInterval(t)
   }, [])
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.from('imoveis')
+      .select('id, titulo, tipo, bairro, cidade, preco, area, quartos, fotos')
+      .eq('status', 'ativo')
+      .order('created_at', { ascending: false })
+      .limit(3)
+      .then(({ data }) => setFeatured(data || []))
+  }, [])
+
+  const searchHref = `/busca${searchQ || searchTipo || searchValor
+    ? `?q=${encodeURIComponent(searchQ)}&tipo=${searchTipo}&valor=${searchValor}`
+    : ''}`
 
   return (
     <main>
-      {/* ── Hero ───────────────────────────────────────────── */}
+      {/* ── Hero ── */}
       <section style={{
         position: 'relative', overflow: 'hidden',
-        minHeight: 580,
-        padding: '4rem 0 6rem',
-        color: '#fff',
-        textAlign: 'center',
+        minHeight: 580, padding: '4rem 0 6rem',
+        color: '#fff', textAlign: 'center',
+        display: 'flex', alignItems: 'center',
       }}>
-        {/* Slideshow backgrounds */}
         {HERO_PHOTOS.map((photo, i) => (
           <div key={photo} style={{
             position: 'absolute', inset: 0,
-            backgroundImage: `url(${photo})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: i === slide ? 1 : 0,
-            transition: 'opacity 1.6s ease',
-            zIndex: 0,
+            backgroundImage: `url(${photo})`, backgroundSize: 'cover', backgroundPosition: 'center',
+            opacity: i === slide ? 1 : 0, transition: 'opacity 1.6s ease', zIndex: 0,
           }} />
         ))}
-
-        {/* Dark overlay */}
         <div style={{
           position: 'absolute', inset: 0, zIndex: 1,
           background: 'linear-gradient(120deg, rgba(15,34,68,0.80) 0%, rgba(15,34,68,0.52) 45%, rgba(15,34,68,0.68) 100%)',
         }} />
-
-        {/* Gold radial glow top-right */}
         <div style={{
-          position: 'absolute', top: 0, right: 0, width: '50%', height: '100%', zIndex: 1,
+          position: 'absolute', top: -200, right: -200, width: 600, height: 600, zIndex: 1,
           background: 'radial-gradient(circle, rgba(212,168,87,0.22) 0%, transparent 65%)',
           pointerEvents: 'none',
         }} />
 
-        {/* Content */}
-        <div style={{ position: 'relative', zIndex: 2, width: 'min(1200px,92vw)', margin: '0 auto' }}>
-          {/* Eyebrow */}
-          <div style={{
-            display: 'inline-block',
-            fontFamily: 'var(--font-body)', fontSize: '0.7rem', fontWeight: 700,
-            letterSpacing: '0.22em', textTransform: 'uppercase',
-            color: 'var(--gold)', marginBottom: 20,
+        <div style={{ position: 'relative', zIndex: 2, width: 'min(1280px,94vw)', margin: '0 auto', textAlign: 'center' }}>
+          <Eyebrow>VN Prime Imóveis · Belo Horizonte e região</Eyebrow>
+          <h1 style={{
+            color: '#fff', fontSize: 'clamp(2rem,4.4vw,3.4rem)',
+            textShadow: '0 2px 24px rgba(0,0,0,0.4)', margin: '0 0 16px',
+            maxWidth: '20ch', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.15,
           }}>
-            VN Prime Imóveis · Belo Horizonte e região
-          </div>
-
-          <h1 style={{ color: '#fff', margin: '0 0 18px', fontSize: 'clamp(2.5rem,5vw,3.8rem)' }}>
             Encontre seu próximo endereço{' '}
-            <em style={{
-              fontStyle: 'normal',
+            <em className="italic-accent" style={{
               background: 'var(--gradient-gold)',
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              color: 'transparent',
-            }}>de alto padrão</em>
+              WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent',
+            }}>
+              de alto padrão
+            </em>
           </h1>
-
-          <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.88)', maxWidth: 500, margin: '0 auto 32px', lineHeight: 1.7 }}>
+          <p style={{ color: 'rgba(250,249,246,0.92)', fontSize: 16, maxWidth: 580, margin: '0 auto 28px', textShadow: '0 1px 10px rgba(0,0,0,0.3)' }}>
             Imóveis premium em Belo Horizonte e Grande BH, selecionados pelo time VN Prime.
           </p>
 
           {/* Search card */}
           <div style={{
-            background: '#fff',
-            borderRadius: 18,
-            padding: '1.25rem',
+            background: '#fff', borderRadius: 18, padding: '1.25rem',
             boxShadow: '0 22px 60px rgba(15,34,68,0.32)',
-            maxWidth: 780,
-            margin: '0 auto',
-            display: 'grid',
-            gridTemplateColumns: '1.6fr 1fr 1fr auto',
-            gap: 12,
-            alignItems: 'center',
+            display: 'grid', gap: 10, maxWidth: 920, margin: '0 auto',
+            gridTemplateColumns: '1.6fr 1fr 1fr auto', alignItems: 'end',
           }}>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-3)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>Onde?</div>
-              <input
-                type="text"
-                placeholder="Cidade, bairro ou código..."
-                value={searchQ}
-                onChange={e => setSearchQ(e.target.value)}
-                style={{ width: '100%', border: 'none', outline: 'none', fontSize: 14, color: 'var(--navy)', background: 'transparent', fontFamily: 'var(--font-body)' }}
-              />
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-3)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>Onde</div>
+              <input type="text" placeholder="Cidade, bairro ou código (ex.: Nova Lima, VN-2048)"
+                value={searchQ} onChange={e => setSearchQ(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && (window.location.href = searchHref)}
+                style={{ width: '100%', border: 'none', outline: 'none', fontSize: 13.5, color: 'var(--navy)', background: 'transparent', fontFamily: 'var(--font-body)' }} />
             </div>
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-3)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>Tipo</div>
-              <select
-                value={searchTipo}
-                onChange={e => setSearchTipo(e.target.value)}
-                style={{ width: '100%', border: 'none', outline: 'none', fontSize: 14, color: 'var(--navy)', background: 'transparent', fontFamily: 'var(--font-body)', cursor: 'pointer' }}
-              >
+              <select value={searchTipo} onChange={e => setSearchTipo(e.target.value)}
+                style={{ width: '100%', border: 'none', outline: 'none', fontSize: 13.5, color: 'var(--navy)', background: 'transparent', fontFamily: 'var(--font-body)', cursor: 'pointer' }}>
                 <option value="">Todos</option>
-                <option value="apartamento">Apartamento</option>
-                <option value="casa">Casa</option>
-                <option value="cobertura">Cobertura</option>
-                <option value="studio">Studio</option>
+                <option>Apartamento</option>
+                <option>Casa</option>
+                <option>Cobertura</option>
+                <option>Studio</option>
               </select>
             </div>
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-3)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>Valor até</div>
-              <select
-                value={searchValor}
-                onChange={e => setSearchValor(e.target.value)}
-                style={{ width: '100%', border: 'none', outline: 'none', fontSize: 14, color: 'var(--navy)', background: 'transparent', fontFamily: 'var(--font-body)', cursor: 'pointer' }}
-              >
+              <select value={searchValor} onChange={e => setSearchValor(e.target.value)}
+                style={{ width: '100%', border: 'none', outline: 'none', fontSize: 13.5, color: 'var(--navy)', background: 'transparent', fontFamily: 'var(--font-body)', cursor: 'pointer' }}>
                 <option value="">Sem limite</option>
                 <option value="2000000">R$ 2 mi</option>
                 <option value="5000000">R$ 5 mi</option>
                 <option value="10000000">R$ 10 mi</option>
               </select>
             </div>
-            <Link href={`/busca${searchQ || searchTipo || searchValor ? `?q=${encodeURIComponent(searchQ)}&tipo=${searchTipo}&valor=${searchValor}` : ''}`}>
-              <Btn variant="accent" size="md">Buscar</Btn>
-            </Link>
+            <Link href={searchHref}><Btn variant="accent" size="lg">Buscar</Btn></Link>
           </div>
 
-          {/* Email alert link */}
-          <div style={{ marginTop: 14 }}>
-            <button style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: 'rgba(245,248,250,0.72)', fontSize: 13, fontFamily: 'var(--font-body)',
-              textDecoration: 'underline', textUnderlineOffset: 3,
-            }}>
+          <div style={{ textAlign: 'center', marginTop: 14 }}>
+            <button style={{ background: 'none', border: 'none', color: 'rgba(245,248,250,0.72)', fontSize: 13, cursor: 'pointer', textDecoration: 'underline', textDecorationStyle: 'dashed', fontFamily: 'inherit' }}>
               ✉ Receber alertas desta busca por e-mail
             </button>
           </div>
 
-          {/* Stats row */}
-          <div style={{
-            display: 'flex', justifyContent: 'center', gap: 'clamp(24px,4vw,56px)',
-            flexWrap: 'wrap', marginTop: 44,
-          }}>
+          {/* Stats */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 28, marginTop: 36, flexWrap: 'wrap' }}>
             {STATS.map(s => (
-              <div key={s.label} style={{ textAlign: 'center' }}>
-                <div style={{
-                  fontSize: 'clamp(1.6rem,3vw,2.2rem)', fontWeight: 800,
-                  background: 'var(--gradient-gold)',
-                  WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent',
-                  lineHeight: 1,
-                }}>{s.value}</div>
-                <div style={{ fontSize: 12, color: 'rgba(245,248,250,0.72)', marginTop: 4, letterSpacing: '0.04em' }}>{s.label}</div>
+              <div key={s.label} style={{ textAlign: 'center', minWidth: 110 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 700, color: 'var(--gold-soft)', lineHeight: 1 }}>{s.value}</div>
+                <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(250,249,246,0.8)', marginTop: 6 }}>{s.label}</div>
               </div>
             ))}
           </div>
 
-          {/* Services pills */}
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', marginTop: 36 }}>
-            {SERVICOS.map(s => (
-              <Link key={s.href} href={s.href}>
-                <button style={{
-                  padding: '8px 18px', borderRadius: 999,
-                  background: 'rgba(255,255,255,0.09)',
-                  border: '1px solid rgba(255,255,255,0.18)',
-                  color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: 600,
-                  cursor: 'pointer', transition: 'all 0.15s',
-                  fontFamily: 'var(--font-body)',
-                }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.background = s.accent + '33'
-                    ;(e.currentTarget as HTMLElement).style.borderColor = s.accent
-                    ;(e.currentTarget as HTMLElement).style.color = '#fff'
+          {/* Service pills */}
+          <div style={{ marginTop: 40, borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 24 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,248,250,0.45)', textAlign: 'center', marginBottom: 14 }}>
+              Nossos serviços
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
+              {SERVICE_PILLS.map(s => (
+                <Link key={s.href} href={s.href}>
+                  <button style={{
+                    background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.16)',
+                    borderRadius: 999, padding: '7px 16px', color: '#fff', fontFamily: 'inherit',
+                    fontSize: 12.5, fontWeight: 600, cursor: 'pointer', backdropFilter: 'blur(6px)',
+                    transition: 'background 0.15s, border-color 0.15s',
                   }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.09)'
-                    ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.18)'
-                    ;(e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.85)'
-                  }}
-                >
-                  {s.label}
-                </button>
-              </Link>
-            ))}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = s.accent + '28'; (e.currentTarget as HTMLElement).style.borderColor = s.accent + '66' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.16)' }}
+                  >{s.label}</button>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── Quick links bar ─────────────────────────────────── */}
-      <div style={{
-        background: '#fff',
-        borderBottom: '1px solid var(--border)',
-        padding: '14px 0',
-      }}>
-        <div style={{ width: 'min(1200px,92vw)', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--fg-3)', letterSpacing: '0.1em', textTransform: 'uppercase', marginRight: 6, flexShrink: 0 }}>
-            Buscas frequentes:
-          </span>
+      {/* ── Quick links ── */}
+      <section style={{ background: 'var(--white)', borderBottom: '1px solid var(--border)', padding: '20px 0' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--fg-2)' }}>Buscas frequentes</span>
           {QUICK_LINKS.map(q => (
-            <Link key={q} href={`/busca?q=${encodeURIComponent(q)}`} style={{
-              padding: '5px 14px', borderRadius: 999,
-              background: 'var(--cream)', border: '1px solid var(--border)',
-              fontSize: 13, fontWeight: 500, color: 'var(--navy-muted)',
-              textDecoration: 'none', transition: 'all 0.15s',
-              whiteSpace: 'nowrap',
-            }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.background = 'var(--cream-tint)'
-                ;(e.currentTarget as HTMLElement).style.borderColor = 'var(--gold)'
-                ;(e.currentTarget as HTMLElement).style.color = 'var(--navy)'
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.background = 'var(--cream)'
-                ;(e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'
-                ;(e.currentTarget as HTMLElement).style.color = 'var(--navy-muted)'
-              }}
-            >
-              {q}
-            </Link>
+            <Link key={q} href={`/busca?q=${encodeURIComponent(q)}`}
+              style={{ fontSize: 13, color: 'var(--navy)', padding: '6px 14px', border: '1px solid var(--border)', borderRadius: 999, textDecoration: 'none', transition: 'border-color 0.15s, color 0.15s' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--gold)'; (e.currentTarget as HTMLElement).style.color = 'var(--gold)' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLElement).style.color = 'var(--navy)' }}
+            >{q}</Link>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* ── Services section ────────────────────────────────── */}
-      <section style={{ background: 'var(--cream)', padding: 'clamp(60px,8vw,100px) 0' }}>
-        <div style={{ width: 'min(1200px,92vw)', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <div style={{
-              fontFamily: 'var(--font-body)', fontSize: '0.7rem', fontWeight: 700,
-              letterSpacing: '0.22em', textTransform: 'uppercase',
-              color: 'var(--gold-deep)', marginBottom: 12,
-            }}>
-              Nossos Serviços
+      {/* ── Destaques ── */}
+      {featured.length > 0 && (
+        <section style={{ padding: 'clamp(2.5rem,5vw,4rem) 0', background: 'var(--cream)' }}>
+          <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24, gap: 24, flexWrap: 'wrap' }}>
+              <div>
+                <Eyebrow color="var(--gold)">Seleção VN Prime · Em destaque</Eyebrow>
+                <h2 style={{ margin: 0, fontSize: 'clamp(1.4rem,2.5vw,1.9rem)' }}>Endereços que valem a visita</h2>
+              </div>
+              <Link href="/busca"><Btn variant="ghost">Ver todos os imóveis →</Btn></Link>
             </div>
-            <h2>Por que escolher a VN Prime?</h2>
+            <div style={{ display: 'grid', gap: 18, gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))' }}>
+              {featured.map(im => {
+                const foto = im.fotos?.[0] ?? 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80'
+                return (
+                  <Link key={im.id} href={`/imovel/${im.id}`} style={{ textDecoration: 'none' }}>
+                    <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', border: '1px solid var(--border)', transition: 'transform 0.18s, box-shadow 0.18s' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 16px 44px rgba(15,34,68,0.14)' }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = 'none' }}>
+                      <div style={{ height: 200, backgroundImage: `url(${foto})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                      <div style={{ padding: '18px 20px' }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 2 }}>Preço de pedida</div>
+                        <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--gold)', marginBottom: 6 }}>{im.preco ? fmt(im.preco) : 'Consulte'}</div>
+                        <h3 style={{ fontSize: 15, color: 'var(--navy)', fontWeight: 600, margin: '0 0 4px', lineHeight: 1.3 }}>{im.titulo}</h3>
+                        <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>{im.bairro}{im.bairro && im.cidade ? ', ' : ''}{im.cidade}</div>
+                        <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--fg-3)', marginTop: 8 }}>
+                          {im.area && <span>{im.area} m²</span>}
+                          {im.quartos && <span>{im.quartos} quartos</span>}
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Serviços (carousel) ── */}
+      <section id="home-servicos" style={{ padding: 'clamp(3rem,6vw,5rem) 0', background: 'var(--white)' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto 40px' }}>
+            <Eyebrow color="var(--gold)">Para quem anuncia e compra</Eyebrow>
+            <h2 style={{ margin: '0 0 12px' }}>Nossos <em className="italic-accent">serviços</em></h2>
+            <p style={{ color: 'var(--fg-2)', margin: 0 }}>
+              Soluções completas para vender, comprar, financiar e documentar seu imóvel com segurança.
+            </p>
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: 28,
-          }}>
-            {SERVICE_CARDS.map(card => (
-              <div key={card.href} style={{
-                background: '#fff',
-                borderRadius: 20,
-                overflow: 'hidden',
-                border: '1px solid var(--border)',
-                display: 'flex', flexDirection: 'column',
-              }}>
-                <div style={{
-                  height: 200,
-                  backgroundImage: `url(${card.img})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  flexShrink: 0,
+          <div style={{ position: 'relative' }}>
+            {serviceIdx > 0 && <ArrowBtn dir="left" onClick={() => setServiceIdx(i => i - 1)} />}
+            {serviceIdx < SERVICOS.length - 1 && <ArrowBtn dir="right" onClick={() => setServiceIdx(i => i + 1)} />}
+
+            <div style={{ overflow: 'hidden', borderRadius: 20 }}>
+              <div style={{ display: 'flex', transform: `translateX(-${serviceIdx * 100}%)`, transition: 'transform 0.45s cubic-bezier(0.4,0,0.2,1)' }}>
+                {SERVICOS.map(s => (
+                  <div key={s.href} style={{ minWidth: '100%' }}>
+                    <div style={{
+                      display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,300px),1fr))', gap: 0,
+                      borderRadius: 20, overflow: 'hidden', boxShadow: 'var(--shadow-soft)', minHeight: 320,
+                    }}>
+                      {/* Photo */}
+                      <div style={{
+                        backgroundImage: `linear-gradient(135deg,rgba(15,22,32,0.45) 0%,rgba(15,22,32,0.15) 100%), url(${s.img})`,
+                        backgroundSize: 'cover', backgroundPosition: 'center',
+                        position: 'relative', minHeight: 380,
+                      }}>
+                        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right,transparent 60%,rgba(255,255,255,1) 100%)' }} />
+                        <div style={{ position: 'absolute', bottom: 32, left: 32 }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#fff', opacity: 0.8, marginBottom: 8 }}>{s.subtitle}</div>
+                          <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.6rem,2.5vw,2.2rem)', fontWeight: 600, color: '#fff', lineHeight: 1.2, maxWidth: '12ch' }}>{s.title}</div>
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div style={{ background: '#fff', padding: 'clamp(28px,4vw,48px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                        <div style={{ width: 40, height: 3, background: s.accent, borderRadius: 2, marginBottom: 20 }} />
+                        <p style={{ fontSize: 15, color: 'var(--fg-2)', lineHeight: 1.75, marginBottom: 24, margin: '0 0 24px' }}>{s.desc}</p>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                          {s.bullets.map(b => (
+                            <li key={b} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 13.5, color: 'var(--fg-1)', lineHeight: 1.5 }}>
+                              <span style={{ color: s.accent, fontWeight: 700, flexShrink: 0 }}>✓</span>{b}
+                            </li>
+                          ))}
+                        </ul>
+                        <div>
+                          <Link href={s.href}>
+                            <button style={{
+                              background: s.accent, color: s.accent === '#D4A857' ? 'var(--navy-deep)' : '#fff',
+                              border: 'none', borderRadius: 10, padding: '12px 24px',
+                              fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit',
+                              boxShadow: `0 6px 20px ${s.accent}44`,
+                            }}>{s.cta} →</button>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 20 }}>
+              {SERVICOS.map((_, i) => (
+                <button key={i} onClick={() => setServiceIdx(i)} style={{
+                  width: i === serviceIdx ? 24 : 8, height: 8, borderRadius: 999,
+                  background: i === serviceIdx ? 'var(--gold)' : 'var(--border)',
+                  border: 'none', cursor: 'pointer', padding: 0,
+                  transition: 'width 0.3s, background 0.3s',
                 }} />
-                <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ width: 36, height: 3, background: card.accent, borderRadius: 2, marginBottom: 14 }} />
-                  <h3 style={{ fontSize: 18, marginBottom: 4 }}>{card.title}</h3>
-                  <div style={{ fontSize: 12.5, fontWeight: 600, color: card.accent, marginBottom: 10, letterSpacing: '0.03em' }}>{card.subtitle}</div>
-                  <p style={{ fontSize: 13.5, color: 'var(--fg-2)', lineHeight: 1.65, marginBottom: 14 }}>{card.desc}</p>
-                  <ul style={{ padding: 0, margin: '0 0 20px', listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {card.bullets.map(b => (
-                      <li key={b} style={{ fontSize: 13, color: 'var(--fg-2)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ width: 16, height: 16, borderRadius: '50%', background: card.accent + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <span style={{ width: 5, height: 5, borderRadius: '50%', background: card.accent, display: 'block' }} />
-                        </span>
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                  <div style={{ marginTop: 'auto' }}>
-                    <Link href={card.href}>
-                      <Btn variant="primary" style={{ background: card.accent, color: card.accent === '#D4A857' ? 'var(--navy)' : '#fff' }}>
-                        {card.cta} →
-                      </Btn>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Plans section ───────────────────────────────────── */}
-      <section style={{ background: '#fff', padding: 'clamp(60px,8vw,100px) 0' }}>
-        <div style={{ width: 'min(1200px,92vw)', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <div style={{
-              fontFamily: 'var(--font-body)', fontSize: '0.7rem', fontWeight: 700,
-              letterSpacing: '0.22em', textTransform: 'uppercase',
-              color: 'var(--gold-deep)', marginBottom: 12,
-            }}>
-              Para proprietários
+              ))}
             </div>
-            <h2>Escolha como quer vender</h2>
-          </div>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: 24,
-            alignItems: 'start',
-          }}>
-            {PLANS.map(plan => (
-              <div key={plan.name} style={{
-                borderRadius: 20,
-                padding: '32px 28px',
-                border: plan.featured ? '2px solid var(--gold)' : '1px solid var(--border)',
-                background: plan.featured ? 'linear-gradient(160deg, #fffdf7 0%, #fff 100%)' : '#fff',
-                position: 'relative',
-                boxShadow: plan.featured ? 'var(--shadow-accent)' : 'none',
-              }}>
-                {plan.featured && (
-                  <div style={{
-                    position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)',
-                    background: 'linear-gradient(135deg,#D4A857 0%,#B8862E 100%)',
-                    color: 'var(--navy)', fontSize: 11, fontWeight: 700,
-                    padding: '4px 16px', borderRadius: 999, letterSpacing: '0.08em',
-                    whiteSpace: 'nowrap',
-                  }}>
-                    MAIS POPULAR
-                  </div>
-                )}
-                <h3 style={{ fontSize: 20, marginBottom: 8 }}>{plan.name}</h3>
-                <div style={{ marginBottom: 12 }}>
-                  <span style={{
-                    fontSize: 36, fontWeight: 800,
-                    background: 'var(--gradient-gold)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent',
-                  }}>{plan.price}</span>
-                  <span style={{ fontSize: 13, color: 'var(--fg-3)', marginLeft: 6 }}>{plan.priceNote}</span>
-                </div>
-                <p style={{ fontSize: 13.5, color: 'var(--fg-2)', lineHeight: 1.65, marginBottom: 20 }}>{plan.desc}</p>
-                <ul style={{ padding: 0, margin: '0 0 24px', listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {plan.features.map(f => (
-                    <li key={f} style={{ fontSize: 13.5, color: 'var(--fg-1)', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                      <span style={{ color: 'var(--gold)', fontWeight: 700, flexShrink: 0 }}>✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href={plan.href}>
-                  <Btn variant={plan.featured ? 'accent' : 'ghost'} fullWidth>
-                    {plan.cta}
-                  </Btn>
-                </Link>
-              </div>
-            ))}
           </div>
         </div>
       </section>
 
-      {/* ── Bottom CTA ──────────────────────────────────────── */}
-      <section style={{
-        padding: 'clamp(60px,8vw,100px) 0',
-        background: 'linear-gradient(135deg, #0F1824 0%, #1B2733 50%, #243341 100%)',
-        textAlign: 'center',
-      }}>
-        <div style={{ width: 'min(700px,92vw)', margin: '0 auto' }}>
-          <div style={{
-            fontFamily: 'var(--font-body)', fontSize: '0.7rem', fontWeight: 700,
-            letterSpacing: '0.22em', textTransform: 'uppercase',
-            color: 'var(--gold)', marginBottom: 16,
-          }}>
-            VN Prime Imóveis
+      {/* ── Planos (carousel) ── */}
+      <section id="home-planos" style={{ padding: 'clamp(3rem,6vw,5rem) 0', background: 'var(--cream)' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto 40px' }}>
+            <Eyebrow color="var(--gold)">Para quem vende</Eyebrow>
+            <h2 style={{ margin: '0 0 12px' }}>Nossos <em className="italic-accent">planos</em></h2>
+            <p style={{ color: 'var(--fg-2)', margin: 0 }}>
+              Você escolhe o nível de envolvimento da plataforma. Sem custo de entrada — só paga se vender.
+            </p>
           </div>
-          <h2 style={{ color: '#fff', margin: '0 0 16px' }}>Pronto para dar o próximo passo?</h2>
-          <p style={{ color: 'rgba(245,248,250,0.80)', fontSize: 16, marginBottom: 36, lineHeight: 1.7 }}>
-            Cadastre-se gratuitamente e acesse o portal do proprietário ou do corretor.
-          </p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/anunciar"><Btn variant="accent" size="lg">Anunciar meu imóvel</Btn></Link>
-            <Link href="/busca"><Btn variant="ghost-light" size="lg">Buscar imóveis</Btn></Link>
+
+          <div style={{ position: 'relative' }}>
+            {planoIdx > 0 && <ArrowBtn dir="left" onClick={() => setPlanoIdx(i => i - 1)} />}
+            {planoIdx < PLANOS.length - 1 && <ArrowBtn dir="right" onClick={() => setPlanoIdx(i => i + 1)} />}
+
+            <div style={{ overflow: 'hidden', borderRadius: 22 }}>
+              <div style={{ display: 'flex', transform: `translateX(-${planoIdx * 100}%)`, transition: 'transform 0.45s cubic-bezier(0.4,0,0.2,1)' }}>
+                {PLANOS.map(p => (
+                  <div key={p.name} style={{ minWidth: '100%' }}>
+                    <div style={{
+                      position: 'relative', borderRadius: 22, overflow: 'hidden',
+                      minHeight: 440, display: 'flex', alignItems: 'center',
+                      backgroundImage: `linear-gradient(110deg,rgba(15,22,32,0.92) 0%,rgba(15,22,32,0.65) 45%,rgba(15,22,32,0.40) 100%), url(${p.img})`,
+                      backgroundSize: 'cover', backgroundPosition: 'center',
+                    }}>
+                      <div style={{
+                        position: 'relative', zIndex: 1, padding: 'clamp(36px,5vw,64px)',
+                        display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,300px),1fr))',
+                        gap: 'clamp(24px,4vw,48px)', alignItems: 'center', width: '100%',
+                      }}>
+                        <div>
+                          <div style={{ display: 'inline-block', background: 'var(--gold)', color: 'var(--navy-deep)', borderRadius: 999, padding: '4px 14px', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 20 }}>{p.tag}</div>
+                          <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem,2.5vw,2rem)', fontWeight: 600, color: '#fff', marginBottom: 8 }}>Plano {p.name}</div>
+                          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 16 }}>
+                            <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.5rem,5vw,4rem)', fontWeight: 700, color: 'var(--gold-soft)', lineHeight: 1 }}>{p.price}</div>
+                          </div>
+                          <div style={{ fontSize: 13, color: 'rgba(245,248,250,0.7)', marginBottom: 24 }}>{p.priceLabel}</div>
+                          <p style={{ fontSize: 15, color: 'rgba(245,248,250,0.88)', lineHeight: 1.75, margin: '0 0 28px' }}>{p.desc}</p>
+                          <Link href="/proprietario">
+                            <button style={{ background: 'var(--gold)', color: 'var(--navy-deep)', border: 'none', borderRadius: 10, padding: '14px 28px', fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: 'inherit' }}>{p.cta} →</button>
+                          </Link>
+                          <div style={{ marginTop: 14, fontSize: 12, color: 'rgba(245,248,250,0.5)', letterSpacing: '0.01em' }}>
+                            Faça o upgrade quando quiser — sem burocracia.
+                          </div>
+                        </div>
+
+                        <div style={{ background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 16, padding: '28px' }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold-soft)', marginBottom: 18 }}>O que está incluso</div>
+                          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+                            {p.bullets.map(b => (
+                              <li key={b} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', fontSize: 14, color: 'rgba(245,248,250,0.92)', lineHeight: 1.5 }}>
+                                <span style={{ color: 'var(--gold)', fontWeight: 700, flexShrink: 0, marginTop: 1 }}>✓</span>{b}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 20 }}>
+              {PLANOS.map((_, i) => (
+                <button key={i} onClick={() => setPlanoIdx(i)} style={{
+                  width: i === planoIdx ? 28 : 8, height: 8, borderRadius: 999,
+                  background: i === planoIdx ? 'var(--gold)' : 'var(--border)',
+                  border: 'none', cursor: 'pointer', padding: 0,
+                  transition: 'width 0.3s, background 0.3s',
+                }} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Bottom CTA ── */}
+      <section style={{ padding: 'clamp(3rem,6vw,5rem) 0', background: 'var(--white)' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+          <div style={{
+            background: 'var(--gradient-navy-hero)', borderRadius: 24,
+            padding: 'clamp(48px,6vw,72px)', textAlign: 'center',
+          }}>
+            <Eyebrow color="var(--gold)">VN Prime Imóveis</Eyebrow>
+            <h2 style={{ color: '#fff', margin: '16px 0 16px', fontSize: 'clamp(1.6rem,3vw,2.4rem)' }}>Pronto para dar o próximo passo?</h2>
+            <p style={{ color: 'rgba(245,248,250,0.80)', fontSize: 16, marginBottom: 36, lineHeight: 1.7, maxWidth: 520, margin: '0 auto 36px' }}>
+              Cadastre-se gratuitamente e acesse o portal do proprietário ou do corretor.
+            </p>
+            <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Link href="/anunciar"><Btn variant="accent" size="lg">Anunciar meu imóvel</Btn></Link>
+              <Link href="/busca"><Btn variant="ghost-light" size="lg">Buscar imóveis</Btn></Link>
+            </div>
           </div>
         </div>
       </section>

@@ -1,39 +1,140 @@
+'use client'
 import Link from 'next/link'
+import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+
+function BrandLockup() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <svg width={32} height={32 * 1.13} viewBox="0 0 44 50" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="goldShieldFt" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#F2DDA9"/>
+            <stop offset="45%" stopColor="#D4A857"/>
+            <stop offset="62%" stopColor="#B8862E"/>
+            <stop offset="100%" stopColor="#D4A857"/>
+          </linearGradient>
+        </defs>
+        <path d="M22 1 L42 6 V24 C42 36 33 45 22 49 C11 45 2 36 2 24 V6 Z"
+          stroke="url(#goldShieldFt)" strokeWidth="2.2" fill="rgba(212,168,87,0.05)"/>
+        <text x="22" y="32" textAnchor="middle"
+          fontFamily="Cinzel, serif" fontSize="18" fontWeight="700"
+          fill="url(#goldShieldFt)" letterSpacing="0.03em">VN</text>
+      </svg>
+      <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+        <span style={{ fontFamily: "'Cinzel', serif", fontSize: 17, fontWeight: 700, letterSpacing: '0.16em', color: '#F5F8FA' }}>VN PRIME</span>
+        <span style={{
+          fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 8.5, letterSpacing: '0.42em',
+          background: 'linear-gradient(90deg,#B8862E,#D4A857,#B8862E)',
+          WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', marginTop: 4,
+        }}>IMÓVEIS</span>
+      </div>
+    </div>
+  )
+}
+
+function FootCol({ title, links }: { title: string; links: { label: string; href: string }[] }) {
+  return (
+    <div>
+      <div style={{ fontFamily: 'var(--font-body)', fontSize: 10.5, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold-soft)', marginBottom: 18 }}>{title}</div>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {links.map(l => (
+          <li key={l.href}>
+            <Link href={l.href} style={{ fontFamily: 'var(--font-body)', fontSize: 13.5, color: 'rgba(245,248,250,0.7)', textDecoration: 'none', fontWeight: 300 }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(245,248,250,0.7)')}
+            >{l.label}</Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 export default function SiteFooter() {
+  const [email, setEmail] = useState('')
+  const [saved, setSaved] = useState(false)
+
+  const saveNewsletter = async () => {
+    if (!email.includes('@')) return
+    const supabase = createClient()
+    await supabase.from('leads').insert({ tipo: 'newsletter', contato: email, mensagem: 'Newsletter signup' })
+    setSaved(true)
+  }
+
   return (
-    <footer style={{ background: 'var(--navy-deep)', color: 'rgba(255,255,255,0.7)', paddingTop: 56, paddingBottom: 32 }}>
-      <div style={{ width: 'min(1200px,92vw)', margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: 40, marginBottom: 48 }}>
+    <footer style={{ background: 'var(--navy)', color: 'rgba(245,248,250,0.72)', padding: '64px 0 32px', marginTop: 60 }}>
+      <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+
+        {/* Newsletter strip */}
+        <div style={{
+          background: 'rgba(212,168,87,0.10)', border: '1px solid rgba(212,168,87,0.22)',
+          borderRadius: 16, padding: '28px 36px', marginBottom: 48,
+          display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 20,
+        }}>
           <div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 8 }}>VN Prime Imóveis</div>
-            <p style={{ fontSize: 13.5, lineHeight: 1.7, color: 'rgba(255,255,255,0.55)' }}>
-              Imóveis de alto padrão em Belo Horizonte e região. Tecnologia, curadoria e transparência em cada transação.
+            <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold-soft)', marginBottom: 8 }}>
+              Fique por dentro
+            </div>
+            <p style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#fff', lineHeight: 1.4 }}>
+              Receba novos imóveis e lançamentos em primeira mão.
+            </p>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgba(245,248,250,0.62)' }}>
+              Sem precisar criar uma conta — só nome e e-mail.
             </p>
           </div>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 16 }}>Comprar</div>
-            {[['Buscar imóveis','/busca'],['Lançamentos','/lancamentos'],['Calculadora ITBI','/calculadora'],['Due Diligence','/due-diligence']].map(([l,h]) => (
-              <Link key={h} href={h} style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.6)', marginBottom: 10, textDecoration: 'none' }}>{l}</Link>
-            ))}
-          </div>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 16 }}>Vender</div>
-            {[['Anunciar imóvel','/anunciar'],['Portal Proprietário','/proprietario'],['Avaliação','/avaliacao'],['Consórcio','/consorcio']].map(([l,h]) => (
-              <Link key={h} href={h} style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.6)', marginBottom: 10, textDecoration: 'none' }}>{l}</Link>
-            ))}
-          </div>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 16 }}>Contato</div>
-            <a href="https://wa.me/5531984144250" style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.6)', marginBottom: 10, textDecoration: 'none' }}>(31) 98414-4250</a>
-            <a href="mailto:contato@vnprimeimoveis.com" style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.6)', marginBottom: 10, textDecoration: 'none' }}>contato@vnprimeimoveis.com</a>
-            <Link href="/sobre" style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.6)', marginBottom: 10, textDecoration: 'none' }}>Sobre nós</Link>
-            <Link href="/admin" style={{ display: 'block', fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 24, textDecoration: 'none' }}>Admin</Link>
-          </div>
+          {saved ? (
+            <div style={{ color: '#6EE7B7', fontWeight: 600, fontSize: 14 }}>✓ Inscrito com sucesso!</div>
+          ) : (
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <input type="email" placeholder="seu@email.com" value={email} onChange={e => setEmail(e.target.value)}
+                style={{ padding: '10px 16px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: 14, fontFamily: 'inherit', outline: 'none', width: 200 }} />
+              <button onClick={saveNewsletter} style={{
+                padding: '10px 22px', borderRadius: 10, border: 'none',
+                background: 'var(--gradient-gold)', color: 'var(--navy)',
+                fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 14, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+              }}>Quero receber novidades</button>
+            </div>
+          )}
         </div>
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>© {new Date().getFullYear()} VN Prime Imóveis. Todos os direitos reservados.</div>
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>CRECI-MG · BH e Região Metropolitana</div>
+
+        {/* Grid */}
+        <div style={{ display: 'grid', gap: 40, gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', marginBottom: 40 }}>
+          <div>
+            <BrandLockup />
+            <p style={{ fontSize: 13.5, lineHeight: 1.7, marginTop: 18, color: 'rgba(245,248,250,0.62)', fontWeight: 300, maxWidth: 280 }}>
+              Curadoria de imóveis premium em Belo Horizonte, Nova Lima e região metropolitana.
+            </p>
+          </div>
+          <FootCol title="Comprar" links={[
+            { label: 'Apartamentos', href: '/busca?tipo=apartamento' },
+            { label: 'Casas', href: '/busca?tipo=casa' },
+            { label: 'Coberturas', href: '/busca?tipo=cobertura' },
+            { label: 'Lançamentos', href: '/lancamentos' },
+            { label: 'Por bairro', href: '/busca' },
+          ]} />
+          <FootCol title="Anuncie" links={[
+            { label: 'Anunciar imóvel', href: '/anunciar' },
+            { label: 'Modalidades', href: '/vender' },
+            { label: 'Para corretores', href: '/corretor' },
+            { label: 'Consórcio', href: '/consorcio' },
+          ]} />
+          <FootCol title="Empresa" links={[
+            { label: 'Sobre', href: '/sobre' },
+            { label: 'Due Diligence', href: '/due-diligence' },
+            { label: 'Avaliação', href: '/avaliacao' },
+            { label: 'Calculadora ITBI', href: '/calculadora' },
+          ]} />
+        </div>
+
+        <div style={{ borderTop: '1px solid rgba(245,248,250,0.10)', paddingTop: 22, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12, fontSize: 12 }}>
+          <span>© {new Date().getFullYear()} VN Prime Imóveis · CRECI-MG 12.345-J</span>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+            <span style={{ fontStyle: 'italic', color: 'var(--gold-soft)', fontSize: 14, letterSpacing: '0.04em' }}>
+              Curadoria silenciosa
+            </span>
+            <Link href="/admin" style={{ fontSize: 11, color: 'rgba(245,248,250,0.20)', textDecoration: 'none', letterSpacing: '0.1em' }}>admin</Link>
+          </div>
         </div>
       </div>
     </footer>
