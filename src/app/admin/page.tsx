@@ -1,0 +1,370 @@
+'use client'
+import { useState, useEffect, useCallback } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import Btn from '@/components/ui/Btn'
+import Link from 'next/link'
+
+const fmt = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
+const fmtDate = (s: string) => new Date(s).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })
+
+type Tab = 'dashboard' | 'imoveis' | 'leads' | 'usuarios'
+
+const STATUS_COLORS: Record<string, string> = {
+  pendente: '#D97706', ativo: '#059669', pausado: '#6B7280', vendido: '#7C3AED', rascunho: '#94A3B8',
+}
+
+export default function AdminPage() {
+  const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [tab, setTab] = useState<Tab>('dashboard')
+
+  const [stats, setStats] = useState({ imoveis: 0, pendentes: 0, leads: 0, usuarios: 0 })
+  const [imoveis, setImoveis] = useState<any[]>([])
+  const [leads, setLeads] = useState<any[]>([])
+  const [usuarios, setUsuarios] = useState<any[]>([])
+
+  const supabase = createClient()
+
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) { window.location.href = '/login?redirect=/admin'; return }
+      setUser(data.user)
+      const { data: p } = await supabase.from('profiles').select('*').eq('id', data.user.id).single()
+      if (!p || p.tipo !== 'admin') { window.location.href = '/'; return }
+      setProfile(p)
+      setLoading(false)
+    })
+  }, [])
+
+  const loadAll = useCallback(async () => {
+    const [imRes, ldRes, usRes] = await Promise.all([
+      supabase.from('imoveis').select('*, profiles(nome, email)').order('criado_em', { ascending: false }),
+      supabase.from('leads').select('*').order('criado_em', { ascending: false }),
+      supabase.from('profiles').select('*').order('criado_em', { ascending: false }),
+    ])
+    const imData = imRes.data || []
+    const ldData = ldRes.data || []
+    const usData = usRes.data || []
+    setImoveis(imData)
+    setLeads(ldData)
+    setUsuarios(usData)
+    setStats({
+      imoveis: imData.length,
+      pendentes: imData.filter((i: any) => i.status === 'pendente').length,
+      leads: ldData.length,
+      usuarios: usData.length,
+    })
+  }, [])
+
+  useEffect(() => { if (!loading) loadAll() }, [loading, loadAll])
+
+  async function setImovelStatus(id: string, status: string) {
+    await supabase.from('imoveis').update({ status }).eq('id', id)
+    setImoveis(prev => prev.map(i => i.id === id ? { ...i, status } : i))
+    setStats(s => ({
+      ...s,
+      pendentes: imoveis.filter(i => (i.id === id ? status : i.status) === 'pendente').length,
+    }))
+  }
+
+  async function deleteImovel(id: string) {
+    if (!confirm('Excluir este imóvel?')) return
+    await supabase.from('imoveis').delete().eq('id', id)
+    setImoveis(prev => prev.filter(i => i.id !== id))
+  }
+
+  async function setUserTipo(id: string, tipo: string) {
+    await supabase.from('profiles').update({ tipo }).eq('id', id)
+    setUsuarios(prev => prev.map(u => u.id === id ? { ...u, tipo } : u))
+  }
+
+  if (loading) {
+    return (
+      <main style={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontSize: 15, color: '#64748B' }}>Verificando acesso...</div>
+      </main>
+    )
+  }
+
+  const TABS: { key: Tab; label: string; badge?: number }[] = [
+    { key: 'dashboard', label: 'Dashboard' },
+    { key: 'imoveis', label: 'Imóveis', badge: stats.pendentes || undefined },
+    { key: 'leads', label: 'Leads', badge: stats.leads || undefined },
+    { key: 'usuarios', label: 'Usuários' },
+  ]
+
+  return (
+    <main style={{ background: '#F1F5F9', minHeight: '100vh' }}>
+      {/* Top bar */}
+      <div style={{ background: 'var(--navy)', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <div style={{ width: 'min(1300px,96vw)', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', letterSpacing: '0.04em' }}>
+            VN Prime — Painel Admin
+          </div>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>{profile?.nome || user?.email}</span>
+            <Link href="/" style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>← Site</Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div style={{ background: '#fff', borderBottom: '1px solid #E2E8F0' }}>
+        <div style={{ width: 'min(1300px,96vw)', margin: '0 auto', display: 'flex', gap: 0 }}>
+          {TABS.map(t => (
+            <button key={t.key} onClick={() => setTab(t.key)}
+              style={{
+                padding: '14px 20px', border: 'none', background: 'none',
+                fontSize: 13.5, fontWeight: tab === t.key ? 700 : 500,
+                color: tab === t.key ? 'var(--navy)' : '#64748B',
+                borderBottom: tab === t.key ? '2px solid var(--gold)' : '2px solid transparent',
+                cursor: 'pointer', fontFamily: 'inherit',
+                display: 'flex', alignItems: 'center', gap: 8,
+                transition: 'color 0.15s',
+              }}>
+              {t.label}
+              {t.badge ? (
+                <span style={{ background: '#DC2626', color: '#fff', fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 99 }}>{t.badge}</span>
+              ) : null}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ width: 'min(1300px,96vw)', margin: '0 auto', padding: '28px 0 60px' }}>
+
+        {/* DASHBOARD */}
+        {tab === 'dashboard' && (
+          <div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 16, marginBottom: 32 }}>
+              {[
+                { label: 'Imóveis cadastrados', value: stats.imoveis, accent: 'var(--navy)' },
+                { label: 'Imóveis pendentes', value: stats.pendentes, accent: '#D97706' },
+                { label: 'Leads recebidos', value: stats.leads, accent: '#059669' },
+                { label: 'Usuários', value: stats.usuarios, accent: '#7C3AED' },
+              ].map(s => (
+                <div key={s.label} style={{ background: '#fff', borderRadius: 14, padding: '20px 22px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: s.accent, letterSpacing: '-0.03em' }}>{s.value}</div>
+                  <div style={{ fontSize: 12, color: '#64748B', marginTop: 4 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Imóveis pendentes */}
+            {stats.pendentes > 0 && (
+              <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 14, padding: '20px 24px', marginBottom: 24 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#92400E', marginBottom: 12 }}>
+                  {stats.pendentes} imóvel(is) aguardando aprovação
+                </div>
+                {imoveis.filter(i => i.status === 'pendente').map(im => (
+                  <div key={im.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderTop: '1px solid #FED7AA', flexWrap: 'wrap', gap: 12 }}>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--navy)' }}>{im.titulo}</div>
+                      <div style={{ fontSize: 12, color: '#64748B' }}>{im.bairro}, {im.cidade} · {im.preco ? fmt(im.preco) : '—'} · por {im.profiles?.nome || im.profiles?.email || '—'}</div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <Btn variant="primary" size="sm" onClick={() => setImovelStatus(im.id, 'ativo')}>Aprovar</Btn>
+                      <Btn variant="danger" size="sm" onClick={() => setImovelStatus(im.id, 'rascunho')}>Rejeitar</Btn>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Últimos leads */}
+            <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', overflow: 'hidden' }}>
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>Últimos leads</div>
+                <button onClick={() => setTab('leads')} style={{ fontSize: 12, color: 'var(--gold-deep)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit' }}>Ver todos →</button>
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: '#F8FAFC' }}>
+                      {['Nome', 'Contato', 'Origem', 'Data'].map(h => (
+                        <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leads.slice(0, 5).map(l => (
+                      <tr key={l.id} style={{ borderTop: '1px solid #F1F5F9' }}>
+                        <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 600, color: 'var(--navy)' }}>{l.nome}</td>
+                        <td style={{ padding: '12px 16px', fontSize: 12, color: '#64748B' }}>
+                          <div>{l.email}</div>
+                          <div>{l.telefone}</div>
+                        </td>
+                        <td style={{ padding: '12px 16px', fontSize: 12, color: '#64748B' }}>{l.origem || '—'}</td>
+                        <td style={{ padding: '12px 16px', fontSize: 12, color: '#64748B', whiteSpace: 'nowrap' }}>{fmtDate(l.criado_em)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* IMÓVEIS */}
+        {tab === 'imoveis' && (
+          <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', overflow: 'hidden' }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{imoveis.length} imóveis cadastrados</div>
+            </div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
+                <thead>
+                  <tr style={{ background: '#F8FAFC' }}>
+                    {['Imóvel', 'Proprietário', 'Preço', 'Status', 'Data', 'Ações'].map(h => (
+                      <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {imoveis.map(im => (
+                    <tr key={im.id} style={{ borderTop: '1px solid #F1F5F9' }}>
+                      <td style={{ padding: '12px 14px' }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--navy)', maxWidth: 220 }}>{im.titulo}</div>
+                        <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>{im.bairro}, {im.cidade} · {im.tipo}</div>
+                      </td>
+                      <td style={{ padding: '12px 14px', fontSize: 12, color: '#64748B' }}>
+                        <div>{im.profiles?.nome || '—'}</div>
+                        <div style={{ fontSize: 11 }}>{im.profiles?.email}</div>
+                      </td>
+                      <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600, color: 'var(--navy)', whiteSpace: 'nowrap' }}>
+                        {im.preco ? fmt(im.preco) : '—'}
+                      </td>
+                      <td style={{ padding: '12px 14px' }}>
+                        <span style={{
+                          padding: '3px 10px', borderRadius: 99, fontSize: 11, fontWeight: 700,
+                          background: `${STATUS_COLORS[im.status]}18`, color: STATUS_COLORS[im.status],
+                        }}>{im.status}</span>
+                      </td>
+                      <td style={{ padding: '12px 14px', fontSize: 11, color: '#64748B', whiteSpace: 'nowrap' }}>{fmtDate(im.criado_em)}</td>
+                      <td style={{ padding: '12px 14px' }}>
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                          {im.status === 'pendente' && (
+                            <button onClick={() => setImovelStatus(im.id, 'ativo')}
+                              style={{ padding: '4px 10px', borderRadius: 6, background: '#059669', color: '#fff', border: 'none', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                              Aprovar
+                            </button>
+                          )}
+                          {im.status === 'ativo' && (
+                            <button onClick={() => setImovelStatus(im.id, 'pausado')}
+                              style={{ padding: '4px 10px', borderRadius: 6, background: '#6B7280', color: '#fff', border: 'none', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                              Pausar
+                            </button>
+                          )}
+                          {im.status === 'pausado' && (
+                            <button onClick={() => setImovelStatus(im.id, 'ativo')}
+                              style={{ padding: '4px 10px', borderRadius: 6, background: '#059669', color: '#fff', border: 'none', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                              Reativar
+                            </button>
+                          )}
+                          <Link href={`/imovel/${im.id}`} target="_blank"
+                            style={{ padding: '4px 10px', borderRadius: 6, background: '#F1F5F9', color: 'var(--navy)', border: 'none', fontSize: 11, fontWeight: 600, textDecoration: 'none' }}>
+                            Ver
+                          </Link>
+                          <button onClick={() => deleteImovel(im.id)}
+                            style={{ padding: '4px 10px', borderRadius: 6, background: '#FEF2F2', color: '#DC2626', border: 'none', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                            Excluir
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* LEADS */}
+        {tab === 'leads' && (
+          <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', overflow: 'hidden' }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{leads.length} leads recebidos</div>
+            </div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
+                <thead>
+                  <tr style={{ background: '#F8FAFC' }}>
+                    {['Nome', 'E-mail', 'Telefone', 'Mensagem', 'Origem', 'Data'].map(h => (
+                      <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {leads.map(l => (
+                    <tr key={l.id} style={{ borderTop: '1px solid #F1F5F9' }}>
+                      <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600, color: 'var(--navy)', whiteSpace: 'nowrap' }}>{l.nome}</td>
+                      <td style={{ padding: '12px 14px', fontSize: 12, color: '#64748B' }}>
+                        <a href={`mailto:${l.email}`} style={{ color: 'var(--gold-deep)', textDecoration: 'none' }}>{l.email}</a>
+                      </td>
+                      <td style={{ padding: '12px 14px', fontSize: 12, color: '#64748B', whiteSpace: 'nowrap' }}>
+                        {l.telefone ? <a href={`https://wa.me/55${l.telefone.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', textDecoration: 'none', fontWeight: 600 }}>{l.telefone}</a> : '—'}
+                      </td>
+                      <td style={{ padding: '12px 14px', fontSize: 12, color: '#64748B', maxWidth: 260 }}>
+                        <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.mensagem || '—'}</div>
+                      </td>
+                      <td style={{ padding: '12px 14px', fontSize: 11, color: '#64748B' }}>{l.origem || '—'}</td>
+                      <td style={{ padding: '12px 14px', fontSize: 11, color: '#64748B', whiteSpace: 'nowrap' }}>{fmtDate(l.criado_em)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* USUÁRIOS */}
+        {tab === 'usuarios' && (
+          <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', overflow: 'hidden' }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{usuarios.length} usuários cadastrados</div>
+            </div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+                <thead>
+                  <tr style={{ background: '#F8FAFC' }}>
+                    {['Nome', 'E-mail', 'Tipo', 'CRECI', 'Cadastro', 'Ações'].map(h => (
+                      <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {usuarios.map(u => (
+                    <tr key={u.id} style={{ borderTop: '1px solid #F1F5F9' }}>
+                      <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600, color: 'var(--navy)' }}>{u.nome || '—'}</td>
+                      <td style={{ padding: '12px 14px', fontSize: 12, color: '#64748B' }}>{u.email}</td>
+                      <td style={{ padding: '12px 14px' }}>
+                        <span style={{
+                          padding: '3px 10px', borderRadius: 99, fontSize: 11, fontWeight: 700,
+                          background: u.tipo === 'admin' ? '#1B273318' : u.tipo === 'corretor' ? '#05966918' : '#D4A85718',
+                          color: u.tipo === 'admin' ? 'var(--navy)' : u.tipo === 'corretor' ? '#059669' : '#92400E',
+                        }}>{u.tipo}</span>
+                      </td>
+                      <td style={{ padding: '12px 14px', fontSize: 12, color: '#64748B' }}>{u.creci || '—'}</td>
+                      <td style={{ padding: '12px 14px', fontSize: 11, color: '#64748B', whiteSpace: 'nowrap' }}>{fmtDate(u.criado_em)}</td>
+                      <td style={{ padding: '12px 14px' }}>
+                        {u.id !== user?.id && (
+                          <select value={u.tipo} onChange={e => setUserTipo(u.id, e.target.value)}
+                            style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid #E2E8F0', fontSize: 12, fontFamily: 'inherit', cursor: 'pointer', background: '#fff', color: 'var(--navy)' }}>
+                            {['proprietario', 'corretor', 'incorporadora', 'admin'].map(t => (
+                              <option key={t} value={t}>{t}</option>
+                            ))}
+                          </select>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+    </main>
+  )
+}
