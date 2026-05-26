@@ -6,6 +6,26 @@ import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 import Btn from '@/components/ui/Btn'
 
+function ShieldMark({ size = 28 }: { size?: number }) {
+  return (
+    <svg width={size} height={size * 1.13} viewBox="0 0 44 50" fill="none">
+      <defs>
+        <linearGradient id="goldShield" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#F2DDA9"/>
+          <stop offset="45%" stopColor="#D4A857"/>
+          <stop offset="62%" stopColor="#B8862E"/>
+          <stop offset="100%" stopColor="#D4A857"/>
+        </linearGradient>
+      </defs>
+      <path d="M22 1 L42 6 V24 C42 36 33 45 22 49 C11 45 2 36 2 24 V6 Z"
+        stroke="url(#goldShield)" strokeWidth="2.2" fill="rgba(212,168,87,0.05)"/>
+      <text x="22" y="32" textAnchor="middle"
+        fontFamily="Cinzel, serif" fontSize="18" fontWeight="700"
+        fill="url(#goldShield)" letterSpacing="0.03em">VN</text>
+    </svg>
+  )
+}
+
 const NAV = [
   { label: 'Buscar',      href: '/busca' },
   { label: 'Lançamentos', href: '/lancamentos' },
@@ -58,9 +78,16 @@ export default function SiteHeader() {
 
           {/* Logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0 }}>
+            <ShieldMark size={28} />
             <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
-              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 21, fontWeight: 700, color: 'var(--navy)', letterSpacing: '0.02em' }}>VN Prime</span>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 8, fontWeight: 700, color: 'var(--gold-deep)', letterSpacing: '0.22em', textTransform: 'uppercase', marginTop: 1 }}>Imóveis</span>
+              <span style={{ fontFamily: "'Cinzel', serif", fontSize: 17, fontWeight: 700, color: 'var(--navy)', letterSpacing: '0.16em' }}>VN PRIME</span>
+              <span style={{
+                fontFamily: "'Cinzel', serif", fontSize: 8.5, fontWeight: 600,
+                letterSpacing: '0.42em',
+                background: 'linear-gradient(90deg,#B8862E,#D4A857,#B8862E)',
+                WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent',
+                marginTop: 2,
+              }}>IMÓVEIS</span>
             </div>
           </Link>
 
