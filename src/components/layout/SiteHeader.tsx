@@ -63,13 +63,29 @@ const NAV = [
 export default function SiteHeader() {
   const pathname = usePathname()
   const [user, setUser] = useState<User | null>(null)
+  const [profileTipo, setProfileTipo] = useState<string | null>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState<string | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
-    supabase.auth.getUser().then(({ data }) => setUser(data.user))
-    const { data: listener } = supabase.auth.onAuthStateChange((_, session) => setUser(session?.user ?? null))
+    supabase.auth.getUser().then(async ({ data }) => {
+      setUser(data.user)
+      if (data.user) {
+        const { data: p } = await supabase.from('profiles').select('tipo').eq('id', data.user.id).single()
+        setProfileTipo(p?.tipo ?? null)
+      }
+    })
+    const { data: listener } = supabase.auth.onAuthStateChange(async (_, session) => {
+      setUser(session?.user ?? null)
+      if (session?.user) {
+        const supabase2 = createClient()
+        const { data: p } = await supabase2.from('profiles').select('tipo').eq('id', session.user.id).single()
+        setProfileTipo(p?.tipo ?? null)
+      } else {
+        setProfileTipo(null)
+      }
+    })
     return () => listener.subscription.unsubscribe()
   }, [])
 
@@ -153,26 +169,26 @@ export default function SiteHeader() {
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }} className="desktop-nav">
             {user ? (
               <>
-                <Link href="/proprietario"
+                {profileTipo === 'admin' && (
+                  <Link href="/admin"
+                    style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--gold-deep)', cursor: 'pointer', fontWeight: 700, textDecoration: 'none', border: '1px solid var(--gold)', padding: '4px 10px', borderRadius: 6 }}>
+                    Admin
+                  </Link>
+                )}
+                <Link href={profileTipo === 'corretor' ? '/corretor' : '/proprietario'}
                   style={{ fontFamily: 'var(--font-body)', fontSize: 13.5, color: 'var(--navy)', cursor: 'pointer', letterSpacing: 0, fontWeight: 600, textDecoration: 'none' }}>
                   Meu portal
                 </Link>
                 <Btn variant="ghost" size="sm" onClick={handleSignOut}>Sair</Btn>
               </>
             ) : (
-              <>
-                <Link href="/login"
-                  style={{ fontFamily: 'var(--font-body)', fontSize: 13.5, color: 'var(--navy)', cursor: 'pointer', letterSpacing: 0, fontWeight: 600, textDecoration: 'none' }}>
-                  Entrar
-                </Link>
-                <Link href="/anunciar"><Btn variant="accent" size="sm">Anunciar grátis</Btn></Link>
-              </>
+              <Link href="/login"><Btn variant="accent" size="sm">Login</Btn></Link>
             )}
           </div>
 
           {/* Mobile: CTA + hamburger */}
           <div className="mobile-menu-btns" style={{ display: 'none', alignItems: 'center', gap: 10 }}>
-            <Link href="/vender"><Btn variant="accent" size="sm">Anunciar</Btn></Link>
+            <Link href="/login"><Btn variant="accent" size="sm">Login</Btn></Link>
             <button onClick={() => setMobileOpen(true)} aria-label="Menu" style={{
               background: 'none', border: 'none', cursor: 'pointer', padding: '6px 4px',
               display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5,
@@ -234,12 +250,15 @@ export default function SiteHeader() {
             </nav>
             <div style={{ padding: '14px 12px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {user ? (
-                <Btn variant="primary" fullWidth onClick={handleSignOut}>Sair</Btn>
-              ) : (
                 <>
-                  <Link href="/login" onClick={() => setMobileOpen(false)}><Btn variant="ghost" size="lg" fullWidth>Entrar</Btn></Link>
-                  <Link href="/anunciar" onClick={() => setMobileOpen(false)}><Btn variant="accent" size="lg" fullWidth>Anunciar grátis</Btn></Link>
+                  {profileTipo === 'admin' && (
+                    <Link href="/admin" onClick={() => setMobileOpen(false)}><Btn variant="ghost" size="lg" fullWidth>Painel Admin</Btn></Link>
+                  )}
+                  <Link href={profileTipo === 'corretor' ? '/corretor' : '/proprietario'} onClick={() => setMobileOpen(false)}><Btn variant="ghost" size="lg" fullWidth>Meu portal</Btn></Link>
+                  <Btn variant="primary" fullWidth onClick={handleSignOut}>Sair</Btn>
                 </>
+              ) : (
+                <Link href="/login" onClick={() => setMobileOpen(false)}><Btn variant="accent" size="lg" fullWidth>Login</Btn></Link>
               )}
             </div>
           </div>

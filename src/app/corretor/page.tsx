@@ -24,7 +24,7 @@ export default function CorretorPage() {
 
   async function loadData() {
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/login?redirect=/corretor'); return }
+    if (!user) { setLoading(false); return }
 
     const [{ data: prof }, { data: cor }, { data: imvs }, { data: lds }] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', user.id).single(),
@@ -46,6 +46,8 @@ export default function CorretorPage() {
       <div className="animate-spin" style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid var(--border)', borderTopColor: 'var(--gold)' }} />
     </div>
   )
+
+  if (!profile) return <CorretorLanding />
 
   return (
     <div style={{ background: 'var(--cream)', minHeight: '100vh' }}>
@@ -177,6 +179,186 @@ export default function CorretorPage() {
         )}
       </div>
     </div>
+  )
+}
+
+function CorretorLanding() {
+  const ACCENT = '#10B981'
+  const FEATURES = [
+    { icon: '🎯', title: 'Leads Qualificados', desc: 'Compradores verificados com perfil e orçamento compatível com seu portfólio. Sem spam, sem perda de tempo.' },
+    { icon: '📊', title: 'CRM Visual', desc: 'Pipeline kanban, histórico completo de contatos, agendamento de visitas e alertas automáticos por WhatsApp.' },
+    { icon: '🏠', title: 'Portfólio Exclusivo', desc: 'Acesso antecipado a imóveis premium em BH antes de irem ao mercado público — vantagem competitiva real.' },
+    { icon: '💳', title: 'Comissões Transparentes', desc: 'Extrato mensal detalhado, nota fiscal automatizada e pagamento em D+2 após o fechamento. Sem surpresas.' },
+  ]
+  const BENEFITS = [
+    {
+      tag: 'Leads',
+      img: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=900&q=80',
+      title: 'Leads qualificados direto no seu painel',
+      desc: 'Cada lead recebido já passou por um filtro de intenção real: perfil de comprador, faixa de preço e urgência confirmados antes de chegarem até você.',
+      points: [
+        'Ficha completa com orçamento, tipologia desejada e prazo de decisão',
+        'Alerta imediato via WhatsApp — você atende primeiro',
+        'Sem leads duplicados: cada lead vai para apenas 1 corretor',
+        'Histórico de interações centralizado no CRM',
+      ],
+      cta: 'Ver meu painel de leads',
+      reverse: false,
+    },
+    {
+      tag: 'CRM',
+      img: 'https://images.unsplash.com/photo-1531538606174-0f90ff5dce83?w=900&q=80',
+      title: 'CRM visual — do contato ao contrato',
+      desc: 'Pipeline kanban que acompanha cada cliente do primeiro contato até a assinatura, com alertas automáticos para não deixar nenhuma oportunidade esfriar.',
+      points: [
+        'Pipeline com 5 etapas personalizáveis',
+        'Agendamento de visitas integrado ao Google Calendar',
+        'Templates de mensagem WhatsApp prontos para cada fase',
+        'Relatório mensal de conversão e comissões previstas',
+      ],
+      cta: undefined,
+      reverse: true,
+    },
+    {
+      tag: 'Portfólio',
+      img: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=900&q=80',
+      title: 'Portfólio exclusivo antes do mercado',
+      desc: 'Imóveis VN Prime são liberados para corretores parceiros 72h antes de aparecerem em portais públicos. Você fecha antes que a concorrência saiba que existe.',
+      points: [
+        'Acesso antecipado a lançamentos e imóveis de alto padrão',
+        'Fotos profissionais e tour virtual prontos para apresentação',
+        'Código VN exclusivo para rastrear seus negócios',
+        'Suporte de curadoria: equipe VN Prime disponível para dúvidas técnicas',
+      ],
+      cta: undefined,
+      reverse: false,
+    },
+    {
+      tag: 'Comissão',
+      img: 'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=900&q=80',
+      title: 'Comissões claras, pagamento rápido',
+      desc: 'Sem surpresas, sem atrasos. Você acompanha cada etapa do pagamento em tempo real e recebe em até 2 dias úteis após o fechamento.',
+      points: [
+        '3% de comissão sobre o valor de venda — garantida em contrato',
+        'Extrato detalhado com status por negócio',
+        'Nota fiscal automática emitida pela VN Prime',
+        'Pagamento D+2 após escritura assinada',
+      ],
+      cta: 'Entrar no portal',
+      reverse: true,
+    },
+  ]
+
+  return (
+    <main style={{ background: 'var(--cream)' }}>
+      {/* Hero */}
+      <section style={{
+        position: 'relative',
+        background: `linear-gradient(160deg, rgba(15,22,32,0.72) 0%, rgba(15,22,32,0.88) 60%, rgba(15,22,32,0.96) 100%), url(https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1400&q=85)`,
+        backgroundSize: 'cover', backgroundPosition: 'center top',
+        color: '#fff', padding: 'clamp(90px,14vw,160px) 0 clamp(70px,10vw,110px)',
+      }}>
+        <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 70% 60% at 80% 40%, ${ACCENT}22 0%, transparent 70%)`, pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', zIndex: 1, width: 'min(1180px,92vw)', margin: '0 auto', maxWidth: 780 }}>
+          <Eyebrow>Portal do Corretor</Eyebrow>
+          <h1 style={{ color: '#fff', fontSize: 'clamp(2.2rem,4.5vw,3.6rem)', lineHeight: 1.06, margin: '14px 0 20px' }}>
+            Leads qualificados, CRM completo e portfólio{' '}
+            <em style={{ color: '#6EE7B7', fontStyle: 'italic' }}>premium</em>
+            {' '}— tudo em um só lugar.
+          </h1>
+          <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.86)', maxWidth: 600, marginBottom: 32, lineHeight: 1.6 }}>
+            Acesse imóveis exclusivos VN Prime, receba leads qualificados diretamente no seu painel e acompanhe comissões em tempo real.
+          </p>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 44 }}>
+            <Link href="/login?redirect=/corretor">
+              <Btn variant="accent" size="lg" style={{ background: ACCENT, boxShadow: `0 6px 24px ${ACCENT}44` }}>Entrar no portal</Btn>
+            </Link>
+            <Link href="/login?redirect=/corretor&tab=cadastrar&tipo=corretor">
+              <Btn variant="ghost" size="lg" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.35)' }}>Criar conta grátis</Btn>
+            </Link>
+          </div>
+          <div style={{ display: 'flex', gap: 40, flexWrap: 'wrap' }}>
+            {[['23','Leads/mês'],['82%','Taxa fechamento'],['30 dias','Grátis'],['48h','Ativação']].map(([v,l]) => (
+              <div key={l}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800, color: ACCENT, lineHeight: 1 }}>{v}</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 5 }}>{l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section style={{ padding: 'clamp(60px,8vw,100px) 0' }}>
+        <div style={{ width: 'min(1180px,92vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 52px' }}>
+            <Eyebrow color="var(--gold-deep)">O que você encontra</Eyebrow>
+            <h2 style={{ margin: '10px 0 12px' }}>Tudo que você precisa em um só lugar</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 15.5 }}>Ferramentas criadas especificamente para o mercado imobiliário premium de Belo Horizonte.</p>
+          </div>
+          <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))' }}>
+            {FEATURES.map(f => (
+              <div key={f.title} style={{ background: '#fff', padding: '28px 26px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: `${ACCENT}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 16 }}>{f.icon}</div>
+                <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', marginBottom: 8 }}>{f.title}</div>
+                <div style={{ fontSize: 14.5, color: 'var(--fg-2)', lineHeight: 1.6 }}>{f.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits alternating */}
+      {BENEFITS.map((b, idx) => (
+        <section key={b.title} style={{ padding: 'clamp(60px,8vw,96px) 0', background: idx % 2 === 0 ? '#fff' : 'var(--cream)', borderTop: '1px solid var(--border)' }}>
+          <div style={{ width: 'min(1180px,92vw)', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,380px),1fr))', gap: 'clamp(32px,5vw,72px)', alignItems: 'center', direction: b.reverse ? 'rtl' : 'ltr' }}>
+            <div style={{ direction: 'ltr', position: 'relative', borderRadius: 20, overflow: 'hidden', boxShadow: '0 20px 56px rgba(27,39,51,0.14)', aspectRatio: '4/3' }}>
+              <img src={b.img} alt={b.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,transparent 50%,rgba(15,22,32,0.60) 100%)' }} />
+              <div style={{ position: 'absolute', bottom: 20, left: 24, background: `${ACCENT}EE`, color: '#fff', borderRadius: 8, padding: '6px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{b.tag}</div>
+            </div>
+            <div style={{ direction: 'ltr' }}>
+              <div style={{ width: 40, height: 3, background: ACCENT, borderRadius: 2, marginBottom: 20 }} />
+              <h2 style={{ margin: '0 0 16px', fontSize: 'clamp(1.5rem,2.8vw,2.1rem)' }}>{b.title}</h2>
+              <p style={{ fontSize: 16, color: 'var(--fg-2)', lineHeight: 1.75, marginBottom: 24 }}>{b.desc}</p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {b.points.map(pt => (
+                  <li key={pt} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                    <span style={{ width: 20, height: 20, borderRadius: 99, background: `${ACCENT}22`, color: ACCENT, fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>✓</span>
+                    <span style={{ fontSize: 14.5, color: 'var(--fg-1)', lineHeight: 1.55 }}>{pt}</span>
+                  </li>
+                ))}
+              </ul>
+              {b.cta && (
+                <Link href="/login?redirect=/corretor">
+                  <Btn variant="accent" size="lg" style={{ background: ACCENT, boxShadow: `0 4px 18px ${ACCENT}44` }}>{b.cta}</Btn>
+                </Link>
+              )}
+            </div>
+          </div>
+        </section>
+      ))}
+
+      {/* CTA Banner */}
+      <section style={{ padding: 'clamp(60px,8vw,100px) 0', background: 'linear-gradient(135deg,#0F1824 0%,#1B2733 100%)' }}>
+        <div style={{ width: 'min(860px,92vw)', margin: '0 auto', textAlign: 'center', color: '#fff' }}>
+          <Eyebrow>Comece hoje</Eyebrow>
+          <h2 style={{ color: '#fff', fontSize: 'clamp(1.8rem,3.5vw,2.6rem)', margin: '14px 0 16px' }}>30 dias grátis. Cancele quando quiser.</h2>
+          <p style={{ color: 'rgba(245,248,250,0.78)', fontSize: 17, maxWidth: 480, margin: '0 auto 32px', lineHeight: 1.6 }}>
+            Faça login com sua conta VN Prime ou crie uma agora. Ativação em menos de 48h.
+          </p>
+          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link href="/login?redirect=/corretor">
+              <Btn variant="accent" size="lg" style={{ background: ACCENT, boxShadow: `0 6px 24px ${ACCENT}44` }}>Acessar meu portal</Btn>
+            </Link>
+            <button onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}
+              style={{ padding: '14px 28px', background: 'transparent', color: '#fff', border: '1.5px solid rgba(255,255,255,0.35)', borderRadius: 999, fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+              Falar com consultor
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
   )
 }
 

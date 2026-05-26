@@ -9,12 +9,14 @@ function LoginContent() {
   const params = useSearchParams()
   const redirect = params.get('redirect') ?? '/'
   const error = params.get('error')
+  const tabParam = params.get('tab')
+  const tipoParam = params.get('tipo') as 'proprietario' | 'corretor' | null
 
-  const [tab, setTab] = useState<'entrar' | 'cadastrar'>('entrar')
+  const [tab, setTab] = useState<'entrar' | 'cadastrar'>(tabParam === 'cadastrar' ? 'cadastrar' : 'entrar')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [nome, setNome] = useState('')
-  const [tipo, setTipo] = useState<'proprietario' | 'corretor'>('proprietario')
+  const [tipo, setTipo] = useState<'proprietario' | 'corretor'>(tipoParam ?? 'proprietario')
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState('')
   const supabase = createClient()

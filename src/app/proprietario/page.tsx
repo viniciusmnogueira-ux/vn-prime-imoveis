@@ -36,7 +36,7 @@ export default function ProprietarioPage() {
 
   async function loadData() {
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/login?redirect=/proprietario'); return }
+    if (!user) { setLoading(false); return }
 
     const [{ data: prof }, { data: imvs }] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', user.id).single(),
@@ -60,6 +60,7 @@ export default function ProprietarioPage() {
   }
 
   if (loading) return <LoadingScreen />
+  if (!profile) return <ProprietarioLanding />
 
   return (
     <div style={{ background: 'var(--cream)', minHeight: '100vh' }}>
@@ -305,6 +306,168 @@ function FotografoSection() {
         Fotografia inclusa nos planos Venda Assistida e Venda Completa · <Link href="/vender" style={{ color: 'var(--gold-deep)', fontWeight: 600 }}>Ver planos</Link>
       </p>
     </div>
+  )
+}
+
+function ProprietarioLanding() {
+  const ACCENT = '#D4A857'
+  const FEATURES = [
+    { icon: '📸', title: 'Fotos Profissionais', desc: 'Sessão fotográfica inclusa nos planos Assistida e Completa. Imagens que destacam seu imóvel e aceleram a venda.' },
+    { icon: '📣', title: 'Mídia Paga Gerenciada', desc: 'Anúncios no Google, Meta e portais imobiliários. A VN Prime gerencia o tráfego para você.' },
+    { icon: '👥', title: 'Leads Qualificados', desc: 'Compradores verificados com perfil compatível com seu imóvel chegam direto no seu painel de controle.' },
+    { icon: '⚖️', title: 'Suporte Jurídico', desc: 'Revisão de contratos, ITBI, cartório e escritura. Profissionais parceiros cuidam da parte burocrática.' },
+  ]
+  const BENEFITS = [
+    {
+      tag: '0% Comissão',
+      img: 'https://images.unsplash.com/photo-1611095973763-414019e72400?w=900&q=80',
+      title: 'Você vende sem pagar comissão',
+      desc: 'Na VN Prime, o proprietário direto paga apenas uma taxa fixa de R$ 297 — e fica com 100% do valor de venda. Sem percentual, sem surpresa no fechamento.',
+      points: [
+        'Taxa fixa R$ 297 — vigência de 90 dias',
+        'Você define o preço e as condições de negociação',
+        'Nenhum corretor entre você e o comprador',
+        'Para o plano 3%: você paga somente ao vender — zero adiantado',
+      ],
+      cta: 'Anunciar meu imóvel',
+    },
+    {
+      tag: 'Você no controle',
+      img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=80',
+      title: 'Gerencie tudo pelo seu painel',
+      desc: 'Acompanhe visualizações, leads e visitas em tempo real. Você decide quem visita, quando visita, e como conduz a negociação.',
+      points: [
+        'Painel com métricas de desempenho do anúncio',
+        'Gestão de agenda de visitas integrada',
+        'Scripts de venda para cada etapa da negociação',
+        'Booster para aumentar visibilidade na hora certa',
+      ],
+      reverse: true,
+    },
+    {
+      tag: 'Visibilidade',
+      img: 'https://images.unsplash.com/photo-1560472355-536de3962603?w=900&q=80',
+      title: 'Seu imóvel na maior vitrine premium de BH',
+      desc: 'A VN Prime distribui seu anúncio nos principais portais, Google, Meta e na base qualificada de compradores ativos — gerando leads reais.',
+      points: [
+        'Distribuição automática em ZAP, Viva Real e OLX',
+        'Campanha de mídia paga gerenciada pela VN Prime',
+        'Fotos profissionais que aumentam em 3× o interesse',
+        'Código exclusivo VN para rastreabilidade do anúncio',
+      ],
+    },
+  ]
+
+  return (
+    <main style={{ background: 'var(--cream)' }}>
+      {/* Hero */}
+      <section style={{
+        position: 'relative',
+        background: `linear-gradient(160deg, rgba(15,22,32,0.72) 0%, rgba(15,22,32,0.88) 60%, rgba(15,22,32,0.96) 100%), url(https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1400&q=85)`,
+        backgroundSize: 'cover', backgroundPosition: 'center top',
+        color: '#fff', padding: 'clamp(90px,14vw,160px) 0 clamp(70px,10vw,110px)',
+      }}>
+        <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 70% 60% at 80% 40%, ${ACCENT}22 0%, transparent 70%)`, pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', zIndex: 1, width: 'min(1180px,92vw)', margin: '0 auto', maxWidth: 780 }}>
+          <Eyebrow>Área do Proprietário</Eyebrow>
+          <h1 style={{ color: '#fff', fontSize: 'clamp(2.2rem,4.5vw,3.6rem)', lineHeight: 1.06, margin: '14px 0 20px' }}>
+            Anuncie seu imóvel com{' '}
+            <em style={{ color: '#F6D77A', fontStyle: 'italic' }}>liberdade total</em>
+            {' '}— sem comissão, sem intermediários.
+          </h1>
+          <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.86)', maxWidth: 600, marginBottom: 32, lineHeight: 1.6 }}>
+            Você define o preço, conduz as visitas e fecha direto com o comprador. A VN Prime entra com plataforma, fotos profissionais, mídia paga e suporte jurídico.
+          </p>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 44 }}>
+            <Link href="/login?redirect=/proprietario">
+              <Btn variant="accent" size="lg">Entrar no portal</Btn>
+            </Link>
+            <Link href="/login?redirect=/proprietario&tab=cadastrar&tipo=proprietario">
+              <Btn variant="ghost" size="lg" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.35)' }}>Criar conta grátis</Btn>
+            </Link>
+          </div>
+          <div style={{ display: 'flex', gap: 40, flexWrap: 'wrap' }}>
+            {[['R$ 297','Taxa fixa única'],['0%','De comissão'],['18 dias','Venda média'],['90 dias','De vigência']].map(([v,l]) => (
+              <div key={l}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800, color: ACCENT, lineHeight: 1 }}>{v}</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 5 }}>{l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section style={{ padding: 'clamp(60px,8vw,100px) 0' }}>
+        <div style={{ width: 'min(1180px,92vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 52px' }}>
+            <Eyebrow color="var(--gold-deep)">O que você encontra</Eyebrow>
+            <h2 style={{ margin: '10px 0 12px' }}>Tudo que você precisa em um só lugar</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 15.5 }}>Ferramentas criadas especificamente para o mercado imobiliário premium de Belo Horizonte.</p>
+          </div>
+          <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))' }}>
+            {FEATURES.map(f => (
+              <div key={f.title} style={{ background: '#fff', padding: '28px 26px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: `${ACCENT}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 16 }}>{f.icon}</div>
+                <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', marginBottom: 8 }}>{f.title}</div>
+                <div style={{ fontSize: 14.5, color: 'var(--fg-2)', lineHeight: 1.6 }}>{f.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits alternating */}
+      {BENEFITS.map((b, idx) => (
+        <section key={b.title} style={{ padding: 'clamp(60px,8vw,96px) 0', background: idx % 2 === 0 ? '#fff' : 'var(--cream)', borderTop: '1px solid var(--border)' }}>
+          <div style={{ width: 'min(1180px,92vw)', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,380px),1fr))', gap: 'clamp(32px,5vw,72px)', alignItems: 'center', direction: b.reverse ? 'rtl' : 'ltr' }}>
+            <div style={{ direction: 'ltr', position: 'relative', borderRadius: 20, overflow: 'hidden', boxShadow: '0 20px 56px rgba(27,39,51,0.14)', aspectRatio: '4/3' }}>
+              <img src={b.img} alt={b.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,transparent 50%,rgba(15,22,32,0.60) 100%)' }} />
+              <div style={{ position: 'absolute', bottom: 20, left: 24, background: `${ACCENT}EE`, color: '#fff', borderRadius: 8, padding: '6px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{b.tag}</div>
+            </div>
+            <div style={{ direction: 'ltr' }}>
+              <div style={{ width: 40, height: 3, background: ACCENT, borderRadius: 2, marginBottom: 20 }} />
+              <h2 style={{ margin: '0 0 16px', fontSize: 'clamp(1.5rem,2.8vw,2.1rem)' }}>{b.title}</h2>
+              <p style={{ fontSize: 16, color: 'var(--fg-2)', lineHeight: 1.75, marginBottom: 24 }}>{b.desc}</p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {b.points.map(pt => (
+                  <li key={pt} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                    <span style={{ width: 20, height: 20, borderRadius: 99, background: `${ACCENT}22`, color: ACCENT, fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>✓</span>
+                    <span style={{ fontSize: 14.5, color: 'var(--fg-1)', lineHeight: 1.55 }}>{pt}</span>
+                  </li>
+                ))}
+              </ul>
+              {b.cta && (
+                <Link href="/login?redirect=/proprietario">
+                  <Btn variant="accent" style={{ background: ACCENT, boxShadow: `0 4px 18px ${ACCENT}44` }}>{b.cta}</Btn>
+                </Link>
+              )}
+            </div>
+          </div>
+        </section>
+      ))}
+
+      {/* CTA Banner */}
+      <section style={{ padding: 'clamp(60px,8vw,100px) 0', background: 'linear-gradient(135deg,#0F1824 0%,#1B2733 100%)' }}>
+        <div style={{ width: 'min(860px,92vw)', margin: '0 auto', textAlign: 'center', color: '#fff' }}>
+          <Eyebrow>Acesso imediato</Eyebrow>
+          <h2 style={{ color: '#fff', fontSize: 'clamp(1.8rem,3.5vw,2.6rem)', margin: '14px 0 16px' }}>Pronto para começar?</h2>
+          <p style={{ color: 'rgba(245,248,250,0.78)', fontSize: 17, maxWidth: 480, margin: '0 auto 32px', lineHeight: 1.6 }}>
+            Faça login com sua conta VN Prime ou crie uma agora. Configuração em menos de 3 minutos.
+          </p>
+          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link href="/login?redirect=/proprietario">
+              <Btn variant="accent" size="lg">Acessar meu portal</Btn>
+            </Link>
+            <button onClick={() => window.dispatchEvent(new CustomEvent('vnprime:consultor'))}
+              style={{ padding: '14px 28px', background: 'transparent', color: '#fff', border: '1.5px solid rgba(255,255,255,0.35)', borderRadius: 999, fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+              Falar com consultor
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
   )
 }
 
