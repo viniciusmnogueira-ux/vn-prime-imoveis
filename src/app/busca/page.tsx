@@ -43,10 +43,10 @@ function BuscaContent() {
           <Eyebrow color="var(--gold)">Buscar imóveis</Eyebrow>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 16 }}>
             {/* Operação */}
-            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.1)', borderRadius: 8, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.1)', borderRadius: 999, overflow: 'hidden' }}>
               {['venda','aluguel'].map(op => (
                 <button key={op} onClick={() => set('operacao', op)} style={{
-                  padding: '9px 18px', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700,
+                  padding: '9px 20px', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700,
                   background: filtros.operacao === op ? 'var(--gold)' : 'transparent',
                   color: filtros.operacao === op ? 'var(--navy-deep)' : 'rgba(255,255,255,0.7)',
                   transition: 'all 0.15s',
@@ -54,10 +54,10 @@ function BuscaContent() {
               ))}
             </div>
             <input placeholder="Bairro ou cidade..." value={filtros.bairro} onChange={e => set('bairro', e.target.value)}
-              style={{ padding: '9px 14px', borderRadius: 8, border: 'none', fontSize: 13, minWidth: 180, outline: 'none' }}
+              style={{ padding: '9px 14px', borderRadius: 10, border: 'none', fontSize: 13, minWidth: 180, outline: 'none' }}
               onKeyDown={e => e.key === 'Enter' && buscar()} />
             <select value={filtros.tipo} onChange={e => set('tipo', e.target.value)}
-              style={{ padding: '9px 14px', borderRadius: 8, border: 'none', fontSize: 13, outline: 'none' }}>
+              style={{ padding: '9px 14px', borderRadius: 10, border: 'none', fontSize: 13, outline: 'none' }}>
               <option value="">Todos os tipos</option>
               {['apartamento','casa','cobertura','terreno','comercial'].map(t => (
                 <option key={t} value={t}>{t.charAt(0).toUpperCase()+t.slice(1)}</option>
@@ -100,7 +100,7 @@ function BuscaContent() {
 function ImovelCard({ im }: { im: any }) {
   return (
     <Link href={`/imovel/${im.id}`} style={{ textDecoration: 'none' }}>
-      <article style={{ background: '#fff', borderRadius: 14, border: '1px solid var(--border)', overflow: 'hidden', boxShadow: 'var(--shadow-card)', transition: 'transform 0.18s, box-shadow 0.18s', cursor: 'pointer' }}
+      <article style={{ background: '#fff', borderRadius: 16, border: '1px solid var(--border)', overflow: 'hidden', boxShadow: 'var(--shadow-card)', transition: 'transform 0.18s, box-shadow 0.18s', cursor: 'pointer' }}
         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 16px 44px rgba(15,34,68,0.14)' }}
         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-card)' }}
       >
@@ -113,7 +113,7 @@ function ImovelCard({ im }: { im: any }) {
         <div style={{ padding: '18px 22px 22px' }}>
           <div style={{ marginBottom: 4 }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 2 }}>Preço de pedida</div>
-            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 700, color: 'var(--gold)' }}>{fmtBRL(im.preco)}</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 800, color: 'var(--gold)' }}>{fmtBRL(im.preco)}</div>
           </div>
           <h3 style={{ fontSize: 16, color: 'var(--navy)', fontWeight: 600, margin: '8px 0 4px', lineHeight: 1.3 }}>{im.titulo}</h3>
           <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>{im.bairro}{im.cidade && im.bairro ? ', ' : ''}{im.cidade}</div>

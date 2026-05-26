@@ -77,7 +77,7 @@ function LoginContent() {
       }}>
         {/* Header */}
         <div style={{ background: 'var(--navy-deep)', padding: '32px 36px 24px', textAlign: 'center' }}>
-          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 700, color: '#fff' }}>VN Prime</div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, color: '#fff' }}>VN Prime</div>
           <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold)', marginTop: 2 }}>Imóveis</div>
         </div>
 

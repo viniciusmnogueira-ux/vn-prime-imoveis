@@ -61,7 +61,7 @@ export default function ImovelPage() {
         {fotos.length === 0 && <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.3)', fontSize: 64 }}>🏠</div>}
       </div>
 
-      <div style={{ width: 'min(1200px,92vw)', margin: '0 auto', paddingTop: 40, display: 'grid', gridTemplateColumns: '1fr min(380px, 35%)', gap: 40, alignItems: 'start' }}>
+      <div style={{ width: 'min(1200px,92vw)', margin: '0 auto', paddingTop: 40, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) min(380px, 38%)', gap: 40, alignItems: 'start' }}>
         {/* Main */}
         <div>
           <Eyebrow color="var(--gold-deep)">{im.tipo?.charAt(0).toUpperCase() + im.tipo?.slice(1)} · {im.operacao}</Eyebrow>
@@ -97,7 +97,7 @@ export default function ImovelPage() {
         <div style={{ position: 'sticky', top: 90 }}>
           <div style={{ background: '#fff', borderRadius: 16, padding: 28, boxShadow: 'var(--shadow-strong)', borderTop: '3px solid var(--gold)' }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 6 }}>Preço de pedida</div>
-            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 32, fontWeight: 700, color: 'var(--gold)', lineHeight: 1, marginBottom: 4 }}>{fmtBRL(im.preco)}</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 800, color: 'var(--gold)', lineHeight: 1, marginBottom: 4 }}>{fmtBRL(im.preco)}</div>
             <div style={{ fontSize: 11.5, color: 'var(--fg-3)', marginBottom: 16 }}>Valor sujeito a negociação</div>
 
             {im.condominio && <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 4 }}>Condomínio: {fmtBRL(im.condominio)}/mês</div>}

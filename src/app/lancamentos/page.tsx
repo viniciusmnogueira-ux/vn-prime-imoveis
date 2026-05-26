@@ -50,7 +50,7 @@ export default function LancamentosPage() {
           <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.85)', lineHeight: 1.7, marginBottom: 36 }}>
             Imóveis recém-cadastrados e lançamentos de alto padrão em BH e região metropolitana. Seja o primeiro a saber.
           </p>
-          <div style={{ display: 'flex', gap: 0, background: 'rgba(255,255,255,0.97)', borderRadius: 12, overflow: 'hidden', maxWidth: 480, boxShadow: '0 8px 32px rgba(0,0,0,0.25)' }}>
+          <div style={{ display: 'flex', gap: 0, background: 'rgba(255,255,255,0.97)', borderRadius: 999, overflow: 'hidden', maxWidth: 480, boxShadow: '0 8px 32px rgba(0,0,0,0.25)' }}>
             <input type="text" placeholder="Filtrar por bairro..."
               value={bairro} onChange={e => setBairro(e.target.value)}
               style={{ flex: 1, padding: '14px 18px', border: 'none', fontSize: 14, outline: 'none', background: 'transparent', color: 'var(--navy)' }} />

@@ -6,7 +6,7 @@ export default function SiteFooter() {
       <div style={{ width: 'min(1200px,92vw)', margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: 40, marginBottom: 48 }}>
           <div>
-            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 700, color: '#fff', marginBottom: 8 }}>VN Prime Imóveis</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 8 }}>VN Prime Imóveis</div>
             <p style={{ fontSize: 13.5, lineHeight: 1.7, color: 'rgba(255,255,255,0.55)' }}>
               Imóveis de alto padrão em Belo Horizonte e região. Tecnologia, curadoria e transparência em cada transação.
             </p>
