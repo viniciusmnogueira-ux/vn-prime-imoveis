@@ -4,106 +4,273 @@ import Link from 'next/link'
 
 export default function SobrePage() {
   return (
-    <main style={{ background: 'var(--cream)' }}>
+    <main style={{ background: 'var(--cream)', minHeight: '100vh' }}>
+
       {/* Hero */}
       <section style={{
-        background: `linear-gradient(180deg, rgba(15,24,36,0.88) 0%, rgba(15,24,36,0.96) 100%), url(https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1900&q=85) center/cover`,
-        padding: 'clamp(80px,12vw,140px) 0 clamp(60px,8vw,100px)',
+        position: 'relative',
+        backgroundImage: `linear-gradient(120deg, rgba(15,22,32,0.90) 0%, rgba(15,22,32,0.70) 100%), url(https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=2400&q=85)`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        padding: 'clamp(70px,10vw,120px) 0',
         color: '#fff',
       }}>
-        <div style={{ width: 'min(1200px,92vw)', margin: '0 auto', maxWidth: 680 }}>
-          <Eyebrow>Sobre a VN Prime</Eyebrow>
-          <h1 style={{ color: '#fff', margin: '14px 0 18px' }}>
-            Imóveis de alto padrão com <em className="italic-accent" style={{ color: 'var(--gold-soft)' }}>transparência real.</em>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+          <div style={{
+            fontSize: 11, fontWeight: 700, letterSpacing: '0.22em',
+            textTransform: 'uppercase', color: 'var(--gold-soft)', marginBottom: 18,
+          }}>
+            Nossa missão
+          </div>
+          <h1 style={{
+            color: '#fff', margin: '0 0 24px',
+            fontSize: 'clamp(2.4rem,4.6vw,4rem)',
+            fontWeight: 800, letterSpacing: '-0.035em', lineHeight: 1.05, maxWidth: 800,
+          }}>
+            A plataforma imobiliária de alto padrão da Grande BH.
           </h1>
-          <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.85)', lineHeight: 1.7 }}>
-            A VN Prime nasceu para democratizar o acesso a imóveis de alto padrão em Belo Horizonte e região metropolitana, com tecnologia, curadoria e transparência em cada etapa.
+          <p style={{
+            color: 'rgba(245,248,250,0.85)', fontSize: 18, lineHeight: 1.7,
+            maxWidth: 640, margin: 0,
+          }}>
+            Conectamos proprietários, corretores e especialistas em um único ecossistema, combinando tecnologia, curadoria e estratégia comercial.
           </p>
         </div>
       </section>
 
-      {/* Sobre */}
-      <section style={{ padding: 'clamp(60px,8vw,100px) 0', background: '#fff' }}>
-        <div style={{ width: 'min(1100px,92vw)', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 48, alignItems: 'center' }}>
+      {/* Quem somos */}
+      <section style={{ padding: 'clamp(60px,8vw,100px) 0' }}>
+        <div style={{
+          width: 'min(1280px,94vw)', margin: '0 auto',
+          display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)',
+          gap: 80, alignItems: 'start',
+        }}>
+
+          {/* Left column */}
           <div>
-            <Eyebrow color="var(--gold-deep)">Nossa missão</Eyebrow>
-            <h2 style={{ margin: '12px 0 20px' }}>Conectar pessoas ao imóvel certo</h2>
-            <p style={{ fontSize: 15.5, color: 'var(--fg-2)', lineHeight: 1.8, marginBottom: 20 }}>
-              Acreditamos que a compra de um imóvel deve ser transparente, sem surpresas e sem comissões abusivas. Por isso criamos um modelo que combina tecnologia com curadoria humana.
-            </p>
-            <p style={{ fontSize: 15.5, color: 'var(--fg-2)', lineHeight: 1.8 }}>
-              Para o proprietário, a liberdade de anunciar com taxa fixa ou optar por suporte completo. Para o comprador, imóveis verificados e consultores honestos.
+            <Eyebrow color="var(--gold-deep)">Quem somos</Eyebrow>
+            <h2 style={{
+              margin: '10px 0 24px',
+              fontSize: 'clamp(1.8rem,2.8vw,2.6rem)',
+              fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1,
+            }}>
+              A VN Prime Imóveis
+            </h2>
+            <div style={{
+              fontSize: 16, lineHeight: 1.8, color: 'var(--fg-1)',
+              display: 'flex', flexDirection: 'column', gap: 18,
+            }}>
+              <p style={{ margin: 0 }}>
+                A VN Prime Imóveis é uma plataforma imobiliária de alto padrão, com atuação em Belo Horizonte e região metropolitana, especialmente em mercados estratégicos como Nova Lima, Alphaville, Belvedere e BH e região.
+              </p>
+              <p style={{ margin: 0 }}>
+                Conectamos proprietários, corretores e especialistas em um único ecossistema, combinando tecnologia, curadoria e estratégia comercial para gerar mais eficiência na venda de imóveis.
+              </p>
+              <p style={{ margin: 0 }}>
+                Nossa atuação prioriza privacidade, qualidade e resultado: o endereço completo do imóvel é protegido, enquanto a vitrine pública exibe apenas as informações essenciais para atrair interessados qualificados.
+              </p>
+            </div>
+          </div>
+
+          {/* Right column — value cards */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {([
+              ['Privacidade', 'O endereço completo é protegido na vitrine. Apenas o bairro é exibido — compradores qualificados têm acesso mediante contato.'],
+              ['Curadoria', 'Cada imóvel passa por análise de qualidade antes de entrar na vitrine. Fotos, descrição e informações são revisadas pela equipe VN Prime.'],
+              ['Tecnologia', 'IA editorial, gerador de descrição, qualificação automatizada de leads e relatórios de performance para proprietários e corretores.'],
+              ['Resultado', 'Modelos de negócio flexíveis — taxa fixa, comissão ou plano enterprise — para que cada cliente escolha a solução mais adequada ao seu perfil.'],
+            ] as [string, string][]).map(([title, desc]) => (
+              <div key={title} style={{
+                padding: '22px 24px', background: 'var(--white)',
+                borderRadius: 16, border: '1px solid var(--border)',
+                borderLeft: '4px solid var(--gold)',
+              }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--navy)', marginBottom: 8 }}>{title}</div>
+                <p style={{ margin: 0, fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.65 }}>{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Mercados de atuação */}
+      <section style={{ padding: 'clamp(60px,8vw,100px) 0' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+          <div style={{ maxWidth: 560, marginBottom: 48 }}>
+            <Eyebrow color="var(--gold-deep)">Onde atuamos</Eyebrow>
+            <h2 style={{ margin: '10px 0 14px' }}>Mercados estratégicos</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 16, lineHeight: 1.7 }}>
+              Atuamos nos mercados de maior potencial de valorização da Grande Belo Horizonte, com conhecimento profundo de cada microregião.
             </p>
           </div>
-          <div style={{ background: 'var(--cream)', borderRadius: 20, padding: 40, border: '1px solid var(--border)' }}>
-            <div style={{ marginBottom: 28 }}>
-              <Eyebrow color="var(--gold-deep)">Fundador</Eyebrow>
-              <div style={{ marginTop: 16, display: 'flex', gap: 16, alignItems: 'center' }}>
-                <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gold)', fontSize: 24, fontWeight: 700, flexShrink: 0 }}>V</div>
-                <div>
-                  <div style={{ fontWeight: 800, fontSize: 17, color: 'var(--navy)' }}>Vinicius Nogueira</div>
-                  <div style={{ fontSize: 13, color: 'var(--fg-2)', marginTop: 3 }}>Fundador & CEO</div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))',
+            gap: 16,
+          }}>
+            {([
+              ['Nova Lima', 'Alphaville · Vale dos Cristais · Quintas do Sol · Retiro do Chalé'],
+              ['Belvedere', 'O bairro mais valorizado de BH — alto padrão residencial e corporativo'],
+              ['Savassi & Lourdes', 'Mercado premium urbano no coração de Belo Horizonte'],
+              ['Alphaville BH', 'Condomínios de alto padrão com infraestrutura completa'],
+              ['Mangabeiras', 'Residências exclusivas com vista panorâmica da cidade'],
+              ['Centro-Sul BH', 'Coberturas e apartamentos de luxo em localização privilegiada'],
+            ] as [string, string][]).map(([bairro, desc]) => (
+              <div key={bairro} style={{
+                padding: '22px 20px', background: 'var(--white)',
+                borderRadius: 14, border: '1px solid var(--border)',
+              }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--navy)', marginBottom: 6 }}>{bairro}</div>
+                <p style={{ margin: 0, fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.6 }}>{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section style={{
+        background: 'var(--cream)', borderTop: '1px solid var(--border)',
+        padding: 'clamp(50px,7vw,80px) 0', textAlign: 'center',
+      }}>
+        <div style={{ width: 'min(640px,94vw)', margin: '0 auto' }}>
+          <h2 style={{
+            margin: '0 0 16px',
+            fontSize: 'clamp(1.8rem,3vw,2.4rem)',
+            fontWeight: 800,
+          }}>
+            Faça parte da plataforma
+          </h2>
+          <p style={{ color: 'var(--fg-2)', fontSize: 16, margin: '0 0 32px', lineHeight: 1.65 }}>
+            Proprietário, corretor, incorporadora ou fotógrafo — há um espaço para você na VN Prime Imóveis.
+          </p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link href="/anunciar"><Btn variant="accent" size="lg">Anunciar meu imóvel</Btn></Link>
+            <Link href="/login"><Btn variant="ghost" size="lg">Criar minha conta</Btn></Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Contato, Redes Sociais e Mapa */}
+      <section style={{ background: 'var(--navy)', padding: 'clamp(50px,7vw,80px) 0' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+          <div style={{
+            display: 'grid', gap: 'clamp(32px,5vw,64px)',
+            gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,320px),1fr))',
+            alignItems: 'start',
+          }}>
+
+            {/* Left column: contact info */}
+            <div>
+              <div style={{ marginBottom: 32 }}>
+                <div style={{
+                  fontSize: 11, fontWeight: 700, letterSpacing: '0.18em',
+                  textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 14,
+                }}>Contato</div>
+                {([
+                  { icon: '✆', label: 'WhatsApp', val: '(31) 98414-4250',              href: 'https://wa.me/5531984144250' },
+                  { icon: '@', label: 'E-mail',   val: 'contato@vnprimeimoveis.com.br', href: 'mailto:contato@vnprimeimoveis.com.br' },
+                  { icon: '⊕', label: 'Site',     val: 'www.vnprimeimoveis.com.br',     href: 'https://www.vnprimeimoveis.com.br' },
+                ] as { icon: string; label: string; val: string; href: string }[]).map(c => (
+                  <a key={c.label} href={c.href} target="_blank" rel="noopener noreferrer"
+                    style={{
+                      display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14,
+                      textDecoration: 'none', color: 'inherit',
+                    }}>
+                    <div style={{
+                      width: 34, height: 34, borderRadius: 8,
+                      background: 'rgba(212,168,87,0.15)',
+                      border: '1px solid rgba(212,168,87,0.25)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 13, color: '#D4A857', flexShrink: 0,
+                    }}>
+                      {c.icon}
+                    </div>
+                    <div>
+                      <div style={{
+                        fontSize: 11, color: 'rgba(245,248,250,0.45)',
+                        textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2,
+                      }}>{c.label}</div>
+                      <div style={{ fontSize: 14, color: '#fff', fontWeight: 600 }}>{c.val}</div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+
+              <div style={{ marginBottom: 32 }}>
+                <div style={{
+                  fontSize: 11, fontWeight: 700, letterSpacing: '0.18em',
+                  textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 14,
+                }}>Endereço</div>
+                <div style={{ fontSize: 14, color: 'rgba(245,248,250,0.75)', lineHeight: 1.75 }}>
+                  Belo Horizonte — MG<br />
+                  Grande BH · Nova Lima · Região Metropolitana<br />
+                  <span style={{ fontSize: 12, color: 'rgba(245,248,250,0.45)' }}>
+                    Atendimento presencial com hora marcada
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <div style={{
+                  fontSize: 11, fontWeight: 700, letterSpacing: '0.18em',
+                  textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 14,
+                }}>Redes Sociais</div>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  {([
+                    { label: 'Instagram', icon: 'IG', href: 'https://instagram.com/vnprimeimoveis' },
+                    { label: 'LinkedIn',  icon: 'in', href: 'https://linkedin.com/company/vnprimeimoveis' },
+                    { label: 'WhatsApp',  icon: 'WA', href: 'https://wa.me/5531984144250' },
+                    { label: 'YouTube',   icon: 'YT', href: 'https://youtube.com/@vnprimeimoveis' },
+                  ] as { label: string; icon: string; href: string }[]).map(s => (
+                    <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
+                      title={s.label}
+                      style={{
+                        width: 42, height: 42, borderRadius: 10,
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.12)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: '#fff', fontWeight: 700, fontSize: 11, textDecoration: 'none',
+                      }}>
+                      {s.icon}
+                    </a>
+                  ))}
                 </div>
               </div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {[
-                { icon: '📱', label: 'WhatsApp', value: '(31) 98414-4250', href: 'https://wa.me/5531984144250' },
-                { icon: '✉️', label: 'E-mail', value: 'contato@vnprimeimoveis.com', href: 'mailto:contato@vnprimeimoveis.com' },
-                { icon: '🌐', label: 'Site', value: 'vnprimeimoveis.com', href: 'https://vnprimeimoveis.com' },
-              ].map(c => (
-                <a key={c.href} href={c.href} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', gap: 12, alignItems: 'center', textDecoration: 'none' }}>
-                  <span style={{ fontSize: 18 }}>{c.icon}</span>
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-3)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{c.label}</div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--navy)' }}>{c.value}</div>
-                  </div>
-                </a>
-              ))}
+
+            {/* Right column: map */}
+            <div style={{
+              borderRadius: 18, overflow: 'hidden',
+              border: '1px solid rgba(255,255,255,0.1)', minHeight: 340,
+            }}>
+              <iframe
+                title="VN Prime Imóveis — Belo Horizonte"
+                src="https://maps.google.com/maps?q=Savassi,Belo+Horizonte,MG,Brasil&output=embed&z=13"
+                width="100%" height="360"
+                style={{ display: 'block', border: 'none', filter: 'saturate(0.7) brightness(0.9)' }}
+                loading="lazy" referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          </div>
+
+          {/* Footer bar */}
+          <div style={{
+            marginTop: 48, paddingTop: 28,
+            borderTop: '1px solid rgba(255,255,255,0.08)',
+            display: 'flex', justifyContent: 'space-between',
+            alignItems: 'center', flexWrap: 'wrap', gap: 12,
+          }}>
+            <div style={{ fontSize: 12, color: 'rgba(245,248,250,0.35)' }}>
+              © 2026 VN Prime Imóveis · CRECI-MG · Todos os direitos reservados
+            </div>
+            <div style={{ fontSize: 12, color: 'rgba(245,248,250,0.35)' }}>
+              Belo Horizonte · MG · Brasil
             </div>
           </div>
         </div>
       </section>
 
-      {/* Redes + Mapa */}
-      <section style={{ padding: 'clamp(50px,7vw,80px) 0', background: 'var(--cream)' }}>
-        <div style={{ width: 'min(1100px,92vw)', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px,1fr))', gap: 40 }}>
-          <div>
-            <Eyebrow color="var(--gold-deep)">Redes sociais</Eyebrow>
-            <div style={{ display: 'flex', gap: 12, marginTop: 20, flexWrap: 'wrap' }}>
-              {[
-                { label: 'Instagram', href: 'https://instagram.com/vnprimeimoveis', color: '#E1306C' },
-                { label: 'LinkedIn', href: 'https://linkedin.com/company/vnprimeimoveis', color: '#0A66C2' },
-                { label: 'YouTube', href: 'https://youtube.com/@vnprimeimoveis', color: '#FF0000' },
-              ].map(s => (
-                <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer" style={{ padding: '10px 20px', borderRadius: 99, background: '#fff', border: '1.5px solid var(--border)', fontSize: 13.5, fontWeight: 700, color: s.color, textDecoration: 'none' }}>
-                  {s.label}
-                </a>
-              ))}
-            </div>
-            <div style={{ marginTop: 32 }}>
-              <Eyebrow color="var(--gold-deep)">Endereço</Eyebrow>
-              <p style={{ marginTop: 12, fontSize: 14.5, color: 'var(--fg-2)', lineHeight: 1.7 }}>
-                Belo Horizonte — MG<br />
-                Atendimento presencial e remoto<br />
-                Área de atuação: RMBH e Sul de MG
-              </p>
-            </div>
-            <div style={{ marginTop: 28 }}>
-              <Link href="/anunciar"><Btn variant="primary" size="lg">Anunciar meu imóvel</Btn></Link>
-            </div>
-          </div>
-          <div>
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d234941.74826249373!2d-44.09955689624451!3d-19.91266887516693!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xa690d739c26fe5%3A0xd6a8a14e4cdf2e34!2sBelo%20Horizonte%2C%20MG!5e0!3m2!1spt-BR!2sbr!4v1715000000000!5m2!1spt-BR!2sbr"
-              width="100%" height="300"
-              style={{ border: 0, borderRadius: 16 }}
-              allowFullScreen loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
-        </div>
-      </section>
     </main>
   )
 }

@@ -1,202 +1,396 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Eyebrow from '@/components/ui/Eyebrow'
 import Btn from '@/components/ui/Btn'
 import { createClient } from '@/lib/supabase/client'
 
+const fmtC = (n: number) => 'R$ ' + new Intl.NumberFormat('pt-BR').format(n)
+
+const MODALIDADES = [
+  {
+    id: 'judicial', badge: 'Validade judicial', nome: 'Laudo Judicial',
+    uso: 'Inventários, divórcio, desapropriação e ações judiciais.',
+    executor: 'Perito judicial nomeado (CNAI)', prazo: '30–60 dias úteis', valor: 'Valor a consultar', destaque: false,
+    quandoUsar: ['Inventário e partilha de bens', 'Processo de divórcio com disputa', 'Desapropriação pelo poder público', 'Ação judicial que exige laudo oficial', 'Perícia técnica determinada pelo juiz'],
+    cta: 'Solicitar laudo judicial',
+    svgPath: 'M12 3l9 4.5v5c0 4.5-3.5 8.7-9 10-5.5-1.3-9-5.5-9-10V7.5L12 3z',
+  },
+  {
+    id: 'extrajudicial', badge: 'Mais solicitado', nome: 'Laudo Extrajudicial (PTAM)',
+    uso: 'Compra/venda, garantia bancária, financiamento, seguro e herança amigável.',
+    executor: 'Engenheiro avaliador credenciado CNAI', prazo: '7–15 dias úteis', valor: 'Valor a consultar', destaque: true,
+    quandoUsar: ['Compra ou venda de imóvel', 'Garantia para financiamento bancário', 'Seguro de imóvel (ajuste de valor segurado)', 'Partilha amigável em herança', 'Atualização de valor patrimonial'],
+    cta: 'Solicitar PTAM',
+    svgPath: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+  },
+  {
+    id: 'ia', badge: 'Grátis clientes VN', nome: 'Estimativa IA',
+    uso: 'Referência rápida pré-negociação e check de mercado.',
+    executor: 'Algoritmo VN Prime (comparativos BH/MG)', prazo: 'Instantânea', valor: 'Grátis para clientes VN Prime', destaque: false,
+    quandoUsar: ['Verificar se o preço pedido é justo', 'Orientação antes de fazer proposta', 'Comparativo rápido com o mercado de BH/MG', 'Clientes VN Prime em pré-negociação'],
+    cta: 'Estimar agora',
+    svgPath: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+  },
+]
+
+function openConsultor() {
+  window.dispatchEvent(new CustomEvent('vnprime:consultor'))
+}
+
 export default function AvaliacaoPage() {
-  const [form, setForm] = useState({ nome: '', telefone: '', email: '', endereco: '', tipo: 'extrajudicial', obs: '' })
-  const [enviado, setEnviado] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const estimSectionRef = useRef<HTMLDivElement>(null)
+  const [showEstimForm, setShowEstimForm] = useState(false)
+  const [estimForm, setEstimForm] = useState({ bairro: '', tipo: 'Apartamento', area: '', quartos: '2' })
+  const [estimLoading, setEstimLoading] = useState(false)
+  const [estimResult, setEstimResult] = useState<{ low: number; high: number; mid: number; m2low: number; m2high: number } | null>(null)
+  const [userEstimValue, setUserEstimValue] = useState('')
 
-  function set(k: string, v: string) { setForm(f => ({ ...f, [k]: v })) }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    const supabase = createClient()
-    await supabase.from('leads').insert({
-      nome: form.nome,
-      telefone: form.telefone,
-      email: form.email,
-      mensagem: `Avaliação ${form.tipo} — Endereço: ${form.endereco}. Obs: ${form.obs}`,
-      origem: 'avaliacao',
-    })
-    setEnviado(true)
-    setLoading(false)
+  function scrollToEstimativa() {
+    setShowEstimForm(true)
+    setTimeout(() => {
+      estimSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 60)
   }
 
-  const planos = [
-    {
-      tipo: 'estimativa',
-      titulo: 'Estimativa por IA',
-      preco: 'Gratuita',
-      sub: 'resultado imediato',
-      desc: 'Algoritmo VN Prime com dados de mercado de BH e RMBH. Boa para ter uma referência rápida antes de negociar.',
-      bullets: ['Resultado em segundos', 'Base: histórico de transações BH/RMBH', 'Sem visita ao imóvel', 'Sem valor legal'],
-      accent: '#6B7280',
-      badge: '',
-    },
-    {
-      tipo: 'extrajudicial',
-      titulo: 'Laudo Extrajudicial',
-      preco: 'Valor a consultar',
-      sub: 'conforme complexidade',
-      desc: 'Laudo técnico assinado por engenheiro ou arquiteto credenciado. Válido para inventários, partilhas e negociações particulares.',
-      bullets: ['Vistoria presencial', 'Relatório fotográfico completo', 'Assinado por profissional credenciado', 'CREA/CAU — validade jurídica'],
-      accent: '#D4A857',
-      badge: 'MAIS SOLICITADO',
-    },
-    {
-      tipo: 'judicial',
-      titulo: 'Laudo Judicial',
-      preco: 'Valor a consultar',
-      sub: 'conforme complexidade',
-      desc: 'Laudo pericial para processos judiciais, herança contestada, divórcio litigioso ou licitação. Perito nomeado pelo tribunal.',
-      bullets: ['Perito judicial ou assistente técnico', 'Norma NBR 14653 rigorosa', 'Aceito em qualquer instância', 'Prazo sob demanda judicial'],
-      accent: '#1B2733',
-      badge: '',
-    },
-  ]
+  function runEstimativa() {
+    if (!estimForm.area) return
+    setEstimLoading(true)
+    setEstimResult(null)
+    setUserEstimValue('')
+    setTimeout(() => {
+      const area = parseFloat(estimForm.area) || 80
+      const quartos = parseInt(estimForm.quartos) || 2
+      const baseM2 = estimForm.tipo === 'Casa' ? 6200 : estimForm.tipo === 'Comercial' ? 5800 : 7400
+      const bLow = estimForm.bairro.toLowerCase()
+      const bairroMult =
+        (bLow.includes('belvedere') || bLow.includes('vale dos')) ? 1.45 :
+        (bLow.includes('lourdes') || bLow.includes('sao pedro') || bLow.includes('são pedro')) ? 1.30 :
+        (bLow.includes('savassi') || bLow.includes('funcionarios') || bLow.includes('funcionários')) ? 1.25 :
+        (bLow.includes('nova lima') || bLow.includes('vila da serra')) ? 1.35 :
+        (bLow.includes('pampulha') || bLow.includes('castelo')) ? 1.10 : 1.0
+      const quartosMult = quartos >= 4 ? 1.12 : quartos === 3 ? 1.06 : 1.0
+      const mBase = baseM2 * bairroMult * quartosMult
+      const low = Math.round(area * mBase * 0.92 / 5000) * 5000
+      const high = Math.round(area * mBase * 1.08 / 5000) * 5000
+      const mid = Math.round((low + high) / 2 / 1000) * 1000
+      setEstimResult({ low, high, mid, m2low: Math.round(mBase * 0.92), m2high: Math.round(mBase * 1.08) })
+      setEstimLoading(false)
+    }, 2200)
+  }
+
+  const IS: React.CSSProperties = {
+    width: '100%', padding: '11px 14px', borderRadius: 9,
+    border: '1.5px solid var(--border)', fontSize: 14, outline: 'none',
+    boxSizing: 'border-box', background: '#fff',
+  }
 
   return (
     <main style={{ background: 'var(--cream)' }}>
+
       {/* Hero */}
       <section style={{
-        background: `linear-gradient(160deg, rgba(15,24,36,0.92) 0%, rgba(27,39,51,0.88) 100%),
-                     url(https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1900&q=85) center/cover`,
-        padding: 'clamp(80px,12vw,140px) 0 clamp(60px,8vw,100px)',
-        color: '#fff',
+        position: 'relative',
+        background: `linear-gradient(180deg, rgba(15,22,32,0.70) 0%, rgba(15,22,32,0.94) 100%), url(https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1900&q=85)`,
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        color: '#fff', padding: 'clamp(80px,12vw,140px) 0 clamp(60px,9vw,100px)',
       }}>
-        <div style={{ width: 'min(1200px,92vw)', margin: '0 auto', maxWidth: 680 }}>
-          <Eyebrow color="var(--gold)">Avaliação de Imóveis</Eyebrow>
-          <h1 style={{ color: '#fff', margin: '14px 0 18px' }}>
-            Quanto vale{' '}
-            <em className="italic-accent" style={{ color: 'var(--gold-soft)' }}>o seu imóvel?</em>
+        <div style={{ width: 'min(1180px,92vw)', margin: '0 auto', maxWidth: 720 }}>
+          <Eyebrow>Avaliação de Imóveis</Eyebrow>
+          <h1 style={{ color: '#fff', margin: '12px 0 18px', fontSize: 'clamp(2.4rem,5vw,3.6rem)', lineHeight: 1.05 }}>
+            Saiba o valor real do seu{' '}
+            <em className="italic-accent" style={{ color: 'var(--gold-soft)' }}>imóvel.</em>
           </h1>
-          <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.85)', lineHeight: 1.7, marginBottom: 36 }}>
-            Estimativa por IA, laudo extrajudicial para inventários e negociações, ou laudo judicial para processos. Escolha o nível de formalidade que você precisa.
+          <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.88)', maxWidth: 560, marginBottom: 28 }}>
+            Três modalidades para cada situação — laudo judicial, extrajudicial ou estimativa instantânea com IA.
           </p>
-          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-            <a href="#solicitar"><Btn variant="accent" size="lg">Solicitar avaliação</Btn></a>
-            <a href="#planos"><Btn variant="ghost-light" size="lg">Ver modalidades</Btn></a>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <Btn variant="accent" size="lg" onClick={openConsultor}>Solicitar laudo</Btn>
+            <Btn variant="ghost-light" size="lg" onClick={scrollToEstimativa}>Estimar agora</Btn>
           </div>
         </div>
       </section>
 
-      {/* Planos */}
-      <section id="planos" style={{ padding: 'clamp(60px,8vw,100px) 0', background: '#fff' }}>
-        <div style={{ width: 'min(1100px,92vw)', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <Eyebrow color="var(--gold-deep)">Modalidades</Eyebrow>
-            <h2 style={{ margin: '10px 0 0' }}>Escolha a avaliação certa</h2>
+      {/* Cards 3 modalidades */}
+      <section style={{ padding: 'clamp(60px,8vw,100px) 0' }}>
+        <div style={{ width: 'min(1180px,92vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto 52px' }}>
+            <Eyebrow color="var(--gold-deep)">3 modalidades</Eyebrow>
+            <h2 style={{ margin: '8px 0 12px' }}>Escolha o laudo certo para cada situação</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 15.5 }}>
+              De uma estimativa instantânea até um laudo com validade judicial. A VN Prime conecta você ao avaliador adequado.
+            </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(270px,1fr))', gap: 24 }}>
-            {planos.map(p => (
-              <div key={p.tipo} style={{
-                background: p.tipo === 'extrajudicial' ? 'var(--navy)' : 'var(--cream)',
+          <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))' }}>
+            {MODALIDADES.map(m => (
+              <div key={m.id} style={{
+                background: m.destaque ? 'var(--navy-deep,#0F1824)' : '#fff',
                 borderRadius: 20,
-                padding: 'clamp(26px,3.5vw,36px)',
-                border: p.tipo === 'extrajudicial' ? 'none' : '1px solid var(--border)',
-                position: 'relative',
-                overflow: 'hidden',
+                border: m.destaque ? 'none' : '1px solid var(--border)',
+                boxShadow: m.destaque ? '0 12px 40px rgba(15,22,32,0.22)' : '0 2px 12px rgba(0,0,0,0.06)',
+                display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative',
               }}>
-                {p.badge && (
-                  <div style={{ position: 'absolute', top: 20, right: 20, background: 'var(--gold)', color: 'var(--navy-deep)', fontSize: 10, fontWeight: 800, padding: '3px 10px', borderRadius: 99, letterSpacing: '0.06em' }}>{p.badge}</div>
-                )}
-                <div style={{ width: 36, height: 3, background: p.accent, borderRadius: 2, marginBottom: 18 }} />
-                <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: p.tipo === 'extrajudicial' ? 'rgba(255,255,255,0.5)' : 'var(--fg-3)', marginBottom: 6 }}>{p.titulo}</div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: p.tipo === 'extrajudicial' ? 'var(--gold-soft)' : 'var(--navy)', marginBottom: 3 }}>{p.preco}</div>
-                <div style={{ fontSize: 12, color: p.tipo === 'extrajudicial' ? 'rgba(255,255,255,0.45)' : 'var(--fg-3)', marginBottom: 16 }}>{p.sub}</div>
-                <div style={{ fontSize: 13.5, color: p.tipo === 'extrajudicial' ? 'rgba(255,255,255,0.7)' : 'var(--fg-2)', lineHeight: 1.6, marginBottom: 20 }}>{p.desc}</div>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {p.bullets.map(b => (
-                    <li key={b} style={{ display: 'flex', gap: 10, fontSize: 13, color: p.tipo === 'extrajudicial' ? 'rgba(255,255,255,0.65)' : 'var(--fg-2)' }}>
-                      <span style={{ color: p.accent === '#D4A857' ? 'var(--gold)' : p.accent, fontWeight: 700, flexShrink: 0 }}>✓</span>
-                      {b}
-                    </li>
-                  ))}
-                </ul>
+                <div style={{ position: 'absolute', top: -1, right: 24,
+                  background: m.destaque ? '#D4A857' : 'var(--navy)',
+                  color: m.destaque ? '#0F1824' : '#fff',
+                  padding: '4px 14px', borderRadius: '0 0 8px 8px',
+                  fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                  {m.badge}
+                </div>
+                <div style={{ padding: '32px 28px 20px',
+                  borderBottom: m.destaque ? '1px solid rgba(255,255,255,0.08)' : '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                      background: m.destaque ? 'rgba(212,168,87,0.18)' : '#1B2733',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="#D4A857" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d={m.svgPath} />
+                      </svg>
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: 17, color: m.destaque ? '#fff' : 'var(--navy)', lineHeight: 1.2 }}>{m.nome}</div>
+                      <div style={{ fontSize: 12, color: m.destaque ? 'rgba(255,255,255,0.55)' : 'var(--fg-3)', fontWeight: 500, marginTop: 3 }}>{m.executor}</div>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: 14, color: m.destaque ? 'rgba(255,255,255,0.72)' : 'var(--fg-2)', margin: 0, lineHeight: 1.65 }}>{m.uso}</p>
+                </div>
+                <div style={{ display: 'flex', gap: 10, padding: '18px 28px 0', flexWrap: 'wrap' }}>
+                  <span style={{ background: m.destaque ? 'rgba(255,255,255,0.08)' : 'var(--cream)',
+                    color: m.destaque ? 'rgba(255,255,255,0.75)' : 'var(--navy)',
+                    padding: '5px 12px', borderRadius: 99, fontSize: 12.5, fontWeight: 600 }}>
+                    {m.prazo}
+                  </span>
+                  <span style={{ background: m.destaque ? 'rgba(212,168,87,0.15)' : '#D4A85714',
+                    color: '#D4A857', border: m.destaque ? 'none' : '1px solid #D4A85730',
+                    padding: '5px 12px', borderRadius: 99, fontSize: 12.5, fontWeight: 700 }}>
+                    {m.valor}
+                  </span>
+                </div>
+                <div style={{ padding: '18px 28px', flex: 1 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em',
+                    color: m.destaque ? 'rgba(255,255,255,0.35)' : 'var(--fg-3)', marginBottom: 12 }}>
+                    Quando usar
+                  </div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 9 }}>
+                    {m.quandoUsar.map(q => (
+                      <li key={q} style={{ fontSize: 13.5, display: 'flex', gap: 9, alignItems: 'flex-start',
+                        color: m.destaque ? 'rgba(255,255,255,0.82)' : 'var(--fg-1)' }}>
+                        <span style={{ color: '#D4A857', fontWeight: 700, flexShrink: 0 }}>✓</span>
+                        {q}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div style={{ padding: '16px 28px 28px' }}>
+                  <button
+                    onClick={m.id === 'ia' ? scrollToEstimativa : openConsultor}
+                    style={{
+                      width: '100%', padding: '13px 20px', borderRadius: 10, border: 'none',
+                      background: m.destaque ? '#D4A857' : 'var(--navy)',
+                      color: m.destaque ? '#0F1824' : '#fff',
+                      fontSize: 14, fontWeight: 700, cursor: 'pointer', transition: 'opacity 0.15s',
+                      fontFamily: 'inherit',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
+                    onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                  >{m.cta}</button>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Formulário */}
-      <section id="solicitar" style={{ padding: 'clamp(50px,7vw,80px) 0', background: 'var(--cream)' }}>
-        <div style={{ width: 'min(700px,92vw)', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 36 }}>
-            <Eyebrow color="var(--gold-deep)">Solicitação</Eyebrow>
-            <h2 style={{ margin: '10px 0 10px' }}>Solicitar avaliação</h2>
-            <p style={{ color: 'var(--fg-2)', fontSize: 15 }}>Retorno em até 24h úteis com orçamento e prazo.</p>
-          </div>
+      {/* Estimativa IA — Interactive Section */}
+      {showEstimForm && (
+        <section ref={estimSectionRef} style={{ padding: 'clamp(60px,8vw,100px) 0', background: '#fff', scrollMarginTop: 80 }}>
+          <div style={{ width: 'min(800px,92vw)', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 40 }}>
+              <Eyebrow color="var(--gold-deep)">Estimativa IA · Gratuita</Eyebrow>
+              <h2 style={{ margin: '8px 0 10px' }}>Qual o valor do seu imóvel?</h2>
+              <p style={{ color: 'var(--fg-2)', fontSize: 15 }}>
+                Estimativa baseada em comparativos de mercado em BH e região. Referência pré-negociação — não substitui laudo técnico.
+              </p>
+            </div>
 
-          <div style={{ background: '#fff', borderRadius: 20, padding: '36px 32px', border: '1px solid var(--border)' }}>
-            {enviado ? (
-              <div style={{ textAlign: 'center', padding: '24px 0' }}>
-                <div style={{ fontSize: 40, marginBottom: 16 }}>✓</div>
-                <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--navy)', marginBottom: 10 }}>Solicitação enviada!</div>
-                <div style={{ fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.6, marginBottom: 24 }}>
-                  Nossa equipe entrará em contato em até 24h úteis com orçamento e disponibilidade.
+            {!estimResult && !estimLoading && (
+              <div style={{ background: 'var(--cream)', borderRadius: 18, padding: 'clamp(28px,4vw,44px)', border: '1px solid var(--border)' }}>
+                <div style={{ display: 'grid', gap: 18, gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))' }}>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 7 }}>Bairro / Cidade</label>
+                    <input type="text" placeholder="Ex.: Savassi, Nova Lima..."
+                      value={estimForm.bairro}
+                      onChange={e => setEstimForm(f => ({ ...f, bairro: e.target.value }))}
+                      style={IS} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 7 }}>Tipo</label>
+                    <select value={estimForm.tipo}
+                      onChange={e => setEstimForm(f => ({ ...f, tipo: e.target.value }))}
+                      style={IS}>
+                      <option>Apartamento</option>
+                      <option>Casa</option>
+                      <option>Comercial</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 7 }}>Área privativa (m²)</label>
+                    <input type="number" placeholder="Ex.: 90"
+                      value={estimForm.area}
+                      onChange={e => setEstimForm(f => ({ ...f, area: e.target.value }))}
+                      style={IS} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 7 }}>Quartos</label>
+                    <select value={estimForm.quartos}
+                      onChange={e => setEstimForm(f => ({ ...f, quartos: e.target.value }))}
+                      style={IS}>
+                      {['1','2','3','4','5+'].map(q => <option key={q}>{q}</option>)}
+                    </select>
+                  </div>
                 </div>
-                <a href={`https://wa.me/5531984144250?text=Olá! Solicitei avaliação de imóvel no site VN Prime. Gostaria de confirmar.`} target="_blank" rel="noopener noreferrer">
-                  <Btn variant="primary">Confirmar pelo WhatsApp</Btn>
-                </a>
+                <div style={{ marginTop: 22, textAlign: 'center' }}>
+                  <button onClick={runEstimativa} disabled={!estimForm.area}
+                    style={{ padding: '13px 36px', borderRadius: 10, border: 'none', fontSize: 15, fontWeight: 700,
+                      background: estimForm.area ? 'var(--navy)' : '#ccc',
+                      color: '#fff', cursor: estimForm.area ? 'pointer' : 'not-allowed',
+                      transition: 'opacity 0.15s', fontFamily: 'inherit' }}>
+                    Calcular estimativa
+                  </button>
+                </div>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 14 }}>
-                  {[
-                    { ph: 'Nome completo', key: 'nome', type: 'text' },
-                    { ph: 'WhatsApp', key: 'telefone', type: 'tel' },
-                    { ph: 'E-mail', key: 'email', type: 'email' },
-                  ].map(f => (
-                    <input key={f.key} type={f.type} placeholder={f.ph} value={(form as any)[f.key]} required
-                      onChange={e => set(f.key, e.target.value)}
-                      style={{ padding: '12px 14px', borderRadius: 10, border: '1.5px solid var(--border)', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
-                  ))}
-                </div>
-                <input type="text" placeholder="Endereço do imóvel" value={form.endereco} required
-                  onChange={e => set('endereco', e.target.value)}
-                  style={{ padding: '12px 14px', borderRadius: 10, border: '1.5px solid var(--border)', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
+            )}
 
-                <div>
-                  <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 10, fontWeight: 600 }}>Tipo de avaliação</div>
-                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                    {[
-                      { v: 'estimativa', l: 'Estimativa IA (gratuita)' },
-                      { v: 'extrajudicial', l: 'Laudo Extrajudicial' },
-                      { v: 'judicial', l: 'Laudo Judicial' },
-                    ].map(o => (
-                      <button key={o.v} type="button" onClick={() => set('tipo', o.v)}
-                        style={{
-                          padding: '8px 16px', borderRadius: 99, border: '1.5px solid',
-                          borderColor: form.tipo === o.v ? 'var(--gold)' : 'var(--border)',
-                          background: form.tipo === o.v ? 'var(--gold)' : '#fff',
-                          color: form.tipo === o.v ? 'var(--navy-deep)' : 'var(--fg-1)',
-                          fontSize: 13, fontWeight: form.tipo === o.v ? 700 : 500, cursor: 'pointer',
-                          fontFamily: 'inherit',
-                        }}>{o.l}</button>
-                    ))}
+            {estimLoading && (
+              <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                <div style={{ width: 56, height: 56, borderRadius: '50%', border: '4px solid var(--border)',
+                  borderTopColor: 'var(--gold)', margin: '0 auto 20px',
+                  animation: 'spin 0.9s linear infinite' }} />
+                <p style={{ color: 'var(--fg-2)', fontSize: 15 }}>Analisando comparativos de mercado em BH/MG…</p>
+              </div>
+            )}
+
+            {estimResult && (
+              <div>
+                <div style={{ background: 'var(--navy-deep,#0F1824)', borderRadius: 18, padding: 'clamp(28px,4vw,44px)', color: '#fff', marginBottom: 24 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 20 }}>
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.45)', marginBottom: 10 }}>
+                        Estimativa de mercado VN Prime
+                      </div>
+                      <div style={{ fontSize: 'clamp(2rem,4vw,2.8rem)', fontWeight: 800, color: '#D4A857', lineHeight: 1 }}>
+                        {fmtC(estimResult.low)} — {fmtC(estimResult.high)}
+                      </div>
+                      <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', marginTop: 8 }}>
+                        Intervalo médio: {fmtC(estimResult.mid)} · {fmtC(estimResult.m2low)}–{fmtC(estimResult.m2high)}/m²
+                      </div>
+                    </div>
+                    <button onClick={() => { setEstimResult(null); setUserEstimValue('') }}
+                      style={{ padding: '9px 18px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.2)',
+                        background: 'transparent', color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: 600,
+                        cursor: 'pointer', fontFamily: 'inherit' }}>
+                      Nova busca
+                    </button>
+                  </div>
+
+                  <div style={{ marginTop: 28, paddingTop: 22, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.38)', marginBottom: 14 }}>
+                      Referências de mercado — compare também em
+                    </div>
+                    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                      {[
+                        { label: 'FipeZap', url: 'https://fipezap.zapimoveis.com.br' },
+                        { label: 'ZAP Imóveis', url: 'https://www.zapimoveis.com.br' },
+                        { label: 'Viva Real', url: 'https://www.vivareal.com.br' },
+                        { label: 'OLX Imóveis', url: 'https://www.olx.com.br/imoveis' },
+                      ].map(b => (
+                        <a key={b.label} href={b.url} target="_blank" rel="noopener noreferrer"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 16px',
+                            borderRadius: 8, background: 'rgba(255,255,255,0.07)',
+                            border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)',
+                            fontSize: 13, fontWeight: 600, textDecoration: 'none', transition: 'background 0.15s' }}
+                          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(212,168,87,0.18)')}
+                          onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.07)')}
+                        >
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+                          {b.label}
+                        </a>
+                      ))}
+                    </div>
+                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 12 }}>
+                      Estimativa baseada em comparativos internos. Para validade jurídica, solicite um Laudo PTAM.
+                    </div>
                   </div>
                 </div>
 
-                <textarea placeholder="Observações (metragem, tipo do imóvel, finalidade)" value={form.obs}
-                  onChange={e => set('obs', e.target.value)} rows={3}
-                  style={{ padding: '12px 14px', borderRadius: 10, border: '1.5px solid var(--border)', fontSize: 14, fontFamily: 'inherit', outline: 'none', resize: 'vertical' }} />
-
-                <Btn variant="primary" type="submit" style={{ opacity: loading ? 0.6 : 1 }}>
-                  {loading ? 'Enviando...' : 'Solicitar avaliação'}
-                </Btn>
-                <div style={{ fontSize: 11, color: 'var(--fg-3)', textAlign: 'center' }}>
-                  Retorno em até 24h úteis · orçamento sem compromisso
+                <div style={{ background: 'var(--cream)', border: '1px solid var(--border)', borderRadius: 16, padding: 'clamp(24px,3vw,36px)' }}>
+                  <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 18 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4A857" strokeWidth="1.8" strokeLinecap="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--navy)', marginBottom: 4 }}>Na sua opinião, quanto vale?</div>
+                      <div style={{ fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.55 }}>
+                        O preço de pedida é diferente do valor de mercado. Qual o valor que você acha justo para este imóvel?
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <input type="text" placeholder="Ex.: R$ 680.000"
+                      value={userEstimValue}
+                      onChange={e => setUserEstimValue(e.target.value)}
+                      style={{ flex: '1 1 200px', padding: '11px 16px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 15, fontWeight: 600, outline: 'none', background: '#fff' }} />
+                    {(() => {
+                      const raw = userEstimValue.replace(/\D/g, '')
+                      const uVal = parseInt(raw, 10)
+                      if (!uVal || uVal < 10000 || !estimResult) return null
+                      const diff = uVal - estimResult.mid
+                      const pct = Math.round((diff / estimResult.mid) * 100)
+                      const above = diff > 0
+                      const within = Math.abs(pct) <= 8
+                      return (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 18px', borderRadius: 10,
+                          background: within ? '#D4A85718' : above ? '#FFF3CD' : '#E3F0FF',
+                          border: `1.5px solid ${within ? '#D4A857' : above ? '#F0C040' : '#90B8D8'}`,
+                          fontSize: 13, fontWeight: 700,
+                          color: within ? '#8B6914' : above ? '#7A5C00' : '#1a5276' }}>
+                          {within ? '✓ Dentro da faixa de mercado' : above ? `↑ ${pct}% acima da estimativa` : `↓ ${Math.abs(pct)}% abaixo da estimativa`}
+                        </div>
+                      )
+                    })()}
+                  </div>
+                  <div style={{ marginTop: 18, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                    <Btn variant="primary" onClick={openConsultor}>Discutir com consultor</Btn>
+                    <Btn variant="ghost" onClick={() => window.open('https://fipezap.zapimoveis.com.br', '_blank')}>Ver FipeZap</Btn>
+                  </div>
                 </div>
-              </form>
+              </div>
             )}
+          </div>
+        </section>
+      )}
+
+      {/* Bottom CTA */}
+      <section style={{ padding: 'clamp(50px,7vw,90px) 0', background: '#fff' }}>
+        <div style={{ width: 'min(900px,92vw)', margin: '0 auto',
+          background: 'var(--gradient-navy-hero)', color: '#fff',
+          padding: 'clamp(36px,5vw,56px)', borderRadius: 'var(--radius-xl)',
+          textAlign: 'center', boxShadow: 'var(--shadow-soft)' }}>
+          <Eyebrow>Avaliação VN Prime</Eyebrow>
+          <h2 style={{ color: '#fff', margin: '14px 0 12px', fontSize: 'clamp(1.8rem,3.5vw,2.4rem)', fontWeight: 800 }}>
+            Não arrisque comprar ou vender pelo preço errado.
+          </h2>
+          <p style={{ color: 'rgba(245,248,250,0.85)', fontSize: 16, maxWidth: 520, margin: '0 auto 28px' }}>
+            Um laudo profissional protege sua negociação, facilita financiamentos e dá segurança jurídica à transação.
+          </p>
+          <Btn variant="accent" size="lg" onClick={openConsultor}>Falar com consultor</Btn>
+          <div style={{ marginTop: 16, fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+            Clientes VN Prime têm acesso gratuito à Estimativa IA
           </div>
         </div>
       </section>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </main>
   )
 }

@@ -5,9 +5,9 @@ import { createClient } from '@/lib/supabase/client'
 import Btn from '@/components/ui/Btn'
 import Eyebrow from '@/components/ui/Eyebrow'
 
-type Step = 'voce' | 'imovel' | 'fotos' | 'plano' | 'publicar'
-const STEPS: Step[] = ['voce', 'imovel', 'fotos', 'plano', 'publicar']
-const STEP_LABELS = ['Você', 'Imóvel', 'Fotos', 'Plano', 'Publicar']
+type Step = 'voce' | 'imovel' | 'fotos' | 'pitch' | 'plano' | 'publicar'
+const STEPS: Step[] = ['voce', 'imovel', 'fotos', 'pitch', 'plano', 'publicar']
+const STEP_LABELS = ['Você', 'Imóvel', 'Fotos', 'Pitch IA', 'Plano', 'Publicar']
 
 const PLANOS = [
   {
@@ -49,6 +49,8 @@ export default function AnunciarPage() {
     condominio: '', iptu: '',
     endereco: '', bairro: '', cidade: 'Belo Horizonte', estado: 'MG', cep: '',
     plano: '',
+    pitches: [] as { label: string; text: string }[],
+    pitchEscolhido: '',
   })
 
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
@@ -255,7 +257,14 @@ export default function AnunciarPage() {
                 ))}
               </div>
             )}
-            <NavBtns onBack={() => setStep('imovel')} onNext={() => setStep('plano')} canNext={true} nextLabel="Continuar" />
+            <NavBtns onBack={() => setStep('imovel')} onNext={() => setStep('pitch')} canNext={true} nextLabel="Continuar" />
+          </Card>
+        )}
+
+        {step === 'pitch' && (
+          <Card title="Pitch perfeito, gerado para você" desc="Nossa IA cria três versões com base nos seus dados. Escolha a que mais combina, edite se quiser.">
+            <StepPitch form={form} set={set} />
+            <NavBtns onBack={() => setStep('fotos')} onNext={() => setStep('plano')} canNext={true} nextLabel="Continuar →" />
           </Card>
         )}
 
@@ -286,7 +295,7 @@ export default function AnunciarPage() {
                 </div>
               ))}
             </div>
-            <NavBtns onBack={() => setStep('fotos')} onNext={() => setStep('publicar')} canNext={!!form.plano} />
+            <NavBtns onBack={() => setStep('pitch')} onNext={() => setStep('publicar')} canNext={!!form.plano} />
           </Card>
         )}
 
@@ -308,7 +317,7 @@ export default function AnunciarPage() {
               ))}
             </div>
             <div style={{ marginTop: 28, display: 'flex', gap: 12 }}>
-              <Btn variant="ghost" onClick={() => setStep('plano')}>← Voltar</Btn>
+              <Btn variant="ghost" onClick={() => setStep('plano')}>← Plano</Btn>
               <Btn variant="accent" size="lg" onClick={handleSubmit} loading={loading} style={{ flex: 1 }}>
                 Publicar anúncio
               </Btn>
@@ -316,6 +325,111 @@ export default function AnunciarPage() {
           </Card>
         )}
       </div>
+    </div>
+  )
+}
+
+function StepPitch({ form, set }: { form: Record<string, any>; set: (k: string, v: any) => void }) {
+  const [loadingPitch, setLoadingPitch] = useState(false)
+  const [pitchError, setPitchError] = useState('')
+
+  const generate = async () => {
+    setLoadingPitch(true); setPitchError('')
+    await new Promise(r => setTimeout(r, 1800))
+    try {
+      const tipo = form.tipo || 'Imóvel'
+      const bairro = form.bairro || 'Belo Horizonte'
+      const area = form.area_m2 ? `${form.area_m2} m²` : 'amplo'
+      const qts = Number(form.quartos) || 3
+      const suits = Number(form.suites) || 2
+      const vagas = Number(form.vagas) || 2
+      const preco = form.preco ? `R$ ${Number(form.preco.replace(/\D/g,'')).toLocaleString('pt-BR')}` : 'valor a consultar'
+      const titulo = form.titulo || `${tipo} em ${bairro}`
+      const pitches = [
+        {
+          label: 'Curto e direto',
+          text: `${titulo} — ${area}, ${qts} quartos, ${suits} suítes, ${vagas} vagas. Localização privilegiada em ${bairro}. Acabamento de alto padrão. Anunciado por ${preco}, com endereço protegido na vitrine. Visitas agendadas diretamente pelo painel da VN Prime.`,
+        },
+        {
+          label: 'Editorial e descritivo',
+          text: `Em ${bairro}, este ${tipo.toLowerCase()} de ${area} reúne planta inteligente e acabamento criterioso. São ${qts} quartos — ${suits} deles em suíte — e ${vagas} ${vagas === 1 ? 'vaga' : 'vagas'} na garagem. Acabamento de alto padrão. Preço pedido de ${preco}. Imóvel VN Prime, com curadoria técnica e processo de venda estruturado do anúncio à escritura.`,
+        },
+        {
+          label: 'Foco em estilo de vida',
+          text: `Imagine acordar com a vista de ${bairro} e ter ${area} de espaço para chamar de seu. Este ${tipo.toLowerCase()} tem ${qts} quartos, ${suits} suítes e garagem para ${vagas} ${vagas === 1 ? 'carro' : 'carros'}. Quem compra aqui não paga por metragem — paga por como vai viver. Valor: ${preco}.`,
+        },
+      ]
+      set('pitches', pitches)
+    } catch {
+      setPitchError('Erro ao gerar pitches. Verifique os dados do imóvel e tente novamente.')
+    } finally {
+      setLoadingPitch(false)
+    }
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(201,150,14,0.12)', color: 'var(--navy)', padding: '5px 12px', borderRadius: 999, fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+        ✦ Assistente VN Prime · IA
+      </div>
+
+      {form.pitches.length === 0 && !loadingPitch && (
+        <div style={{ background: 'linear-gradient(135deg,#0F1824 0%,#1B2733 100%)', color: '#fff', borderRadius: 14, padding: '28px 30px', textAlign: 'center' }}>
+          <div style={{ fontSize: 38, color: 'var(--gold-soft)', marginBottom: 10 }}>✦</div>
+          <h3 style={{ color: '#fff', margin: '0 0 8px' }}>Pronto para gerar 3 pitches?</h3>
+          <p style={{ color: 'rgba(250,249,246,0.85)', margin: '0 auto 18px', maxWidth: 440, fontSize: 14 }}>
+            Vamos cruzar os dados do seu imóvel com as melhores práticas de copywriting do mercado de alto padrão.
+          </p>
+          <button onClick={generate} style={{ padding: '12px 28px', background: 'var(--gold)', color: 'var(--navy-deep)', border: 'none', borderRadius: 999, fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+            ✦ Gerar pitches
+          </button>
+        </div>
+      )}
+
+      {loadingPitch && (
+        <div style={{ background: '#fff', border: '1px solid var(--border)', borderRadius: 14, padding: '40px 24px', textAlign: 'center' }}>
+          <div style={{ width: 36, height: 36, borderRadius: 999, margin: '0 auto 14px', border: '3px solid rgba(201,150,14,0.2)', borderTopColor: 'var(--gold)', animation: 'spin 0.8s linear infinite' }} />
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--navy)' }}>Escrevendo seus pitches...</div>
+          <div style={{ fontSize: 12.5, color: 'var(--fg-2)', marginTop: 4 }}>Levamos cerca de 8 segundos</div>
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      )}
+
+      {pitchError && (
+        <div style={{ background: '#FEF3C7', color: '#92400E', padding: 14, borderRadius: 8, fontSize: 13 }}>
+          {pitchError}{' '}
+          <button onClick={generate} style={{ background: 'none', border: 'none', color: '#92400E', textDecoration: 'underline', cursor: 'pointer', fontFamily: 'inherit' }}>Tentar de novo</button>
+        </div>
+      )}
+
+      {form.pitches.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {form.pitches.map((p: { label: string; text: string }, i: number) => {
+            const selected = form.pitchEscolhido === p.text
+            return (
+              <div key={i} onClick={() => { set('pitchEscolhido', p.text); set('descricao', p.text) }}
+                style={{ background: selected ? 'rgba(201,150,14,0.06)' : '#fff', border: selected ? '2px solid var(--gold)' : '1px solid var(--border)', borderRadius: 12, padding: '18px 22px', cursor: 'pointer', transition: 'all 0.18s ease' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)' }}>{p.label}</div>
+                  {selected && <span style={{ background: 'var(--gold)', color: 'var(--navy-deep)', padding: '2px 10px', borderRadius: 99, fontSize: 11, fontWeight: 700 }}>Escolhido</span>}
+                </div>
+                <p style={{ margin: 0, color: 'var(--fg-1)', fontSize: 14, lineHeight: 1.65 }}>{p.text}</p>
+              </div>
+            )
+          })}
+          <button onClick={generate} style={{ alignSelf: 'flex-start', padding: '7px 16px', borderRadius: 8, border: '1px solid var(--border)', background: '#fff', color: 'var(--fg-2)', fontSize: 13, cursor: 'pointer' }}>↻ Gerar outras 3 versões</button>
+
+          {form.pitchEscolhido && (
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 7 }}>
+                Edite se quiser (opcional)
+              </label>
+              <textarea value={form.descricao} onChange={e => set('descricao', e.target.value)}
+                style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 14, outline: 'none', background: '#fff', minHeight: 130, resize: 'vertical', lineHeight: 1.6, boxSizing: 'border-box' }} />
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
