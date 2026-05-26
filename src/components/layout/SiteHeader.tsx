@@ -43,19 +43,19 @@ function BrandLockup({ onNavy = false }: { onNavy?: boolean }) {
 }
 
 const NAV = [
-  { label: 'Buscar',      href: '/busca' },
+  { label: 'Início',      href: '/' },
+  { label: 'Comprar',     href: '/busca' },
+  { label: 'Anuncie',     href: '/vender' },
   { label: 'Lançamentos', href: '/lancamentos' },
-  { label: 'Vender',      href: '/vender' },
   { label: 'Sobre',       href: '/sobre' },
   {
     label: 'Serviços', href: '#',
     dropdown: [
-      { label: 'Proprietário Direto',  href: '/proprietario',  desc: 'Anuncie · taxa fixa ou comissão' },
-      { label: 'Portal do Corretor',   href: '/corretor',       desc: 'Leads, CRM e portfólio premium' },
+      { label: 'Proprietário Direto',  href: '/proprietario',  desc: 'Anuncie seu imóvel · taxa fixa ou comissão' },
+      { label: 'Portal do Corretor',   href: '/corretor',       desc: 'Leads, CRM e portfólio premium de BH' },
       { label: 'Consórcio',            href: '/consorcio',      desc: 'Compre sem juros com carta de crédito' },
-      { label: 'Due Diligence',        href: '/due-diligence',  desc: 'Análise jurídica antes de comprar' },
-      { label: 'Avaliação de Imóveis', href: '/avaliacao',      desc: 'Laudo judicial, extrajudicial ou IA' },
-      { label: 'Calculadora ITBI',     href: '/calculadora',    desc: 'ITBI + escritura + registro gratuito' },
+      { label: 'Due Diligence',        href: '/due-diligence',  desc: 'Análise jurídica e técnica antes de comprar' },
+      { label: 'Avaliação de Imóveis', href: '/avaliacao',      desc: 'Laudo judicial, extrajudicial ou estimativa IA' },
     ],
   },
 ]

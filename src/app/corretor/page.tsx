@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
+import Link from 'next/link'
 import { fmtBRL } from '@/lib/utils'
 import Btn from '@/components/ui/Btn'
 import Eyebrow from '@/components/ui/Eyebrow'
@@ -17,7 +18,7 @@ export default function CorretorPage() {
   const [leads, setLeads] = useState<any[]>([])
   const [imoveis, setImoveis] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [sec, setSec] = useState<'dashboard' | 'cadastro' | 'imoveis' | 'leads'>('dashboard')
+  const [sec, setSec] = useState<'dashboard' | 'cadastro' | 'imoveis' | 'leads' | 'fotografo'>('dashboard')
 
   useEffect(() => { loadData() }, [])
 
@@ -70,7 +71,7 @@ export default function CorretorPage() {
         {/* Tabs */}
         {(() => {
           const tabs: [string, string][] = corretor
-            ? [['dashboard','Dashboard'],['imoveis','Imóveis'],['leads','Leads'],['cadastro','Meus dados']]
+            ? [['dashboard','Dashboard'],['imoveis','Imóveis'],['leads','Leads'],['fotografo','📸 Fotógrafo'],['cadastro','Meus dados']]
             : [['cadastro','Completar cadastro']]
           return (
             <div style={{ display: 'flex', gap: 4, borderBottom: '2px solid var(--border)', marginBottom: 32 }}>
@@ -165,6 +166,8 @@ export default function CorretorPage() {
           </div>
         )}
 
+        {sec === 'fotografo' && <FotografoSection />}
+
         {sec === 'cadastro' && (
           <CadastroCorretor
             profile={profile}
@@ -239,6 +242,63 @@ function CadastroCorretor({ profile, corretor, onSaved }: { profile: Profile | n
           </Btn>
         </div>
       </div>
+    </div>
+  )
+}
+
+const FOTO_PACOTES_C = [
+  { id: 'essencial', nome: 'Essencial', preco: 'R$ 390', duracao: '60 min',
+    itens: ['25 fotos editadas em alta', 'Tratamento de luz e cor', 'Entrega em 48h', 'Direito de uso comercial'] },
+  { id: 'completo', nome: 'Completo', preco: 'R$ 690', duracao: '90 min', destaque: true,
+    itens: ['40 fotos editadas em alta', 'Tour virtual 360°', 'Vídeo curto (30s vertical)', 'Planta humanizada', 'Entrega em 48h'] },
+  { id: 'premium', nome: 'Premium · com drone', preco: 'R$ 1.190', duracao: '2h',
+    itens: ['60 fotos + drone aéreo', 'Tour 360° + Matterport', 'Vídeo cinematográfico (60s)', 'Plantas + contexto urbano', 'Entrega em 24h'] },
+]
+
+function FotografoSection() {
+  return (
+    <div>
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#2F8674', marginBottom: 6 }}>Canal do Fotógrafo</div>
+        <h3 style={{ margin: 0, marginBottom: 8 }}>Contrate fotografia profissional para seus clientes</h3>
+        <p style={{ margin: 0, color: 'var(--fg-2)', fontSize: 14 }}>Fotografia, tour virtual 360°, drone e vídeo cinematográfico. Imóveis com fotos profissionais vendem até 3× mais rápido. Atendemos toda a Grande BH. Entrega em até 48h.</p>
+      </div>
+      <div style={{ display: 'grid', gap: 18, gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', marginBottom: 20 }}>
+        {FOTO_PACOTES_C.map(p => (
+          <div key={p.id} style={{
+            background: p.destaque ? 'var(--navy)' : '#fff',
+            padding: 24, borderRadius: 16,
+            border: p.destaque ? 'none' : '1px solid var(--border)',
+            boxShadow: p.destaque ? 'var(--shadow-soft)' : 'none',
+            position: 'relative',
+          }}>
+            {p.destaque && (
+              <div style={{ position: 'absolute', top: -11, left: 20, background: 'var(--gold)', color: 'var(--navy-deep)', padding: '3px 11px', borderRadius: 999, fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                Mais escolhido
+              </div>
+            )}
+            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: p.destaque ? 'var(--gold-soft)' : 'var(--gold-deep)', marginBottom: 8 }}>{p.nome}</div>
+            <div style={{ fontSize: 32, fontWeight: 800, fontFamily: 'var(--font-display)', letterSpacing: '-0.02em', color: p.destaque ? '#fff' : 'var(--navy)' }}>{p.preco}</div>
+            <div style={{ fontSize: 12.5, color: p.destaque ? 'rgba(255,255,255,0.55)' : 'var(--fg-3)', marginBottom: 16 }}>sessão de {p.duracao}</div>
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: 9 }}>
+              {p.itens.map(it => (
+                <li key={it} style={{ fontSize: 13.5, display: 'flex', gap: 9 }}>
+                  <span style={{ color: p.destaque ? 'var(--gold-soft)' : 'var(--gold-deep)', fontWeight: 700 }}>✓</span>
+                  <span style={{ color: p.destaque ? 'rgba(255,255,255,0.85)' : 'var(--fg-1)' }}>{it}</span>
+                </li>
+              ))}
+            </ul>
+            <Link href="/fotografo" style={{ display: 'block' }}>
+              <Btn variant={p.destaque ? 'accent' : 'primary'} size="sm" style={{ width: '100%' }}>
+                Contratar {p.nome}
+              </Btn>
+            </Link>
+          </div>
+        ))}
+      </div>
+      <p style={{ fontSize: 12.5, color: 'var(--fg-3)', textAlign: 'center' }}>
+        Incluso nos planos Venda Assistida e Venda Completa · <Link href="/vender" style={{ color: 'var(--gold-deep)', fontWeight: 600 }}>Ver planos</Link>
+      </p>
     </div>
   )
 }
