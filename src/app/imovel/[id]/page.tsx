@@ -298,6 +298,9 @@ export default function ImovelPage() {
                 ↗ Compartilhar
               </a>
             </div>
+            <button onClick={() => window.print()} style={{ width: '100%', padding: '7px 0', borderRadius: 8, border: '1px solid var(--border)', background: 'transparent', color: 'var(--fg-3)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 8 }}>
+              🖨 Imprimir / Salvar PDF
+            </button>
 
             {!sent ? (
               <>
