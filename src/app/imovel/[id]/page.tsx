@@ -1,5 +1,6 @@
 'use client'
-import { useEffect, useState } from 'react'
+import 'leaflet/dist/leaflet.css'
+import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { fmtBRL } from '@/lib/utils'
@@ -26,6 +27,8 @@ export default function ImovelPage() {
   const [propostaSending, setPropostaSending] = useState(false)
   const [propostaSent, setPropostaSent] = useState(false)
   const [lightbox, setLightbox] = useState<number | null>(null)
+  const mapRef = useRef<HTMLDivElement>(null)
+  const mapInstance = useRef<any>(null)
 
   useEffect(() => {
     const favs: string[] = JSON.parse(localStorage.getItem('vnp_favs') ?? '[]')
@@ -71,6 +74,20 @@ export default function ImovelPage() {
     })
     setVisitaSent(true); setVisitaSending(false)
   }
+
+  useEffect(() => {
+    if (!im?.lat || !im?.lng || !mapRef.current || mapInstance.current) return
+    import('leaflet').then(({ default: L }) => {
+      const map = L.map(mapRef.current!, { center: [im.lat, im.lng], zoom: 15, zoomControl: true })
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap', maxZoom: 19,
+      }).addTo(map)
+      L.circle([im.lat, im.lng], { radius: 120, color: 'var(--gold)', fillColor: 'var(--gold)', fillOpacity: 0.15, weight: 2 }).addTo(map)
+      mapInstance.current = map
+      setTimeout(() => map.invalidateSize(), 100)
+    })
+    return () => { if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null } }
+  }, [im])
 
   const sendProposta = async () => {
     if (!proposta.nome || !proposta.email || !proposta.valor) return
@@ -233,6 +250,14 @@ export default function ImovelPage() {
               </div>
             )}
           </div>
+          {/* Mapa */}
+          {(im.lat && im.lng) && (
+            <div style={{ marginTop: 40 }}>
+              <h3 style={{ fontSize: 18, marginBottom: 12 }}>Localização</h3>
+              <p style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 16 }}>Localização aproximada — endereço exato fornecido após contato.</p>
+              <div ref={mapRef} style={{ height: 320, borderRadius: 14, overflow: 'hidden', border: '1px solid var(--border)', zIndex: 0 }} />
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
