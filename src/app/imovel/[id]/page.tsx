@@ -8,8 +8,19 @@ import { fmtBRL } from '@/lib/utils'
 import Btn from '@/components/ui/Btn'
 import Eyebrow from '@/components/ui/Eyebrow'
 
+function useIsMobile() {
+  const [m, setM] = useState(false)
+  useEffect(() => {
+    const chk = () => setM(window.innerWidth <= 768)
+    chk(); window.addEventListener('resize', chk)
+    return () => window.removeEventListener('resize', chk)
+  }, [])
+  return m
+}
+
 export default function ImovelPage() {
   const { id } = useParams<{ id: string }>()
+  const isMobile = useIsMobile()
   const supabase = createClient()
   const [im, setIm] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -152,7 +163,7 @@ export default function ImovelPage() {
         {fotos.length === 0 && <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.3)', fontSize: 64 }}>🏠</div>}
       </div>
 
-      <div style={{ width: 'min(1200px,92vw)', margin: '0 auto', paddingTop: 40, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) min(380px, 38%)', gap: 40, alignItems: 'start' }}>
+      <div style={{ width: 'min(1200px,92vw)', margin: '0 auto', paddingTop: 40, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 1fr) min(380px, 38%)', gap: isMobile ? 28 : 40, alignItems: 'start' }}>
         {/* Main */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
@@ -270,7 +281,7 @@ export default function ImovelPage() {
         </div>
 
         {/* Sidebar */}
-        <div style={{ position: 'sticky', top: 90 }}>
+        <div style={{ position: isMobile ? 'static' : 'sticky', top: 90 }}>
           <div style={{ background: '#fff', borderRadius: 16, padding: 28, boxShadow: 'var(--shadow-strong)', borderTop: '3px solid var(--gold)' }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 6 }}>Preço de pedida</div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 800, color: 'var(--gold)', lineHeight: 1, marginBottom: 4 }}>{fmtBRL(im.preco)}</div>
