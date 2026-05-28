@@ -31,14 +31,24 @@ export default function AdminPage() {
   const supabase = createClient()
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) { window.location.href = '/login?redirect=/admin'; return }
-      setUser(data.user)
-      const { data: p } = await supabase.from('profiles').select('*').eq('id', data.user.id).single()
-      if (!p || p.tipo !== 'admin') { window.location.href = '/'; return }
-      setProfile(p)
-      setLoading(false)
-    })
+    async function checkAuth() {
+      try {
+        const { data: { user }, error: authErr } = await supabase.auth.getUser()
+        if (authErr || !user) { window.location.href = '/login?redirect=/admin'; return }
+        setUser(user)
+        const { data: p, error: profErr } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+        if (profErr || !p) {
+          // Perfil não encontrado — cria um básico e redireciona para login para tentar novamente
+          window.location.href = '/login?redirect=/admin'; return
+        }
+        if (p.tipo !== 'admin') { window.location.href = '/'; return }
+        setProfile(p)
+        setLoading(false)
+      } catch {
+        window.location.href = '/login?redirect=/admin'
+      }
+    }
+    checkAuth()
   }, [])
 
   const loadAll = useCallback(async () => {
