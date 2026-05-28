@@ -2,6 +2,7 @@
 import 'leaflet/dist/leaflet.css'
 import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { fmtBRL } from '@/lib/utils'
 import Btn from '@/components/ui/Btn'
@@ -314,6 +315,19 @@ export default function ImovelPage() {
                 ✅ Mensagem enviada! O responsável entrará em contato em breve.
               </div>
             )}
+          </div>
+
+          {/* Consórcio CTA */}
+          <div style={{ background: '#fff', borderRadius: 16, padding: '20px 22px', boxShadow: 'var(--shadow-soft)', border: '1px solid var(--border)', marginTop: 16 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#059669', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Alternativa ao financiamento</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>Compre via Consórcio</div>
+            {im.preco && (() => {
+              const parcela = Math.round((im.preco * 1.17) / 180)
+              return <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 12 }}>A partir de <strong style={{ color: 'var(--navy)' }}>R$ {parcela.toLocaleString('pt-BR')}/mês</strong> · 0% juros bancários</div>
+            })()}
+            <Link href="/consorcio" style={{ textDecoration: 'none', display: 'block', textAlign: 'center', padding: '9px', background: 'rgba(5,150,105,0.08)', border: '1.5px solid rgba(5,150,105,0.3)', borderRadius: 9, fontSize: 13, fontWeight: 700, color: '#059669', fontFamily: 'var(--font-body)' }}>
+              Simular consórcio →
+            </Link>
           </div>
         </div>
       </div>
