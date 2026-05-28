@@ -27,7 +27,7 @@ const SERVICOS = [
     subtitle: 'Leads qualificados e comissão garantida',
     desc: 'Acesse o portfólio VN Prime, receba leads com contato completo e gerencie seu funil de vendas com CRM Kanban integrado. Comissão integral em cada venda.',
     bullets: ['Leads com WhatsApp + e-mail qualificados', 'CRM Kanban de funil de vendas', 'Portfólio premium VN Prime', 'Comissão integral garantida'],
-    cta: 'Acessar portal', href: '/corretor',
+    cta: 'Entrar como corretor parceiro', href: '/corretor',
     img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&q=80',
     accent: '#2F8674',
   },
@@ -35,8 +35,8 @@ const SERVICOS = [
     title: 'Consórcio Imobiliário',
     subtitle: 'Compre sem juros, no seu ritmo',
     desc: 'A forma mais inteligente de adquirir seu imóvel. Sem juros, sem entrada obrigatória. Carta de crédito nominal contemplada por sorteio ou lance mensal.',
-    bullets: ['0% de juros — nunca', 'Prazo de até 12 anos', 'Contemplação por sorteio ou lance', '200+ consorciados em BH e região'],
-    cta: 'Simular meu consórcio', href: '/consorcio',
+    bullets: ['Sem juros bancários; apenas taxa de administração conforme administradora', 'Prazo de até 12 anos', 'Contemplação por sorteio ou lance', '200+ consorciados em BH e região'],
+    cta: 'Simular minha carta', href: '/consorcio',
     img: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=900&q=80',
     accent: '#059669',
   },
@@ -82,7 +82,7 @@ const PLANOS = [
   },
   {
     name: 'Venda Assistida',
-    tag: 'Mais escolhido · Venda garantida',
+    tag: 'Mais escolhido · Você só paga se vender',
     price: '3%',
     priceLabel: 'você paga apenas quando vender — zero risco',
     desc: 'Venda mais rápido com o apoio da VN Prime. Você cadastra o imóvel e conduz o processo; a equipe VN Prime qualifica compradores, cuida do anúncio e mantém tudo otimizado até fechar o negócio.',
@@ -92,7 +92,7 @@ const PLANOS = [
   },
   {
     name: 'Venda Completa',
-    tag: 'Mãos livres · Venda garantida',
+    tag: 'Mãos livres · Você só paga se vender',
     price: '6%',
     priceLabel: 'você paga apenas quando vender — você aprova a proposta e assina',
     desc: 'A VN Prime cuida de tudo. Corretor dedicado, fotos profissionais, mídia paga gerenciada, visitas conduzidas e negociação. Você só precisa aprovar a proposta e assinar a escritura.',
@@ -103,10 +103,10 @@ const PLANOS = [
 ]
 
 const STATS = [
-  { value: '18 dias', label: 'Tempo médio de venda' },
-  { value: 'R$ 297', label: 'Taxa fixa — sem comissão' },
-  { value: '3%', label: 'Plano Venda Assistida' },
-  { value: 'BH + Grande BH', label: 'Área de atuação' },
+  { value: 'BH e Grande BH', label: 'Área de atuação' },
+  { value: '3 planos', label: 'De venda — sem custo de entrada' },
+  { value: '0%', label: 'De comissão no plano direto' },
+  { value: 'Jurídico', label: 'Due diligence + consórcio incluso' },
 ]
 
 const SERVICE_PILLS = [
@@ -208,7 +208,7 @@ export default function HomePage() {
             </em>
           </h1>
           <p style={{ color: 'rgba(250,249,246,0.92)', fontSize: 16, maxWidth: 580, margin: '0 auto 28px', textShadow: '0 1px 10px rgba(0,0,0,0.3)' }}>
-            Imóveis premium em Belo Horizonte e Grande BH, selecionados pelo time VN Prime.
+            Compre, venda ou invista em imóveis com curadoria, tecnologia e segurança jurídica em BH e região.
           </p>
 
           {/* Search card */}
@@ -491,8 +491,35 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Bottom CTA ── */}
+      {/* ── Segurança em cada etapa ── */}
       <section style={{ padding: 'clamp(3rem,6vw,5rem) 0', background: 'var(--white)' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 44px' }}>
+            <Eyebrow color="var(--gold)">Nosso compromisso</Eyebrow>
+            <h2 style={{ margin: '10px 0 12px' }}>Segurança em <em className="italic-accent">cada etapa</em></h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 15.5, margin: 0 }}>
+              Do primeiro contato à escritura, cada passo da sua transação é protegido pela curadoria VN Prime.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 2 }}>
+            {[
+              { num: '01', title: 'Você só paga se vender', desc: 'Nos planos Assistida e Completa, zero adiantado. Comissão cobrada exclusivamente na conclusão do negócio.' },
+              { num: '02', title: 'Due diligence incluso', desc: 'Análise de 30+ itens jurídicos e técnicos antes de qualquer assinatura. Sem surpresas no pós-venda.' },
+              { num: '03', title: 'Dados protegidos', desc: 'Seus documentos e informações pessoais trafegam com criptografia. Nunca repassamos dados a terceiros sem autorização.' },
+              { num: '04', title: 'Contrato transparente', desc: 'Termos claros, sem cláusulas surpresa. Você revisa e aprova tudo antes de assinar qualquer documento.' },
+            ].map(item => (
+              <div key={item.num} style={{ padding: '32px 28px', border: '1px solid var(--border)', background: '#FAFAF8' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, color: 'var(--gold)', letterSpacing: '0.12em', marginBottom: 16 }}>{item.num}</div>
+                <h3 style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', margin: '0 0 10px', lineHeight: 1.3 }}>{item.title}</h3>
+                <p style={{ fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.7, margin: 0 }}>{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Bottom CTA ── */}
+      <section style={{ padding: 'clamp(3rem,6vw,5rem) 0', background: 'var(--cream)' }}>
         <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
           <div style={{
             background: 'var(--gradient-navy-hero)', borderRadius: 24,
@@ -501,11 +528,13 @@ export default function HomePage() {
             <Eyebrow color="var(--gold)">VN Prime Imóveis</Eyebrow>
             <h2 style={{ color: '#fff', margin: '16px 0 16px', fontSize: 'clamp(1.6rem,3vw,2.4rem)' }}>Pronto para dar o próximo passo?</h2>
             <p style={{ color: 'rgba(245,248,250,0.80)', fontSize: 16, marginBottom: 36, lineHeight: 1.7, maxWidth: 520, margin: '0 auto 36px' }}>
-              Cadastre-se gratuitamente e acesse o portal do proprietário ou do corretor.
+              Curadoria de alto padrão, segurança jurídica e tecnologia — tudo em Belo Horizonte e região.
             </p>
             <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link href="/anunciar"><Btn variant="accent" size="lg">Anunciar meu imóvel</Btn></Link>
-              <Link href="/busca"><Btn variant="ghost-light" size="lg">Buscar imóveis</Btn></Link>
+              <Link href="/corretor"><Btn variant="ghost-light" size="lg">Entrar como corretor parceiro</Btn></Link>
+              <Link href="/consorcio"><Btn variant="ghost-light" size="lg">Simular minha carta</Btn></Link>
+              <Link href="/busca"><Btn variant="ghost-light" size="lg">Ver oportunidades</Btn></Link>
             </div>
           </div>
         </div>
