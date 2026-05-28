@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -56,6 +56,13 @@ export default function SiteFooter() {
   const pathname = usePathname()
   const [email, setEmail] = useState('')
   const [saved, setSaved] = useState(false)
+  const [showTop, setShowTop] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 400)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   if (pathname === '/login') return null
 
@@ -67,6 +74,13 @@ export default function SiteFooter() {
   }
 
   return (
+    <>
+    {showTop && (
+      <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Voltar ao topo"
+        style={{ position: 'fixed', bottom: 90, right: 24, zIndex: 9980, width: 44, height: 44, borderRadius: '50%', background: 'var(--navy)', color: 'var(--gold)', border: '1.5px solid rgba(212,168,87,0.35)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, boxShadow: '0 2px 12px rgba(15,34,68,0.22)', transition: 'opacity 0.2s', fontFamily: 'inherit' }}>
+        ↑
+      </button>
+    )}
     <footer style={{ background: 'var(--navy)', color: 'rgba(245,248,250,0.72)', padding: '64px 0 32px', marginTop: 60 }}>
       <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
 
@@ -147,5 +161,6 @@ export default function SiteFooter() {
         </div>
       </div>
     </footer>
+    </>
   )
 }

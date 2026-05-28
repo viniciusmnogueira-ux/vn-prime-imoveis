@@ -502,6 +502,14 @@ export default function AdminPage() {
                       {o || 'Todos'}
                     </button>
                   ))}
+                  <button onClick={() => {
+                    const next = { ...leadLido }
+                    filtered.forEach(l => { next[l.id] = true })
+                    setLeadLido(next)
+                    localStorage.setItem('vnp_admin_leadlido', JSON.stringify(next))
+                  }} style={{ padding: '5px 14px', borderRadius: 8, border: '1px solid #E2E8F0', background: '#F8FAFC', color: '#64748B', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    ✓ Marcar todos lidos
+                  </button>
                   <button onClick={exportCSV} style={{ padding: '5px 14px', borderRadius: 8, border: '1px solid #E2E8F0', background: '#F8FAFC', color: '#0369A1', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4 }}>
                     ↓ CSV
                   </button>
