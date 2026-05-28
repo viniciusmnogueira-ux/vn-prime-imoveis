@@ -56,6 +56,7 @@ const NAV = [
       { label: 'Consórcio',            href: '/consorcio',      desc: 'Compre sem juros com carta de crédito' },
       { label: 'Due Diligence',        href: '/due-diligence',  desc: 'Análise jurídica e técnica antes de comprar' },
       { label: 'Avaliação de Imóveis', href: '/avaliacao',      desc: 'Laudo judicial, extrajudicial ou estimativa IA' },
+      { label: 'Calculadora ITBI',    href: '/calculadora',     desc: 'Calcule ITBI, escritura e registro em segundos' },
     ],
   },
 ]
@@ -95,6 +96,8 @@ export default function SiteHeader() {
     setUser(null)
     window.location.href = '/'
   }
+
+  if (pathname === '/login') return null
 
   return (
     <>

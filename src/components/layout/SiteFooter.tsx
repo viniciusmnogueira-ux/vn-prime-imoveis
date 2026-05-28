@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 function BrandLockup() {
@@ -52,8 +53,11 @@ function FootCol({ title, links }: { title: string; links: { label: string; href
 }
 
 export default function SiteFooter() {
+  const pathname = usePathname()
   const [email, setEmail] = useState('')
   const [saved, setSaved] = useState(false)
+
+  if (pathname === '/login') return null
 
   const saveNewsletter = async () => {
     if (!email.includes('@')) return

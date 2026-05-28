@@ -58,6 +58,15 @@ const SERVICOS = [
     img: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=900&q=80',
     accent: '#D4A857',
   },
+  {
+    title: 'Calculadora ITBI',
+    subtitle: 'Calcule todos os custos antes de fechar',
+    desc: 'Saiba exatamente quanto vai pagar de ITBI, registro, escritura e demais custos cartorários antes de assinar qualquer contrato. Cálculo preciso em segundos.',
+    bullets: ['ITBI + escritura + registro tudo junto', 'Resultado instantâneo e gratuito', 'Simule por valor de venda ou avaliação', 'Referência para negociação e planejamento'],
+    cta: 'Calcular agora', href: '/calculadora',
+    img: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=900&q=80',
+    accent: '#6366F1',
+  },
 ]
 
 const PLANOS = [
@@ -94,10 +103,10 @@ const PLANOS = [
 ]
 
 const STATS = [
-  { value: '142', label: 'Imóveis disponíveis' },
-  { value: 'R$ 4,2 bi', label: 'Em portfólio' },
-  { value: '96%', label: 'Satisfação' },
   { value: '18 dias', label: 'Tempo médio de venda' },
+  { value: 'R$ 297', label: 'Taxa fixa — sem comissão' },
+  { value: '3%', label: 'Plano Venda Assistida' },
+  { value: 'BH + Grande BH', label: 'Área de atuação' },
 ]
 
 const SERVICE_PILLS = [
@@ -238,12 +247,6 @@ export default function HomePage() {
               </select>
             </div>
             <Link href={searchHref}><Btn variant="accent" size="lg">Buscar</Btn></Link>
-          </div>
-
-          <div style={{ textAlign: 'center', marginTop: 14 }}>
-            <button style={{ background: 'none', border: 'none', color: 'rgba(245,248,250,0.72)', fontSize: 13, cursor: 'pointer', textDecoration: 'underline', textDecorationStyle: 'dashed', fontFamily: 'inherit' }}>
-              ✉ Receber alertas desta busca por e-mail
-            </button>
           </div>
 
           {/* Stats */}
