@@ -279,7 +279,7 @@ export default function AdminPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
                 <thead>
                   <tr style={{ background: '#F8FAFC' }}>
-                    {['Imóvel', 'Proprietário', 'Preço', 'Status', 'Data', 'Ações'].map(h => (
+                    {['Imóvel', 'Proprietário', 'Preço', 'Status', 'Flags', 'Data', 'Ações'].map(h => (
                       <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
@@ -303,6 +303,12 @@ export default function AdminPage() {
                           padding: '3px 10px', borderRadius: 99, fontSize: 11, fontWeight: 700,
                           background: `${STATUS_COLORS[im.status]}18`, color: STATUS_COLORS[im.status],
                         }}>{im.status}</span>
+                      </td>
+                      <td style={{ padding: '12px 14px' }}>
+                        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                          {im.verificado && <span style={{ fontSize: 10, fontWeight: 700, background: '#ECFDF5', color: '#059669', padding: '2px 7px', borderRadius: 99 }}>✓ Ver.</span>}
+                          {im.destaque && <span style={{ fontSize: 10, fontWeight: 700, background: '#FFFBEB', color: '#D97706', padding: '2px 7px', borderRadius: 99 }}>★ Dest.</span>}
+                        </div>
                       </td>
                       <td style={{ padding: '12px 14px', fontSize: 11, color: '#64748B', whiteSpace: 'nowrap' }}>{fmtDate(im.criado_em)}</td>
                       <td style={{ padding: '12px 14px' }}>
