@@ -4,6 +4,25 @@ import Eyebrow from '@/components/ui/Eyebrow'
 import Btn from '@/components/ui/Btn'
 import { createClient } from '@/lib/supabase/client'
 
+function FaqAccordion({ items }: { items: { q: string; a: string }[] }) {
+  const [open, setOpen] = useState<number | null>(null)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {items.map((item, i) => (
+        <div key={i} style={{ borderBottom: '1px solid var(--border)' }}>
+          <button onClick={() => setOpen(open === i ? null : i)} style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', padding: '18px 0', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, fontFamily: 'inherit' }}>
+            <span style={{ fontSize: 15.5, fontWeight: 600, color: 'var(--navy)', lineHeight: 1.4 }}>{item.q}</span>
+            <span style={{ fontSize: 18, color: 'var(--gold)', flexShrink: 0, transition: 'transform 0.2s', transform: open === i ? 'rotate(45deg)' : 'none', display: 'inline-block' }}>+</span>
+          </button>
+          {open === i && (
+            <p style={{ fontSize: 14.5, color: 'var(--fg-1)', lineHeight: 1.75, margin: '0 0 18px', paddingRight: 32 }}>{item.a}</p>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 type Cert = {
   id: string; nome: string; para: string;
   sobre: 'vendedor' | 'imovel'; categoria: string;
@@ -379,6 +398,24 @@ export default function DueDiligencePage() {
           </section>
         </>
       )}
+
+      {/* FAQ */}
+      <section style={{ padding: 'clamp(3rem,5vw,5rem) 0', background: '#fff' }}>
+        <div style={{ width: 'min(820px,94vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <Eyebrow color="var(--gold-deep)">Dúvidas frequentes</Eyebrow>
+            <h2 style={{ margin: '8px 0 0' }}>Due Diligence — perguntas e respostas</h2>
+          </div>
+          <FaqAccordion items={[
+            { q: 'O que é Due Diligence imobiliária?', a: 'É a análise completa da situação jurídica e documental de um imóvel antes da compra. Envolve certidões do imóvel, do vendedor, regularidade fiscal, conformidade de área e ausência de ônus.' },
+            { q: 'Quanto tempo leva a análise?', a: 'A análise padrão leva de 3 a 7 dias úteis, dependendo da complexidade do imóvel e da disponibilidade das certidões nos órgãos competentes.' },
+            { q: 'Quais certidões são obrigatórias?', a: 'As essenciais são: Certidão Vintenária, Certidão de Ônus Reais, certidões negativas de débitos federais, estaduais e municipais do vendedor, e IPTU em dia. Veja a lista completa na ferramenta acima.' },
+            { q: 'A VN Prime faz o levantamento por mim?', a: 'Sim. No serviço de Due Diligence Assistida nossa equipe levanta todas as certidões e entrega um laudo com parecer jurídico completo. Consulte o valor pelo WhatsApp.' },
+            { q: 'Quem deve pagar pela Due Diligence?', a: 'O comprador, pois é quem tem interesse em garantir que o imóvel está livre de impedimentos. Em negociações assistidas, pode ser negociado como custo compartilhado.' },
+            { q: 'O que acontece se encontrarem irregularidades?', a: 'A compra pode ser condicionada à regularização pelo vendedor, ou renegociada com desconto. Em casos graves (como penhora ativa), é recomendável desistir da compra.' },
+          ]} />
+        </div>
+      </section>
     </main>
   )
 }

@@ -30,6 +30,7 @@ export default function ImovelPage() {
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const [isFav, setIsFav] = useState(false)
+  const [inCompare, setInCompare] = useState(false)
   const [showVisita, setShowVisita] = useState(false)
   const [visita, setVisita] = useState({ nome: '', email: '', telefone: '', data: '' })
   const [visitaSending, setVisitaSending] = useState(false)
@@ -46,6 +47,8 @@ export default function ImovelPage() {
   useEffect(() => {
     const favs: string[] = JSON.parse(localStorage.getItem('vnp_favs') ?? '[]')
     setIsFav(favs.includes(id))
+    const cmp: string[] = JSON.parse(localStorage.getItem('vnp_compare') ?? '[]')
+    setInCompare(cmp.includes(id))
   }, [id])
 
   function toggleFav() {
@@ -53,6 +56,13 @@ export default function ImovelPage() {
     const next = isFav ? favs.filter(f => f !== id) : [...favs, id]
     localStorage.setItem('vnp_favs', JSON.stringify(next))
     setIsFav(!isFav)
+  }
+
+  function toggleCompare() {
+    const cmp: string[] = JSON.parse(localStorage.getItem('vnp_compare') ?? '[]')
+    const next = inCompare ? cmp.filter(x => x !== id) : cmp.length < 3 ? [...cmp, id] : cmp
+    localStorage.setItem('vnp_compare', JSON.stringify(next))
+    setInCompare(next.includes(id))
   }
 
   useEffect(() => {
@@ -289,7 +299,7 @@ export default function ImovelPage() {
 
             {im.condominio && <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 4 }}>Condomínio: {fmtBRL(im.condominio)}/mês</div>}
             {im.iptu && <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 12 }}>IPTU: {fmtBRL(im.iptu)}/ano</div>}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
               <button onClick={toggleFav} style={{ padding: '8px 0', borderRadius: 8, border: `1.5px solid ${isFav ? '#DC2626' : 'var(--border)'}`, background: isFav ? '#FEF2F2' : 'transparent', color: isFav ? '#DC2626' : 'var(--fg-2)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, transition: 'all 0.15s' }}>
                 <span>{isFav ? '♥' : '♡'}</span>
                 {isFav ? 'Salvo' : 'Salvar'}
@@ -298,10 +308,20 @@ export default function ImovelPage() {
                 ↗ Compartilhar
               </a>
             </div>
-            <button onClick={() => window.print()} style={{ width: '100%', padding: '7px 0', borderRadius: 8, border: '1px solid var(--border)', background: 'transparent', color: 'var(--fg-3)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 8 }}>
-              🖨 Imprimir / Salvar PDF
-            </button>
-
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
+              <button onClick={toggleCompare} style={{ padding: '8px 0', borderRadius: 8, border: `1.5px solid ${inCompare ? 'var(--gold)' : 'var(--border)'}`, background: inCompare ? 'rgba(212,168,87,0.10)' : 'transparent', color: inCompare ? 'var(--gold-deep)' : 'var(--fg-2)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, transition: 'all 0.15s' }}>
+                ⚖ {inCompare ? 'No comparador' : 'Comparar'}
+              </button>
+              {inCompare ? (
+                <Link href="/comparar" style={{ padding: '8px 0', borderRadius: 8, border: '1.5px solid var(--gold)', background: 'var(--gradient-gold)', color: 'var(--navy)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', transition: 'all 0.15s' }}>
+                  Ver comparação →
+                </Link>
+              ) : (
+                <button onClick={() => window.print()} style={{ padding: '8px 0', borderRadius: 8, border: '1px solid var(--border)', background: 'transparent', color: 'var(--fg-3)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+                  🖨 Imprimir
+                </button>
+              )}
+            </div>
             {!sent ? (
               <>
                 {!showContact ? (

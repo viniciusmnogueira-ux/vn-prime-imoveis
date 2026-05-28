@@ -4,6 +4,25 @@ import Eyebrow from '@/components/ui/Eyebrow'
 import Btn from '@/components/ui/Btn'
 import { createClient } from '@/lib/supabase/client'
 
+function FaqAccordion({ items }: { items: { q: string; a: string }[] }) {
+  const [open, setOpen] = useState<number | null>(null)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {items.map((item, i) => (
+        <div key={i} style={{ borderBottom: '1px solid var(--border)' }}>
+          <button onClick={() => setOpen(open === i ? null : i)} style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', padding: '18px 0', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, fontFamily: 'inherit' }}>
+            <span style={{ fontSize: 15.5, fontWeight: 600, color: 'var(--navy)', lineHeight: 1.4 }}>{item.q}</span>
+            <span style={{ fontSize: 18, color: 'var(--gold)', flexShrink: 0, transition: 'transform 0.2s', transform: open === i ? 'rotate(45deg)' : 'none', display: 'inline-block' }}>+</span>
+          </button>
+          {open === i && (
+            <p style={{ fontSize: 14.5, color: 'var(--fg-1)', lineHeight: 1.75, margin: '0 0 18px', paddingRight: 32 }}>{item.a}</p>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 const fmt = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
 const fmtN = (n: number, d = 1) => new Intl.NumberFormat('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }).format(n)
 const TAX = 0.17
@@ -345,6 +364,29 @@ export default function ConsorcioPage() {
 
       <SimuladorConsorcio />
       <SimuladorComparativo />
+
+      {/* FAQ */}
+      {(() => {
+        const FAQS = [
+          { q: 'Qual é a diferença entre consórcio e financiamento?', a: 'No financiamento você paga juros bancários (tipicamente 8–12% a.a.) sobre o saldo devedor. No consórcio você paga apenas taxa de administração (17% diluída em todo o prazo), sem juros. A desvantagem é que não há liberação imediata — você aguarda contemplação ou dá um lance.' },
+          { q: 'Como funciona a contemplação?', a: 'Mensalmente o grupo realiza um sorteio entre todos os cotistas. Você também pode dar um lance (oferta acima da parcela) para antecipar a contemplação. O maior lance do mês leva a carta.' },
+          { q: 'Posso usar FGTS no consórcio?', a: 'Sim. O FGTS pode ser usado como lance para antecipar a contemplação ou para quitar parcelas após ser contemplado, desde que o imóvel se enquadre nas regras do FGTS.' },
+          { q: 'E se eu precisar cancelar?', a: 'Em caso de desistência, você recebe de volta as parcelas pagas (descontada a taxa de administração) no próximo sorteio de devoluções do grupo.' },
+          { q: 'Qual o prazo máximo?', a: 'Trabalhamos com grupos de 60 a 240 meses. Quanto maior o prazo, menor a parcela mensal — mas maior o tempo esperado para contemplação sem lance.' },
+          { q: 'A carta pode ser usada em qualquer imóvel?', a: 'Sim, desde que o valor esteja dentro da carta contratada. Pode ser usado em imóvel novo, usado, na planta ou terreno.' },
+        ]
+        return (
+          <section style={{ padding: 'clamp(3rem,5vw,5rem) 0', background: 'var(--cream)' }}>
+            <div style={{ width: 'min(820px,94vw)', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: 40 }}>
+                <Eyebrow color="var(--gold-deep)">Dúvidas frequentes</Eyebrow>
+                <h2 style={{ margin: '8px 0 0' }}>Consórcio — perguntas e respostas</h2>
+              </div>
+              <FaqAccordion items={FAQS} />
+            </div>
+          </section>
+        )
+      })()}
 
       {/* CTA final */}
       <section style={{ padding: 'clamp(50px,7vw,80px) 0', background: '#fff' }}>

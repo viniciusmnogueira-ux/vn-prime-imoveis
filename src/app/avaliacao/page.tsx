@@ -6,6 +6,25 @@ import { createClient } from '@/lib/supabase/client'
 
 const fmtC = (n: number) => 'R$ ' + new Intl.NumberFormat('pt-BR').format(n)
 
+function FaqAccordion({ items }: { items: { q: string; a: string }[] }) {
+  const [open, setOpen] = useState<number | null>(null)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {items.map((item, i) => (
+        <div key={i} style={{ borderBottom: '1px solid var(--border)' }}>
+          <button onClick={() => setOpen(open === i ? null : i)} style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', padding: '18px 0', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, fontFamily: 'inherit' }}>
+            <span style={{ fontSize: 15.5, fontWeight: 600, color: 'var(--navy)', lineHeight: 1.4 }}>{item.q}</span>
+            <span style={{ fontSize: 18, color: 'var(--gold)', flexShrink: 0, transition: 'transform 0.2s', transform: open === i ? 'rotate(45deg)' : 'none', display: 'inline-block' }}>+</span>
+          </button>
+          {open === i && (
+            <p style={{ fontSize: 14.5, color: 'var(--fg-1)', lineHeight: 1.75, margin: '0 0 18px', paddingRight: 32 }}>{item.a}</p>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 const MODALIDADES = [
   {
     id: 'judicial', badge: 'Validade judicial', nome: 'Laudo Judicial',
@@ -453,6 +472,23 @@ export default function AvaliacaoPage() {
           </div>
         </section>
       )}
+
+      {/* FAQ */}
+      <section style={{ padding: 'clamp(3rem,5vw,5rem) 0', background: 'var(--cream)' }}>
+        <div style={{ width: 'min(820px,94vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <Eyebrow color="var(--gold-deep)">Dúvidas frequentes</Eyebrow>
+            <h2 style={{ margin: '8px 0 0' }}>Avaliação — perguntas e respostas</h2>
+          </div>
+          <FaqAccordion items={[
+            { q: 'O que é a Estimativa IA da VN Prime?', a: 'Nossa ferramenta analisa imóveis similares cadastrados na VN Prime e na região para sugerir uma faixa de valor de mercado. É uma estimativa indicativa — não substitui o laudo ABNT.' },
+            { q: 'Para que serve o Laudo de Avaliação ABNT?', a: 'O laudo formal é exigido por bancos para aprovação de financiamento, por cartórios em inventários e em disputas judiciais. Emitido por engenheiro ou arquiteto com habilitação CNAI.' },
+            { q: 'Em quanto tempo recebo o laudo?', a: 'Após visita técnica, o laudo completo é entregue em até 5 dias úteis. Para urgências, consulte disponibilidade de prazo reduzido.' },
+            { q: 'Qual a diferença entre avaliação e Due Diligence?', a: 'A avaliação determina o valor de mercado do imóvel. A Due Diligence investiga a situação jurídica e documental — débitos, ônus, área real, conformidade legal. São serviços complementares.' },
+            { q: 'A estimativa é gratuita?', a: 'Sim. A Estimativa IA está disponível para todos os visitantes. O Laudo ABNT é um serviço pago realizado por profissional habilitado.' },
+          ]} />
+        </div>
+      </section>
 
       {/* Bottom CTA */}
       <section style={{ padding: 'clamp(50px,7vw,90px) 0', background: '#fff' }}>

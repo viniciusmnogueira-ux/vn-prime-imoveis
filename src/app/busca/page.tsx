@@ -291,9 +291,11 @@ function BuscaContent() {
   const [savedSearches, setSavedSearches] = useState<Array<{label: string; filters: typeof EMPTY_FILTERS}>>([])
   const [showSavedSearches, setShowSavedSearches] = useState(false)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const [compareIds, setCompareIds] = useState<string[]>([])
 
   useEffect(() => {
     try { setSavedSearches(JSON.parse(localStorage.getItem('vnp_saved_searches') ?? '[]')) } catch {}
+    try { setCompareIds(JSON.parse(localStorage.getItem('vnp_compare') ?? '[]')) } catch {}
   }, [])
 
   const saveSearch = () => {
@@ -374,6 +376,14 @@ function BuscaContent() {
     setFilters(f => ({ ...f, ...partial }))
 
   const clearFilters = () => setFilters(f => ({ ...EMPTY_FILTERS, op: f.op }))
+
+  const toggleCompare = (id: string) => {
+    setCompareIds(prev => {
+      const next = prev.includes(id) ? prev.filter(x => x !== id) : prev.length < 3 ? [...prev, id] : prev
+      localStorage.setItem('vnp_compare', JSON.stringify(next))
+      return next
+    })
+  }
 
   const pillBtn = (active: boolean): React.CSSProperties => ({
     padding: '6px 11px', border: '1px solid',
@@ -656,15 +666,52 @@ function BuscaContent() {
                     ? '1fr'
                     : 'repeat(auto-fit, minmax(280px, 1fr))',
                 }}>
-                  {visible.map(l => (
-                    <ImovelCard key={l.id} im={l} layout={layout === 'list' ? 'horizontal' : 'grid'} />
-                  ))}
+                  {visible.map(l => {
+                    const inCompare = compareIds.includes(l.id)
+                    const atMax = compareIds.length >= 3 && !inCompare
+                    return (
+                      <div key={l.id} style={{ position: 'relative' }}>
+                        <ImovelCard im={l} layout={layout === 'list' ? 'horizontal' : 'grid'} />
+                        <button
+                          onClick={e => { e.preventDefault(); if (!atMax) toggleCompare(l.id) }}
+                          title={atMax ? 'Máximo de 3 imóveis para comparar' : (inCompare ? 'Remover da comparação' : 'Adicionar à comparação')}
+                          style={{
+                            position: 'absolute', bottom: layout === 'list' ? 16 : 12, right: layout === 'list' ? 16 : 12,
+                            padding: '5px 11px', borderRadius: 7, border: `1.5px solid ${inCompare ? 'var(--gold)' : 'var(--border)'}`,
+                            background: inCompare ? 'var(--gold)' : 'rgba(255,255,255,0.92)',
+                            color: inCompare ? 'var(--navy-deep)' : atMax ? 'var(--fg-3)' : 'var(--navy)',
+                            fontSize: 11.5, fontWeight: 700, cursor: atMax ? 'not-allowed' : 'pointer',
+                            fontFamily: 'inherit', backdropFilter: 'blur(4px)', opacity: atMax ? 0.5 : 1,
+                            transition: 'all 0.15s', zIndex: 2,
+                          }}>
+                          {inCompare ? '✓ Comparar' : '⚖ Comparar'}
+                        </button>
+                      </div>
+                    )
+                  })}
                 </div>
                 {visible.length < results.length && (
                   <div style={{ textAlign: 'center', marginTop: 30 }}>
                     <Btn variant="ghost" onClick={() => setPage(p => p + 1)}>
                       Mostrar mais {Math.min(PER_PAGE, results.length - visible.length)} imóveis
                     </Btn>
+                  </div>
+                )}
+
+                {/* Floating compare bar */}
+                {compareIds.length > 0 && (
+                  <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 1000, background: 'var(--navy)', borderRadius: 14, boxShadow: '0 8px 40px rgba(15,34,68,0.35)', padding: '14px 22px', display: 'flex', alignItems: 'center', gap: 16, minWidth: 320 }}>
+                    <span style={{ fontSize: 13.5, fontWeight: 700, color: '#fff' }}>
+                      {compareIds.length} {compareIds.length === 1 ? 'imóvel' : 'imóveis'} selecionado{compareIds.length > 1 ? 's' : ''}
+                    </span>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <Link href="/comparar" style={{ textDecoration: 'none', padding: '8px 18px', borderRadius: 8, background: 'var(--gradient-gold)', color: 'var(--navy)', fontSize: 13, fontWeight: 700, fontFamily: 'inherit' }}>
+                        Comparar →
+                      </Link>
+                      <button onClick={() => { setCompareIds([]); localStorage.removeItem('vnp_compare') }} style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                        Limpar
+                      </button>
+                    </div>
                   </div>
                 )}
               </>

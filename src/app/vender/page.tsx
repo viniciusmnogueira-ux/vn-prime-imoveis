@@ -5,6 +5,25 @@ import Btn from '@/components/ui/Btn'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
+function FaqList({ items }: { items: { q: string; a: string }[] }) {
+  const [open, setOpen] = useState<number | null>(null)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+      {items.map((item, i) => (
+        <div key={i} style={{ borderBottom: '1px solid var(--border)', overflow: 'hidden' }}>
+          <button onClick={() => setOpen(open === i ? null : i)} style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', padding: '18px 0', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, fontFamily: 'inherit' }}>
+            <span style={{ fontSize: 15.5, fontWeight: 600, color: 'var(--navy)', lineHeight: 1.4 }}>{item.q}</span>
+            <span style={{ fontSize: 18, color: 'var(--gold)', flexShrink: 0, transition: 'transform 0.2s', transform: open === i ? 'rotate(45deg)' : 'none', display: 'inline-block' }}>+</span>
+          </button>
+          {open === i && (
+            <p style={{ fontSize: 14.5, color: 'var(--fg-1)', lineHeight: 1.75, margin: '0 0 18px', paddingRight: 32 }}>{item.a}</p>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 const PLANOS_PROP = [
   {
     id: 'direta', tag: 'Venda Direta', tagColor: '#D4A857',
@@ -304,6 +323,29 @@ export default function VenderPage() {
           </div>
         </section>
       )}
+
+      {/* FAQ */}
+      {(() => {
+        const FAQS = [
+          { q: 'Quanto tempo leva para meu imóvel aparecer na vitrine?', a: 'Após o envio, nossa equipe de curadoria revisa em até 24 horas úteis. Imóveis com fotos profissionais e descrição completa são aprovados mais rápido.' },
+          { q: 'Posso anunciar sem usar corretor?', a: 'Sim. No plano Venda Direta você mantém controle total da negociação. A VN Prime entra com a vitrine, distribuição em portais e suporte de plataforma.' },
+          { q: 'Como a VN Prime garante que o comprador é qualificado?', a: 'Todo comprador que entra em contato passa pelo nosso formulário de qualificação — perfil, faixa de orçamento e intenção de compra. Você recebe o lead pré-filtrado.' },
+          { q: 'O que está incluso no plano de 6%?', a: 'Sessão fotográfica profissional, mídia paga em Meta e Google, corretor dedicado para visitas e negociação, e suporte jurídico da minuta até a escritura.' },
+          { q: 'Posso pausar ou cancelar a qualquer momento?', a: 'Sim. No plano Direta você tem 90 dias de vigência e pode pausar a qualquer momento pelo painel. Nos planos de comissão não há prazo mínimo.' },
+          { q: 'E se meu imóvel não vender?', a: 'No plano Direta você paga apenas a taxa de publicação (R$ 297). Nos planos de comissão (3% ou 6%) não há cobrança se não houver venda.' },
+        ]
+        return (
+          <section style={{ padding: 'clamp(3rem,5vw,5rem) 0', background: 'var(--cream)' }}>
+            <div style={{ width: 'min(820px,94vw)', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: 40 }}>
+                <Eyebrow color="var(--gold-deep)">Dúvidas frequentes</Eyebrow>
+                <h2 style={{ margin: '8px 0 0' }}>Perguntas e respostas</h2>
+              </div>
+              <FaqList items={FAQS} />
+            </div>
+          </section>
+        )
+      })()}
 
       {/* Trust strip */}
       <section style={{ padding: 'clamp(3rem,5vw,4rem) 0', background: 'var(--navy)', color: '#fff' }}>
