@@ -21,6 +21,10 @@ export default function ImovelPage() {
   const [visita, setVisita] = useState({ nome: '', email: '', telefone: '', data: '' })
   const [visitaSending, setVisitaSending] = useState(false)
   const [visitaSent, setVisitaSent] = useState(false)
+  const [showProposta, setShowProposta] = useState(false)
+  const [proposta, setProposta] = useState({ nome: '', email: '', telefone: '', valor: '', condicoes: '' })
+  const [propostaSending, setPropostaSending] = useState(false)
+  const [propostaSent, setPropostaSent] = useState(false)
 
   useEffect(() => {
     const favs: string[] = JSON.parse(localStorage.getItem('vnp_favs') ?? '[]')
@@ -65,6 +69,20 @@ export default function ImovelPage() {
       origem: 'agendamento',
     })
     setVisitaSent(true); setVisitaSending(false)
+  }
+
+  const sendProposta = async () => {
+    if (!proposta.nome || !proposta.email || !proposta.valor) return
+    setPropostaSending(true)
+    await supabase.from('leads').insert({
+      imovel_id: id,
+      proprietario_id: im?.proprietario_id,
+      corretor_id: im?.corretor_id,
+      nome: proposta.nome, email: proposta.email, telefone: proposta.telefone,
+      mensagem: `Proposta de R$ ${proposta.valor}${proposta.condicoes ? ` | Condições: ${proposta.condicoes}` : ''}`,
+      origem: 'proposta',
+    })
+    setPropostaSent(true); setPropostaSending(false)
   }
 
   if (loading) return (
@@ -127,6 +145,43 @@ export default function ImovelPage() {
               <p style={{ fontSize: 15, color: 'var(--fg-1)', lineHeight: 1.8, whiteSpace: 'pre-line' }}>{im.descricao}</p>
             </div>
           )}
+
+          {/* Proposta online */}
+          <div style={{ marginTop: 40, background: '#fff', borderRadius: 16, padding: 28, border: '1px solid var(--border)', boxShadow: '0 4px 18px rgba(15,34,68,0.06)' }}>
+            <h3 style={{ fontSize: 18, marginBottom: 4 }}>📝 Fazer uma proposta</h3>
+            <p style={{ fontSize: 14, color: 'var(--fg-2)', marginBottom: 20 }}>Envie sua oferta diretamente ao responsável. Todas as propostas são registradas e rastreáveis.</p>
+            {propostaSent ? (
+              <div style={{ background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 10, padding: '14px 16px', fontSize: 14, color: '#065F46', textAlign: 'center' }}>
+                ✅ Proposta enviada! O responsável analisará e retornará em breve.
+              </div>
+            ) : !showProposta ? (
+              <Btn variant="ghost" onClick={() => setShowProposta(true)}>Enviar proposta de compra</Btn>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <input type="text" placeholder="Seu nome *" value={proposta.nome}
+                    onChange={e => setProposta(p => ({ ...p, nome: e.target.value }))}
+                    style={{ padding: '10px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 13, outline: 'none' }} />
+                  <input type="email" placeholder="Seu e-mail *" value={proposta.email}
+                    onChange={e => setProposta(p => ({ ...p, email: e.target.value }))}
+                    style={{ padding: '10px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 13, outline: 'none' }} />
+                  <input type="tel" placeholder="WhatsApp" value={proposta.telefone}
+                    onChange={e => setProposta(p => ({ ...p, telefone: e.target.value }))}
+                    style={{ padding: '10px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 13, outline: 'none' }} />
+                  <input type="number" placeholder="Valor da proposta (R$) *" value={proposta.valor}
+                    onChange={e => setProposta(p => ({ ...p, valor: e.target.value }))}
+                    style={{ padding: '10px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 13, outline: 'none' }} />
+                </div>
+                <textarea placeholder="Condições (pagamento à vista, financiamento, prazo…)" rows={2} value={proposta.condicoes}
+                  onChange={e => setProposta(p => ({ ...p, condicoes: e.target.value }))}
+                  style={{ padding: '10px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 13, outline: 'none', resize: 'none' }} />
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <Btn variant="accent" onClick={sendProposta} loading={propostaSending} disabled={!proposta.nome || !proposta.email || !proposta.valor}>Enviar proposta</Btn>
+                  <Btn variant="ghost" onClick={() => setShowProposta(false)}>Cancelar</Btn>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Agendar visita */}
           <div style={{ marginTop: 40, background: '#fff', borderRadius: 16, padding: 28, border: '1px solid var(--border)', boxShadow: '0 4px 18px rgba(15,34,68,0.06)' }}>
