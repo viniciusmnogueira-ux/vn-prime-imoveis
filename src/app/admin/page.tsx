@@ -235,12 +235,37 @@ export default function AdminPage() {
               </div>
             )}
 
-            {/* Últimos leads */}
-            <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', overflow: 'hidden' }}>
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>Últimos leads</div>
-                <button onClick={() => setTab('leads')} style={{ fontSize: 12, color: 'var(--gold-deep)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit' }}>Ver todos →</button>
+            {/* Activity feed + Últimos leads — side by side */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(320px,1fr))', gap: 20, marginBottom: 24 }}>
+              {/* Feed de atividade recente */}
+              <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', overflow: 'hidden' }}>
+                <div style={{ padding: '14px 20px', borderBottom: '1px solid #E2E8F0', fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>Atividade recente</div>
+                <div style={{ padding: '8px 0' }}>
+                  {[
+                    ...leads.slice(0, 4).map(l => ({ type: 'lead', label: `Lead: ${l.nome || '—'}`, sub: l.origem ?? 'direto', time: l.criado_em, color: '#7C3AED' })),
+                    ...imoveis.slice(0, 4).map(i => ({ type: 'imovel', label: `Imóvel: ${i.titulo || '—'}`, sub: i.status ?? '—', time: i.criado_em, color: '#0369A1' })),
+                  ]
+                    .sort((a, b) => new Date(b.time ?? 0).getTime() - new Date(a.time ?? 0).getTime())
+                    .slice(0, 8)
+                    .map((item, idx) => (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px', borderBottom: '1px solid #F8FAFC' }}>
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: item.color, flexShrink: 0 }} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--navy)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</div>
+                          <div style={{ fontSize: 11, color: '#94A3B8' }}>{item.sub}</div>
+                        </div>
+                        <div style={{ fontSize: 11, color: '#94A3B8', flexShrink: 0 }}>{fmtDate(item.time)}</div>
+                      </div>
+                    ))}
+                </div>
               </div>
+
+              {/* Últimos leads */}
+              <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', overflow: 'hidden' }}>
+                <div style={{ padding: '14px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>Últimos leads</div>
+                  <button onClick={() => setTab('leads')} style={{ fontSize: 12, color: 'var(--gold-deep)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit' }}>Ver todos →</button>
+                </div>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
@@ -265,7 +290,8 @@ export default function AdminPage() {
                   </tbody>
                 </table>
               </div>
-            </div>
+            </div>{/* close Últimos leads card */}
+            </div>{/* close activity grid */}
           </div>
         )}
 

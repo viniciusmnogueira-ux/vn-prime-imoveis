@@ -505,6 +505,39 @@ function BuscaContent() {
         </div>
       </section>
 
+      {/* Active filters summary */}
+      {(() => {
+        const chips: { label: string; onRemove: () => void }[] = []
+        if (filters.tipo) chips.push({ label: filters.tipo, onRemove: () => setF({ tipo: '' }) })
+        if (filters.priceRange) chips.push({ label: { ate500: 'Até R$ 500k', '500-1M': 'R$ 500k–1M', '1M-2M': 'R$ 1M–2M', '2M-5M': 'R$ 2M–5M', acima5M: 'Acima R$ 5M' }[filters.priceRange] ?? filters.priceRange, onRemove: () => setF({ priceRange: '' }) })
+        if (filters.priceMin) chips.push({ label: `Mín R$ ${filters.priceMin}`, onRemove: () => setF({ priceMin: '' }) })
+        if (filters.priceMax) chips.push({ label: `Máx R$ ${filters.priceMax}`, onRemove: () => setF({ priceMax: '' }) })
+        if (filters.quartos) chips.push({ label: `${filters.quartos}+ quartos`, onRemove: () => setF({ quartos: 0 }) })
+        if (filters.suites) chips.push({ label: `${filters.suites}+ suítes`, onRemove: () => setF({ suites: 0 }) })
+        if (filters.vagas) chips.push({ label: `${filters.vagas}+ vagas`, onRemove: () => setF({ vagas: 0 }) })
+        if (filters.areaMin) chips.push({ label: `Área ≥ ${filters.areaMin}m²`, onRemove: () => setF({ areaMin: '' }) })
+        if (filters.areaMax) chips.push({ label: `Área ≤ ${filters.areaMax}m²`, onRemove: () => setF({ areaMax: '' }) })
+        filters.bairros.forEach(b => chips.push({ label: b, onRemove: () => setF({ bairros: filters.bairros.filter(x => x !== b) }) }))
+        filters.amenidades.forEach(a => chips.push({ label: a, onRemove: () => setF({ amenidades: filters.amenidades.filter(x => x !== a) }) }))
+        if (filters.onlyFeatured) chips.push({ label: 'Só destaques', onRemove: () => setF({ onlyFeatured: false }) })
+        if (filters.onlyNew) chips.push({ label: 'Recém adicionados', onRemove: () => setF({ onlyNew: false }) })
+        if (!chips.length) return null
+        return (
+          <div style={{ background: 'rgba(212,168,87,0.06)', borderBottom: '1px solid var(--border)', padding: '10px 0' }}>
+            <div style={{ width: 'min(1280px,94vw)', margin: '0 auto', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-3)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Filtros:</span>
+              {chips.map(c => (
+                <span key={c.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 99, background: 'rgba(212,168,87,0.15)', border: '1px solid rgba(212,168,87,0.35)', fontSize: 12, fontWeight: 600, color: 'var(--navy)' }}>
+                  {c.label}
+                  <button onClick={c.onRemove} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--fg-3)', fontSize: 13, lineHeight: 1, padding: 0 }}>✕</button>
+                </span>
+              ))}
+              <button onClick={clearFilters} style={{ fontSize: 11, color: 'var(--gold-deep)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, fontFamily: 'inherit', textDecoration: 'underline', marginLeft: 4 }}>Limpar tudo</button>
+            </div>
+          </div>
+        )
+      })()}
+
       {/* Body */}
       <section style={{ padding: '24px 0 60px' }}>
         <div style={{ width: 'min(1280px,94vw)', margin: '0 auto', display: 'grid',
