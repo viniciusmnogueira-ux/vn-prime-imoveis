@@ -17,6 +17,10 @@ export default function ImovelPage() {
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const [isFav, setIsFav] = useState(false)
+  const [showVisita, setShowVisita] = useState(false)
+  const [visita, setVisita] = useState({ nome: '', email: '', telefone: '', data: '' })
+  const [visitaSending, setVisitaSending] = useState(false)
+  const [visitaSent, setVisitaSent] = useState(false)
 
   useEffect(() => {
     const favs: string[] = JSON.parse(localStorage.getItem('vnp_favs') ?? '[]')
@@ -47,6 +51,20 @@ export default function ImovelPage() {
       origem: 'detalhe',
     })
     setSent(true); setSending(false)
+  }
+
+  const sendVisita = async () => {
+    if (!visita.nome || !visita.email || !visita.data) return
+    setVisitaSending(true)
+    await supabase.from('leads').insert({
+      imovel_id: id,
+      proprietario_id: im?.proprietario_id,
+      corretor_id: im?.corretor_id,
+      nome: visita.nome, email: visita.email, telefone: visita.telefone,
+      mensagem: `Agendamento de visita solicitado para: ${visita.data}`,
+      origem: 'agendamento',
+    })
+    setVisitaSent(true); setVisitaSending(false)
   }
 
   if (loading) return (
@@ -109,6 +127,41 @@ export default function ImovelPage() {
               <p style={{ fontSize: 15, color: 'var(--fg-1)', lineHeight: 1.8, whiteSpace: 'pre-line' }}>{im.descricao}</p>
             </div>
           )}
+
+          {/* Agendar visita */}
+          <div style={{ marginTop: 40, background: '#fff', borderRadius: 16, padding: 28, border: '1px solid var(--border)', boxShadow: '0 4px 18px rgba(15,34,68,0.06)' }}>
+            <h3 style={{ fontSize: 18, marginBottom: 4 }}>📅 Agendar visita</h3>
+            <p style={{ fontSize: 14, color: 'var(--fg-2)', marginBottom: 20 }}>Escolha uma data e entraremos em contato para confirmar o horário.</p>
+            {visitaSent ? (
+              <div style={{ background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 10, padding: '14px 16px', fontSize: 14, color: '#065F46', textAlign: 'center' }}>
+                ✅ Visita solicitada! Entraremos em contato em breve para confirmar.
+              </div>
+            ) : !showVisita ? (
+              <Btn variant="primary" onClick={() => setShowVisita(true)}>Quero agendar uma visita</Btn>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <input type="text" placeholder="Seu nome *" value={visita.nome}
+                    onChange={e => setVisita(v => ({ ...v, nome: e.target.value }))}
+                    style={{ padding: '10px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 13, outline: 'none' }} />
+                  <input type="email" placeholder="Seu e-mail *" value={visita.email}
+                    onChange={e => setVisita(v => ({ ...v, email: e.target.value }))}
+                    style={{ padding: '10px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 13, outline: 'none' }} />
+                  <input type="tel" placeholder="WhatsApp" value={visita.telefone}
+                    onChange={e => setVisita(v => ({ ...v, telefone: e.target.value }))}
+                    style={{ padding: '10px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 13, outline: 'none' }} />
+                  <input type="date" value={visita.data}
+                    onChange={e => setVisita(v => ({ ...v, data: e.target.value }))}
+                    min={new Date().toISOString().split('T')[0]}
+                    style={{ padding: '10px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 13, outline: 'none', color: visita.data ? 'var(--navy)' : 'var(--fg-3)' }} />
+                </div>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <Btn variant="accent" onClick={sendVisita} loading={visitaSending} disabled={!visita.nome || !visita.email || !visita.data}>Confirmar agendamento</Btn>
+                  <Btn variant="ghost" onClick={() => setShowVisita(false)}>Cancelar</Btn>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Sidebar */}
