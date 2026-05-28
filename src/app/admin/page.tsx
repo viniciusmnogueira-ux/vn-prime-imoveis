@@ -801,21 +801,37 @@ export default function AdminPage() {
             </div>
             <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 8 }}>Após o cadastro, altere o tipo do usuário na tabela abaixo.</div>
           </div>
+          {(() => {
+            const [usQ, setUsQ] = [adminEditFields._usQ ?? '', (v: string) => setAdminEditFields(p => ({ ...p, _usQ: v }))]
+            const [usTipo, setUsTipo] = [adminEditFields._usTipo ?? '', (v: string) => setAdminEditFields(p => ({ ...p, _usTipo: v }))]
+            const usFiltered = usuarios.filter(u => {
+              if (usTipo && u.tipo !== usTipo) return false
+              if (usQ) { const q = usQ.toLowerCase(); return (u.nome ?? '').toLowerCase().includes(q) || (u.email ?? '').toLowerCase().includes(q) }
+              return true
+            })
+            return (
           <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', overflow: 'hidden' }}>
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0' }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{usuarios.length} usuários cadastrados</div>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{usFiltered.length} / {usuarios.length} usuários</div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input type="text" placeholder="Buscar nome ou e-mail..." value={usQ} onChange={e => setUsQ(e.target.value)} style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #E2E8F0', fontSize: 13, fontFamily: 'inherit', outline: 'none', width: 200 }} />
+                <select value={usTipo} onChange={e => setUsTipo(e.target.value)} style={{ padding: '6px 10px', borderRadius: 8, border: '1px solid #E2E8F0', fontSize: 13, fontFamily: 'inherit', outline: 'none', cursor: 'pointer' }}>
+                  <option value="">Todos os tipos</option>
+                  {['proprietario','corretor','incorporadora','admin'].map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
             </div>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
                 <thead>
                   <tr style={{ background: '#F8FAFC' }}>
-                    {['Nome', 'E-mail', 'Tipo', 'CRECI', 'Cadastro', 'Ações'].map(h => (
+                    {['Nome', 'E-mail', 'Tipo', 'Plano', 'CRECI', 'Cadastro', 'Ações'].map(h => (
                       <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {usuarios.map(u => (
+                  {usFiltered.map(u => (
                     <tr key={u.id} style={{ borderTop: '1px solid #F1F5F9' }}>
                       <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600, color: 'var(--navy)' }}>{u.nome || '—'}</td>
                       <td style={{ padding: '12px 14px', fontSize: 12, color: '#64748B' }}>{u.email}</td>
@@ -826,6 +842,7 @@ export default function AdminPage() {
                           color: u.tipo === 'admin' ? 'var(--navy)' : u.tipo === 'corretor' ? '#059669' : '#92400E',
                         }}>{u.tipo}</span>
                       </td>
+                      <td style={{ padding: '12px 14px', fontSize: 12, color: '#64748B' }}>{u.plano || '—'}</td>
                       <td style={{ padding: '12px 14px', fontSize: 12, color: '#64748B' }}>{u.creci || '—'}</td>
                       <td style={{ padding: '12px 14px', fontSize: 11, color: '#64748B', whiteSpace: 'nowrap' }}>{fmtDate(u.criado_em)}</td>
                       <td style={{ padding: '12px 14px' }}>
@@ -844,6 +861,8 @@ export default function AdminPage() {
               </table>
             </div>
           </div>
+            )
+          })()}
           </div>
         )}
       </div>
