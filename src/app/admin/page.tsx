@@ -270,10 +270,25 @@ export default function AdminPage() {
         )}
 
         {/* IMÓVEIS */}
-        {tab === 'imoveis' && (
+        {tab === 'imoveis' && (() => {
+          const [imovelQ, setImovelQ] = [adminEditFields._searchQ ?? '', (v: string) => setAdminEditFields(p => ({ ...p, _searchQ: v }))]
+          const [imovelStatus, setImovelStatusF] = [adminEditFields._statusF ?? '', (v: string) => setAdminEditFields(p => ({ ...p, _statusF: v }))]
+          const imsFiltered = imoveis.filter(im => {
+            if (imovelStatus && im.status !== imovelStatus) return false
+            if (imovelQ) { const q = imovelQ.toLowerCase(); return (im.titulo ?? '').toLowerCase().includes(q) || (im.bairro ?? '').toLowerCase().includes(q) || (im.profiles?.nome ?? '').toLowerCase().includes(q) }
+            return true
+          })
+          return (
           <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', overflow: 'hidden' }}>
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0' }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{imoveis.length} imóveis cadastrados</div>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{imsFiltered.length} / {imoveis.length} imóveis</div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <input type="text" placeholder="Buscar por título, bairro, proprietário..." value={imovelQ} onChange={e => setImovelQ(e.target.value)} style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #E2E8F0', fontSize: 13, fontFamily: 'inherit', outline: 'none', width: 260 }} />
+                <select value={imovelStatus} onChange={e => setImovelStatusF(e.target.value)} style={{ padding: '6px 10px', borderRadius: 8, border: '1px solid #E2E8F0', fontSize: 13, fontFamily: 'inherit', outline: 'none', cursor: 'pointer' }}>
+                  <option value="">Todos os status</option>
+                  {['ativo','pendente','pausado','vendido','rascunho'].map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
             </div>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
@@ -285,7 +300,7 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {imoveis.map(im => (<>
+                  {imsFiltered.map(im => (<>
                     <tr key={im.id} style={{ borderTop: '1px solid #F1F5F9' }}>
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--navy)', maxWidth: 220 }}>{im.titulo}</div>
@@ -416,7 +431,8 @@ export default function AdminPage() {
               </table>
             </div>
           </div>
-        )}
+          )
+        })()}
 
         {/* LEADS */}
         {tab === 'leads' && (() => {
