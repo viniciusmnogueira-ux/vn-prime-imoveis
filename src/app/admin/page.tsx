@@ -432,6 +432,12 @@ export default function AdminPage() {
             detalhe: '#3B82F6', agendamento: '#059669', proposta: '#7C3AED',
             avaliacao: '#D97706', vender_completa: '#DC2626', 'vender-completa': '#DC2626',
           }
+          const exportCSV = () => {
+            const rows = [['Nome','Email','Telefone','Mensagem','Origem','Data']]
+            filtered.forEach(l => rows.push([l.nome ?? '', l.email ?? '', l.telefone ?? '', (l.mensagem ?? '').replace(/,/g, ';'), l.origem ?? '', new Date(l.criado_em).toLocaleDateString('pt-BR')]))
+            const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n')
+            const a = document.createElement('a'); a.href = `data:text/csv;charset=utf-8,﻿${encodeURIComponent(csv)}`; a.download = `leads_vnprime_${new Date().toISOString().slice(0,10)}.csv`; a.click()
+          }
           return (
             <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', overflow: 'hidden' }}>
               <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', justifyContent: 'space-between' }}>
@@ -439,13 +445,16 @@ export default function AdminPage() {
                   <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{filtered.length} leads {leadsOrigemFilter ? `(${leadsOrigemFilter})` : 'recebidos'}</div>
                   {naoLidos > 0 && <div style={{ fontSize: 12, color: '#DC2626', marginTop: 2 }}>{naoLidos} não lidos</div>}
                 </div>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
                   {['', ...ORIGENS].map(o => (
                     <button key={o} onClick={() => setLeadsOrigemFilter(o)}
                       style={{ padding: '4px 12px', borderRadius: 99, border: '1px solid', fontSize: 11.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', borderColor: leadsOrigemFilter === o ? 'var(--navy)' : '#E2E8F0', background: leadsOrigemFilter === o ? 'var(--navy)' : '#fff', color: leadsOrigemFilter === o ? '#fff' : '#64748B' }}>
                       {o || 'Todos'}
                     </button>
                   ))}
+                  <button onClick={exportCSV} style={{ padding: '5px 14px', borderRadius: 8, border: '1px solid #E2E8F0', background: '#F8FAFC', color: '#0369A1', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    ↓ CSV
+                  </button>
                 </div>
               </div>
               <div style={{ overflowX: 'auto' }}>
