@@ -180,6 +180,18 @@ export default function ImovelPage() {
         {fotos.length === 0 && <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.3)', fontSize: 64 }}>🏠</div>}
       </div>
 
+      {/* Breadcrumb */}
+      <div style={{ background: '#fff', borderBottom: '1px solid var(--border)', padding: '12px 0' }}>
+        <div style={{ width: 'min(1200px,92vw)', margin: '0 auto', fontSize: 12, color: 'var(--fg-2)' }}>
+          <Link href="/" style={{ color: 'var(--fg-2)', textDecoration: 'none' }}>Início</Link>
+          {' › '}
+          <Link href="/busca" style={{ color: 'var(--fg-2)', textDecoration: 'none' }}>Busca</Link>
+          {im.bairro && <>{' › '}<Link href={`/busca?q=${encodeURIComponent(im.bairro)}`} style={{ color: 'var(--fg-2)', textDecoration: 'none' }}>{im.bairro}</Link></>}
+          {' › '}
+          <span style={{ color: 'var(--navy)', fontWeight: 600 }}>{im.titulo}</span>
+        </div>
+      </div>
+
       <div style={{ width: 'min(1200px,92vw)', margin: '0 auto', paddingTop: 40, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 1fr) min(380px, 38%)', gap: isMobile ? 28 : 40, alignItems: 'start' }}>
         {/* Main */}
         <div>
@@ -203,6 +215,7 @@ export default function ImovelPage() {
                 [im.suites, `${im.suites} suíte${im.suites !== 1 ? 's' : ''}`],
                 [im.banheiros, `${im.banheiros} banheiro${im.banheiros !== 1 ? 's' : ''}`],
                 [im.vagas, `${im.vagas} vaga${im.vagas !== 1 ? 's' : ''}`],
+                [im.preco && im.area_m2, `${fmtBRL(Math.round(im.preco / im.area_m2))}/m²`],
               ].filter(([v]) => v).map(([, l]) => (
                 <div key={String(l)} style={{ fontSize: 14, fontWeight: 600, color: 'var(--navy)' }}>{l as string}</div>
               ))}

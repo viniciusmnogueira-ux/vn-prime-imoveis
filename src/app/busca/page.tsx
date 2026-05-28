@@ -272,7 +272,7 @@ const EMPTY_FILTERS = {
   priceMin: '', priceMax: '', priceRange: '',
   areaMin: '', areaMax: '',
   amenidades: [] as string[],
-  onlyFeatured: false, onlyNew: false,
+  onlyFeatured: false, onlyNew: false, onlyWithPhotos: false,
 }
 
 function BuscaContent() {
@@ -364,6 +364,7 @@ function BuscaContent() {
       if (filters.areaMax && (l.area_m2 ?? 0) > +filters.areaMax) return false
       if (filters.onlyFeatured && !l.destaque) return false
       if (filters.onlyNew && !l.novo) return false
+      if (filters.onlyWithPhotos && (!l.fotos || l.fotos.length === 0)) return false
       if (filters.amenidades.length) {
         const desc = ((l.descricao ?? '') + ' ' + (l.titulo ?? '')).toLowerCase()
         const ams: string[] = l.amenidades ?? []
@@ -521,6 +522,7 @@ function BuscaContent() {
         filters.amenidades.forEach(a => chips.push({ label: a, onRemove: () => setF({ amenidades: filters.amenidades.filter(x => x !== a) }) }))
         if (filters.onlyFeatured) chips.push({ label: 'Só destaques', onRemove: () => setF({ onlyFeatured: false }) })
         if (filters.onlyNew) chips.push({ label: 'Recém adicionados', onRemove: () => setF({ onlyNew: false }) })
+        if (filters.onlyWithPhotos) chips.push({ label: 'Com fotos', onRemove: () => setF({ onlyWithPhotos: false }) })
         if (!chips.length) return null
         return (
           <div style={{ background: 'rgba(212,168,87,0.06)', borderBottom: '1px solid var(--border)', padding: '10px 0' }}>
@@ -693,11 +695,18 @@ function BuscaContent() {
                 Apenas em destaque
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8,
-                fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--navy)', cursor: 'pointer' }}>
+                fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--navy)', cursor: 'pointer', marginBottom: 6 }}>
                 <input type="checkbox" checked={filters.onlyNew}
                   onChange={e => { setF({ onlyNew: e.target.checked }); setPage(1) }}
                   style={{ accentColor: 'var(--gold)' }} />
                 Recém adicionados
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8,
+                fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--navy)', cursor: 'pointer' }}>
+                <input type="checkbox" checked={filters.onlyWithPhotos}
+                  onChange={e => { setF({ onlyWithPhotos: e.target.checked }); setPage(1) }}
+                  style={{ accentColor: 'var(--gold)' }} />
+                Apenas com fotos
               </label>
             </FilterGroup>
           </aside>

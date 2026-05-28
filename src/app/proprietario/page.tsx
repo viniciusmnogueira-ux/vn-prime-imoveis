@@ -125,6 +125,24 @@ export default function ProprietarioPage() {
           ))}
         </div>
 
+        {/* Quick stats */}
+        {imoveis.length > 0 && (
+          <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
+            {[
+              { label: 'Ativos', value: imoveis.filter(i => i.status === 'ativo').length, color: '#059669' },
+              { label: 'Em análise', value: imoveis.filter(i => i.status === 'pendente').length, color: '#D97706' },
+              { label: 'Pausados', value: imoveis.filter(i => i.status === 'pausado').length, color: '#6B7280' },
+              { label: 'Vendidos', value: imoveis.filter(i => i.status === 'vendido').length, color: '#7C3AED' },
+            ].filter(s => s.value > 0).map(s => (
+              <div key={s.label} style={{ background: '#fff', borderRadius: 10, padding: '10px 16px', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: s.color, flexShrink: 0, display: 'inline-block' }} />
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>{s.value}</span>
+                <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>{s.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 4, borderBottom: '2px solid var(--border)', marginBottom: 28, overflowX: 'auto' }}>
           {([['imoveis','Meus imóveis'],['leads','Leads'],['scripts','Scripts'],['calculadoras','Calculadoras'],['fotografo','Fotógrafo'],['config','Configurações']] as const).map(([id, lbl]) => (
