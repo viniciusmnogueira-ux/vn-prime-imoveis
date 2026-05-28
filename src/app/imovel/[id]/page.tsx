@@ -28,6 +28,7 @@ export default function ImovelPage() {
   const [propostaSending, setPropostaSending] = useState(false)
   const [propostaSent, setPropostaSent] = useState(false)
   const [lightbox, setLightbox] = useState<number | null>(null)
+  const [similares, setSimilares] = useState<any[]>([])
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstance = useRef<any>(null)
 
@@ -45,7 +46,14 @@ export default function ImovelPage() {
 
   useEffect(() => {
     supabase.from('imoveis').select('*, profiles!proprietario_id(nome, telefone)').eq('id', id).single()
-      .then(({ data }) => { setIm(data); setLoading(false) })
+      .then(({ data }) => {
+        setIm(data); setLoading(false)
+        if (data?.tipo && data?.bairro) {
+          supabase.from('imoveis').select('id, titulo, tipo, bairro, cidade, preco, fotos')
+            .eq('status', 'ativo').eq('tipo', data.tipo).neq('id', id).limit(4)
+            .then(({ data: sims }) => setSimilares(sims ?? []))
+        }
+      })
   }, [id])
 
   const sendLead = async () => {
@@ -366,6 +374,29 @@ export default function ImovelPage() {
           </div>
         </div>
       </div>
+
+      {/* Imóveis similares */}
+      {similares.length > 0 && (
+        <div style={{ width: 'min(1200px,92vw)', margin: '60px auto 0' }}>
+          <h3 style={{ fontSize: 22, marginBottom: 24 }}>Imóveis similares</h3>
+          <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
+            {similares.map(s => (
+              <Link key={s.id} href={`/imovel/${s.id}`} style={{ textDecoration: 'none' }}>
+                <div style={{ background: '#fff', borderRadius: 14, overflow: 'hidden', border: '1px solid var(--border)', boxShadow: 'var(--shadow-card)', transition: 'transform 0.18s, box-shadow 0.18s' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 16px 44px rgba(15,34,68,0.14)' }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-card)' }}>
+                  <div style={{ height: 180, background: s.fotos?.[0] ? `url(${s.fotos[0]}) center/cover` : 'var(--cream)' }} />
+                  <div style={{ padding: '16px 18px' }}>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800, color: 'var(--gold)', marginBottom: 4 }}>{fmtBRL(s.preco)}</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--navy)', marginBottom: 2 }}>{s.titulo}</div>
+                    <div style={{ fontSize: 12, color: 'var(--fg-2)' }}>{s.bairro}{s.cidade && s.bairro ? ', ' : ''}{s.cidade}</div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
