@@ -581,6 +581,32 @@ function FotografoSection() {
           </div>
         ))}
       </div>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 12 }}>Boosters — Add-ons opcionais</div>
+        <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))' }}>
+          {[
+            { nome: 'Booster Mídia', preco: 'R$ 49', itens: ['+5 fotos extras tratadas', 'Capa otimizada para portais', 'Texto descritivo SEO', 'Entrega junto com o pacote'] },
+            { nome: 'Booster Visibilidade', preco: 'R$ 99', itens: ['Destaque pago em 3 portais (15 dias)', 'Pack stories + reels (3 peças)', 'Distribuição por WhatsApp VN Prime', 'Relatório de impressões'] },
+          ].map(b => (
+            <div key={b.nome} style={{ background: 'var(--cream)', borderRadius: 14, border: '1px dashed var(--gold)', padding: '18px 20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{b.nome}</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--gold-deep)' }}>{b.preco}</div>
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 14px', display: 'flex', flexDirection: 'column', gap: 7 }}>
+                {b.itens.map(it => (
+                  <li key={it} style={{ fontSize: 13, display: 'flex', gap: 8, color: 'var(--fg-1)' }}>
+                    <span style={{ color: 'var(--gold-deep)', fontWeight: 700 }}>+</span>{it}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/fotografo" style={{ display: 'block' }}>
+                <Btn variant="ghost" size="sm" style={{ width: '100%' }}>Adicionar booster</Btn>
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
       <p style={{ fontSize: 12.5, color: 'var(--fg-3)', textAlign: 'center' }}>
         Fotografia inclusa nos planos Venda Assistida e Venda Completa · <Link href="/vender" style={{ color: 'var(--gold-deep)', fontWeight: 600 }}>Ver planos</Link>
       </p>
