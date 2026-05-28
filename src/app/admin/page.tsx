@@ -31,6 +31,8 @@ export default function AdminPage() {
   const [adminEditFields, setAdminEditFields] = useState<Record<string, any>>({})
   const [leadStatus, setLeadStatus] = useState<Record<string, string>>({})
   const [leadNota, setLeadNota] = useState<Record<string, string>>({})
+  const [leadLido, setLeadLido] = useState<Record<string, boolean>>({})
+  const [leadsOrigemFilter, setLeadsOrigemFilter] = useState('')
   const [newAccessEmail, setNewAccessEmail] = useState('')
   const [newAccessTipo, setNewAccessTipo] = useState('proprietario')
   const supabase = createClient()
@@ -82,8 +84,10 @@ export default function AdminPage() {
     if (loading) return
     const ls = localStorage.getItem('vnp_admin_leadstatus')
     const ln = localStorage.getItem('vnp_admin_leadnota')
+    const ll = localStorage.getItem('vnp_admin_leadlido')
     if (ls) try { setLeadStatus(JSON.parse(ls)) } catch {}
     if (ln) try { setLeadNota(JSON.parse(ln)) } catch {}
+    if (ll) try { setLeadLido(JSON.parse(ll)) } catch {}
   }, [loading])
 
   async function setImovelStatus(id: string, status: string) {
@@ -371,42 +375,77 @@ export default function AdminPage() {
         )}
 
         {/* LEADS */}
-        {tab === 'leads' && (
-          <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', overflow: 'hidden' }}>
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0' }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{leads.length} leads recebidos</div>
-            </div>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
-                <thead>
-                  <tr style={{ background: '#F8FAFC' }}>
-                    {['Nome', 'E-mail', 'Telefone', 'Mensagem', 'Origem', 'Data'].map(h => (
-                      <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {leads.map(l => (
-                    <tr key={l.id} style={{ borderTop: '1px solid #F1F5F9' }}>
-                      <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600, color: 'var(--navy)', whiteSpace: 'nowrap' }}>{l.nome}</td>
-                      <td style={{ padding: '12px 14px', fontSize: 12, color: '#64748B' }}>
-                        <a href={`mailto:${l.email}`} style={{ color: 'var(--gold-deep)', textDecoration: 'none' }}>{l.email}</a>
-                      </td>
-                      <td style={{ padding: '12px 14px', fontSize: 12, color: '#64748B', whiteSpace: 'nowrap' }}>
-                        {l.telefone ? <a href={`https://wa.me/55${l.telefone.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', textDecoration: 'none', fontWeight: 600 }}>{l.telefone}</a> : '—'}
-                      </td>
-                      <td style={{ padding: '12px 14px', fontSize: 12, color: '#64748B', maxWidth: 260 }}>
-                        <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.mensagem || '—'}</div>
-                      </td>
-                      <td style={{ padding: '12px 14px', fontSize: 11, color: '#64748B' }}>{l.origem || '—'}</td>
-                      <td style={{ padding: '12px 14px', fontSize: 11, color: '#64748B', whiteSpace: 'nowrap' }}>{fmtDate(l.criado_em)}</td>
-                    </tr>
+        {tab === 'leads' && (() => {
+          const ORIGENS = Array.from(new Set(leads.map(l => l.origem).filter(Boolean))) as string[]
+          const filtered = leadsOrigemFilter ? leads.filter(l => l.origem === leadsOrigemFilter) : leads
+          const naoLidos = leads.filter(l => !leadLido[l.id]).length
+          const toggleLido = (id: string) => {
+            const next = { ...leadLido, [id]: !leadLido[id] }
+            setLeadLido(next)
+            localStorage.setItem('vnp_admin_leadlido', JSON.stringify(next))
+          }
+          const ORIGEM_COLORS: Record<string, string> = {
+            detalhe: '#3B82F6', agendamento: '#059669', proposta: '#7C3AED',
+            avaliacao: '#D97706', vender_completa: '#DC2626', 'vender-completa': '#DC2626',
+          }
+          return (
+            <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', overflow: 'hidden' }}>
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{filtered.length} leads {leadsOrigemFilter ? `(${leadsOrigemFilter})` : 'recebidos'}</div>
+                  {naoLidos > 0 && <div style={{ fontSize: 12, color: '#DC2626', marginTop: 2 }}>{naoLidos} não lidos</div>}
+                </div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {['', ...ORIGENS].map(o => (
+                    <button key={o} onClick={() => setLeadsOrigemFilter(o)}
+                      style={{ padding: '4px 12px', borderRadius: 99, border: '1px solid', fontSize: 11.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', borderColor: leadsOrigemFilter === o ? 'var(--navy)' : '#E2E8F0', background: leadsOrigemFilter === o ? 'var(--navy)' : '#fff', color: leadsOrigemFilter === o ? '#fff' : '#64748B' }}>
+                      {o || 'Todos'}
+                    </button>
                   ))}
-                </tbody>
-              </table>
+                </div>
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
+                  <thead>
+                    <tr style={{ background: '#F8FAFC' }}>
+                      {['', 'Nome', 'E-mail', 'Telefone', 'Mensagem', 'Origem', 'Data'].map(h => (
+                        <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map(l => {
+                      const lido = !!leadLido[l.id]
+                      return (
+                        <tr key={l.id} style={{ borderTop: '1px solid #F1F5F9', background: lido ? 'transparent' : 'rgba(59,130,246,0.04)' }}>
+                          <td style={{ padding: '12px 10px' }}>
+                            <button onClick={() => toggleLido(l.id)} title={lido ? 'Marcar como não lido' : 'Marcar como lido'} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: lido ? '#CBD5E1' : '#3B82F6' }}>
+                              {lido ? '○' : '●'}
+                            </button>
+                          </td>
+                          <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: lido ? 400 : 700, color: 'var(--navy)', whiteSpace: 'nowrap' }}>{l.nome}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 12, color: '#64748B' }}>
+                            <a href={`mailto:${l.email}`} style={{ color: 'var(--gold-deep)', textDecoration: 'none' }}>{l.email}</a>
+                          </td>
+                          <td style={{ padding: '12px 14px', fontSize: 12, color: '#64748B', whiteSpace: 'nowrap' }}>
+                            {l.telefone ? <a href={`https://wa.me/55${l.telefone.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', textDecoration: 'none', fontWeight: 600 }}>{l.telefone}</a> : '—'}
+                          </td>
+                          <td style={{ padding: '12px 14px', fontSize: 12, color: '#64748B', maxWidth: 260 }}>
+                            <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.mensagem || '—'}</div>
+                          </td>
+                          <td style={{ padding: '12px 14px', fontSize: 11 }}>
+                            <span style={{ background: ORIGEM_COLORS[l.origem ?? ''] ? `${ORIGEM_COLORS[l.origem]}20` : '#F1F5F9', color: ORIGEM_COLORS[l.origem ?? ''] ?? '#64748B', padding: '2px 8px', borderRadius: 99, fontWeight: 700 }}>{l.origem || '—'}</span>
+                          </td>
+                          <td style={{ padding: '12px 14px', fontSize: 11, color: '#64748B', whiteSpace: 'nowrap' }}>{fmtDate(l.criado_em)}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
 
         {/* CURADORIA */}
         {tab === 'curadoria' && (
