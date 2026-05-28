@@ -94,7 +94,7 @@ export default function SiteHeader() {
     const supabase = createClient()
     await supabase.auth.signOut()
     setUser(null)
-    window.location.href = '/'
+    window.location.replace(window.location.origin + '/')
   }
 
   if (pathname === '/login') return null

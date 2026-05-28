@@ -42,6 +42,13 @@ export default function ProprietarioPage() {
       supabase.from('profiles').select('*').eq('id', user.id).single(),
       supabase.from('imoveis').select('*').eq('proprietario_id', user.id).order('criado_em', { ascending: false }),
     ])
+
+    // Corretor logado → redireciona para o portal certo
+    if (prof?.tipo === 'corretor') {
+      router.replace('/corretor')
+      return
+    }
+
     setProfile(prof)
     setImoveis(imvs ?? [])
     setLoading(false)

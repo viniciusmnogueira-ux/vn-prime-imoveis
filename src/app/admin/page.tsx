@@ -367,16 +367,50 @@ export default function AdminPage() {
                       </div>
                       {isOpen && (
                         <div style={{ borderTop: '1px solid #F1F5F9', padding: 20 }}>
-                          {im.fotos?.length > 0 && (
-                            <div style={{ marginBottom: 18 }}>
-                              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#64748B', textTransform: 'uppercase', marginBottom: 8 }}>Fotos ({im.fotos.length})</div>
+                          <div style={{ marginBottom: 18 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#64748B', textTransform: 'uppercase' }}>
+                                Fotos {im.fotos?.length > 0 ? `(${im.fotos.length})` : '— nenhuma'}
+                              </div>
+                              <label style={{ padding: '5px 12px', borderRadius: 7, background: '#EFF8FF', color: '#0369A1', fontSize: 11, fontWeight: 700, cursor: 'pointer', border: '1px solid #BAE6FD' }}>
+                                + Adicionar fotos
+                                <input type="file" accept="image/*" multiple style={{ display: 'none' }}
+                                  onChange={async e => {
+                                    const files = Array.from(e.target.files || [])
+                                    if (!files.length) return
+                                    const urls: string[] = []
+                                    for (const file of files) {
+                                      const ext = file.name.split('.').pop()
+                                      const path = `imoveis/${im.proprietario_id ?? 'admin'}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+                                      const { error: upErr } = await supabase.storage.from('imoveis').upload(path, file)
+                                      if (!upErr) {
+                                        const { data: { publicUrl } } = supabase.storage.from('imoveis').getPublicUrl(path)
+                                        urls.push(publicUrl)
+                                      }
+                                    }
+                                    if (urls.length) {
+                                      const newFotos = [...(im.fotos ?? []), ...urls]
+                                      await supabase.from('imoveis').update({ fotos: newFotos }).eq('id', im.id)
+                                      setImoveis(prev => prev.map(i => i.id === im.id ? { ...i, fotos: newFotos } : i))
+                                    }
+                                  }} />
+                              </label>
+                            </div>
+                            {im.fotos?.length > 0 && (
                               <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
                                 {im.fotos.map((f: string, idx: number) => (
-                                  <img key={idx} src={f} alt="" style={{ height: 90, width: 130, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />
+                                  <div key={idx} style={{ position: 'relative', flexShrink: 0 }}>
+                                    <img src={f} alt="" style={{ height: 90, width: 130, objectFit: 'cover', borderRadius: 8 }} />
+                                    <button onClick={async () => {
+                                      const newFotos = im.fotos.filter((_: string, i: number) => i !== idx)
+                                      await supabase.from('imoveis').update({ fotos: newFotos }).eq('id', im.id)
+                                      setImoveis(prev => prev.map(i => i.id === im.id ? { ...i, fotos: newFotos } : i))
+                                    }} style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(220,38,38,0.85)', color: '#fff', border: 'none', borderRadius: 99, width: 20, height: 20, fontSize: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit' }}>✕</button>
+                                  </div>
                                 ))}
                               </div>
-                            </div>
-                          )}
+                            )}
+                          </div>
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 12, marginBottom: 14 }}>
                             {[
                               { label: 'Título', key: 'titulo', val: ef.titulo ?? im.titulo ?? '' },
