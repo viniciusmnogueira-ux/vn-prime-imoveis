@@ -158,10 +158,11 @@ export default function HomePage() {
   useEffect(() => {
     const supabase = createClient()
     supabase.from('imoveis')
-      .select('id, titulo, tipo, bairro, cidade, preco, area, quartos, fotos')
+      .select('id, titulo, tipo, bairro, cidade, preco, area_m2, quartos, fotos, destaque')
       .eq('status', 'ativo')
-      .order('created_at', { ascending: false })
-      .limit(3)
+      .order('destaque', { ascending: false })
+      .order('criado_em', { ascending: false })
+      .limit(6)
       .then(({ data }) => setFeatured(data || []))
   }, [])
 
@@ -327,14 +328,16 @@ export default function HomePage() {
                     <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', border: '1px solid var(--border)', transition: 'transform 0.18s, box-shadow 0.18s' }}
                       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 16px 44px rgba(15,34,68,0.14)' }}
                       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = 'none' }}>
-                      <div style={{ height: 200, backgroundImage: `url(${foto})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                      <div style={{ height: 200, backgroundImage: `url(${foto})`, backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
+                        {im.destaque && <span style={{ position: 'absolute', top: 12, left: 12, background: 'var(--gold)', color: 'var(--navy-deep)', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 99, textTransform: 'uppercase' }}>★ Destaque</span>}
+                      </div>
                       <div style={{ padding: '18px 20px' }}>
                         <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 2 }}>Preço de pedida</div>
                         <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--gold)', marginBottom: 6 }}>{im.preco ? fmt(im.preco) : 'Consulte'}</div>
                         <h3 style={{ fontSize: 15, color: 'var(--navy)', fontWeight: 600, margin: '0 0 4px', lineHeight: 1.3 }}>{im.titulo}</h3>
                         <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>{im.bairro}{im.bairro && im.cidade ? ', ' : ''}{im.cidade}</div>
                         <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--fg-3)', marginTop: 8 }}>
-                          {im.area && <span>{im.area} m²</span>}
+                          {im.area_m2 && <span>{im.area_m2} m²</span>}
                           {im.quartos && <span>{im.quartos} quartos</span>}
                         </div>
                       </div>
