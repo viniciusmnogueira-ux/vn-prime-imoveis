@@ -174,6 +174,11 @@ export default function ProprietarioPage() {
                         }}>
                           {isEditing ? 'Cancelar' : 'Editar'}
                         </Btn>
+                        {im.status === 'ativo' && (
+                          <button onClick={() => { try { navigator.clipboard.writeText(`${window.location.origin}/imovel/${im.id}`) } catch(e) {} }} style={{ padding: '6px 12px', borderRadius: 8, background: 'none', border: '1px solid var(--border)', fontSize: 12, fontWeight: 600, color: 'var(--fg-2)', cursor: 'pointer', fontFamily: 'inherit' }}>
+                            🔗 Copiar link
+                          </button>
+                        )}
                         {(im.status === 'ativo' || im.status === 'pausado') && (
                           <Btn variant="ghost" size="sm" onClick={() => toggleStatus(im.id, im.status)}>
                             {im.status === 'ativo' ? 'Pausar' : 'Ativar'}

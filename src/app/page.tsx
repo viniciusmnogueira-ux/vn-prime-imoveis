@@ -146,6 +146,8 @@ export default function HomePage() {
   const [searchTipo, setSearchTipo] = useState('')
   const [searchValor, setSearchValor] = useState('')
   const [featured, setFeatured] = useState<any[]>([])
+  const [recentIds, setRecentIds] = useState<string[]>([])
+  const [recentImoveis, setRecentImoveis] = useState<any[]>([])
   const [nlEmail, setNlEmail] = useState('')
   const [nlSent, setNlSent] = useState(false)
   const [nlSending, setNlSending] = useState(false)
@@ -164,6 +166,22 @@ export default function HomePage() {
       .order('criado_em', { ascending: false })
       .limit(6)
       .then(({ data }) => setFeatured(data || []))
+
+    // Recently viewed
+    const ids: string[] = JSON.parse(localStorage.getItem('vnp_recent') ?? '[]')
+    setRecentIds(ids)
+    if (ids.length > 0) {
+      supabase.from('imoveis')
+        .select('id, titulo, tipo, bairro, cidade, preco, area_m2, quartos, fotos, destaque')
+        .in('id', ids)
+        .eq('status', 'ativo')
+        .then(({ data }) => {
+          if (data) {
+            const ordered = ids.map(id => data.find(d => d.id === id)).filter(Boolean)
+            setRecentImoveis(ordered)
+          }
+        })
+    }
   }, [])
 
   const sendNl = async () => {
@@ -531,6 +549,36 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── Vistos recentemente ── */}
+      {recentImoveis.length > 0 && (
+        <section style={{ padding: 'clamp(2rem,4vw,3rem) 0', background: '#fff', borderBottom: '1px solid var(--border)' }}>
+          <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h2 style={{ fontSize: 'clamp(1.2rem,2vw,1.5rem)', margin: 0 }}>Vistos recentemente</h2>
+              <button onClick={() => { localStorage.removeItem('vnp_recent'); setRecentImoveis([]) }} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--fg-3)', cursor: 'pointer', fontFamily: 'inherit' }}>Limpar histórico</button>
+            </div>
+            <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 8 }}>
+              {recentImoveis.map(im => (
+                <Link key={im.id} href={`/imovel/${im.id}`} style={{ textDecoration: 'none', flexShrink: 0 }}>
+                  <div style={{ width: 200, background: 'var(--cream)', borderRadius: 12, overflow: 'hidden', border: '1px solid var(--border)', transition: 'transform 0.18s', cursor: 'pointer' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none' }}>
+                    <div style={{ height: 120, background: im.fotos?.[0] ? `url(${im.fotos[0]}) center/cover` : 'var(--navy)', position: 'relative' }}>
+                      {im.destaque && <span style={{ position: 'absolute', top: 8, left: 8, background: 'var(--gold)', color: 'var(--navy-deep)', fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 99 }}>★</span>}
+                    </div>
+                    <div style={{ padding: '10px 12px' }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)', marginBottom: 2 }}>{fmt(im.preco)}</div>
+                      <div style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--navy)', lineHeight: 1.3, marginBottom: 3 }}>{im.titulo}</div>
+                      <div style={{ fontSize: 11, color: 'var(--fg-3)' }}>{im.bairro}</div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Newsletter ── */}
       <section style={{ padding: 'clamp(2.5rem,5vw,3.5rem) 0', background: 'var(--navy-deep)' }}>

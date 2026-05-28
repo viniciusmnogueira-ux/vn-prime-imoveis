@@ -66,6 +66,13 @@ export default function ImovelPage() {
   }
 
   useEffect(() => {
+    // Track recent views
+    const recent: string[] = JSON.parse(localStorage.getItem('vnp_recent') ?? '[]')
+    const next = [id, ...recent.filter(x => x !== id)].slice(0, 8)
+    localStorage.setItem('vnp_recent', JSON.stringify(next))
+  }, [id])
+
+  useEffect(() => {
     supabase.from('imoveis').select('*, profiles!proprietario_id(nome, telefone)').eq('id', id).single()
       .then(({ data }) => {
         setIm(data); setLoading(false)

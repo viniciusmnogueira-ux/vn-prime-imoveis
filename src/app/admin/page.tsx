@@ -288,6 +288,14 @@ export default function AdminPage() {
                   <option value="">Todos os status</option>
                   {['ativo','pendente','pausado','vendido','rascunho'].map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
+                <button onClick={() => {
+                  const header = ['ID','Título','Tipo','Bairro','Cidade','Preço','Área','Quartos','Status','Verificado','Destaque','Proprietário','Data']
+                  const rows = imsFiltered.map(i => [i.id, i.titulo, i.tipo, i.bairro, i.cidade, i.preco, i.area_m2, i.quartos, i.status, i.verificado ? 'Sim' : 'Não', i.destaque ? 'Sim' : 'Não', i.profiles?.nome ?? i.profiles?.email ?? '', (i.criado_em ?? '').slice(0, 10)])
+                  const csv = [header, ...rows].map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',')).join('\n')
+                  const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'imoveis.csv'; a.click()
+                }} style={{ padding: '6px 14px', borderRadius: 8, background: '#EFF8FF', color: '#0369A1', border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  ↓ Exportar CSV
+                </button>
               </div>
             </div>
             <div style={{ overflowX: 'auto' }}>
