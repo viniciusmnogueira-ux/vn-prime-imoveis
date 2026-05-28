@@ -285,7 +285,28 @@ function BuscaContent() {
   const [sort, setSort] = useState('relevance')
   const [layout, setLayout] = useState<'grid' | 'list' | 'map'>('grid')
   const [page, setPage] = useState(1)
+  const [savedSearches, setSavedSearches] = useState<Array<{label: string; filters: typeof EMPTY_FILTERS}>>([])
+  const [showSavedSearches, setShowSavedSearches] = useState(false)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+
+  useEffect(() => {
+    try { setSavedSearches(JSON.parse(localStorage.getItem('vnp_saved_searches') ?? '[]')) } catch {}
+  }, [])
+
+  const saveSearch = () => {
+    const hasFilters = filters.q || filters.tipo || filters.bairros.length || filters.quartos || filters.priceRange || filters.priceMin || filters.priceMax
+    if (!hasFilters) return
+    const label = [filters.q, filters.tipo, filters.bairros.join('/'), filters.quartos ? `${filters.quartos}+ qtos` : '', filters.priceRange || (filters.priceMin ? `R$${filters.priceMin}+` : '')].filter(Boolean).join(' · ')
+    const next = [{ label, filters }, ...savedSearches.filter(s => s.label !== label)].slice(0, 5)
+    setSavedSearches(next)
+    localStorage.setItem('vnp_saved_searches', JSON.stringify(next))
+  }
+
+  const removeSavedSearch = (label: string) => {
+    const next = savedSearches.filter(s => s.label !== label)
+    setSavedSearches(next)
+    localStorage.setItem('vnp_saved_searches', JSON.stringify(next))
+  }
 
   useEffect(() => {
     if (!supabase) return
@@ -415,6 +436,27 @@ function BuscaContent() {
             <Link href="/favoritos" style={{ fontFamily: 'var(--font-body)', fontSize: 12.5, fontWeight: 600, color: 'var(--fg-2)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, padding: '0.5rem 0.75rem', border: '1px solid var(--border)', borderRadius: 8, background: '#fff', whiteSpace: 'nowrap' }}>
               ♡ Favoritos
             </Link>
+            <div style={{ position: 'relative' }}>
+              <button onClick={() => setShowSavedSearches(s => !s)} style={{ fontFamily: 'var(--font-body)', fontSize: 12.5, fontWeight: 600, color: 'var(--fg-2)', display: 'flex', alignItems: 'center', gap: 4, padding: '0.5rem 0.75rem', border: '1px solid var(--border)', borderRadius: 8, background: '#fff', whiteSpace: 'nowrap', cursor: 'pointer' }}>
+                🔔 Alertas {savedSearches.length > 0 && <span style={{ background: 'var(--gold)', color: 'var(--navy-deep)', borderRadius: 99, fontSize: 10, fontWeight: 800, padding: '1px 5px' }}>{savedSearches.length}</span>}
+              </button>
+              {showSavedSearches && (
+                <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 6, background: '#fff', border: '1px solid var(--border)', borderRadius: 12, padding: 12, minWidth: 280, zIndex: 200, boxShadow: 'var(--shadow-soft)' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-3)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>Buscas salvas</div>
+                  {savedSearches.length === 0 ? (
+                    <div style={{ fontSize: 13, color: 'var(--fg-2)', padding: '8px 4px' }}>Nenhuma busca salva ainda.</div>
+                  ) : savedSearches.map(s => (
+                    <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 4px', borderBottom: '1px solid var(--border)' }}>
+                      <button onClick={() => { setFilters(f => ({ ...f, ...s.filters })); setPage(1); setShowSavedSearches(false) }} style={{ flex: 1, background: 'none', border: 'none', textAlign: 'left', fontSize: 12.5, color: 'var(--navy)', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600, padding: 0 }}>{s.label}</button>
+                      <button onClick={() => removeSavedSearch(s.label)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', fontSize: 14, padding: '0 2px' }}>✕</button>
+                    </div>
+                  ))}
+                  <button onClick={saveSearch} style={{ marginTop: 10, width: '100%', padding: '8px', background: 'var(--navy)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    + Salvar busca atual
+                  </button>
+                </div>
+              )}
+            </div>
             <select value={sort} onChange={e => setSort(e.target.value)}
               style={{ ...IS, padding: '0.5rem 0.7rem', fontSize: 13, width: 'auto' }}>
               <option value="relevance">Mais relevantes</option>
