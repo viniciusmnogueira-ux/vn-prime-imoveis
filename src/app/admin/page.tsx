@@ -7,7 +7,7 @@ import Link from 'next/link'
 const fmt = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
 const fmtDate = (s: string) => new Date(s).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })
 
-type Tab = 'dashboard' | 'imoveis' | 'leads' | 'usuarios'
+type Tab = 'dashboard' | 'curadoria' | 'imoveis' | 'leads' | 'usuarios' | 'financiamento'
 
 const STATUS_COLORS: Record<string, string> = {
   pendente: '#D97706', ativo: '#059669', pausado: '#6B7280', vendido: '#7C3AED', rascunho: '#94A3B8',
@@ -23,6 +23,10 @@ export default function AdminPage() {
   const [imoveis, setImoveis] = useState<any[]>([])
   const [leads, setLeads] = useState<any[]>([])
   const [usuarios, setUsuarios] = useState<any[]>([])
+  const [openCuradoria, setOpenCuradoria] = useState<string | null>(null)
+  const [editFields, setEditFields] = useState<Record<string, any>>({})
+  const [notasInternas, setNotasInternas] = useState<Record<string, string>>({})
+  const [finCalc, setFinCalc] = useState({ valor: 800000, entrada: 20, prazo: 240, taxa: 10.5, sistema: 'price' as 'price' | 'sac' })
 
   const supabase = createClient()
 
@@ -89,9 +93,11 @@ export default function AdminPage() {
 
   const TABS: { key: Tab; label: string; badge?: number }[] = [
     { key: 'dashboard', label: 'Dashboard' },
-    { key: 'imoveis', label: 'Imóveis', badge: stats.pendentes || undefined },
+    { key: 'curadoria', label: 'Curadoria', badge: stats.pendentes || undefined },
+    { key: 'imoveis', label: 'Imóveis' },
     { key: 'leads', label: 'Leads', badge: stats.leads || undefined },
     { key: 'usuarios', label: 'Usuários' },
+    { key: 'financiamento', label: 'FactorOne Finance' },
   ]
 
   return (
@@ -314,6 +320,248 @@ export default function AdminPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {/* CURADORIA */}
+        {tab === 'curadoria' && (
+          <div>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>
+                Curadoria de imóveis — {imoveis.filter(i => i.status === 'pendente' || i.status === 'rascunho').length} pendentes
+              </div>
+              <div style={{ fontSize: 12, color: '#64748B' }}>Revise, edite e aprove cada imóvel antes de publicar.</div>
+            </div>
+            {imoveis.filter(i => i.status === 'pendente' || i.status === 'rascunho').length === 0 ? (
+              <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', padding: '60px 24px', textAlign: 'center' }}>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>✅</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--navy)', marginBottom: 8 }}>Nenhum imóvel pendente</div>
+                <div style={{ fontSize: 13, color: '#64748B' }}>Todos os imóveis foram revisados.</div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {imoveis.filter(i => i.status === 'pendente' || i.status === 'rascunho').map(im => {
+                  const isOpen = openCuradoria === im.id
+                  const ef = editFields[im.id] ?? {}
+                  return (
+                    <div key={im.id} style={{ background: '#fff', borderRadius: 14, border: `1.5px solid ${isOpen ? 'var(--gold)' : '#E2E8F0'}`, overflow: 'hidden', transition: 'border-color 0.2s' }}>
+                      <div style={{ padding: '16px 20px', display: 'flex', gap: 14, alignItems: 'center', cursor: 'pointer' }}
+                        onClick={() => setOpenCuradoria(isOpen ? null : im.id)}>
+                        {im.fotos?.[0] && <img src={im.fotos[0]} alt="" style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{im.titulo}</span>
+                            <span style={{ padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 700, background: `${STATUS_COLORS[im.status]}18`, color: STATUS_COLORS[im.status] }}>{im.status}</span>
+                          </div>
+                          <div style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>{im.bairro}, {im.cidade} · {im.tipo} · {im.preco ? fmt(im.preco) : '—'}</div>
+                          <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>por {im.profiles?.nome || im.profiles?.email || '—'} · {fmtDate(im.criado_em)}</div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center' }}>
+                          <button onClick={e => { e.stopPropagation(); setImovelStatus(im.id, 'ativo') }}
+                            style={{ padding: '6px 14px', borderRadius: 8, background: '#059669', color: '#fff', border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Aprovar</button>
+                          <button onClick={e => { e.stopPropagation(); setImovelStatus(im.id, 'rascunho') }}
+                            style={{ padding: '6px 14px', borderRadius: 8, background: '#FEF2F2', color: '#DC2626', border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Rejeitar</button>
+                          <span style={{ fontSize: 16, color: '#94A3B8', userSelect: 'none' }}>{isOpen ? '▲' : '▼'}</span>
+                        </div>
+                      </div>
+                      {isOpen && (
+                        <div style={{ borderTop: '1px solid #F1F5F9', padding: 20 }}>
+                          {im.fotos?.length > 0 && (
+                            <div style={{ marginBottom: 18 }}>
+                              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#64748B', textTransform: 'uppercase', marginBottom: 8 }}>Fotos ({im.fotos.length})</div>
+                              <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+                                {im.fotos.map((f: string, idx: number) => (
+                                  <img key={idx} src={f} alt="" style={{ height: 90, width: 130, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 12, marginBottom: 14 }}>
+                            {[
+                              { label: 'Título', key: 'titulo', val: ef.titulo ?? im.titulo ?? '' },
+                              { label: 'Preço (R$)', key: 'preco', val: ef.preco ?? im.preco ?? '' },
+                              { label: 'Bairro', key: 'bairro', val: ef.bairro ?? im.bairro ?? '' },
+                              { label: 'Cidade', key: 'cidade', val: ef.cidade ?? im.cidade ?? '' },
+                              { label: 'Área m²', key: 'area', val: ef.area ?? im.area ?? '' },
+                              { label: 'Quartos', key: 'quartos', val: ef.quartos ?? im.quartos ?? '' },
+                            ].map(({ label, key, val }) => (
+                              <div key={key}>
+                                <label style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748B', display: 'block', marginBottom: 4 }}>{label}</label>
+                                <input value={val} onChange={e => setEditFields(prev => ({ ...prev, [im.id]: { ...(prev[im.id] ?? {}), [key]: e.target.value } }))}
+                                  style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: '1px solid #E2E8F0', fontSize: 13, fontFamily: 'inherit', outline: 'none', background: '#FAFAFA', boxSizing: 'border-box' }} />
+                              </div>
+                            ))}
+                          </div>
+                          <div style={{ marginBottom: 12 }}>
+                            <label style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748B', display: 'block', marginBottom: 4 }}>Descrição</label>
+                            <textarea value={ef.descricao ?? im.descricao ?? ''} rows={3}
+                              onChange={e => setEditFields(prev => ({ ...prev, [im.id]: { ...(prev[im.id] ?? {}), descricao: e.target.value } }))}
+                              style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: '1px solid #E2E8F0', fontSize: 13, fontFamily: 'inherit', outline: 'none', resize: 'vertical', background: '#FAFAFA', boxSizing: 'border-box' }} />
+                          </div>
+                          <div style={{ marginBottom: 14 }}>
+                            <label style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94A3B8', display: 'block', marginBottom: 4 }}>Notas internas (não visíveis ao proprietário)</label>
+                            <textarea value={notasInternas[im.id] ?? ''} rows={2}
+                              onChange={e => setNotasInternas(prev => ({ ...prev, [im.id]: e.target.value }))}
+                              placeholder="Observações de curadoria, pendências, histórico..."
+                              style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: '1px dashed #E2E8F0', fontSize: 13, fontFamily: 'inherit', outline: 'none', resize: 'vertical', background: '#FFFBF0', color: '#92400E', boxSizing: 'border-box' }} />
+                          </div>
+                          {editFields[im.id] && Object.keys(editFields[im.id]).length > 0 && (
+                            <div style={{ display: 'flex', gap: 10 }}>
+                              <button onClick={async () => {
+                                await supabase.from('imoveis').update(editFields[im.id]).eq('id', im.id)
+                                setImoveis(prev => prev.map(i => i.id === im.id ? { ...i, ...editFields[im.id] } : i))
+                                setEditFields(prev => { const n = { ...prev }; delete n[im.id]; return n })
+                              }} style={{ padding: '8px 18px', borderRadius: 8, background: 'var(--navy)', color: '#fff', border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                Salvar edições
+                              </button>
+                              <button onClick={() => setEditFields(prev => { const n = { ...prev }; delete n[im.id]; return n })}
+                                style={{ padding: '8px 14px', borderRadius: 8, background: '#F1F5F9', color: '#64748B', border: 'none', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                Descartar
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* FINANCIAMENTO — FactorOne Finance mock */}
+        {tab === 'financiamento' && (
+          <div>
+            <div style={{ background: 'linear-gradient(135deg, #0F2744 0%, #1A3A6A 100%)', borderRadius: 16, padding: '22px 28px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14 }}>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', color: '#90C4FF', textTransform: 'uppercase', marginBottom: 6 }}>Integração Parceira</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>FactorOne <span style={{ color: '#4DA6FF', fontStyle: 'italic' }}>Finance</span></div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 4 }}>Simulação de crédito imobiliário · dados meramente ilustrativos</div>
+              </div>
+              <div style={{ padding: '7px 14px', background: 'rgba(77,166,255,0.15)', border: '1px solid rgba(77,166,255,0.3)', borderRadius: 8, fontSize: 11, fontWeight: 700, color: '#4DA6FF', letterSpacing: '0.1em' }}>MOCK · v1.0</div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
+              {/* Inputs */}
+              <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', padding: 24 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', marginBottom: 20 }}>Parâmetros da simulação</div>
+                <div style={{ marginBottom: 18 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}>
+                    <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748B' }}>Valor do imóvel</label>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>{fmt(finCalc.valor)}</span>
+                  </div>
+                  <input type="range" min={200000} max={5000000} step={50000} value={finCalc.valor}
+                    onChange={e => setFinCalc(f => ({ ...f, valor: +e.target.value }))}
+                    style={{ width: '100%', accentColor: 'var(--navy)' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#94A3B8', marginTop: 3 }}><span>R$ 200k</span><span>R$ 5M</span></div>
+                </div>
+                <div style={{ marginBottom: 18 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}>
+                    <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748B' }}>Entrada</label>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>{finCalc.entrada}% · {fmt(finCalc.valor * finCalc.entrada / 100)}</span>
+                  </div>
+                  <input type="range" min={10} max={80} step={5} value={finCalc.entrada}
+                    onChange={e => setFinCalc(f => ({ ...f, entrada: +e.target.value }))}
+                    style={{ width: '100%', accentColor: 'var(--navy)' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#94A3B8', marginTop: 3 }}><span>10%</span><span>80%</span></div>
+                </div>
+                <div style={{ marginBottom: 18 }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748B', display: 'block', marginBottom: 8 }}>Prazo</label>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    {[60,120,180,240,360].map(p => (
+                      <button key={p} onClick={() => setFinCalc(f => ({ ...f, prazo: p }))}
+                        style={{ padding: '6px 12px', borderRadius: 7, border: `1.5px solid ${finCalc.prazo === p ? 'var(--navy)' : '#E2E8F0'}`, background: finCalc.prazo === p ? 'var(--navy)' : '#fff', color: finCalc.prazo === p ? '#fff' : '#64748B', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                        {p/12}a
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ marginBottom: 18 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}>
+                    <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748B' }}>Taxa (a.a.)</label>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>{finCalc.taxa}%</span>
+                  </div>
+                  <input type="range" min={8} max={16} step={0.5} value={finCalc.taxa}
+                    onChange={e => setFinCalc(f => ({ ...f, taxa: +e.target.value }))}
+                    style={{ width: '100%', accentColor: '#4DA6FF' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#94A3B8', marginTop: 3 }}><span>8% a.a.</span><span>16% a.a.</span></div>
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748B', display: 'block', marginBottom: 8 }}>Sistema de amortização</label>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {(['price', 'sac'] as const).map(s => (
+                      <button key={s} onClick={() => setFinCalc(f => ({ ...f, sistema: s }))}
+                        style={{ flex: 1, padding: '8px', borderRadius: 7, border: `1.5px solid ${finCalc.sistema === s ? '#4DA6FF' : '#E2E8F0'}`, background: finCalc.sistema === s ? '#EFF8FF' : '#fff', color: finCalc.sistema === s ? '#0369A1' : '#64748B', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                        {s === 'price' ? 'PRICE (fixa)' : 'SAC (decrescente)'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              {/* Results */}
+              {(() => {
+                const PV = finCalc.valor * (1 - finCalc.entrada / 100)
+                const n = finCalc.prazo
+                const i = finCalc.taxa / 100 / 12
+                let parcelaInicial: number, parcelaFinal: number, totalPago: number
+                if (finCalc.sistema === 'price') {
+                  const pmt = PV * (i * Math.pow(1 + i, n)) / (Math.pow(1 + i, n) - 1)
+                  parcelaInicial = pmt; parcelaFinal = pmt; totalPago = pmt * n
+                } else {
+                  const amort = PV / n
+                  parcelaInicial = amort + PV * i; parcelaFinal = amort + amort * i; totalPago = PV + PV * i * (n + 1) / 2
+                }
+                const jurosTotal = totalPago - PV
+                return (
+                  <div style={{ background: 'linear-gradient(135deg, #0F2744 0%, #1A3A6A 100%)', borderRadius: 14, padding: 24, color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#90C4FF', marginBottom: 18, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Resultado da simulação</div>
+                      <div style={{ marginBottom: 20 }}>
+                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Valor financiado</div>
+                        <div style={{ fontSize: 30, fontWeight: 900, letterSpacing: '-0.03em' }}>{fmt(PV)}</div>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+                        <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 10, padding: '14px 16px' }}>
+                          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 5 }}>{finCalc.sistema === 'price' ? 'Parcela fixa' : '1ª parcela'}</div>
+                          <div style={{ fontSize: 20, fontWeight: 800, color: '#4DA6FF' }}>{fmt(parcelaInicial)}</div>
+                        </div>
+                        {finCalc.sistema === 'sac' ? (
+                          <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 10, padding: '14px 16px' }}>
+                            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 5 }}>Última parcela</div>
+                            <div style={{ fontSize: 20, fontWeight: 800, color: '#6EE7B7' }}>{fmt(parcelaFinal)}</div>
+                          </div>
+                        ) : (
+                          <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 10, padding: '14px 16px' }}>
+                            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 5 }}>{n} parcelas</div>
+                            <div style={{ fontSize: 20, fontWeight: 800, color: '#6EE7B7' }}>{n/12} anos</div>
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 9, borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 16, marginBottom: 20 }}>
+                        {[
+                          { label: 'Total pago', value: fmt(totalPago) },
+                          { label: 'Total de juros', value: fmt(jurosTotal) },
+                          { label: 'Taxa mensal', value: `${(i * 100).toFixed(3)}% a.m.` },
+                        ].map(r => (
+                          <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5 }}>
+                            <span style={{ color: 'rgba(255,255,255,0.55)' }}>{r.label}</span>
+                            <span style={{ fontWeight: 700 }}>{r.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <button style={{ width: '100%', padding: '12px', borderRadius: 10, background: '#4DA6FF', color: '#fff', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                        Solicitar proposta FactorOne →
+                      </button>
+                      <div style={{ textAlign: 'center', fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 10 }}>
+                        Simulação ilustrativa · sujeito a análise de crédito
+                      </div>
+                    </div>
+                  </div>
+                )
+              })()}
             </div>
           </div>
         )}

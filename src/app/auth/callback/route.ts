@@ -25,6 +25,16 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
+      // Auto-create profile for OAuth users (Google etc.) if not yet exists
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const meta = user.user_metadata ?? {}
+        const displayName = meta.full_name || meta.name || user.email?.split('@')[0] || ''
+        await supabase.from('profiles').upsert(
+          { id: user.id, email: user.email, nome: displayName, tipo: 'proprietario', plano_ativo: false },
+          { onConflict: 'id', ignoreDuplicates: true }
+        )
+      }
       return NextResponse.redirect(`${origin}${next}`)
     }
   }

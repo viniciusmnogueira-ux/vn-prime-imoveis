@@ -133,17 +133,19 @@ const FILTROS_TIPO = ['Todos', 'Apartamento', 'Cobertura', 'Casa']
 
 // ─── Animações ────────────────────────────────────────────────────────────────
 
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1]
+
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
   visible: (i: number) => ({
     opacity: 1, y: 0,
-    transition: { duration: 0.52, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.52, delay: i * 0.08, ease: EASE },
   }),
 }
 
 const cardVariants = {
   hidden: { opacity: 0, y: 32, scale: 0.98 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: EASE } },
   exit:    { opacity: 0, y: -16, scale: 0.97, transition: { duration: 0.28 } },
 }
 
@@ -184,7 +186,7 @@ function LancamentoCard({ item, index }: { item: Lancamento; index: number }) {
           src={item.img}
           alt={item.nome}
           animate={{ scale: hovered ? 1.05 : 1 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.55, ease: EASE }}
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         />
         <motion.div
@@ -439,7 +441,7 @@ export default function LancamentosPage() {
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.55, ease: EASE }}
           style={{ width: 'min(720px,92vw)', margin: '0 auto', textAlign: 'center' }}
         >
           <div style={{ width: 40, height: 2, background: '#D4A857', borderRadius: 1, margin: '0 auto 24px' }} />
