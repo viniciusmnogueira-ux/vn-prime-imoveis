@@ -145,8 +145,8 @@ export default function SobrePage() {
             Proprietário, corretor, incorporadora ou fotógrafo — há um espaço para você na VN Prime Imóveis.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/anunciar"><Btn variant="accent" size="lg">Anunciar meu imóvel</Btn></Link>
-            <Link href="/login"><Btn variant="ghost" size="lg">Criar minha conta</Btn></Link>
+            <Link href="/login?redirect=/proprietario"><Btn variant="accent" size="lg">Anunciar meu imóvel</Btn></Link>
+            <Link href="/login?redirect=/proprietario&tab=cadastrar"><Btn variant="ghost" size="lg">Criar minha conta</Btn></Link>
           </div>
         </div>
       </section>

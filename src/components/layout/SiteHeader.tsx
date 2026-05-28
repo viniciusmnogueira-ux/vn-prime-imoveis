@@ -90,11 +90,8 @@ export default function SiteHeader() {
     return () => listener.subscription.unsubscribe()
   }, [])
 
-  const handleSignOut = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    setUser(null)
-    window.location.replace(window.location.origin + '/')
+  const handleSignOut = () => {
+    window.location.href = '/api/auth/signout'
   }
 
   if (pathname === '/login') return null

@@ -82,12 +82,24 @@ export default function ProprietarioPage() {
               Olá, {profile?.nome?.split(' ')[0] ?? 'bem-vindo'}
             </h1>
             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', marginTop: 4 }}>
-              Plano: <span style={{ color: 'var(--gold)', fontWeight: 700, textTransform: 'capitalize' }}>{profile?.plano ?? 'sem plano'}</span>
+              Plano: <span style={{ color: 'var(--gold)', fontWeight: 700 }}>{
+                (['direta','assistida','completa'].includes(profile?.plano)
+                  ? { direta: 'Venda Direta', assistida: 'Venda Assistida', completa: 'Venda Completa' }[profile.plano as string]
+                  : 'Venda Direta')
+              }</span>
             </div>
           </div>
-          <Link href="/anunciar">
-            <Btn variant="accent" size="lg">+ Novo anúncio</Btn>
-          </Link>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <Link href="/anunciar">
+              <Btn variant="accent" size="lg">+ Novo anúncio</Btn>
+            </Link>
+            <button onClick={() => { window.location.href = '/api/auth/signout' }}
+              style={{ padding: '8px 16px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.15s' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.18)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}>
+              Sair
+            </button>
+          </div>
         </div>
       </div>
 
@@ -407,39 +419,112 @@ Me diz o que pensa!`,
 
 function ScriptSection() {
   const [copied, setCopied] = useState<string | null>(null)
+  const [aiOpen, setAiOpen] = useState(false)
+  const [aiForm, setAiForm] = useState({ nome: '', imovel: '', contexto: '' })
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiReady, setAiReady] = useState(false)
+
+  const personalizar = async () => {
+    if (!aiForm.nome && !aiForm.imovel) return
+    setAiLoading(true)
+    await new Promise(r => setTimeout(r, 1600))
+    setAiReady(true)
+    setAiLoading(false)
+  }
+
+  const applyAI = (texto: string): string => {
+    if (!aiReady) return texto
+    let t = texto
+    if (aiForm.nome) t = t.replace(/\[NOME\]/g, aiForm.nome)
+    if (aiForm.imovel) {
+      t = t.replace(/\[TÍTULO\/BAIRRO\]/g, aiForm.imovel)
+      t = t.replace(/\[TÍTULO\]/g, aiForm.imovel)
+      t = t.replace(/\[BAIRRO\]/g, aiForm.imovel)
+    }
+    return t
+  }
 
   const copy = (texto: string, fase: string) => {
-    navigator.clipboard.writeText(texto)
+    navigator.clipboard.writeText(applyAI(texto))
     setCopied(fase)
     setTimeout(() => setCopied(null), 2000)
   }
 
   return (
     <div>
-      <div style={{ marginBottom: 28 }}>
+      <div style={{ marginBottom: 20 }}>
         <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold-deep)', marginBottom: 6 }}>Scripts de venda</div>
         <h3 style={{ margin: 0, marginBottom: 8 }}>Mensagens prontas para cada etapa</h3>
         <p style={{ margin: 0, color: 'var(--fg-2)', fontSize: 14 }}>Copie, adapte com os dados do seu imóvel e use no WhatsApp ou e-mail. Textos testados e aprovados para imóveis premium.</p>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {SCRIPTS.map(s => (
-          <div key={s.fase} style={{ background: '#fff', borderRadius: 14, border: '1px solid var(--border)', overflow: 'hidden' }}>
-            <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FAFAF8' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 10, height: 10, borderRadius: '50%', background: s.cor, flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>{s.fase}</span>
-              </div>
-              <button onClick={() => copy(s.texto, s.fase)}
-                style={{ padding: '6px 14px', borderRadius: 8, border: `1.5px solid ${copied === s.fase ? '#059669' : 'var(--border)'}`, background: copied === s.fase ? '#D1FAE5' : '#fff', color: copied === s.fase ? '#065F46' : 'var(--fg-2)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
-                {copied === s.fase ? '✓ Copiado!' : 'Copiar'}
-              </button>
-            </div>
-            <pre style={{ margin: 0, padding: '18px 20px', fontSize: 13.5, lineHeight: 1.7, color: 'var(--fg-1)', fontFamily: 'var(--font-body)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{s.texto}</pre>
+
+      {/* Personalizar com IA */}
+      <div style={{ background: aiOpen ? '#FFFBF0' : '#fff', border: `1.5px solid ${aiOpen ? 'var(--gold)' : 'var(--border)'}`, borderRadius: 14, marginBottom: 20, overflow: 'hidden', transition: 'border-color 0.2s' }}>
+        <div onClick={() => setAiOpen(o => !o)} style={{ padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 16 }}>✨</span>
+            <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--navy)' }}>Personalizar com IA</span>
+            {aiReady && <span style={{ fontSize: 10, fontWeight: 800, background: '#FEF3C7', color: '#B45309', padding: '2px 8px', borderRadius: 99 }}>ATIVO</span>}
           </div>
-        ))}
+          <span style={{ fontSize: 13, color: '#94A3B8' }}>{aiOpen ? '▲' : '▼'}</span>
+        </div>
+        {aiOpen && (
+          <div style={{ padding: '0 20px 20px', borderTop: '1px solid #FEF3C7' }}>
+            <p style={{ fontSize: 13, color: 'var(--fg-2)', margin: '14px 0 16px', lineHeight: 1.5 }}>
+              Preencha os dados do cliente e do seu imóvel. Os scripts serão adaptados automaticamente com essas informações.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 12, marginBottom: 14 }}>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 5 }}>Nome do comprador</label>
+                <input value={aiForm.nome} onChange={e => { setAiForm(f => ({ ...f, nome: e.target.value })); setAiReady(false) }}
+                  placeholder="Ex.: João Silva"
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1.5px solid var(--border)', fontSize: 13, outline: 'none', boxSizing: 'border-box' as any }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 5 }}>Seu imóvel (título/bairro)</label>
+                <input value={aiForm.imovel} onChange={e => { setAiForm(f => ({ ...f, imovel: e.target.value })); setAiReady(false) }}
+                  placeholder="Ex.: Apto Belvedere 3Q"
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1.5px solid var(--border)', fontSize: 13, outline: 'none', boxSizing: 'border-box' as any }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 5 }}>Contexto (opcional)</label>
+                <input value={aiForm.contexto} onChange={e => { setAiForm(f => ({ ...f, contexto: e.target.value })); setAiReady(false) }}
+                  placeholder="Ex.: urgência de mudança, pagamento à vista"
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1.5px solid var(--border)', fontSize: 13, outline: 'none', boxSizing: 'border-box' as any }} />
+              </div>
+            </div>
+            <button onClick={personalizar} disabled={aiLoading || (!aiForm.nome && !aiForm.imovel)}
+              style={{ padding: '9px 22px', borderRadius: 9, background: 'var(--gold-deep)', color: '#fff', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: aiLoading || (!aiForm.nome && !aiForm.imovel) ? 0.6 : 1, transition: 'opacity 0.2s' }}>
+              {aiLoading ? 'Personalizando...' : aiReady ? '✓ Scripts personalizados' : 'Personalizar scripts'}
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {SCRIPTS.map(s => {
+          const textoFinal = applyAI(s.texto)
+          const isPersonalizado = aiReady && textoFinal !== s.texto
+          return (
+            <div key={s.fase} style={{ background: '#fff', borderRadius: 14, border: '1px solid var(--border)', overflow: 'hidden' }}>
+              <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FAFAF8' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: s.cor, flexShrink: 0 }} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>{s.fase}</span>
+                  {isPersonalizado && <span style={{ fontSize: 10, fontWeight: 700, background: '#FEF3C7', color: '#B45309', padding: '2px 7px', borderRadius: 99 }}>✨ IA</span>}
+                </div>
+                <button onClick={() => copy(s.texto, s.fase)}
+                  style={{ padding: '6px 14px', borderRadius: 8, border: `1.5px solid ${copied === s.fase ? '#059669' : 'var(--border)'}`, background: copied === s.fase ? '#D1FAE5' : '#fff', color: copied === s.fase ? '#065F46' : 'var(--fg-2)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+                  {copied === s.fase ? '✓ Copiado!' : 'Copiar'}
+                </button>
+              </div>
+              <pre style={{ margin: 0, padding: '18px 20px', fontSize: 13.5, lineHeight: 1.7, color: 'var(--fg-1)', fontFamily: 'var(--font-body)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{textoFinal}</pre>
+            </div>
+          )
+        })}
       </div>
       <p style={{ fontSize: 12, color: 'var(--fg-3)', textAlign: 'center', marginTop: 20 }}>
-        Substitua os campos entre colchetes [NOME], [TÍTULO], etc. pelos dados reais antes de enviar.
+        {aiReady ? 'Scripts personalizados com IA. Revise antes de enviar.' : 'Substitua os campos entre colchetes [NOME], [TÍTULO], etc. pelos dados reais antes de enviar.'}
       </p>
     </div>
   )

@@ -3,11 +3,12 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Btn from '@/components/ui/Btn'
 import Link from 'next/link'
+import FinanceiroTab from './FinanceiroTab'
 
 const fmt = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
 const fmtDate = (s: string) => new Date(s).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })
 
-type Tab = 'dashboard' | 'curadoria' | 'imoveis' | 'leads' | 'usuarios' | 'financiamento'
+type Tab = 'dashboard' | 'curadoria' | 'imoveis' | 'leads' | 'usuarios' | 'financeiro'
 
 const STATUS_COLORS: Record<string, string> = {
   pendente: '#D97706', ativo: '#059669', pausado: '#6B7280', vendido: '#7C3AED', rascunho: '#94A3B8',
@@ -26,8 +27,6 @@ export default function AdminPage() {
   const [openCuradoria, setOpenCuradoria] = useState<string | null>(null)
   const [editFields, setEditFields] = useState<Record<string, any>>({})
   const [notasInternas, setNotasInternas] = useState<Record<string, string>>({})
-  const [finCalc, setFinCalc] = useState({ valor: 800000, entrada: 20, prazo: 240, taxa: 10.5, sistema: 'price' as 'price' | 'sac' })
-
   const supabase = createClient()
 
   useEffect(() => {
@@ -107,7 +106,7 @@ export default function AdminPage() {
     { key: 'imoveis', label: 'Imóveis' },
     { key: 'leads', label: 'Leads', badge: stats.leads || undefined },
     { key: 'usuarios', label: 'Usuários' },
-    { key: 'financiamento', label: 'FactorOne Finance' },
+    { key: 'financeiro', label: 'Financeiro' },
   ]
 
   return (
@@ -121,6 +120,10 @@ export default function AdminPage() {
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>{profile?.nome || user?.email}</span>
             <Link href="/" style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>← Site</Link>
+            <button onClick={() => { window.location.href = '/api/auth/signout' }}
+              style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', background: 'none', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontFamily: 'inherit' }}>
+              Sair
+            </button>
           </div>
         </div>
       </div>
@@ -475,140 +478,7 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* FINANCIAMENTO — FactorOne Finance mock */}
-        {tab === 'financiamento' && (
-          <div>
-            <div style={{ background: 'linear-gradient(135deg, #0F2744 0%, #1A3A6A 100%)', borderRadius: 16, padding: '22px 28px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', color: '#90C4FF', textTransform: 'uppercase', marginBottom: 6 }}>Integração Parceira</div>
-                <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>FactorOne <span style={{ color: '#4DA6FF', fontStyle: 'italic' }}>Finance</span></div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 4 }}>Simulação de crédito imobiliário · dados meramente ilustrativos</div>
-              </div>
-              <div style={{ padding: '7px 14px', background: 'rgba(77,166,255,0.15)', border: '1px solid rgba(77,166,255,0.3)', borderRadius: 8, fontSize: 11, fontWeight: 700, color: '#4DA6FF', letterSpacing: '0.1em' }}>MOCK · v1.0</div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
-              {/* Inputs */}
-              <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', padding: 24 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', marginBottom: 20 }}>Parâmetros da simulação</div>
-                <div style={{ marginBottom: 18 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}>
-                    <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748B' }}>Valor do imóvel</label>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>{fmt(finCalc.valor)}</span>
-                  </div>
-                  <input type="range" min={200000} max={5000000} step={50000} value={finCalc.valor}
-                    onChange={e => setFinCalc(f => ({ ...f, valor: +e.target.value }))}
-                    style={{ width: '100%', accentColor: 'var(--navy)' }} />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#94A3B8', marginTop: 3 }}><span>R$ 200k</span><span>R$ 5M</span></div>
-                </div>
-                <div style={{ marginBottom: 18 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}>
-                    <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748B' }}>Entrada</label>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>{finCalc.entrada}% · {fmt(finCalc.valor * finCalc.entrada / 100)}</span>
-                  </div>
-                  <input type="range" min={10} max={80} step={5} value={finCalc.entrada}
-                    onChange={e => setFinCalc(f => ({ ...f, entrada: +e.target.value }))}
-                    style={{ width: '100%', accentColor: 'var(--navy)' }} />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#94A3B8', marginTop: 3 }}><span>10%</span><span>80%</span></div>
-                </div>
-                <div style={{ marginBottom: 18 }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748B', display: 'block', marginBottom: 8 }}>Prazo</label>
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {[60,120,180,240,360].map(p => (
-                      <button key={p} onClick={() => setFinCalc(f => ({ ...f, prazo: p }))}
-                        style={{ padding: '6px 12px', borderRadius: 7, border: `1.5px solid ${finCalc.prazo === p ? 'var(--navy)' : '#E2E8F0'}`, background: finCalc.prazo === p ? 'var(--navy)' : '#fff', color: finCalc.prazo === p ? '#fff' : '#64748B', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
-                        {p/12}a
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div style={{ marginBottom: 18 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}>
-                    <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748B' }}>Taxa (a.a.)</label>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>{finCalc.taxa}%</span>
-                  </div>
-                  <input type="range" min={8} max={16} step={0.5} value={finCalc.taxa}
-                    onChange={e => setFinCalc(f => ({ ...f, taxa: +e.target.value }))}
-                    style={{ width: '100%', accentColor: '#4DA6FF' }} />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#94A3B8', marginTop: 3 }}><span>8% a.a.</span><span>16% a.a.</span></div>
-                </div>
-                <div>
-                  <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748B', display: 'block', marginBottom: 8 }}>Sistema de amortização</label>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    {(['price', 'sac'] as const).map(s => (
-                      <button key={s} onClick={() => setFinCalc(f => ({ ...f, sistema: s }))}
-                        style={{ flex: 1, padding: '8px', borderRadius: 7, border: `1.5px solid ${finCalc.sistema === s ? '#4DA6FF' : '#E2E8F0'}`, background: finCalc.sistema === s ? '#EFF8FF' : '#fff', color: finCalc.sistema === s ? '#0369A1' : '#64748B', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-                        {s === 'price' ? 'PRICE (fixa)' : 'SAC (decrescente)'}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              {/* Results */}
-              {(() => {
-                const PV = finCalc.valor * (1 - finCalc.entrada / 100)
-                const n = finCalc.prazo
-                const i = finCalc.taxa / 100 / 12
-                let parcelaInicial: number, parcelaFinal: number, totalPago: number
-                if (finCalc.sistema === 'price') {
-                  const pmt = PV * (i * Math.pow(1 + i, n)) / (Math.pow(1 + i, n) - 1)
-                  parcelaInicial = pmt; parcelaFinal = pmt; totalPago = pmt * n
-                } else {
-                  const amort = PV / n
-                  parcelaInicial = amort + PV * i; parcelaFinal = amort + amort * i; totalPago = PV + PV * i * (n + 1) / 2
-                }
-                const jurosTotal = totalPago - PV
-                return (
-                  <div style={{ background: 'linear-gradient(135deg, #0F2744 0%, #1A3A6A 100%)', borderRadius: 14, padding: 24, color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: '#90C4FF', marginBottom: 18, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Resultado da simulação</div>
-                      <div style={{ marginBottom: 20 }}>
-                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Valor financiado</div>
-                        <div style={{ fontSize: 30, fontWeight: 900, letterSpacing: '-0.03em' }}>{fmt(PV)}</div>
-                      </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
-                        <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 10, padding: '14px 16px' }}>
-                          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 5 }}>{finCalc.sistema === 'price' ? 'Parcela fixa' : '1ª parcela'}</div>
-                          <div style={{ fontSize: 20, fontWeight: 800, color: '#4DA6FF' }}>{fmt(parcelaInicial)}</div>
-                        </div>
-                        {finCalc.sistema === 'sac' ? (
-                          <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 10, padding: '14px 16px' }}>
-                            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 5 }}>Última parcela</div>
-                            <div style={{ fontSize: 20, fontWeight: 800, color: '#6EE7B7' }}>{fmt(parcelaFinal)}</div>
-                          </div>
-                        ) : (
-                          <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 10, padding: '14px 16px' }}>
-                            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 5 }}>{n} parcelas</div>
-                            <div style={{ fontSize: 20, fontWeight: 800, color: '#6EE7B7' }}>{n/12} anos</div>
-                          </div>
-                        )}
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 9, borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 16, marginBottom: 20 }}>
-                        {[
-                          { label: 'Total pago', value: fmt(totalPago) },
-                          { label: 'Total de juros', value: fmt(jurosTotal) },
-                          { label: 'Taxa mensal', value: `${(i * 100).toFixed(3)}% a.m.` },
-                        ].map(r => (
-                          <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5 }}>
-                            <span style={{ color: 'rgba(255,255,255,0.55)' }}>{r.label}</span>
-                            <span style={{ fontWeight: 700 }}>{r.value}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <button style={{ width: '100%', padding: '12px', borderRadius: 10, background: '#4DA6FF', color: '#fff', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-                        Solicitar proposta FactorOne →
-                      </button>
-                      <div style={{ textAlign: 'center', fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 10 }}>
-                        Simulação ilustrativa · sujeito a análise de crédito
-                      </div>
-                    </div>
-                  </div>
-                )
-              })()}
-            </div>
-          </div>
-        )}
+        {tab === 'financeiro' && <FinanceiroTab imoveis={imoveis} leads={leads} />}
 
         {/* USUÁRIOS */}
         {tab === 'usuarios' && (

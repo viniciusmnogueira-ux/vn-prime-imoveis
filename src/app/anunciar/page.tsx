@@ -84,11 +84,15 @@ export default function AnunciarPage() {
         return
       }
 
-      // Upsert profile
+      // Upsert profile — não sobrescreve tipo (pode ser admin/corretor)
+      const planoValido = (['direta','assistida','completa'].includes(form.plano) ? form.plano : 'direta') as 'direta' | 'assistida' | 'completa'
       await supabase.from('profiles').upsert({
-        id: user.id, email: user.email!, nome: form.nome || user.user_metadata?.nome,
-        telefone: form.telefone, tipo: 'proprietario', plano: form.plano as any, plano_ativo: true,
-      })
+        id: user.id, email: user.email!,
+        nome: form.nome || user.user_metadata?.nome,
+        telefone: form.telefone,
+        plano: planoValido,
+        plano_ativo: true,
+      }, { onConflict: 'id' })
 
       // Upload fotos
       const fotoUrls: string[] = []

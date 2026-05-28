@@ -25,15 +25,31 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      // Auto-create profile for OAuth users (Google etc.) if not yet exists
+      // Auto-create or update profile for OAuth users (Google etc.)
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const meta = user.user_metadata ?? {}
         const displayName = meta.full_name || meta.name || user.email?.split('@')[0] || ''
-        await supabase.from('profiles').upsert(
-          { id: user.id, email: user.email, nome: displayName, tipo: 'proprietario', plano_ativo: false },
-          { onConflict: 'id', ignoreDuplicates: true }
-        )
+
+        // Check if profile already exists
+        const { data: existing } = await supabase
+          .from('profiles')
+          .select('id, plano, tipo')
+          .eq('id', user.id)
+          .single()
+
+        if (!existing) {
+          // New user — create full profile
+          await supabase.from('profiles').insert({
+            id: user.id, email: user.email, nome: displayName,
+            tipo: 'proprietario', plano_ativo: false, plano: 'direta',
+          })
+        } else if (!existing.plano) {
+          // Existing user sem plano — adiciona plano sem sobrescrever tipo
+          await supabase.from('profiles')
+            .update({ plano: 'direta', nome: displayName })
+            .eq('id', user.id)
+        }
       }
       return NextResponse.redirect(`${origin}${next}`)
     }

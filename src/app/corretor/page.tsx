@@ -18,7 +18,7 @@ export default function CorretorPage() {
   const [leads, setLeads] = useState<any[]>([])
   const [imoveis, setImoveis] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [sec, setSec] = useState<'dashboard' | 'cadastro' | 'imoveis' | 'leads' | 'fotografo'>('dashboard')
+  const [sec, setSec] = useState<'dashboard' | 'cadastro' | 'imoveis' | 'leads' | 'fotografo' | 'scripts'>('dashboard')
 
   useEffect(() => { loadData() }, [])
 
@@ -68,11 +68,15 @@ export default function CorretorPage() {
               {corretor?.creci && <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginLeft: 12, fontFamily: 'DM Sans' }}>CRECI {corretor.creci}</span>}
             </h1>
           </div>
-          {corretor && (
-            <div style={{ display: 'flex', gap: 12 }}>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            {corretor && (
               <Btn variant="ghost-light" size="sm" onClick={() => setSec('leads')}>Leads ({leads.length})</Btn>
-            </div>
-          )}
+            )}
+            <button onClick={() => { window.location.href = '/api/auth/signout' }}
+              style={{ padding: '8px 16px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+              Sair
+            </button>
+          </div>
         </div>
       </div>
 
@@ -80,7 +84,7 @@ export default function CorretorPage() {
         {/* Tabs */}
         {(() => {
           const tabs: [string, string][] = corretor
-            ? [['dashboard','Dashboard'],['imoveis','Imóveis'],['leads','Leads'],['fotografo','📸 Fotógrafo'],['cadastro','Meus dados']]
+            ? [['dashboard','Dashboard'],['imoveis','Imóveis'],['leads','Leads'],['scripts','Scripts'],['fotografo','📸 Fotógrafo'],['cadastro','Meus dados']]
             : [['cadastro','Completar cadastro']]
           return (
             <div style={{ display: 'flex', gap: 4, borderBottom: '2px solid var(--border)', marginBottom: 32 }}>
@@ -174,6 +178,8 @@ export default function CorretorPage() {
             ))}
           </div>
         )}
+
+        {sec === 'scripts' && <ScriptCorretorSection />}
 
         {sec === 'fotografo' && <FotografoSection />}
 
@@ -387,7 +393,7 @@ function CadastroCorretor({ profile, corretor, onSaved }: { profile: Profile | n
     if (!form.creci) { setError('CRECI é obrigatório.'); return }
     setSaving(true); setError('')
     try {
-      await supabase.from('profiles').upsert({ id: profile!.id, email: profile!.email, nome: form.nome, telefone: form.telefone, tipo: 'corretor', plano_ativo: true })
+      await supabase.from('profiles').upsert({ id: profile!.id, email: profile!.email, nome: form.nome, telefone: form.telefone, plano_ativo: true }, { onConflict: 'id' })
       await supabase.from('corretores').upsert({
         profile_id: profile!.id,
         creci: form.creci,
@@ -431,6 +437,174 @@ function CadastroCorretor({ profile, corretor, onSaved }: { profile: Profile | n
           </Btn>
         </div>
       </div>
+    </div>
+  )
+}
+
+const SCRIPTS_CORRETOR = [
+  {
+    fase: 'Apresentação ao comprador — WhatsApp',
+    cor: '#2F8674',
+    texto: `Olá, [NOME]! Sou [SEU NOME], corretor parceiro da VN Prime.
+
+Entrei em contato pois temos um imóvel em [BAIRRO] que se encaixa no perfil que você está buscando: [TIPOLOGIA E CARACTERÍSTICAS].
+
+Posso te enviar fotos e detalhes completos agora. Teria 5 minutos para conversar?`,
+  },
+  {
+    fase: 'Qualificação de interesse',
+    cor: '#D4A857',
+    texto: `Ótimo, [NOME]! Para encontrar o imóvel ideal, me conta:
+
+1. Qual faixa de valor você está pensando?
+2. Quantos quartos? Precisa de vaga de garagem?
+3. Tem preferência de bairro ou pode ser na Grande BH?
+4. Prazo para mudança — tem urgência?
+5. Vai usar financiamento, FGTS ou pagamento à vista?
+
+Com essas informações já consigo selecionar as melhores opções para você!`,
+  },
+  {
+    fase: 'Pós-visita — Levantando interesse',
+    cor: '#6366F1',
+    texto: `[NOME], que ótima visita hoje!
+
+Como você pode ver, o imóvel oferece [DIFERENCIAIS: localização, acabamento, vista, área de lazer].
+
+Temos outros interessados, mas quero garantir que você tenha a chance de fazer sua proposta primeiro.
+
+O que mais te chamou atenção? Tem algum ponto que ficou dúvida?`,
+  },
+  {
+    fase: 'Encaminhando proposta',
+    cor: '#0F1824',
+    texto: `[NOME], fico feliz com seu interesse!
+
+Para formalizar sua proposta ao proprietário, preciso de:
+— Valor proposto
+— Forma de pagamento (à vista / financiamento / FGTS)
+— Prazo desejado para a transferência
+— Alguma condição especial (mobília inclusa, pintura, etc.)
+
+Vou apresentar ao proprietário e te retorno em até 24h. Podemos avançar?`,
+  },
+  {
+    fase: 'Fechamento e próximos passos',
+    cor: '#059669',
+    texto: `[NOME], excelente notícia — proposta aceita!
+
+Próximos passos:
+1. Assinatura do contrato de compra e venda
+2. Pagamento de sinal (geralmente 10% do valor)
+3. Análise de crédito / aprovação de financiamento (se aplicável)
+4. Vistoria e laudo técnico
+5. Escritura e registro em cartório
+
+Nossa equipe jurídica acompanha todo o processo. Vou te mandar o checklist completo aqui. Parabéns pela decisão!`,
+  },
+]
+
+function ScriptCorretorSection() {
+  const [copied, setCopied] = useState<string | null>(null)
+  const [aiOpen, setAiOpen] = useState(false)
+  const [aiForm, setAiForm] = useState({ nome: '', bairro: '', tipo: '', contexto: '' })
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiReady, setAiReady] = useState(false)
+
+  const personalizar = async () => {
+    if (!aiForm.nome && !aiForm.bairro) return
+    setAiLoading(true)
+    await new Promise(r => setTimeout(r, 1600))
+    setAiReady(true)
+    setAiLoading(false)
+  }
+
+  const applyAI = (texto: string): string => {
+    if (!aiReady) return texto
+    let t = texto
+    if (aiForm.nome) t = t.replace(/\[NOME\]/g, aiForm.nome)
+    if (aiForm.bairro) t = t.replace(/\[BAIRRO\]/g, aiForm.bairro)
+    if (aiForm.tipo) t = t.replace(/\[TIPOLOGIA E CARACTERÍSTICAS\]/g, aiForm.tipo)
+    if (aiForm.contexto) t = t.replace(/\[CONTEXTO\]/g, aiForm.contexto)
+    return t
+  }
+
+  const copy = (texto: string, fase: string) => {
+    navigator.clipboard.writeText(applyAI(texto))
+    setCopied(fase)
+    setTimeout(() => setCopied(null), 2000)
+  }
+
+  return (
+    <div>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#2F8674', marginBottom: 6 }}>Scripts do Corretor</div>
+        <h3 style={{ margin: 0, marginBottom: 8 }}>Mensagens prontas para cada etapa da venda</h3>
+        <p style={{ margin: 0, color: 'var(--fg-2)', fontSize: 14 }}>Do primeiro contato ao fechamento. Personalize com os dados do cliente e use no WhatsApp.</p>
+      </div>
+
+      {/* Personalizar com IA */}
+      <div style={{ background: aiOpen ? '#F0FFF8' : '#fff', border: `1.5px solid ${aiOpen ? '#2F8674' : 'var(--border)'}`, borderRadius: 14, marginBottom: 20, overflow: 'hidden', transition: 'border-color 0.2s' }}>
+        <div onClick={() => setAiOpen(o => !o)} style={{ padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 16 }}>✨</span>
+            <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--navy)' }}>Personalizar com IA</span>
+            {aiReady && <span style={{ fontSize: 10, fontWeight: 800, background: '#D1FAE5', color: '#065F46', padding: '2px 8px', borderRadius: 99 }}>ATIVO</span>}
+          </div>
+          <span style={{ fontSize: 13, color: '#94A3B8' }}>{aiOpen ? '▲' : '▼'}</span>
+        </div>
+        {aiOpen && (
+          <div style={{ padding: '0 20px 20px', borderTop: '1px solid #D1FAE5' }}>
+            <p style={{ fontSize: 13, color: 'var(--fg-2)', margin: '14px 0 16px', lineHeight: 1.5 }}>
+              Preencha os dados do cliente e do imóvel. Os scripts serão adaptados automaticamente.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 12, marginBottom: 14 }}>
+              {[
+                { key: 'nome', label: 'Nome do cliente', placeholder: 'Ex.: Maria' },
+                { key: 'bairro', label: 'Bairro / imóvel', placeholder: 'Ex.: Belvedere' },
+                { key: 'tipo', label: 'Tipologia', placeholder: 'Ex.: Apto 3Q com suíte' },
+                { key: 'contexto', label: 'Contexto (opcional)', placeholder: 'Ex.: comprando com FGTS' },
+              ].map(({ key, label, placeholder }) => (
+                <div key={key}>
+                  <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 5 }}>{label}</label>
+                  <input value={(aiForm as any)[key]} onChange={e => { setAiForm(f => ({ ...f, [key]: e.target.value })); setAiReady(false) }}
+                    placeholder={placeholder} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1.5px solid var(--border)', fontSize: 13, outline: 'none', boxSizing: 'border-box' as any }} />
+                </div>
+              ))}
+            </div>
+            <button onClick={personalizar} disabled={aiLoading || (!aiForm.nome && !aiForm.bairro)}
+              style={{ padding: '9px 22px', borderRadius: 9, background: '#2F8674', color: '#fff', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: aiLoading || (!aiForm.nome && !aiForm.bairro) ? 0.6 : 1, transition: 'opacity 0.2s' }}>
+              {aiLoading ? 'Personalizando...' : aiReady ? '✓ Scripts personalizados' : 'Personalizar scripts'}
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {SCRIPTS_CORRETOR.map(s => {
+          const textoFinal = applyAI(s.texto)
+          const isPersonalizado = aiReady && textoFinal !== s.texto
+          return (
+            <div key={s.fase} style={{ background: '#fff', borderRadius: 14, border: '1px solid var(--border)', overflow: 'hidden' }}>
+              <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FAFAF8' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: s.cor, flexShrink: 0 }} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>{s.fase}</span>
+                  {isPersonalizado && <span style={{ fontSize: 10, fontWeight: 700, background: '#D1FAE5', color: '#065F46', padding: '2px 7px', borderRadius: 99 }}>✨ IA</span>}
+                </div>
+                <button onClick={() => copy(s.texto, s.fase)}
+                  style={{ padding: '6px 14px', borderRadius: 8, border: `1.5px solid ${copied === s.fase ? '#059669' : 'var(--border)'}`, background: copied === s.fase ? '#D1FAE5' : '#fff', color: copied === s.fase ? '#065F46' : 'var(--fg-2)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+                  {copied === s.fase ? '✓ Copiado!' : 'Copiar'}
+                </button>
+              </div>
+              <pre style={{ margin: 0, padding: '18px 20px', fontSize: 13.5, lineHeight: 1.7, color: 'var(--fg-1)', fontFamily: 'var(--font-body)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{textoFinal}</pre>
+            </div>
+          )
+        })}
+      </div>
+      <p style={{ fontSize: 12, color: 'var(--fg-3)', textAlign: 'center', marginTop: 20 }}>
+        {aiReady ? 'Scripts personalizados com IA. Revise antes de enviar.' : 'Substitua os campos entre colchetes pelos dados reais antes de enviar.'}
+      </p>
     </div>
   )
 }

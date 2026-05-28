@@ -57,14 +57,19 @@ function LoginContent() {
     if (error) { setMsg(error.message); setLoading(false); return }
     if (data.user) {
       await supabase.from('profiles').upsert({
-        id: data.user.id, email, nome, tipo, plano_ativo: false,
+        id: data.user.id, email, nome, tipo, plano_ativo: false, plano: 'direta',
       })
     }
-    setMsg('Confirme seu e-mail para ativar a conta.')
-    setLoading(false)
+    if (data.session) {
+      // Confirmação de e-mail desativada no Supabase → entra direto
+      router.replace(redirect)
+    } else {
+      setMsg('Conta criada! Verifique seu e-mail para ativar a conta.')
+      setLoading(false)
+    }
   }
 
-  const isSuccess = msg.includes('Confirme')
+  const isSuccess = msg.includes('Conta criada') || msg.includes('Confirme') || msg.includes('Verifique')
 
   return (
     <div style={{ display: 'flex', minHeight: '100dvh' }}>
