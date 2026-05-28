@@ -128,6 +128,7 @@ export default function SiteFooter() {
             { label: 'Due Diligence', href: '/due-diligence' },
             { label: 'Avaliação', href: '/avaliacao' },
             { label: 'Calculadora ITBI', href: '/calculadora' },
+            { label: 'Termos e Condições', href: '/termos' },
           ]} />
         </div>
 
@@ -137,6 +138,7 @@ export default function SiteFooter() {
             <span style={{ fontStyle: 'italic', color: 'var(--gold-soft)', fontSize: 14, letterSpacing: '0.04em' }}>
               Curadoria silenciosa
             </span>
+            <Link href="/termos" style={{ fontSize: 11, color: 'rgba(245,248,250,0.35)', textDecoration: 'none' }}>Termos</Link>
             <Link href="/admin" style={{ fontSize: 11, color: 'rgba(245,248,250,0.20)', textDecoration: 'none', letterSpacing: '0.1em' }}>admin</Link>
           </div>
         </div>
