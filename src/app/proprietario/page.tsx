@@ -243,6 +243,7 @@ function LeadsSection({ proprietarioId }: { proprietarioId: string }) {
   const supabase = createClient()
   const [leads, setLeads] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [origemFilter, setOrigemFilter] = useState('')
 
   useEffect(() => {
     supabase.from('leads').select('*, imoveis(titulo)').eq('proprietario_id', proprietarioId)
@@ -256,7 +257,13 @@ function LeadsSection({ proprietarioId }: { proprietarioId: string }) {
     { id: 'mock3', nome: 'Rafael Andrade', email: 'r.andrade@empresa.com.br', telefone: '31996543210', mensagem: 'Estou buscando imóvel para investimento. Qual a possibilidade de negociação no preço? Posso pagar à vista.', criado_em: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), mock: true },
   ]
 
-  const showLeads = leads.length > 0 ? leads : MOCK_LEADS
+  const ORIGEM_LABELS: Record<string, string> = { detalhe: 'Interesse', agendamento: 'Visita', proposta: 'Proposta', avaliacao: 'Avaliação', vender_completa: 'Vender' }
+  const ORIGEM_COLORS: Record<string, [string, string]> = {
+    detalhe: ['#EFF6FF', '#1D4ED8'], agendamento: ['#F0FDF4', '#16A34A'], proposta: ['#FAF5FF', '#7C3AED'],
+  }
+  const realLeads = leads.filter(l => !origemFilter || l.origem === origemFilter)
+  const showLeads = leads.length > 0 ? realLeads : MOCK_LEADS
+  const origens = Array.from(new Set(leads.map(l => l.origem).filter(Boolean))) as string[]
 
   if (loading) return <LoadingScreen />
 
@@ -267,29 +274,42 @@ function LeadsSection({ proprietarioId }: { proprietarioId: string }) {
           Simulação — veja como seus leads chegam. Quando seu anúncio estiver ativo, leads reais aparecem aqui.
         </div>
       )}
-      {showLeads.map((l: any) => (
-        <div key={l.id} style={{ background: '#fff', borderRadius: 12, padding: '18px 22px', boxShadow: 'var(--shadow-soft)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, opacity: l.mock ? 0.85 : 1 }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 4 }}>
-              <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--navy)' }}>{l.nome}</span>
-              {l.mock && <span style={{ fontSize: 10, fontWeight: 700, background: '#FEF3C7', color: '#B45309', padding: '2px 8px', borderRadius: 99, letterSpacing: '0.08em' }}>DEMO</span>}
-            </div>
-            <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>{l.email} {l.telefone ? `· ${l.telefone}` : ''}</div>
-            {l.mensagem && <div style={{ fontSize: 13, color: 'var(--fg-2)', marginTop: 6, fontStyle: 'italic', lineHeight: 1.5 }}>"{l.mensagem}"</div>}
-            <div style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 6 }}>
-              {l.imoveis?.titulo ? `Imóvel: ${l.imoveis.titulo} · ` : ''}{new Date(l.criado_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: 8, flexDirection: 'column', alignItems: 'flex-end' }}>
-            <a href={`https://wa.me/55${l.telefone?.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer">
-              <Btn variant="accent" size="sm">WhatsApp</Btn>
-            </a>
-            <a href={`mailto:${l.email}`}>
-              <Btn variant="ghost" size="sm">E-mail</Btn>
-            </a>
-          </div>
+      {leads.length > 0 && origens.length > 1 && (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
+          {['', ...origens].map(o => (
+            <button key={o} onClick={() => setOrigemFilter(o)} style={{ padding: '5px 12px', borderRadius: 99, border: '1px solid', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', borderColor: origemFilter === o ? 'var(--navy)' : 'var(--border)', background: origemFilter === o ? 'var(--navy)' : '#fff', color: origemFilter === o ? '#fff' : 'var(--navy)' }}>
+              {o ? (ORIGEM_LABELS[o] ?? o) : 'Todos'} {o ? `(${leads.filter(l => l.origem === o).length})` : `(${leads.length})`}
+            </button>
+          ))}
         </div>
-      ))}
+      )}
+      {showLeads.map((l: any) => {
+        const [bg, color] = ORIGEM_COLORS[l.origem ?? ''] ?? ['#F8FAFC', '#64748B']
+        return (
+          <div key={l.id} style={{ background: '#fff', borderRadius: 12, padding: '18px 22px', boxShadow: 'var(--shadow-soft)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, opacity: l.mock ? 0.85 : 1 }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 4 }}>
+                <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--navy)' }}>{l.nome}</span>
+                {l.mock && <span style={{ fontSize: 10, fontWeight: 700, background: '#FEF3C7', color: '#B45309', padding: '2px 8px', borderRadius: 99, letterSpacing: '0.08em' }}>DEMO</span>}
+                {l.origem && !l.mock && <span style={{ fontSize: 10, fontWeight: 700, background: bg, color, padding: '2px 8px', borderRadius: 99 }}>{ORIGEM_LABELS[l.origem] ?? l.origem}</span>}
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>{l.email} {l.telefone ? `· ${l.telefone}` : ''}</div>
+              {l.mensagem && <div style={{ fontSize: 13, color: 'var(--fg-2)', marginTop: 6, fontStyle: 'italic', lineHeight: 1.5 }}>"{l.mensagem}"</div>}
+              <div style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 6 }}>
+                {l.imoveis?.titulo ? `Imóvel: ${l.imoveis.titulo} · ` : ''}{new Date(l.criado_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8, flexDirection: 'column', alignItems: 'flex-end' }}>
+              <a href={`https://wa.me/55${l.telefone?.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer">
+                <Btn variant="accent" size="sm">WhatsApp</Btn>
+              </a>
+              <a href={`mailto:${l.email}`}>
+                <Btn variant="ghost" size="sm">E-mail</Btn>
+              </a>
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }
