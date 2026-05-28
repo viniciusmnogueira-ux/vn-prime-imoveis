@@ -67,6 +67,8 @@ export default function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState<string | null>(null)
   const [sessionAck, setSessionAck] = useState(true)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchQ, setSearchQ] = useState('')
 
   const handleSignOut = () => { window.location.href = '/api/auth/signout' }
 
@@ -144,6 +146,10 @@ export default function SiteHeader() {
                 )}
               </div>
             ))}
+            <button onClick={() => setSearchOpen(true)} aria-label="Buscar" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--navy-muted)', fontSize: 17, padding: '4px 6px', display: 'flex', alignItems: 'center', borderRadius: 6, transition: 'color 0.15s' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--navy)')} onMouseLeave={e => (e.currentTarget.style.color = 'var(--navy-muted)')}>
+              ⌕
+            </button>
             <span style={{ width: 1, height: 22, background: 'var(--border)', display: 'inline-block' }} />
           </nav>
 
@@ -176,6 +182,31 @@ export default function SiteHeader() {
           </div>
         </div>
       </header>
+
+      {/* Quick search overlay */}
+      {searchOpen && (
+        <div onClick={() => setSearchOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 9998, background: 'rgba(15,24,36,0.5)', backdropFilter: 'blur(4px)' }}>
+          <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 80, left: '50%', transform: 'translateX(-50%)', width: 'min(560px,90vw)', background: '#fff', borderRadius: 16, boxShadow: '0 24px 64px rgba(15,34,68,0.22)', overflow: 'hidden' }}>
+            <form onSubmit={e => { e.preventDefault(); if (searchQ.trim()) { window.location.href = `/busca?q=${encodeURIComponent(searchQ.trim())}`; setSearchOpen(false) } }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
+                <span style={{ fontSize: 18, color: 'var(--navy-muted)', flexShrink: 0 }}>⌕</span>
+                <input autoFocus type="text" value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder="Buscar imóveis, bairros, tipos…"
+                  style={{ flex: 1, border: 'none', outline: 'none', fontSize: 16, fontFamily: 'var(--font-body)', color: 'var(--navy)', background: 'transparent' }} />
+                <button type="button" onClick={() => setSearchOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--fg-3)', fontSize: 16, padding: '2px 4px' }}>✕</button>
+              </div>
+            </form>
+            <div style={{ padding: '12px 20px', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 11.5, color: 'var(--fg-3)', width: '100%', marginBottom: 4 }}>Buscas rápidas</span>
+              {['Apartamento Savassi', 'Cobertura BH', 'Studio Centro', 'Casa Lourdes', 'Lançamentos'].map(s => (
+                <Link key={s} href={`/busca?q=${encodeURIComponent(s)}`} onClick={() => setSearchOpen(false)}
+                  style={{ padding: '5px 12px', borderRadius: 99, border: '1px solid var(--border)', fontSize: 12.5, fontWeight: 600, color: 'var(--navy)', textDecoration: 'none', background: '#F8FAFC', fontFamily: 'var(--font-body)' }}>
+                  {s}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Session banner — aparece uma vez por sessão quando logado */}
       {!sessionAck && user && profileNome && (
