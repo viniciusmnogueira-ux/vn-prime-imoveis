@@ -16,6 +16,19 @@ export default function ImovelPage() {
   const [lead, setLead] = useState({ nome: '', email: '', telefone: '', mensagem: '' })
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
+  const [isFav, setIsFav] = useState(false)
+
+  useEffect(() => {
+    const favs: string[] = JSON.parse(localStorage.getItem('vnp_favs') ?? '[]')
+    setIsFav(favs.includes(id))
+  }, [id])
+
+  function toggleFav() {
+    const favs: string[] = JSON.parse(localStorage.getItem('vnp_favs') ?? '[]')
+    const next = isFav ? favs.filter(f => f !== id) : [...favs, id]
+    localStorage.setItem('vnp_favs', JSON.stringify(next))
+    setIsFav(!isFav)
+  }
 
   useEffect(() => {
     supabase.from('imoveis').select('*, profiles!proprietario_id(nome, telefone)').eq('id', id).single()
@@ -101,7 +114,11 @@ export default function ImovelPage() {
             <div style={{ fontSize: 11.5, color: 'var(--fg-3)', marginBottom: 16 }}>Valor sujeito a negociação</div>
 
             {im.condominio && <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 4 }}>Condomínio: {fmtBRL(im.condominio)}/mês</div>}
-            {im.iptu && <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 16 }}>IPTU: {fmtBRL(im.iptu)}/ano</div>}
+            {im.iptu && <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 12 }}>IPTU: {fmtBRL(im.iptu)}/ano</div>}
+            <button onClick={toggleFav} style={{ width: '100%', padding: '8px 0', borderRadius: 8, border: `1.5px solid ${isFav ? '#DC2626' : 'var(--border)'}`, background: isFav ? '#FEF2F2' : 'transparent', color: isFav ? '#DC2626' : 'var(--fg-2)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 16, transition: 'all 0.15s' }}>
+              <span style={{ fontSize: 16 }}>{isFav ? '♥' : '♡'}</span>
+              {isFav ? 'Salvo nos favoritos' : 'Salvar imóvel'}
+            </button>
 
             {!sent ? (
               <>

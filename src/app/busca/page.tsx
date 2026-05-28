@@ -72,6 +72,26 @@ function OperationTabsLight({ value, onChange }: { value: string; onChange: (v: 
   )
 }
 
+function HeartBtn({ id }: { id: string }) {
+  const [fav, setFav] = useState(false)
+  useEffect(() => {
+    const favs: string[] = JSON.parse(localStorage.getItem('vnp_favs') ?? '[]')
+    setFav(favs.includes(id))
+  }, [id])
+  const toggle = (e: React.MouseEvent) => {
+    e.preventDefault(); e.stopPropagation()
+    const favs: string[] = JSON.parse(localStorage.getItem('vnp_favs') ?? '[]')
+    const next = fav ? favs.filter(f => f !== id) : [...favs, id]
+    localStorage.setItem('vnp_favs', JSON.stringify(next))
+    setFav(!fav)
+  }
+  return (
+    <button onClick={toggle} style={{ position: 'absolute', top: 12, right: 12, width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', color: fav ? '#DC2626' : '#94A3B8', transition: 'color 0.15s' }}>
+      {fav ? '♥' : '♡'}
+    </button>
+  )
+}
+
 function ImovelCard({ im, layout = 'grid' }: { im: any; layout?: 'grid' | 'horizontal' }) {
   const hover = (el: HTMLElement, on: boolean) => {
     el.style.transform = on ? 'translateY(-2px)' : 'none'
@@ -139,6 +159,7 @@ function ImovelCard({ im, layout = 'grid' }: { im: any; layout?: 'grid' | 'horiz
             textTransform: 'uppercase', letterSpacing: '0.1em' }}>
             {im.plano_label ?? im.tipo}
           </span>
+          <HeartBtn id={im.id} />
         </div>
         <div style={{ padding: '18px 22px 22px' }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em',
@@ -388,6 +409,9 @@ function BuscaContent() {
             )}
           </div>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <Link href="/favoritos" style={{ fontFamily: 'var(--font-body)', fontSize: 12.5, fontWeight: 600, color: 'var(--fg-2)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, padding: '0.5rem 0.75rem', border: '1px solid var(--border)', borderRadius: 8, background: '#fff', whiteSpace: 'nowrap' }}>
+              ♡ Favoritos
+            </Link>
             <select value={sort} onChange={e => setSort(e.target.value)}
               style={{ ...IS, padding: '0.5rem 0.7rem', fontSize: 13, width: 'auto' }}>
               <option value="relevance">Mais relevantes</option>
