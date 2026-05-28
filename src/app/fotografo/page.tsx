@@ -1,7 +1,9 @@
 'use client'
+import { useState } from 'react'
 import Link from 'next/link'
 import Btn from '@/components/ui/Btn'
 import Eyebrow from '@/components/ui/Eyebrow'
+import { createClient } from '@/lib/supabase/client'
 
 const PACOTES = [
   {
@@ -26,6 +28,25 @@ const PASSOS = [
 ]
 
 export default function FotografoPage() {
+  const [form, setForm] = useState({ nome: '', telefone: '', email: '', pacote: 'Completo', endereco: '', mensagem: '' })
+  const [sending, setSending] = useState(false)
+  const [sent, setSent] = useState(false)
+
+  const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!form.nome || !form.telefone) return
+    setSending(true)
+    const supabase = createClient()
+    await supabase.from('leads').insert({
+      nome: form.nome, email: form.email, telefone: form.telefone,
+      mensagem: `Pacote: ${form.pacote} | Endereço: ${form.endereco} | ${form.mensagem}`,
+      origem: 'fotografo',
+    })
+    setSent(true); setSending(false)
+  }
+
   return (
     <main style={{ background: 'var(--cream)' }}>
 
@@ -114,6 +135,60 @@ export default function FotografoPage() {
           <p style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: 'var(--fg-3)' }}>
             Fotografia inclusa nos planos Venda Assistida e Venda Completa · <Link href="/vender" style={{ color: 'var(--gold-deep)', fontWeight: 600 }}>Ver planos</Link>
           </p>
+        </div>
+      </section>
+
+      {/* Formulário de agendamento */}
+      <section style={{ padding: 'clamp(50px,7vw,90px) 0', background: 'var(--cream)' }}>
+        <div style={{ width: 'min(720px,92vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 36 }}>
+            <Eyebrow color="var(--gold-deep)">Agendar sessão</Eyebrow>
+            <h2 style={{ margin: '8px 0 10px' }}>Solicite um orçamento</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 15, maxWidth: 440, margin: '0 auto' }}>
+              Preencha e entraremos em contato em até 2 horas para confirmar disponibilidade.
+            </p>
+          </div>
+          {sent ? (
+            <div style={{ background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 14, padding: '28px 32px', textAlign: 'center' }}>
+              <div style={{ fontSize: 28, marginBottom: 10 }}>📸</div>
+              <div style={{ fontSize: 17, fontWeight: 700, color: '#065F46', marginBottom: 6 }}>Solicitação recebida!</div>
+              <div style={{ fontSize: 14, color: '#047857' }}>Nossa equipe entrará em contato em até 2 horas pelo WhatsApp ou e-mail informado.</div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} style={{ background: '#fff', borderRadius: 16, padding: '32px 36px', border: '1px solid var(--border)', boxShadow: '0 4px 24px rgba(15,34,68,0.06)', display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>Nome *</label>
+                  <input value={form.nome} onChange={e => set('nome', e.target.value)} placeholder="Seu nome completo" required style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>WhatsApp *</label>
+                  <input value={form.telefone} onChange={e => set('telefone', e.target.value)} placeholder="(31) 99999-9999" type="tel" required style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>E-mail</label>
+                <input value={form.email} onChange={e => set('email', e.target.value)} placeholder="seu@email.com" type="email" style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>Pacote desejado</label>
+                <select value={form.pacote} onChange={e => set('pacote', e.target.value)} style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 13, fontFamily: 'inherit', outline: 'none', background: '#fff', color: 'var(--navy)', cursor: 'pointer' }}>
+                  {PACOTES.map(p => <option key={p.id} value={p.nome}>{p.nome} — {p.preco}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>Endereço do imóvel</label>
+                <input value={form.endereco} onChange={e => set('endereco', e.target.value)} placeholder="Rua, número, bairro, cidade" style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>Observações</label>
+                <textarea value={form.mensagem} onChange={e => set('mensagem', e.target.value)} placeholder="Disponibilidade, número de ambientes, estilo…" rows={3} style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 13, fontFamily: 'inherit', outline: 'none', resize: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <Btn variant="accent" size="lg" style={{ width: '100%' }} loading={sending} disabled={!form.nome || !form.telefone}>
+                {sending ? 'Enviando…' : 'Solicitar orçamento'}
+              </Btn>
+            </form>
+          )}
         </div>
       </section>
 

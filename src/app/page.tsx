@@ -400,6 +400,34 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Depoimentos ── */}
+      <section style={{ padding: 'clamp(3rem,5vw,4.5rem) 0', background: 'var(--navy)' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 36 }}>
+            <Eyebrow color="var(--gold)">O que nossos clientes dizem</Eyebrow>
+            <h2 style={{ color: '#fff', margin: '8px 0 0', fontWeight: 400 }}>Histórias de quem vendeu e comprou com a VN Prime</h2>
+          </div>
+          <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))' }}>
+            {[
+              { nome: 'Fernanda Costa', cargo: 'Proprietária — Savassi', txt: 'Vendi meu apartamento em 18 dias. Recebi 5 leads qualificados na primeira semana e o processo foi completamente transparente do início ao fim.', stars: 5 },
+              { nome: 'Rodrigo Lima', cargo: 'Comprador — Nova Lima', txt: 'A due diligence que a equipe fez me salvou de uma compra com problemas jurídicos sérios. Encontrei outro imóvel em 2 semanas e fechei com total segurança.', stars: 5 },
+              { nome: 'Ana Paula Nunes', cargo: 'Corretora parceira', txt: 'O portal de corretor é o melhor que já usei. Leads qualificados chegam com histórico de interesse, pipeline visual e pagamento garantido em D+2.', stars: 5 },
+            ].map(t => (
+              <div key={t.nome} style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 16, padding: '28px 28px', border: '1px solid rgba(255,255,255,0.10)' }}>
+                <div style={{ display: 'flex', gap: 2, marginBottom: 16 }}>
+                  {Array.from({ length: t.stars }).map((_, i) => <span key={i} style={{ color: 'var(--gold)', fontSize: 14 }}>★</span>)}
+                </div>
+                <p style={{ color: 'rgba(245,248,250,0.85)', fontSize: 14.5, lineHeight: 1.75, margin: '0 0 20px', fontStyle: 'italic' }}>"{t.txt}"</p>
+                <div>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: '#fff' }}>{t.nome}</div>
+                  <div style={{ fontSize: 12, color: 'var(--gold-soft)' }}>{t.cargo}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Serviços (carousel) ── */}
       <section id="home-servicos" style={{ padding: 'clamp(3rem,6vw,5rem) 0', background: 'var(--white)' }}>
         <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>

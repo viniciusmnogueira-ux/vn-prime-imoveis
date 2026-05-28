@@ -137,6 +137,32 @@ export default function CalculadoraPage() {
             <div style={{ fontSize: 12, color: 'var(--fg-3)', lineHeight: 1.6, padding: '0 4px' }}>
               * Valores estimados. ITBI calculado sobre o maior entre valor declarado e valor venal. Emolumentos conforme Tabela TJMG 2024. Consulte seu tabelião.
             </div>
+
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <button onClick={() => window.print()} style={{ flex: 1, padding: '12px', borderRadius: 10, border: '1.5px solid var(--border)', background: '#fff', color: 'var(--navy)', fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                🖨 Imprimir / Salvar PDF
+              </button>
+              <button onClick={() => {
+                const txt = [
+                  'RELATÓRIO DE CUSTOS DE TRANSFERÊNCIA',
+                  `Valor do imóvel: ${fmt(valor)}`,
+                  `Taxa ITBI: ${taxaItbi}%`,
+                  '',
+                  ...rows.map(r => `${r.label}: ${fmt(r.valor)}`),
+                  '',
+                  `TOTAL: ${fmt(total)} (${pct}% do valor)`,
+                  ...(financiado ? [`Entrada (${entradaPct}%): ${fmt(entrada)}`, `Desembolso total no ato: ${fmt(entrada + total)}`] : []),
+                  '',
+                  '* Estimativa VN Prime Imóveis — vnprimeimoveis.com.br',
+                ].join('\n')
+                const a = document.createElement('a')
+                a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(txt)
+                a.download = 'custos-itbi.txt'
+                a.click()
+              }} style={{ flex: 1, padding: '12px', borderRadius: 10, border: '1.5px solid var(--border)', background: '#fff', color: 'var(--navy)', fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                ↓ Baixar resumo
+              </button>
+            </div>
           </div>
         </div>
       </section>
