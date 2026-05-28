@@ -32,11 +32,7 @@ function BrandLockup({ onNavy = false }: { onNavy?: boolean }) {
       <ShieldMark size={32} />
       <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
         <span style={{ fontFamily: "'Cinzel', serif", fontSize: 17, fontWeight: 700, letterSpacing: '0.16em', color: onNavy ? '#F5F8FA' : 'var(--navy)' }}>VN PRIME</span>
-        <span style={{
-          fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 8.5, letterSpacing: '0.42em',
-          background: 'linear-gradient(90deg,#B8862E,#D4A857,#B8862E)',
-          WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', marginTop: 4,
-        }}>IMÓVEIS</span>
+        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 8.5, letterSpacing: '0.42em', background: 'linear-gradient(90deg,#B8862E,#D4A857,#B8862E)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', marginTop: 4 }}>IMÓVEIS</span>
       </div>
     </div>
   )
@@ -53,10 +49,10 @@ const NAV = [
     dropdown: [
       { label: 'Proprietário Direto',  href: '/proprietario',  desc: 'Anuncie seu imóvel · taxa fixa ou comissão' },
       { label: 'Portal do Corretor',   href: '/corretor',       desc: 'Leads, CRM e portfólio premium de BH' },
-      { label: 'Consórcio',            href: '/consorcio',      desc: 'Compre sem juros com carta de crédito' },
+      { label: 'Consórcio',            href: '/consorcio',      desc: 'Compre seu imóvel com parcelas acessíveis' },
       { label: 'Due Diligence',        href: '/due-diligence',  desc: 'Análise jurídica e técnica antes de comprar' },
       { label: 'Avaliação de Imóveis', href: '/avaliacao',      desc: 'Laudo judicial, extrajudicial ou estimativa IA' },
-      { label: 'Calculadora ITBI',    href: '/calculadora',     desc: 'Calcule ITBI, escritura e registro em segundos' },
+      { label: 'Calculadora ITBI',     href: '/calculadora',    desc: 'Calcule ITBI, escritura e registro em segundos' },
     ],
   },
 ]
@@ -65,94 +61,79 @@ export default function SiteHeader() {
   const pathname = usePathname()
   const [user, setUser] = useState<User | null>(null)
   const [profileTipo, setProfileTipo] = useState<string | null>(null)
+  const [profileNome, setProfileNome] = useState<string | null>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState<string | null>(null)
+  const [sessionAck, setSessionAck] = useState(true)
+
+  const handleSignOut = () => { window.location.href = '/api/auth/signout' }
 
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(async ({ data }) => {
       setUser(data.user)
       if (data.user) {
-        const { data: p } = await supabase.from('profiles').select('tipo').eq('id', data.user.id).single()
+        const { data: p } = await supabase.from('profiles').select('tipo, nome').eq('id', data.user.id).single()
         setProfileTipo(p?.tipo ?? null)
+        setProfileNome(p?.nome?.split(' ')[0] ?? null)
+        if (!sessionStorage.getItem('vnp_session_ack')) setSessionAck(false)
       }
     })
     const { data: listener } = supabase.auth.onAuthStateChange(async (_, session) => {
       setUser(session?.user ?? null)
       if (session?.user) {
         const supabase2 = createClient()
-        const { data: p } = await supabase2.from('profiles').select('tipo').eq('id', session.user.id).single()
+        const { data: p } = await supabase2.from('profiles').select('tipo, nome').eq('id', session.user.id).single()
         setProfileTipo(p?.tipo ?? null)
+        setProfileNome(p?.nome?.split(' ')[0] ?? null)
       } else {
         setProfileTipo(null)
+        setProfileNome(null)
+        setSessionAck(true)
       }
     })
     return () => listener.subscription.unsubscribe()
   }, [])
 
-  const handleSignOut = () => {
-    window.location.href = '/api/auth/signout'
-  }
+  const ackSession = () => { sessionStorage.setItem('vnp_session_ack', '1'); setSessionAck(true) }
 
   if (pathname === '/login') return null
 
+  const portalHref = profileTipo === 'admin' ? '/admin' : profileTipo === 'corretor' ? '/corretor' : '/proprietario'
+
   return (
     <>
-      <header style={{
-        position: 'sticky', top: 0, zIndex: 100,
-        height: 'var(--header-h)',
-        background: 'rgba(245,248,250,0.92)',
-        backdropFilter: 'blur(14px)',
-        WebkitBackdropFilter: 'blur(14px)',
-        borderBottom: '1px solid var(--border)',
-        display: 'flex', alignItems: 'center',
-      }}>
+      <header style={{ position: 'sticky', top: 0, zIndex: 100, height: 'var(--header-h)', background: 'rgba(245,248,250,0.92)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center' }}>
         <div style={{ width: 'min(1280px,94vw)', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
 
-          {/* Logo */}
           <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
             <BrandLockup />
           </Link>
 
-          {/* Desktop nav */}
           <nav style={{ display: 'flex', alignItems: 'center', gap: 22 }} className="desktop-nav">
             {NAV.map(item => (
               <div key={item.href} style={{ position: 'relative' }}
                 onMouseEnter={() => item.dropdown && setOpenMenu(item.label)}
-                onMouseLeave={() => setOpenMenu(null)}
-              >
+                onMouseLeave={() => setOpenMenu(null)}>
                 <Link href={item.href} style={{
                   fontFamily: 'var(--font-body)', fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
-                  color: item.href === '/vender'
-                    ? 'var(--gold-deep)'
-                    : pathname === item.href ? 'var(--navy)' : 'var(--navy-muted)',
-                  borderBottom: item.href === '/vender'
-                    ? '2px solid var(--gold)'
-                    : pathname === item.href ? '2px solid var(--gold)' : '2px solid transparent',
+                  color: item.href === '/vender' ? 'var(--gold-deep)' : pathname === item.href ? 'var(--navy)' : 'var(--navy-muted)',
+                  borderBottom: item.href === '/vender' ? '2px solid var(--gold)' : pathname === item.href ? '2px solid var(--gold)' : '2px solid transparent',
                   background: item.href === '/vender' ? 'rgba(212,168,87,0.10)' : 'transparent',
                   padding: item.href === '/vender' ? '6px 14px' : '8px 0',
                   borderRadius: item.href === '/vender' ? 8 : 0,
-                  textDecoration: 'none',
-                  display: 'inline-flex', alignItems: 'center', gap: 4,
-                  transition: 'background 0.15s',
+                  textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4, transition: 'background 0.15s',
                 }}>
                   {item.label}
                   {item.dropdown && <span style={{ fontSize: 9, opacity: 0.6 }}>▼</span>}
                 </Link>
-
                 {item.dropdown && openMenu === item.label && (
-                  <div style={{
-                    position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)',
-                    background: '#fff', borderRadius: 'var(--radius-lg)',
-                    boxShadow: 'var(--shadow-soft)', border: '1px solid var(--border)',
-                    padding: 10, marginTop: 4, minWidth: 320, zIndex: 200,
-                  }}>
+                  <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', background: '#fff', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-soft)', border: '1px solid var(--border)', padding: 10, marginTop: 4, minWidth: 320, zIndex: 200 }}>
                     {item.dropdown.map(d => (
                       <Link key={d.href} href={d.href}
                         style={{ display: 'block', padding: '12px 14px', borderRadius: 'var(--radius-md)', textDecoration: 'none', transition: 'background 0.12s' }}
                         onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-tint)')}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                      >
+                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
                         <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{d.label}</div>
                         <div style={{ fontSize: 12.5, color: 'var(--fg-2)', marginTop: 2 }}>{d.desc}</div>
                       </Link>
@@ -161,23 +142,17 @@ export default function SiteHeader() {
                 )}
               </div>
             ))}
-
             <span style={{ width: 1, height: 22, background: 'var(--border)', display: 'inline-block' }} />
           </nav>
 
-          {/* Auth */}
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }} className="desktop-nav">
             {user ? (
               <>
                 {profileTipo === 'admin' && (
-                  <Link href="/admin"
-                    style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--gold-deep)', cursor: 'pointer', fontWeight: 700, textDecoration: 'none', border: '1px solid var(--gold)', padding: '4px 10px', borderRadius: 6 }}>
-                    Admin
-                  </Link>
+                  <Link href="/admin" style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--gold-deep)', cursor: 'pointer', fontWeight: 700, textDecoration: 'none', border: '1px solid var(--gold)', padding: '4px 10px', borderRadius: 6 }}>Admin</Link>
                 )}
-                <Link href={profileTipo === 'corretor' ? '/corretor' : '/proprietario'}
-                  style={{ fontFamily: 'var(--font-body)', fontSize: 13.5, color: 'var(--navy)', cursor: 'pointer', letterSpacing: 0, fontWeight: 600, textDecoration: 'none' }}>
-                  Meu portal
+                <Link href={portalHref} style={{ fontFamily: 'var(--font-body)', fontSize: 13.5, color: 'var(--navy)', cursor: 'pointer', fontWeight: 600, textDecoration: 'none' }}>
+                  {profileNome ? `Olá, ${profileNome}` : 'Meu portal'}
                 </Link>
                 <Btn variant="ghost" size="sm" onClick={handleSignOut}>Sair</Btn>
               </>
@@ -186,13 +161,12 @@ export default function SiteHeader() {
             )}
           </div>
 
-          {/* Mobile: CTA + hamburger */}
           <div className="mobile-menu-btns" style={{ display: 'none', alignItems: 'center', gap: 10 }}>
-            <Link href="/login"><Btn variant="accent" size="sm">Login</Btn></Link>
-            <button onClick={() => setMobileOpen(true)} aria-label="Menu" style={{
-              background: 'none', border: 'none', cursor: 'pointer', padding: '6px 4px',
-              display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5,
-            }}>
+            {user
+              ? <Btn variant="accent" size="sm" onClick={handleSignOut}>Sair</Btn>
+              : <Link href="/login"><Btn variant="accent" size="sm">Login</Btn></Link>
+            }
+            <button onClick={() => setMobileOpen(true)} aria-label="Menu" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px 4px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5 }}>
               <span style={{ width: 22, height: 2, background: 'var(--navy)', borderRadius: 2, display: 'block' }} />
               <span style={{ width: 22, height: 2, background: 'var(--navy)', borderRadius: 2, display: 'block' }} />
               <span style={{ width: 16, height: 2, background: 'var(--navy)', borderRadius: 2, display: 'block' }} />
@@ -201,21 +175,26 @@ export default function SiteHeader() {
         </div>
       </header>
 
-      {/* Mobile drawer — right-side panel */}
+      {/* Session banner — aparece uma vez por sessão quando logado */}
+      {!sessionAck && user && profileNome && (
+        <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: 'var(--navy-deep)', color: '#fff', borderRadius: 14, padding: '14px 22px', boxShadow: '0 8px 32px rgba(0,0,0,0.28)', display: 'flex', alignItems: 'center', gap: 16, whiteSpace: 'nowrap', border: '1px solid rgba(255,255,255,0.12)' }}>
+          <span style={{ fontSize: 14 }}>Você está logado como <strong style={{ color: 'var(--gold)' }}>{profileNome}</strong></span>
+          <button onClick={ackSession}
+            style={{ padding: '6px 16px', background: 'var(--gold)', color: 'var(--navy-deep)', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+            Continuar
+          </button>
+          <button onClick={handleSignOut}
+            style={{ padding: '6px 14px', background: 'transparent', color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+            Trocar conta
+          </button>
+        </div>
+      )}
+
+      {/* Mobile drawer */}
       {mobileOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 999 }}>
-          {/* Backdrop */}
-          <div onClick={() => setMobileOpen(false)} style={{
-            position: 'absolute', inset: 0,
-            background: 'rgba(15,24,36,0.5)', backdropFilter: 'blur(2px)',
-          }} />
-          {/* Panel */}
-          <div style={{
-            position: 'absolute', top: 0, right: 0, bottom: 0, width: 285,
-            background: '#fff', overflowY: 'auto',
-            boxShadow: '-4px 0 28px rgba(15,24,36,0.20)',
-            display: 'flex', flexDirection: 'column',
-          }}>
+          <div onClick={() => setMobileOpen(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(15,24,36,0.5)', backdropFilter: 'blur(2px)' }} />
+          <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 285, background: '#fff', overflowY: 'auto', boxShadow: '-4px 0 28px rgba(15,24,36,0.20)', display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '18px 20px 14px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <BrandLockup />
               <button onClick={() => setMobileOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: 'var(--navy)', padding: 4, lineHeight: 1 }}>✕</button>
@@ -223,15 +202,8 @@ export default function SiteHeader() {
             <nav style={{ padding: '10px', flex: 1 }}>
               {NAV.map(item => (
                 <div key={item.href}>
-                  <Link href={item.dropdown ? '#' : item.href}
-                    onClick={() => !item.dropdown && setMobileOpen(false)}
-                    style={{
-                      display: 'block', padding: '11px 12px', borderRadius: 10,
-                      fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 700,
-                      color: item.href === '/vender' ? 'var(--gold-deep)' : 'var(--navy)',
-                      background: pathname === item.href ? 'rgba(212,168,87,0.12)' : 'transparent',
-                      textDecoration: 'none',
-                    }}>
+                  <Link href={item.dropdown ? '#' : item.href} onClick={() => !item.dropdown && setMobileOpen(false)}
+                    style={{ display: 'block', padding: '11px 12px', borderRadius: 10, fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 700, color: item.href === '/vender' ? 'var(--gold-deep)' : 'var(--navy)', background: pathname === item.href ? 'rgba(212,168,87,0.12)' : 'transparent', textDecoration: 'none' }}>
                     {item.label}
                     {item.dropdown && <span style={{ fontSize: 10, opacity: 0.45, marginLeft: 6 }}>▼</span>}
                   </Link>
@@ -251,10 +223,10 @@ export default function SiteHeader() {
             <div style={{ padding: '14px 12px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {user ? (
                 <>
-                  {profileTipo === 'admin' && (
-                    <Link href="/admin" onClick={() => setMobileOpen(false)}><Btn variant="ghost" size="lg" fullWidth>Painel Admin</Btn></Link>
-                  )}
-                  <Link href={profileTipo === 'corretor' ? '/corretor' : '/proprietario'} onClick={() => setMobileOpen(false)}><Btn variant="ghost" size="lg" fullWidth>Meu portal</Btn></Link>
+                  {profileTipo === 'admin' && <Link href="/admin" onClick={() => setMobileOpen(false)}><Btn variant="ghost" size="lg" fullWidth>Painel Admin</Btn></Link>}
+                  <Link href={portalHref} onClick={() => setMobileOpen(false)}>
+                    <Btn variant="ghost" size="lg" fullWidth>{profileNome ? `Olá, ${profileNome}` : 'Meu portal'}</Btn>
+                  </Link>
                   <Btn variant="primary" fullWidth onClick={handleSignOut}>Sair</Btn>
                 </>
               ) : (

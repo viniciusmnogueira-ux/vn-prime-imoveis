@@ -27,6 +27,8 @@ export default function AdminPage() {
   const [openCuradoria, setOpenCuradoria] = useState<string | null>(null)
   const [editFields, setEditFields] = useState<Record<string, any>>({})
   const [notasInternas, setNotasInternas] = useState<Record<string, string>>({})
+  const [adminEditId, setAdminEditId] = useState<string | null>(null)
+  const [adminEditFields, setAdminEditFields] = useState<Record<string, any>>({})
   const supabase = createClient()
 
   useEffect(() => {
@@ -241,7 +243,7 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {imoveis.map(im => (
+                  {imoveis.map(im => (<>
                     <tr key={im.id} style={{ borderTop: '1px solid #F1F5F9' }}>
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--navy)', maxWidth: 220 }}>{im.titulo}</div>
@@ -285,6 +287,13 @@ export default function AdminPage() {
                             style={{ padding: '4px 10px', borderRadius: 6, background: '#F1F5F9', color: 'var(--navy)', border: 'none', fontSize: 11, fontWeight: 600, textDecoration: 'none' }}>
                             Ver
                           </Link>
+                          <button onClick={() => {
+                              if (adminEditId === im.id) { setAdminEditId(null); setAdminEditFields({}) }
+                              else { setAdminEditId(im.id); setAdminEditFields({ titulo: im.titulo ?? '', preco: im.preco ?? '', bairro: im.bairro ?? '', cidade: im.cidade ?? '', area: im.area ?? im.area_m2 ?? '', quartos: im.quartos ?? '', descricao: im.descricao ?? '' }) }
+                            }}
+                            style={{ padding: '4px 10px', borderRadius: 6, background: adminEditId === im.id ? 'var(--navy)' : '#EFF8FF', color: adminEditId === im.id ? '#fff' : '#0369A1', border: 'none', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                            {adminEditId === im.id ? 'Fechar' : 'Editar'}
+                          </button>
                           <button onClick={() => deleteImovel(im.id)}
                             style={{ padding: '4px 10px', borderRadius: 6, background: '#FEF2F2', color: '#DC2626', border: 'none', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
                             Excluir
@@ -292,7 +301,55 @@ export default function AdminPage() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                    {adminEditId === im.id && (
+                      <tr>
+                        <td colSpan={6} style={{ padding: '0 14px 16px' }}>
+                          <div style={{ background: '#F8FAFC', borderRadius: 10, padding: '18px 20px', border: '1px solid var(--border)' }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0369A1', marginBottom: 14 }}>Editar imóvel — {im.titulo}</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(170px,1fr))', gap: 10, marginBottom: 12 }}>
+                              {[
+                                { label: 'Título', key: 'titulo' }, { label: 'Preço (R$)', key: 'preco' },
+                                { label: 'Bairro', key: 'bairro' }, { label: 'Cidade', key: 'cidade' },
+                                { label: 'Área m²', key: 'area' }, { label: 'Quartos', key: 'quartos' },
+                              ].map(({ label, key }) => (
+                                <div key={key}>
+                                  <label style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748B', display: 'block', marginBottom: 4 }}>{label}</label>
+                                  <input value={adminEditFields[key] ?? ''} onChange={e => setAdminEditFields(p => ({ ...p, [key]: e.target.value }))}
+                                    style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: '1px solid #E2E8F0', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                                </div>
+                              ))}
+                            </div>
+                            <div style={{ marginBottom: 12 }}>
+                              <label style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748B', display: 'block', marginBottom: 4 }}>Descrição</label>
+                              <textarea value={adminEditFields.descricao ?? ''} rows={2} onChange={e => setAdminEditFields(p => ({ ...p, descricao: e.target.value }))}
+                                style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: '1px solid #E2E8F0', fontSize: 13, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} />
+                            </div>
+                            <div style={{ marginBottom: 12 }}>
+                              <label style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748B', display: 'block', marginBottom: 4 }}>Status</label>
+                              <select value={im.status} onChange={e => { setImovelStatus(im.id, e.target.value); setAdminEditFields(p => ({ ...p })) }}
+                                style={{ padding: '7px 10px', borderRadius: 7, border: '1px solid #E2E8F0', fontSize: 13, fontFamily: 'inherit', outline: 'none', cursor: 'pointer' }}>
+                                {['pendente','ativo','pausado','vendido','rascunho'].map(s => <option key={s} value={s}>{s}</option>)}
+                              </select>
+                            </div>
+                            <div style={{ display: 'flex', gap: 8 }}>
+                              <button onClick={async () => {
+                                  await supabase.from('imoveis').update(adminEditFields).eq('id', im.id)
+                                  setImoveis(prev => prev.map(i => i.id === im.id ? { ...i, ...adminEditFields } : i))
+                                  setAdminEditId(null); setAdminEditFields({})
+                                }}
+                                style={{ padding: '7px 16px', borderRadius: 8, background: 'var(--navy)', color: '#fff', border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                Salvar
+                              </button>
+                              <button onClick={() => { setAdminEditId(null); setAdminEditFields({}) }}
+                                style={{ padding: '7px 12px', borderRadius: 8, background: '#F1F5F9', color: '#64748B', border: 'none', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                Cancelar
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>))}
                 </tbody>
               </table>
             </div>

@@ -28,7 +28,7 @@ export default function ProprietarioPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [imoveis, setImoveis] = useState<Imovel[]>([])
   const [loading, setLoading] = useState(true)
-  const [sec, setSec] = useState<'imoveis' | 'leads' | 'scripts' | 'fotografo' | 'config'>('imoveis')
+  const [sec, setSec] = useState<'imoveis' | 'leads' | 'scripts' | 'fotografo' | 'calculadoras' | 'config'>('imoveis')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<Record<string, any>>({})
 
@@ -127,7 +127,7 @@ export default function ProprietarioPage() {
 
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 4, borderBottom: '2px solid var(--border)', marginBottom: 28, overflowX: 'auto' }}>
-          {([['imoveis','Meus imóveis'],['leads','Leads'],['scripts','Scripts'],['fotografo','Fotógrafo'],['config','Configurações']] as const).map(([id, lbl]) => (
+          {([['imoveis','Meus imóveis'],['leads','Leads'],['scripts','Scripts'],['calculadoras','Calculadoras'],['fotografo','Fotógrafo'],['config','Configurações']] as const).map(([id, lbl]) => (
             <button key={id} onClick={() => setSec(id)} style={{
               padding: '10px 20px', background: 'none', border: 'none', cursor: 'pointer',
               fontSize: 13.5, fontWeight: 700, whiteSpace: 'nowrap',
@@ -228,6 +228,7 @@ export default function ProprietarioPage() {
 
         {sec === 'scripts' && <ScriptSection />}
 
+        {sec === 'calculadoras' && <CalculadorasSection imoveis={imoveis} supabase={supabase} />}
         {sec === 'fotografo' && <FotografoSection />}
 
         {sec === 'config' && (
@@ -665,7 +666,7 @@ function ProprietarioLanding() {
             </Link>
           </div>
           <div style={{ display: 'flex', gap: 40, flexWrap: 'wrap' }}>
-            {[['R$ 297','Taxa fixa única'],['0%','De comissão'],['18 dias','Venda média'],['90 dias','De vigência']].map(([v,l]) => (
+            {[['R$ 297','Venda Direta'],['0%','De comissão'],['3%','Plano Assistida'],['90 dias','De vigência']].map(([v,l]) => (
               <div key={l}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800, color: ACCENT, lineHeight: 1 }}>{v}</div>
                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 5 }}>{l}</div>
@@ -746,6 +747,122 @@ function ProprietarioLanding() {
         </div>
       </section>
     </main>
+  )
+}
+
+function CalculadorasSection({ imoveis, supabase }: { imoveis: any[]; supabase: any }) {
+  const [itbiValor, setItbiValor] = useState('')
+  const [itbiAliq, setItbiAliq] = useState('2')
+  const [mercadoBairro, setMercadoBairro] = useState('')
+  const [mercadoArea, setMercadoArea] = useState('')
+  const [mercadoMedia, setMercadoMedia] = useState<number | null>(null)
+  const [mercadoLoading, setMercadoLoading] = useState(false)
+
+  const itbiNum = Number(itbiValor.replace(/\D/g, ''))
+  const aliqNum = Number(itbiAliq)
+  const fmt = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
+
+  const calcMercado = async () => {
+    if (!mercadoBairro) return
+    setMercadoLoading(true)
+    const { data } = await supabase.from('imoveis').select('preco, area_m2, area').ilike('bairro', `%${mercadoBairro}%`).eq('status', 'ativo').not('preco', 'is', null)
+    const valid = (data ?? []).filter((i: any) => (i.area_m2 || i.area) && i.preco > 0)
+    if (valid.length > 0) {
+      const mediaPorM2 = valid.reduce((s: number, i: any) => s + i.preco / (i.area_m2 || i.area), 0) / valid.length
+      setMercadoMedia(mediaPorM2)
+    } else {
+      setMercadoMedia(0)
+    }
+    setMercadoLoading(false)
+  }
+
+  const areaNum = Number(mercadoArea.replace(/\D/g, ''))
+  const valorEstimado = mercadoMedia && areaNum > 0 ? mercadoMedia * areaNum : null
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(320px,1fr))', gap: 24 }}>
+      {/* ITBI */}
+      <div style={{ background: '#fff', borderRadius: 16, padding: '28px 28px', boxShadow: 'var(--shadow-soft)' }}>
+        <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--gold-deep)', marginBottom: 6 }}>Calculadora</div>
+        <h3 style={{ margin: '0 0 6px', fontSize: 18 }}>ITBI</h3>
+        <p style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 20, lineHeight: 1.5 }}>Imposto de Transmissão de Bens Imóveis. Cobrado pela prefeitura na transferência do imóvel.</p>
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>Valor do imóvel (R$)</label>
+          <input value={itbiValor} onChange={e => setItbiValor(e.target.value)} placeholder="Ex: 500000"
+            style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+        </div>
+        <div style={{ marginBottom: 20 }}>
+          <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>Alíquota (%)</label>
+          <select value={itbiAliq} onChange={e => setItbiAliq(e.target.value)}
+            style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 14, fontFamily: 'inherit', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}>
+            <option value="2">2% — padrão BH e região</option>
+            <option value="2.5">2,5%</option>
+            <option value="3">3%</option>
+          </select>
+        </div>
+        {itbiNum > 0 && (
+          <div style={{ background: '#F8FAFC', borderRadius: 10, padding: '16px 18px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {[
+                { label: `ITBI (${aliqNum}%)`, value: fmt(itbiNum * aliqNum / 100), gold: true },
+                { label: 'Escritura estimada (1%)', value: fmt(itbiNum * 0.01) },
+                { label: 'Registro estimado (0.4%)', value: fmt(itbiNum * 0.004) },
+              ].map(r => (
+                <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>{r.label}</span>
+                  <span style={{ fontSize: r.gold ? 18 : 14, fontWeight: r.gold ? 800 : 600, color: r.gold ? 'var(--gold)' : 'var(--navy)' }}>{r.value}</span>
+                </div>
+              ))}
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10, display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>Total estimado</span>
+                <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--navy)' }}>{fmt(itbiNum * (aliqNum / 100 + 0.014))}</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Calculadora de mercado */}
+      <div style={{ background: '#fff', borderRadius: 16, padding: '28px 28px', boxShadow: 'var(--shadow-soft)' }}>
+        <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--gold-deep)', marginBottom: 6 }}>Calculadora</div>
+        <h3 style={{ margin: '0 0 6px', fontSize: 18 }}>Valor de mercado</h3>
+        <p style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 20, lineHeight: 1.5 }}>Compare com o preço médio do m² no bairro, baseado nos imóveis ativos na plataforma.</p>
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>Bairro</label>
+          <input value={mercadoBairro} onChange={e => setMercadoBairro(e.target.value)} placeholder="Ex: Savassi"
+            style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+        </div>
+        <div style={{ marginBottom: 20 }}>
+          <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>Área do imóvel (m²)</label>
+          <input value={mercadoArea} onChange={e => setMercadoArea(e.target.value)} placeholder="Ex: 80"
+            style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+        </div>
+        <button onClick={calcMercado} disabled={!mercadoBairro || mercadoLoading}
+          style={{ width: '100%', padding: '11px 0', borderRadius: 9, background: 'var(--navy)', color: '#fff', border: 'none', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: !mercadoBairro || mercadoLoading ? 0.6 : 1, marginBottom: 16 }}>
+          {mercadoLoading ? 'Consultando...' : 'Consultar mercado'}
+        </button>
+        {mercadoMedia !== null && (
+          <div style={{ background: '#F8FAFC', borderRadius: 10, padding: '16px 18px' }}>
+            {mercadoMedia === 0 ? (
+              <div style={{ fontSize: 13, color: 'var(--fg-3)', textAlign: 'center' }}>Sem imóveis ativos neste bairro ainda. A base cresce com o tempo.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>Preço médio do m² em {mercadoBairro}</span>
+                  <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--gold)' }}>{fmt(mercadoMedia)}/m²</span>
+                </div>
+                {valorEstimado && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>Estimativa para {mercadoArea} m²</span>
+                    <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--navy)' }}>{fmt(valorEstimado)}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
 
