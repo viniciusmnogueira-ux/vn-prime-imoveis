@@ -414,6 +414,8 @@ function CRMSection({ leads, crmStatus, setCrmStatus, crmNota, setCrmNota }: any
                   <div style={{ fontSize: 12, color: 'var(--fg-2)' }}>{l.email}</div>
                 </div>
                 {l.mock && <span style={{ fontSize: 10, fontWeight: 700, background: '#FEF3C7', color: '#B45309', padding: '2px 8px', borderRadius: 99 }}>DEMO</span>}
+                {l.origem === 'agendamento' && <span style={{ fontSize: 10, fontWeight: 700, background: '#F0FDF4', color: '#16A34A', padding: '2px 8px', borderRadius: 99 }}>📅 Visita</span>}
+                {l.origem === 'proposta' && <span style={{ fontSize: 10, fontWeight: 700, background: '#FAF5FF', color: '#7C3AED', padding: '2px 8px', borderRadius: 99 }}>📝 Proposta</span>}
                 <span style={{ padding: '3px 10px', borderRadius: 99, fontSize: 11, fontWeight: 700, background: `${st.color}18`, color: st.color }}>{st.label}</span>
                 <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>{isOpen ? '▲' : '▼'}</span>
               </div>
