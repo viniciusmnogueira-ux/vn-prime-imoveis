@@ -233,20 +233,6 @@ function LoginContent() {
               <input type="text" placeholder="Seu nome completo" value={nome} onChange={e => setNome(e.target.value)} required style={inp} />
               <input type="email" placeholder="E-mail" value={email} onChange={e => setEmail(e.target.value)} required style={inp} />
               <input type="password" placeholder="Senha (mín. 6 caracteres)" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} style={inp} />
-              <div>
-                <div style={{ fontSize: 11.5, fontWeight: 700, color: '#6B7280', marginBottom: 8, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Sou um</div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  {([['proprietario', 'Proprietário'], ['corretor', 'Corretor']] as const).map(([v, l]) => (
-                    <button key={v} type="button" onClick={() => setTipo(v)} style={{
-                      flex: 1, padding: '10px 0', borderRadius: 9,
-                      border: `2px solid ${tipo === v ? '#1B2733' : '#E5E7EB'}`,
-                      background: tipo === v ? '#1B2733' : '#fff',
-                      color: tipo === v ? '#fff' : '#6B7280',
-                      fontWeight: 700, fontSize: 13.5, cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit',
-                    }}>{l}</button>
-                  ))}
-                </div>
-              </div>
               <button type="submit" disabled={loading} style={btnPrimary}>
                 {loading ? 'Criando conta…' : 'Criar conta grátis'}
               </button>

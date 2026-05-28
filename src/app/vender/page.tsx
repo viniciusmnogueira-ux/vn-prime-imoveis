@@ -3,6 +3,7 @@ import { useState } from 'react'
 import Eyebrow from '@/components/ui/Eyebrow'
 import Btn from '@/components/ui/Btn'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 const PLANOS_PROP = [
   {
@@ -58,6 +59,10 @@ const BENEFICIOS_CORRETOR = [
 
 export default function VenderPage() {
   const [perfil, setPerfil] = useState<null | 'proprietario' | 'corretor'>(null)
+  const [showCompleta6Form, setShowCompleta6Form] = useState(false)
+  const [completa6, setCompleta6] = useState({ nome: '', email: '', telefone: '', endereco: '' })
+  const [completa6Loading, setCompleta6Loading] = useState(false)
+  const [completa6Enviado, setCompleta6Enviado] = useState(false)
 
   return (
     <main style={{ background: 'var(--cream)', minHeight: '100vh' }}>
@@ -157,14 +162,55 @@ export default function VenderPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link href="/anunciar" style={{ display: 'block' }}>
-                    <button style={{
-                      width: '100%', padding: '13px 0', borderRadius: 10, border: 'none', cursor: 'pointer',
-                      background: i === 2 ? p.accent : 'var(--navy)', color: '#fff',
-                      fontFamily: 'inherit', fontWeight: 700, fontSize: 14,
-                      boxShadow: i === 2 ? `0 6px 20px ${p.accent}44` : 'none',
-                    }}>{p.cta}</button>
-                  </Link>
+                  {p.id === 'completa' ? (
+                    <>
+                      <button onClick={() => setShowCompleta6Form(s => !s)}
+                        style={{ width: '100%', padding: '13px 0', borderRadius: 10, border: 'none', cursor: 'pointer',
+                          background: p.accent, color: '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 14,
+                          boxShadow: `0 6px 20px ${p.accent}44` }}>{p.cta}</button>
+                      {showCompleta6Form && (
+                        <div style={{ marginTop: 14 }}>
+                          {completa6Enviado ? (
+                            <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 12, padding: '20px 16px', textAlign: 'center' }}>
+                              <div style={{ fontSize: 24, marginBottom: 8 }}>✓</div>
+                              <div style={{ fontSize: 15, fontWeight: 700, color: '#065F46', marginBottom: 6 }}>Recebemos seu contato!</div>
+                              <div style={{ fontSize: 13, color: '#065F46' }}>Um corretor VN Prime entrará em contato em até 2h úteis.</div>
+                            </div>
+                          ) : (
+                            <form onSubmit={async e => {
+                              e.preventDefault()
+                              setCompleta6Loading(true)
+                              const sb = createClient()
+                              await sb.from('leads').insert({ nome: completa6.nome, email: completa6.email, telefone: completa6.telefone, mensagem: `Venda Completa (6%) — ${completa6.endereco}`, origem: 'vender_completa' })
+                              setCompleta6Enviado(true)
+                              setCompleta6Loading(false)
+                            }} style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+                              {([
+                                { ph: 'Seu nome', key: 'nome', type: 'text' },
+                                { ph: 'WhatsApp', key: 'telefone', type: 'tel' },
+                                { ph: 'E-mail', key: 'email', type: 'email' },
+                                { ph: 'Endereço / bairro do imóvel', key: 'endereco', type: 'text' },
+                              ] as const).map(f => (
+                                <input key={f.key} type={f.type} placeholder={f.ph} required
+                                  value={completa6[f.key]}
+                                  onChange={e => setCompleta6(s => ({ ...s, [f.key]: e.target.value }))}
+                                  style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, fontFamily: 'inherit', outline: 'none', background: '#fff' }} />
+                              ))}
+                              <button type="submit" disabled={completa6Loading}
+                                style={{ padding: '11px 0', borderRadius: 8, border: 'none', background: p.accent, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: completa6Loading ? 0.7 : 1 }}>
+                                {completa6Loading ? 'Enviando…' : 'Quero um corretor dedicado'}
+                              </button>
+                            </form>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <Link href={`/login?tab=cadastrar&plano=${p.id}`} style={{ display: 'block' }}>
+                      <button style={{ width: '100%', padding: '13px 0', borderRadius: 10, border: 'none', cursor: 'pointer',
+                        background: 'var(--navy)', color: '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 14 }}>{p.cta}</button>
+                    </Link>
+                  )}
                   <div style={{ marginTop: 12, textAlign: 'center', fontSize: 11.5, color: 'var(--fg-3)', letterSpacing: '0.01em' }}>
                     Faça o upgrade quando quiser — sem burocracia.
                   </div>
