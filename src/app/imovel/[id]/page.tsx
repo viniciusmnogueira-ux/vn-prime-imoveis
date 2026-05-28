@@ -317,6 +317,41 @@ export default function ImovelPage() {
             )}
           </div>
 
+          {/* Simulador rápido de financiamento */}
+          {im.preco && (() => {
+            const entrada = im.preco * 0.2
+            const financiado = im.preco - entrada
+            const taxa = 0.0089
+            const prazo = 360
+            const fator = (taxa * Math.pow(1 + taxa, prazo)) / (Math.pow(1 + taxa, prazo) - 1)
+            const parcelaPrice = Math.round(financiado * fator)
+            return (
+              <div style={{ background: '#fff', borderRadius: 16, padding: '20px 22px', boxShadow: 'var(--shadow-soft)', border: '1px solid var(--border)', marginTop: 16 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold-deep)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Simulação rápida</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 12 }}>Financiamento bancário</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 12 }}>
+                  <div>
+                    <div style={{ color: 'var(--fg-3)', fontSize: 11 }}>Entrada (20%)</div>
+                    <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: 13 }}>R$ {Math.round(entrada).toLocaleString('pt-BR')}</div>
+                  </div>
+                  <div>
+                    <div style={{ color: 'var(--fg-3)', fontSize: 11 }}>Parcela PRICE</div>
+                    <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: 13 }}>R$ {parcelaPrice.toLocaleString('pt-BR')}/mês</div>
+                  </div>
+                  <div>
+                    <div style={{ color: 'var(--fg-3)', fontSize: 11 }}>Taxa</div>
+                    <div style={{ fontWeight: 600, color: 'var(--fg-2)', fontSize: 13 }}>8,9% a.a.</div>
+                  </div>
+                  <div>
+                    <div style={{ color: 'var(--fg-3)', fontSize: 11 }}>Prazo</div>
+                    <div style={{ fontWeight: 600, color: 'var(--fg-2)', fontSize: 13 }}>360 meses</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: 10.5, color: 'var(--fg-3)', marginTop: 10 }}>Simulação estimada. Sujeita a aprovação de crédito.</div>
+              </div>
+            )
+          })()}
+
           {/* Consórcio CTA */}
           <div style={{ background: '#fff', borderRadius: 16, padding: '20px 22px', boxShadow: 'var(--shadow-soft)', border: '1px solid var(--border)', marginTop: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#059669', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Alternativa ao financiamento</div>
