@@ -757,6 +757,9 @@ function CalculadorasSection({ imoveis, supabase }: { imoveis: any[]; supabase: 
   const [mercadoArea, setMercadoArea] = useState('')
   const [mercadoMedia, setMercadoMedia] = useState<number | null>(null)
   const [mercadoLoading, setMercadoLoading] = useState(false)
+  const [invValor, setInvValor] = useState('')
+  const [invAluguel, setInvAluguel] = useState('')
+  const [invVacancia, setInvVacancia] = useState('10')
 
   const itbiNum = Number(itbiValor.replace(/\D/g, ''))
   const aliqNum = Number(itbiAliq)
@@ -862,6 +865,71 @@ function CalculadorasSection({ imoveis, supabase }: { imoveis: any[]; supabase: 
           </div>
         )}
       </div>
+      {/* Retorno do Investidor */}
+      {(() => {
+        const vNum = Number(invValor.replace(/\D/g, ''))
+        const aNum = Number(invAluguel.replace(/\D/g, ''))
+        const vacNum = Number(invVacancia) / 100
+        const alugLiq = aNum * (1 - vacNum)
+        const yield12 = vNum > 0 && alugLiq > 0 ? (alugLiq * 12 / vNum) * 100 : null
+        const payback = vNum > 0 && alugLiq > 0 ? vNum / (alugLiq * 12) : null
+        const IS2: React.CSSProperties = { width: '100%', padding: '11px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', background: '#fff' }
+        return (
+          <div style={{ background: '#fff', borderRadius: 16, padding: '28px 28px', boxShadow: 'var(--shadow-soft)' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--gold-deep)', marginBottom: 6 }}>Calculadora</div>
+            <h3 style={{ margin: '0 0 6px', fontSize: 18 }}>Retorno do Investidor</h3>
+            <p style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 20, lineHeight: 1.5 }}>Calcule o cap rate e payback de um imóvel para locação ou revenda.</p>
+            {[
+              { label: 'Valor de compra (R$)', val: invValor, set: setInvValor, ph: 'Ex: 600000' },
+              { label: 'Aluguel mensal esperado (R$)', val: invAluguel, set: setInvAluguel, ph: 'Ex: 3500' },
+            ].map(f => (
+              <div key={f.label} style={{ marginBottom: 14 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>{f.label}</label>
+                <input value={f.val} onChange={e => f.set(e.target.value)} placeholder={f.ph} style={IS2} />
+              </div>
+            ))}
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>Vacância / custos (%)</label>
+              <select value={invVacancia} onChange={e => setInvVacancia(e.target.value)} style={IS2}>
+                {['0','5','10','15','20'].map(v => <option key={v} value={v}>{v}% — {v === '0' ? 'sem vacância' : v === '10' ? 'estimado BH' : v === '20' ? 'conservador' : ''}</option>)}
+              </select>
+            </div>
+            {yield12 !== null && payback !== null && (
+              <div style={{ background: '#F8FAFC', borderRadius: 10, padding: '16px 18px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>Cap rate (yield anual)</span>
+                    <span style={{ fontSize: 18, fontWeight: 800, color: yield12 >= 6 ? '#059669' : yield12 >= 4 ? 'var(--gold)' : '#DC2626' }}>{yield12.toFixed(2)}% a.a.</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>Payback do investimento</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{payback.toFixed(1)} anos</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>Aluguel líquido/mês</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{fmt(alugLiq)}</span>
+                  </div>
+                  <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Comparativo</div>
+                    {[
+                      { label: 'Poupança', pct: 6.17 },
+                      { label: 'CDI (ref. 2025)', pct: 11.65 },
+                      { label: 'FII médio BH', pct: 8.5 },
+                    ].map(c => (
+                      <div key={c.label} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                        <span style={{ fontSize: 12, color: 'var(--fg-2)' }}>{c.label}</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: yield12 >= c.pct ? '#059669' : '#DC2626' }}>
+                          {c.pct}% — você {yield12 >= c.pct ? '↑ supera' : '↓ fica abaixo'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      })()}
     </div>
   )
 }
