@@ -128,7 +128,9 @@ export default function SiteFooter() {
             { label: 'Due Diligence', href: '/due-diligence' },
             { label: 'Avaliação', href: '/avaliacao' },
             { label: 'Calculadora ITBI', href: '/calculadora' },
+            { label: 'Relatório de Mercado', href: '/relatorio' },
             { label: 'Termos e Condições', href: '/termos' },
+            { label: 'Política de Privacidade', href: '/politica' },
           ]} />
         </div>
 
