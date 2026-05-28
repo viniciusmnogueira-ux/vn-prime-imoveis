@@ -96,7 +96,12 @@ export default function RelatorioPage() {
           <p style={{ color: 'rgba(245,248,250,0.78)', fontSize: 16, maxWidth: 560, marginBottom: 0 }}>
             Dados ao vivo do portfólio VN Prime — imóveis ativos, preços médios e tendências por bairro em Belo Horizonte.
           </p>
-          <div style={{ marginTop: 16, fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>Atualizado em tempo real · {month}</div>
+          <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>Atualizado em tempo real · {month}</span>
+            <button onClick={() => window.print()} style={{ padding: '8px 18px', borderRadius: 8, border: '1px solid rgba(212,168,87,0.4)', background: 'rgba(212,168,87,0.12)', color: 'var(--gold)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+              🖨 Imprimir PDF
+            </button>
+          </div>
         </div>
       </section>
 

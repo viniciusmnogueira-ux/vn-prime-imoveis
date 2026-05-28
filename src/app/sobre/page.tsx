@@ -128,6 +128,65 @@ export default function SobrePage() {
         </div>
       </section>
 
+      {/* Timeline */}
+      <section style={{ background: '#fff', borderTop: '1px solid var(--border)', padding: 'clamp(60px,8vw,100px) 0' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+          <div style={{ maxWidth: 560, marginBottom: 52 }}>
+            <Eyebrow color="var(--gold-deep)">Nossa história</Eyebrow>
+            <h2 style={{ margin: '10px 0 14px' }}>Uma trajetória de curadoria</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 16, lineHeight: 1.7 }}>
+              Construída para os que entendem que imóvel de alto padrão merece uma plataforma à altura.
+            </p>
+          </div>
+          <div style={{ position: 'relative', paddingLeft: 32 }}>
+            <div style={{ position: 'absolute', left: 7, top: 8, bottom: 8, width: 2, background: 'linear-gradient(to bottom, var(--gold), transparent)' }} />
+            {([
+              { year: '2024', title: 'Fundação', desc: 'VN Prime Imóveis nasce com a missão de criar uma plataforma de alto padrão para BH e região metropolitana, combinando curadoria editorial com tecnologia.' },
+              { year: '2025', title: 'Plataforma digital', desc: 'Lançamos o portal completo com busca inteligente, portais dedicados para proprietários e corretores, fotografia profissional e geração de pitch com IA.' },
+              { year: '2026', title: 'Expansão regional', desc: 'Consolidamos presença em Nova Lima, Alphaville e Grande BH. Chegamos a centenas de imóveis curados, com parceiros corretores credenciados em toda a região.' },
+            ] as { year: string; title: string; desc: string }[]).map((t, i) => (
+              <div key={t.year} style={{ display: 'flex', gap: 24, marginBottom: i < 2 ? 40 : 0, position: 'relative' }}>
+                <div style={{ position: 'absolute', left: -32, top: 6, width: 16, height: 16, borderRadius: '50%', background: 'var(--gold)', border: '3px solid #fff', boxShadow: '0 0 0 2px var(--gold)' }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold-deep)', marginBottom: 4 }}>{t.year}</div>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', marginBottom: 6 }}>{t.title}</div>
+                  <p style={{ margin: 0, fontSize: 15, color: 'var(--fg-2)', lineHeight: 1.7 }}>{t.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Equipe */}
+      <section style={{ padding: 'clamp(60px,8vw,100px) 0', background: 'var(--cream)' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+          <div style={{ maxWidth: 560, marginBottom: 48 }}>
+            <Eyebrow color="var(--gold-deep)">A equipe</Eyebrow>
+            <h2 style={{ margin: '10px 0 14px' }}>Quem está por trás da VN Prime</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 16, lineHeight: 1.7 }}>
+              Especialistas em mercado imobiliário, tecnologia e experiência do cliente reunidos em um só lugar.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 24 }}>
+            {([
+              { nome: 'Vinicius Nogueira', cargo: 'Fundador & CEO', desc: 'Especialista em mercado imobiliário premium da Grande BH, com foco em tecnologia e curadoria de alto padrão.', inicial: 'VN' },
+              { nome: 'Equipe Comercial', cargo: 'Corretores Parceiros', desc: 'Rede de corretores CRECI certificados, especializados nos mercados de Nova Lima, Belvedere e Savassi.', inicial: 'CC' },
+              { nome: 'Equipe de Curadoria', cargo: 'Análise & Qualidade', desc: 'Responsáveis pela revisão de cada anúncio — fotos, descrição e documentação — antes de entrar na vitrine.', inicial: 'CQ' },
+            ] as { nome: string; cargo: string; desc: string; inicial: string }[]).map(m => (
+              <div key={m.nome} style={{ background: '#fff', borderRadius: 16, padding: '28px 24px', border: '1px solid var(--border)', boxShadow: '0 4px 18px rgba(15,34,68,0.06)' }}>
+                <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'var(--gradient-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, color: 'var(--navy-deep)', marginBottom: 16 }}>
+                  {m.inicial}
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>{m.nome}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold-deep)', marginBottom: 12 }}>{m.cargo}</div>
+                <p style={{ margin: 0, fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.65 }}>{m.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section style={{
         background: 'var(--cream)', borderTop: '1px solid var(--border)',

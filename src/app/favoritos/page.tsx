@@ -96,9 +96,26 @@ export default function FavoritosPage() {
               </p>
             </div>
             {imoveis.length > 0 && (
-              <button onClick={clearAll} style={{ padding: '8px 18px', border: '1px solid var(--border)', borderRadius: 8, background: '#fff', color: 'var(--fg-2)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
-                Limpar tudo
-              </button>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <button onClick={() => {
+                  const cmp = imoveis.slice(0, 3).map(im => im.id)
+                  localStorage.setItem('vnp_compare', JSON.stringify(cmp))
+                  window.location.href = '/comparar'
+                }} style={{ padding: '8px 18px', border: '1px solid var(--gold)', borderRadius: 8, background: 'rgba(212,168,87,0.10)', color: 'var(--gold-deep)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  ⚖ Comparar {Math.min(imoveis.length, 3)} selecionados
+                </button>
+                <button onClick={() => {
+                  const rows = ['Título,Bairro,Cidade,Preço,Área,Quartos', ...imoveis.map(im => `"${im.titulo}","${im.bairro ?? ''}","${im.cidade ?? ''}","${im.preco ?? ''}","${im.area_m2 ?? ''}","${im.quartos ?? ''}"`)]
+                  const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' })
+                  const url = URL.createObjectURL(blob)
+                  const a = document.createElement('a'); a.href = url; a.download = 'favoritos-vnprime.csv'; a.click(); URL.revokeObjectURL(url)
+                }} style={{ padding: '8px 18px', border: '1px solid var(--border)', borderRadius: 8, background: '#fff', color: 'var(--fg-2)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  ↓ Exportar CSV
+                </button>
+                <button onClick={clearAll} style={{ padding: '8px 18px', border: '1px solid var(--border)', borderRadius: 8, background: '#fff', color: 'var(--fg-2)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  Limpar tudo
+                </button>
+              </div>
             )}
           </div>
         </div>

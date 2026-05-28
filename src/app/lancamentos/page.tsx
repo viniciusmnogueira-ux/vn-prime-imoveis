@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 // ─── Dados ───────────────────────────────────────────────────────────────────
 
@@ -153,7 +154,23 @@ const cardVariants = {
 
 function LancamentoCard({ item, index }: { item: Lancamento; index: number }) {
   const [hovered, setHovered] = useState(false)
+  const [showNotify, setShowNotify] = useState(false)
+  const [notifyForm, setNotifyForm] = useState({ nome: '', contato: '' })
+  const [notifySent, setNotifySent] = useState(false)
   const st = STATUS_CONFIG[item.status]
+
+  const sendNotify = async () => {
+    if (!notifyForm.nome || !notifyForm.contato) return
+    const sb = createClient()
+    await sb.from('leads').insert({
+      tipo: 'notificacao_lancamento',
+      nome: notifyForm.nome,
+      contato: notifyForm.contato,
+      mensagem: `Notificar quando abrir: ${item.nome} (${item.bairro}, ${item.cidade})`,
+      origem: 'lancamentos',
+    })
+    setNotifySent(true)
+  }
 
   return (
     <motion.div
@@ -266,6 +283,43 @@ function LancamentoCard({ item, index }: { item: Lancamento; index: number }) {
           </div>
           <div style={{ fontSize: 12, color: '#6B7280', fontWeight: 500 }}>{item.entrega}</div>
         </div>
+
+        {/* Notificar-me */}
+        {notifySent ? (
+          <div style={{ marginTop: 14, padding: '10px 14px', background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 10, fontSize: 13, color: '#065F46', textAlign: 'center', fontWeight: 600 }}>
+            ✓ Avisaremos quando abrir!
+          </div>
+        ) : !showNotify ? (
+          <button
+            onClick={e => { e.stopPropagation(); setShowNotify(true) }}
+            style={{ marginTop: 14, width: '100%', padding: '10px', border: '1.5px solid #D4A857', borderRadius: 10, background: 'transparent', color: '#92650A', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+          >
+            🔔 Me avise quando abrir
+          </button>
+        ) : (
+          <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }} onClick={e => e.stopPropagation()}>
+            <input
+              type="text" placeholder="Seu nome"
+              value={notifyForm.nome}
+              onChange={e => setNotifyForm(f => ({ ...f, nome: e.target.value }))}
+              style={{ padding: '9px 12px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 13, outline: 'none', fontFamily: 'inherit' }}
+            />
+            <input
+              type="text" placeholder="WhatsApp ou e-mail"
+              value={notifyForm.contato}
+              onChange={e => setNotifyForm(f => ({ ...f, contato: e.target.value }))}
+              style={{ padding: '9px 12px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 13, outline: 'none', fontFamily: 'inherit' }}
+            />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={sendNotify} disabled={!notifyForm.nome || !notifyForm.contato} style={{ flex: 1, padding: '9px', borderRadius: 8, border: 'none', background: '#0F1824', color: '#D4A857', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                Confirmar
+              </button>
+              <button onClick={() => setShowNotify(false)} style={{ padding: '9px 14px', borderRadius: 8, border: '1px solid #E5E7EB', background: '#fff', color: '#9CA3AF', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>
   )
