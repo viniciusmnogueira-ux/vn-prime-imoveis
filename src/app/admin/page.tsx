@@ -349,6 +349,20 @@ export default function AdminPage() {
                                 {['pendente','ativo','pausado','vendido','rascunho'].map(s => <option key={s} value={s}>{s}</option>)}
                               </select>
                             </div>
+                            <div style={{ display: 'flex', gap: 20, marginBottom: 14 }}>
+                              <label style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 600, color: 'var(--navy)', cursor: 'pointer' }}>
+                                <input type="checkbox" checked={!!(adminEditFields.verificado ?? im.verificado)}
+                                  onChange={e => setAdminEditFields(p => ({ ...p, verificado: e.target.checked }))}
+                                  style={{ accentColor: '#059669', width: 15, height: 15 }} />
+                                ✓ VN Prime Verificado
+                              </label>
+                              <label style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 600, color: 'var(--navy)', cursor: 'pointer' }}>
+                                <input type="checkbox" checked={!!(adminEditFields.destaque ?? im.destaque)}
+                                  onChange={e => setAdminEditFields(p => ({ ...p, destaque: e.target.checked }))}
+                                  style={{ accentColor: 'var(--gold)', width: 15, height: 15 }} />
+                                ★ Em Destaque
+                              </label>
+                            </div>
                             <div style={{ display: 'flex', gap: 8 }}>
                               <button onClick={async () => {
                                   await supabase.from('imoveis').update(adminEditFields).eq('id', im.id)
