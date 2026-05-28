@@ -597,6 +597,11 @@ function TodoSection({ todos, saveTodos, newTodo, setNewTodo }: any) {
 // ─── FINANÇAS ─────────────────────────────────────────────────────────────────
 function FinancasSection({ leads, imoveis, pipeline }: any) {
   const [calcValor, setCalcValor] = useState('')
+  const [finValor, setFinValor] = useState('')
+  const [finEntrada, setFinEntrada] = useState('20')
+  const [finTaxa, setFinTaxa] = useState('10.5')
+  const [finPrazo, setFinPrazo] = useState('360')
+  const [finSistema, setFinSistema] = useState<'SAC' | 'PRICE'>('SAC')
   const fechados = pipeline.filter((c: PipelineCard) => c.col === 'fechamento')
   const totalFechado = fechados.reduce((s: number, c: PipelineCard) => s + (Number(c.valor?.replace(/\D/g, '') ?? 0) || 0), 0)
   const potencial = pipeline.reduce((s: number, c: PipelineCard) => s + (Number(c.valor?.replace(/\D/g, '') ?? 0) || 0), 0)
@@ -636,6 +641,91 @@ function FinancasSection({ leads, imoveis, pipeline }: any) {
           </div>
         )}
       </div>
+
+      {/* Simulador de financiamento */}
+      {(() => {
+        const vNum = Number(finValor.replace(/\D/g, ''))
+        const entNum = vNum * Number(finEntrada) / 100
+        const financiado = vNum - entNum
+        const taxaM = Number(finTaxa) / 100 / 12
+        const prazo = Number(finPrazo)
+        const amortSAC = financiado / prazo
+        const jurosPrim = financiado * taxaM
+        const primSAC = amortSAC + jurosPrim
+        const totalJurosSAC = financiado * taxaM * (prazo + 1) / 2
+        const parcelaPrice = taxaM > 0
+          ? financiado * (taxaM * Math.pow(1 + taxaM, prazo)) / (Math.pow(1 + taxaM, prazo) - 1)
+          : financiado / prazo
+        const totalJurosPrice = parcelaPrice * prazo - financiado
+        const IS3: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', background: '#fff' }
+        return (
+          <div style={{ background: '#fff', borderRadius: 14, padding: '24px 28px', boxShadow: 'var(--shadow-soft)', marginBottom: 24 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--navy)', marginBottom: 16 }}>Simulador de Financiamento</div>
+            <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', marginBottom: 14 }}>
+              {[
+                { label: 'Valor do imóvel (R$)', val: finValor, set: setFinValor, ph: '500000' },
+                { label: 'Entrada (%)', val: finEntrada, set: setFinEntrada, ph: '20', isSelect: false },
+                { label: 'Juros a.a. (%)', val: finTaxa, set: setFinTaxa, ph: '10.5' },
+              ].map(f => (
+                <div key={f.label}>
+                  <label style={labelSt}>{f.label}</label>
+                  <input value={f.val} onChange={e => f.set(e.target.value)} placeholder={f.ph} style={IS3} />
+                </div>
+              ))}
+              <div>
+                <label style={labelSt}>Prazo (meses)</label>
+                <select value={finPrazo} onChange={e => setFinPrazo(e.target.value)} style={IS3}>
+                  {[120, 180, 240, 300, 360, 420].map(p => <option key={p} value={p}>{p}m ({p/12} anos)</option>)}
+                </select>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8, marginBottom: vNum > 0 ? 16 : 0 }}>
+              {(['SAC', 'PRICE'] as const).map(s => (
+                <button key={s} onClick={() => setFinSistema(s)}
+                  style={{ padding: '6px 16px', borderRadius: 8, border: '1px solid', borderColor: finSistema === s ? 'var(--navy)' : 'var(--border)', background: finSistema === s ? 'var(--navy)' : '#fff', color: finSistema === s ? '#fff' : 'var(--navy)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  {s}
+                </button>
+              ))}
+            </div>
+            {vNum > 0 && financiado > 0 && (
+              <div style={{ background: '#F8FAFC', borderRadius: 10, padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {finSistema === 'SAC' ? (
+                  <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>1ª parcela (SAC)</span>
+                      <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--gold)' }}>{fmt(primSAC)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 12, color: 'var(--fg-2)' }}>Última parcela</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>{fmt(amortSAC * (1 + taxaM))}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 12, color: 'var(--fg-2)' }}>Total de juros (est.)</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#DC2626' }}>{fmt(totalJurosSAC)}</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>Parcela fixa (PRICE)</span>
+                      <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--gold)' }}>{fmt(parcelaPrice)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 12, color: 'var(--fg-2)' }}>Total de juros</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#DC2626' }}>{fmt(totalJurosPrice)}</span>
+                    </div>
+                  </>
+                )}
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10, display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--navy)' }}>Total pago</span>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--navy)' }}>{fmt(finSistema === 'SAC' ? financiado + totalJurosSAC + entNum : parcelaPrice * prazo + entNum)}</span>
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--fg-3)' }}>Entrada {finEntrada}% = {fmt(entNum)} · Financiado: {fmt(financiado)} · {finTaxa}% a.a.</div>
+              </div>
+            )}
+          </div>
+        )
+      })()}
 
       {fechados.length > 0 && (
         <div style={{ background: '#fff', borderRadius: 14, padding: '24px 28px', boxShadow: 'var(--shadow-soft)' }}>
