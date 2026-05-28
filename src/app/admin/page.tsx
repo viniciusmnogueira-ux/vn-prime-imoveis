@@ -176,12 +176,14 @@ export default function AdminPage() {
         {/* DASHBOARD */}
         {tab === 'dashboard' && (
           <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 16, marginBottom: 32 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 16, marginBottom: 32 }}>
               {[
-                { label: 'Imóveis cadastrados', value: stats.imoveis, accent: 'var(--navy)' },
-                { label: 'Imóveis pendentes', value: stats.pendentes, accent: '#D97706' },
-                { label: 'Leads recebidos', value: stats.leads, accent: '#059669' },
-                { label: 'Usuários', value: stats.usuarios, accent: '#7C3AED' },
+                { label: 'Imóveis ativos', value: imoveis.filter(i => i.status === 'ativo').length, accent: 'var(--navy)' },
+                { label: 'Pendentes', value: stats.pendentes, accent: '#D97706' },
+                { label: 'Verificados', value: imoveis.filter(i => i.verificado).length, accent: '#059669' },
+                { label: 'Leads totais', value: stats.leads, accent: '#7C3AED' },
+                { label: 'Não lidos', value: leads.filter(l => !leadLido[l.id]).length, accent: '#DC2626' },
+                { label: 'Usuários', value: stats.usuarios, accent: '#0369A1' },
               ].map(s => (
                 <div key={s.label} style={{ background: '#fff', borderRadius: 14, padding: '20px 22px', border: '1px solid #E2E8F0' }}>
                   <div style={{ fontSize: 28, fontWeight: 900, color: s.accent, letterSpacing: '-0.03em' }}>{s.value}</div>
@@ -189,6 +191,28 @@ export default function AdminPage() {
                 </div>
               ))}
             </div>
+            {/* Leads por origem */}
+            {leads.length > 0 && (() => {
+              const byOrig: Record<string, number> = {}
+              leads.forEach(l => { byOrig[l.origem ?? 'outro'] = (byOrig[l.origem ?? 'outro'] ?? 0) + 1 })
+              const max = Math.max(...Object.values(byOrig))
+              return (
+                <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', padding: '20px 24px', marginBottom: 24 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', marginBottom: 16 }}>Leads por origem</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {Object.entries(byOrig).sort((a, b) => b[1] - a[1]).map(([orig, cnt]) => (
+                      <div key={orig} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ width: 100, fontSize: 12, fontWeight: 600, color: '#64748B', textAlign: 'right', flexShrink: 0 }}>{orig}</div>
+                        <div style={{ flex: 1, height: 8, background: '#F1F5F9', borderRadius: 99 }}>
+                          <div style={{ width: `${(cnt / max) * 100}%`, height: '100%', background: 'var(--gold)', borderRadius: 99, transition: 'width 0.4s' }} />
+                        </div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', width: 32, textAlign: 'right' }}>{cnt}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
 
             {/* Imóveis pendentes */}
             {stats.pendentes > 0 && (
