@@ -44,6 +44,7 @@ const NAV = [
   { label: 'Anuncie',     href: '/vender' },
   { label: 'Lançamentos', href: '/lancamentos' },
   { label: 'Sobre',       href: '/sobre' },
+  { label: '♡',          href: '/favoritos' },
   {
     label: 'Serviços', href: '#',
     dropdown: [

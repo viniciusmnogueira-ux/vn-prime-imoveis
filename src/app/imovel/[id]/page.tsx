@@ -77,7 +77,12 @@ export default function ImovelPage() {
       <div style={{ width: 'min(1200px,92vw)', margin: '0 auto', paddingTop: 40, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) min(380px, 38%)', gap: 40, alignItems: 'start' }}>
         {/* Main */}
         <div>
-          <Eyebrow color="var(--gold-deep)">{im.tipo?.charAt(0).toUpperCase() + im.tipo?.slice(1)} · {im.operacao}</Eyebrow>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <Eyebrow color="var(--gold-deep)">{im.tipo?.charAt(0).toUpperCase() + im.tipo?.slice(1)} · {im.operacao}</Eyebrow>
+            {im.verificado && (
+              <span style={{ background: '#059669', color: '#fff', fontSize: 10.5, fontWeight: 700, padding: '3px 10px', borderRadius: 99, letterSpacing: '0.06em' }}>✓ VN Prime Verificado</span>
+            )}
+          </div>
           <h1 style={{ marginTop: 10, marginBottom: 8 }}>{im.titulo}</h1>
           <div style={{ fontSize: 14, color: 'var(--fg-2)', marginBottom: 24 }}>
             {[im.endereco, im.bairro, im.cidade, im.estado].filter(Boolean).join(', ')}

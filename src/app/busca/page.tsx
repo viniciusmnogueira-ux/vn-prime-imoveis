@@ -153,6 +153,9 @@ function ImovelCard({ im, layout = 'grid' }: { im: any; layout?: 'grid' | 'horiz
               color: 'var(--navy-deep)', fontSize: 10, fontWeight: 700, padding: '3px 10px',
               borderRadius: 99, textTransform: 'uppercase' }}>★ Destaque</span>
           )}
+          {im.verificado && (
+            <span style={{ position: 'absolute', top: im.destaque ? 38 : 12, left: 12, background: '#059669', color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 99, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4 }}>✓ Verificado</span>
+          )}
           <span style={{ position: 'absolute', bottom: 10, left: 12,
             background: 'rgba(15,34,68,0.85)', color: 'var(--gold-soft)',
             fontSize: 10, fontWeight: 700, padding: '3px 9px', borderRadius: 4,
