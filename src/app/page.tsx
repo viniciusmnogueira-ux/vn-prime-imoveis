@@ -146,6 +146,9 @@ export default function HomePage() {
   const [searchTipo, setSearchTipo] = useState('')
   const [searchValor, setSearchValor] = useState('')
   const [featured, setFeatured] = useState<any[]>([])
+  const [nlEmail, setNlEmail] = useState('')
+  const [nlSent, setNlSent] = useState(false)
+  const [nlSending, setNlSending] = useState(false)
 
   useEffect(() => {
     const t = setInterval(() => setSlide(s => (s + 1) % HERO_PHOTOS.length), 7000)
@@ -161,6 +164,14 @@ export default function HomePage() {
       .limit(3)
       .then(({ data }) => setFeatured(data || []))
   }, [])
+
+  const sendNl = async () => {
+    if (!nlEmail) return
+    setNlSending(true)
+    const supabase = createClient()
+    await supabase.from('leads').insert({ nome: '', email: nlEmail, origem: 'newsletter' })
+    setNlSent(true); setNlSending(false)
+  }
 
   const searchHref = `/busca${searchQ || searchTipo || searchValor
     ? `?q=${encodeURIComponent(searchQ)}&tipo=${searchTipo}&valor=${searchValor}`
@@ -515,6 +526,30 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── Newsletter ── */}
+      <section style={{ padding: 'clamp(2.5rem,5vw,3.5rem) 0', background: 'var(--navy-deep)' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 20 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', color: 'var(--gold)', textTransform: 'uppercase' }}>Fique por dentro</div>
+          <h2 style={{ color: '#fff', margin: 0, fontSize: 'clamp(1.4rem,2.5vw,2rem)' }}>Alertas do mercado imobiliário de BH</h2>
+          <p style={{ color: 'rgba(245,248,250,0.65)', fontSize: 15, maxWidth: 480, margin: 0 }}>Receba novos imóveis em destaque, análises de mercado e oportunidades exclusivas diretamente no seu e-mail.</p>
+          {nlSent ? (
+            <div style={{ background: 'rgba(5,150,105,0.15)', border: '1px solid rgba(5,150,105,0.4)', borderRadius: 10, padding: '14px 24px', color: '#34D399', fontSize: 14, fontWeight: 600 }}>
+              ✅ Inscrito! Você receberá nossas atualizações em breve.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', gap: 0, maxWidth: 460, width: '100%', borderRadius: 10, overflow: 'hidden', border: '1.5px solid rgba(212,168,87,0.35)', background: 'rgba(255,255,255,0.05)' }}>
+              <input type="email" placeholder="Seu melhor e-mail" value={nlEmail} onChange={e => setNlEmail(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendNl()}
+                style={{ flex: 1, padding: '14px 18px', background: 'transparent', border: 'none', outline: 'none', color: '#fff', fontSize: 14, fontFamily: 'var(--font-body)' }} />
+              <button onClick={sendNl} disabled={!nlEmail || nlSending}
+                style={{ padding: '14px 22px', background: 'var(--gold)', border: 'none', cursor: nlEmail ? 'pointer' : 'default', fontSize: 13.5, fontWeight: 700, color: 'var(--navy-deep)', fontFamily: 'var(--font-body)', opacity: nlEmail ? 1 : 0.5, transition: 'opacity 0.15s' }}>
+                {nlSending ? '…' : 'Inscrever'}
+              </button>
+            </div>
+          )}
+          <p style={{ color: 'rgba(245,248,250,0.35)', fontSize: 11.5, margin: 0 }}>Sem spam. Cancele quando quiser. Conforme a LGPD.</p>
         </div>
       </section>
 
