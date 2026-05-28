@@ -8,7 +8,7 @@ import FinanceiroTab from './FinanceiroTab'
 const fmt = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
 const fmtDate = (s: string) => new Date(s).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })
 
-type Tab = 'dashboard' | 'curadoria' | 'imoveis' | 'leads' | 'usuarios' | 'financeiro'
+type Tab = 'dashboard' | 'curadoria' | 'imoveis' | 'leads' | 'crm' | 'pipeline' | 'usuarios' | 'financeiro'
 
 const STATUS_COLORS: Record<string, string> = {
   pendente: '#D97706', ativo: '#059669', pausado: '#6B7280', vendido: '#7C3AED', rascunho: '#94A3B8',
@@ -29,6 +29,10 @@ export default function AdminPage() {
   const [notasInternas, setNotasInternas] = useState<Record<string, string>>({})
   const [adminEditId, setAdminEditId] = useState<string | null>(null)
   const [adminEditFields, setAdminEditFields] = useState<Record<string, any>>({})
+  const [leadStatus, setLeadStatus] = useState<Record<string, string>>({})
+  const [leadNota, setLeadNota] = useState<Record<string, string>>({})
+  const [newAccessEmail, setNewAccessEmail] = useState('')
+  const [newAccessTipo, setNewAccessTipo] = useState('proprietario')
   const supabase = createClient()
 
   useEffect(() => {
@@ -74,6 +78,14 @@ export default function AdminPage() {
 
   useEffect(() => { if (!loading) loadAll() }, [loading, loadAll])
 
+  useEffect(() => {
+    if (loading) return
+    const ls = localStorage.getItem('vnp_admin_leadstatus')
+    const ln = localStorage.getItem('vnp_admin_leadnota')
+    if (ls) try { setLeadStatus(JSON.parse(ls)) } catch {}
+    if (ln) try { setLeadNota(JSON.parse(ln)) } catch {}
+  }, [loading])
+
   async function setImovelStatus(id: string, status: string) {
     await supabase.from('imoveis').update({ status }).eq('id', id)
     setImoveis(prev => prev.map(i => i.id === id ? { ...i, status } : i))
@@ -107,6 +119,8 @@ export default function AdminPage() {
     { key: 'curadoria', label: 'Curadoria', badge: stats.pendentes || undefined },
     { key: 'imoveis', label: 'Imóveis' },
     { key: 'leads', label: 'Leads', badge: stats.leads || undefined },
+    { key: 'crm', label: 'CRM' },
+    { key: 'pipeline', label: 'Pipeline' },
     { key: 'usuarios', label: 'Usuários' },
     { key: 'financeiro', label: 'Financeiro' },
   ]
@@ -535,10 +549,150 @@ export default function AdminPage() {
           </div>
         )}
 
+        {/* CRM */}
+        {tab === 'crm' && (() => {
+          const CRM_OPTS = ['novo','contatado','qualificado','proposta','fechado','sem interesse']
+          const ST_COLOR: Record<string, string> = {
+            novo: '#6366F1', contatado: '#D97706', qualificado: '#0369A1',
+            proposta: '#7C3AED', fechado: '#059669', 'sem interesse': '#94A3B8',
+          }
+          const saveSt = (id: string, val: string) => {
+            const ns = { ...leadStatus, [id]: val }
+            setLeadStatus(ns)
+            localStorage.setItem('vnp_admin_leadstatus', JSON.stringify(ns))
+          }
+          const saveNota = (id: string, val: string) => {
+            const nn = { ...leadNota, [id]: val }
+            setLeadNota(nn)
+            localStorage.setItem('vnp_admin_leadnota', JSON.stringify(nn))
+          }
+          return (
+            <div>
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>CRM de Leads — {leads.length} contatos</div>
+                <div style={{ fontSize: 12, color: '#64748B' }}>Gerencie o status e notas de cada lead. Dados salvos localmente.</div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {leads.map(l => {
+                  const st = leadStatus[l.id] ?? 'novo'
+                  const nota = leadNota[l.id] ?? ''
+                  return (
+                    <div key={l.id} style={{ background: '#fff', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 18px' }}>
+                      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                        <div style={{ flex: 1, minWidth: 200 }}>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 2 }}>{l.nome}</div>
+                          <div style={{ fontSize: 12, color: '#64748B' }}>{l.email}{l.telefone ? ` · ${l.telefone}` : ''}</div>
+                          <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{l.origem ?? '—'} · {fmtDate(l.criado_em)}</div>
+                          {l.mensagem && <div style={{ fontSize: 12, color: '#64748B', marginTop: 4, fontStyle: 'italic' }}>"{l.mensagem.slice(0, 120)}{l.mensagem.length > 120 ? '…' : ''}"</div>}
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0, flexWrap: 'wrap' }}>
+                          <span style={{ padding: '3px 10px', borderRadius: 99, fontSize: 11, fontWeight: 700, background: `${ST_COLOR[st]}18`, color: ST_COLOR[st] }}>{st}</span>
+                          <select value={st} onChange={e => saveSt(l.id, e.target.value)}
+                            style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid #E2E8F0', fontSize: 12, fontFamily: 'inherit', cursor: 'pointer', color: 'var(--navy)' }}>
+                            {CRM_OPTS.map(o => <option key={o} value={o}>{o}</option>)}
+                          </select>
+                          {l.telefone && (
+                            <a href={`https://wa.me/55${l.telefone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer"
+                              style={{ padding: '4px 12px', borderRadius: 6, background: '#DCFCE7', color: '#166534', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>WhatsApp</a>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ marginTop: 10 }}>
+                        <textarea value={nota} rows={1} placeholder="Notas sobre este lead..."
+                          onChange={e => saveNota(l.id, e.target.value)}
+                          style={{ width: '100%', padding: '6px 10px', borderRadius: 7, border: '1px solid #E2E8F0', fontSize: 12, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box', color: 'var(--navy)' }} />
+                      </div>
+                    </div>
+                  )
+                })}
+                {leads.length === 0 && (
+                  <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', padding: '60px 24px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 12, color: '#94A3B8' }}>Nenhum lead ainda.</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })()}
+
+        {/* PIPELINE */}
+        {tab === 'pipeline' && (() => {
+          const COLS = ['novo', 'contatado', 'qualificado', 'proposta', 'fechado']
+          const COL_LABELS: Record<string, string> = { novo: 'Novos', contatado: 'Contatados', qualificado: 'Qualificados', proposta: 'Proposta', fechado: 'Fechados' }
+          const COL_COLORS: Record<string, string> = { novo: '#6366F1', contatado: '#D97706', qualificado: '#0369A1', proposta: '#7C3AED', fechado: '#059669' }
+          return (
+            <div>
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>Pipeline de Leads</div>
+                <div style={{ fontSize: 12, color: '#64748B' }}>Visualização kanban dos leads por status. Altere o status no CRM para mover os cards.</div>
+              </div>
+              <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 12, alignItems: 'flex-start' }}>
+                {COLS.map(col => {
+                  const colLeads = leads.filter(l => (leadStatus[l.id] ?? 'novo') === col)
+                  return (
+                    <div key={col} style={{ minWidth: 210, flex: '1 0 210px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, padding: '0 4px' }}>
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: COL_COLORS[col], flexShrink: 0 }} />
+                        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--navy)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{COL_LABELS[col]}</span>
+                        <span style={{ marginLeft: 'auto', fontSize: 11, background: `${COL_COLORS[col]}18`, color: COL_COLORS[col], padding: '2px 7px', borderRadius: 99, fontWeight: 700 }}>{colLeads.length}</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {colLeads.map(l => (
+                          <div key={l.id} style={{ background: '#fff', borderRadius: 10, border: '1px solid #E2E8F0', padding: '12px 14px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', marginBottom: 2 }}>{l.nome}</div>
+                            <div style={{ fontSize: 11, color: '#64748B', marginBottom: 6 }}>{l.origem ?? '—'} · {fmtDate(l.criado_em)}</div>
+                            {leadNota[l.id] && <div style={{ fontSize: 11, color: '#64748B', fontStyle: 'italic', marginBottom: 6 }}>"{leadNota[l.id].slice(0, 60)}{leadNota[l.id].length > 60 ? '…' : ''}"</div>}
+                            {l.telefone && (
+                              <a href={`https://wa.me/55${l.telefone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer"
+                                style={{ fontSize: 11, color: '#25D366', textDecoration: 'none', fontWeight: 700 }}>WhatsApp →</a>
+                            )}
+                          </div>
+                        ))}
+                        {colLeads.length === 0 && (
+                          <div style={{ background: '#F8FAFC', borderRadius: 10, border: '1px dashed #E2E8F0', padding: '20px 14px', textAlign: 'center', fontSize: 12, color: '#94A3B8' }}>Sem leads</div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })()}
+
         {tab === 'financeiro' && <FinanceiroTab imoveis={imoveis} leads={leads} />}
 
         {/* USUÁRIOS */}
         {tab === 'usuarios' && (
+          <div>
+          <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', padding: '18px 20px', marginBottom: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', marginBottom: 12 }}>Convidar novo usuário</div>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+              <input type="email" placeholder="E-mail do usuário" value={newAccessEmail}
+                onChange={e => setNewAccessEmail(e.target.value)}
+                style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #E2E8F0', fontSize: 13, fontFamily: 'inherit', outline: 'none', minWidth: 240 }} />
+              <select value={newAccessTipo} onChange={e => setNewAccessTipo(e.target.value)}
+                style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #E2E8F0', fontSize: 13, fontFamily: 'inherit', outline: 'none', cursor: 'pointer', background: '#fff', color: 'var(--navy)' }}>
+                {['proprietario', 'corretor', 'incorporadora', 'admin'].map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+              <button onClick={() => {
+                if (!newAccessEmail) return
+                const msg = encodeURIComponent(`Olá! Você foi convidado para acessar o portal VN Prime Imóveis como ${newAccessTipo}. Acesse vnprimeimoveis.com/login e cadastre-se com este e-mail: ${newAccessEmail}`)
+                window.open(`https://wa.me/?text=${msg}`, '_blank')
+              }}
+                style={{ padding: '8px 16px', borderRadius: 8, background: '#25D366', color: '#fff', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                Enviar convite WhatsApp
+              </button>
+              <button onClick={() => {
+                if (!newAccessEmail) return
+                window.location.href = `mailto:${newAccessEmail}?subject=Convite%20VN%20Prime%20Im%C3%B3veis&body=Ol%C3%A1!%20Voc%C3%AA%20foi%20convidado%20para%20o%20portal%20VN%20Prime%20Im%C3%B3veis%20como%20${newAccessTipo}.%20Acesse%20vnprimeimoveis.com%2Flogin%20e%20cadastre-se%20com%20este%20e-mail.`
+              }}
+                style={{ padding: '8px 16px', borderRadius: 8, background: '#EFF8FF', color: '#0369A1', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                Enviar por e-mail
+              </button>
+            </div>
+            <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 8 }}>Após o cadastro, altere o tipo do usuário na tabela abaixo.</div>
+          </div>
           <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', overflow: 'hidden' }}>
             <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0' }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{usuarios.length} usuários cadastrados</div>
@@ -581,6 +735,7 @@ export default function AdminPage() {
                 </tbody>
               </table>
             </div>
+          </div>
           </div>
         )}
       </div>

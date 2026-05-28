@@ -46,7 +46,7 @@ function SimuladorConsorcio() {
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <Eyebrow color="var(--gold-deep)">Simulador</Eyebrow>
           <h2 style={{ margin: '8px 0 10px' }}>Quanto você quer de carta de crédito?</h2>
-          <p style={{ color: 'var(--fg-2)', fontSize: 15 }}>Ajuste os valores e veja sua parcela estimada em tempo real · sem juros</p>
+          <p style={{ color: 'var(--fg-2)', fontSize: 15 }}>Ajuste os valores e veja sua parcela estimada em tempo real · sem juros bancários</p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,320px),1fr))', gap: 32, alignItems: 'start' }}>
@@ -108,7 +108,7 @@ function SimuladorConsorcio() {
             <div style={{ background: 'var(--gradient-navy-hero)', borderRadius: 20, padding: '28px 26px 22px', color: '#fff', marginBottom: 24, textAlign: 'center' }}>
               <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold-soft)', marginBottom: 6 }}>Parcela estimada</div>
               <div style={{ fontSize: 'clamp(2.6rem,5vw,3.4rem)', fontWeight: 800, letterSpacing: '-0.03em', color: '#fff', lineHeight: 1 }}>{fmt(parcela)}</div>
-              <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', marginTop: 6 }}>por mês · sem juros</div>
+              <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', marginTop: 6 }}>por mês · 0% juros bancários</div>
               <div style={{ marginTop: 20, display: 'flex', gap: 16, justifyContent: 'center', alignItems: 'center' }}>
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--gold-soft)' }}>{prazo}</div>
@@ -206,7 +206,7 @@ function SimuladorComparativo() {
           <Eyebrow color="var(--gold-deep)">Comparativo</Eyebrow>
           <h2 style={{ margin: '0 0 10px' }}>Consórcio vs Financiamento</h2>
           <p style={{ color: 'var(--fg-2)', fontSize: 15, maxWidth: 520, margin: '0 auto' }}>
-            Simule lado a lado e descubra quanto você economiza comprando sem juros.
+            Simule lado a lado e descubra quanto você economiza com o consórcio.
           </p>
         </div>
 
@@ -248,7 +248,7 @@ function SimuladorComparativo() {
             <div style={{ position: 'absolute', top: -20, right: -20, width: 120, height: 120, borderRadius: '50%', background: 'rgba(212,168,87,0.1)' }} />
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 6 }}>Consórcio VN Prime</div>
             <div style={{ fontSize: 'clamp(1.8rem,3.5vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.03em', color: '#fff', lineHeight: 1 }}>{fmt(parcelaConsorc)}</div>
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 20 }}>/mês estimado · sem juros</div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 20 }}>/mês estimado · 0% juros</div>
             {[['Carta de crédito', fmt(valor)], ['Taxa adm. (17%)', fmt(valor * TAX)], ['Fundo reserva (3%)', fmt(valor * TAX_FUNDO)], ['Total a pagar', fmt(totalConsorc)]].map(([l, v], i) => (
               <div key={l as string} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: i < 3 ? '1px solid rgba(255,255,255,0.1)' : 'none' }}>
                 <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>{l}</span>
@@ -311,7 +311,7 @@ export default function ConsorcioPage() {
           <Eyebrow color="var(--gold)">VN Prime Imóveis</Eyebrow>
           <h1 style={{ color: '#fff', margin: '14px 0 18px', fontSize: 'clamp(2.4rem,5vw,3.6rem)', lineHeight: 1.05 }}>
             Compre seu imóvel{' '}
-            <em className="italic-accent" style={{ color: 'var(--gold-soft)' }}>sem juros</em>.
+            <em className="italic-accent" style={{ color: 'var(--gold-soft)' }}>com parcelas acessíveis</em>.
           </h1>
           <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.88)', maxWidth: 560, marginBottom: 28 }}>
             Carta de crédito de R$ 120 mil a R$ 2 milhões. Use como entrada, lance ou compra à vista — paga à vista, paga melhor.
@@ -329,7 +329,7 @@ export default function ConsorcioPage() {
       <section style={{ padding: 'clamp(50px,7vw,80px) 0' }}>
         <div style={{ width: 'min(1180px,92vw)', margin: '0 auto', display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))' }}>
           {[
-            { t: 'Sem juros', d: 'Apenas taxa de administração. Economia de até 38% comparado ao financiamento bancário.' },
+            { t: '0% Juros Bancários', d: 'Apenas taxa de administração de 17%. Economia de até 38% comparado ao financiamento bancário.' },
             { t: 'Lance livre', d: 'Use FGTS, recursos próprios ou parcelas adiantadas para antecipar sua contemplação.' },
             { t: 'Carta forte', d: 'Poder de compra à vista para o vendedor — posição de negociação superior ao financiado.' },
             { t: 'Use como entrada', d: 'Combine carta com financiamento para imóveis de maior valor. Sem burocracia adicional.' },

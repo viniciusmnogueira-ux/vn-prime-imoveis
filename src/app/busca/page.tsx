@@ -442,7 +442,7 @@ function BuscaContent() {
 
             <FilterGroup title="Tipo de imóvel">
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                {['', 'Apartamento', 'Casa', 'Cobertura', 'Studio', 'Loft', 'Casa de condomínio', 'Terreno', 'Loteamento'].map(t => (
+                {['', 'Apartamento', 'Casa', 'Cobertura', 'Studio', 'Loft', 'Casa de condomínio', 'Condomínio', 'Terreno', 'Loteamento', 'Lote', 'Sala Comercial'].map(t => (
                   <button key={t} onClick={() => { setF({ tipo: t }); setPage(1) }}
                     style={pillBtn(filters.tipo === t)}>
                     {t || 'Todos'}
