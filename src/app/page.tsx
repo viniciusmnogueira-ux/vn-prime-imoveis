@@ -368,6 +368,38 @@ export default function HomePage() {
         </section>
       )}
 
+      {/* ── Bairros ── */}
+      <section style={{ padding: 'clamp(2rem,4vw,3.5rem) 0', background: '#fff' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <div>
+              <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold-deep)', marginBottom: 6 }}>Explorar por bairro</div>
+              <h2 style={{ margin: 0, fontSize: 'clamp(1.3rem,2.2vw,1.7rem)' }}>Regiões em destaque</h2>
+            </div>
+            <Link href="/busca" style={{ fontSize: 13, fontWeight: 700, color: 'var(--gold-deep)', textDecoration: 'none' }}>Ver todos →</Link>
+          </div>
+          <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))' }}>
+            {[
+              { nome: 'Savassi', img: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=400&q=80' },
+              { nome: 'Belvedere', img: 'https://images.unsplash.com/photo-1560185007-5f0bb1866cab?w=400&q=80' },
+              { nome: 'Lourdes', img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80' },
+              { nome: 'Funcionários', img: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80' },
+              { nome: 'Nova Lima', img: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=80' },
+              { nome: 'Serra', img: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=80' },
+            ].map(b => (
+              <Link key={b.nome} href={`/busca?q=${encodeURIComponent(b.nome)}`} style={{ textDecoration: 'none' }}>
+                <div style={{ borderRadius: 14, overflow: 'hidden', position: 'relative', paddingTop: '70%', background: `url(${b.img}) center/cover`, boxShadow: '0 2px 12px rgba(15,34,68,0.10)', transition: 'transform 0.18s, box-shadow 0.18s', cursor: 'pointer' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 28px rgba(15,34,68,0.18)' }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 12px rgba(15,34,68,0.10)' }}>
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,24,36,0.75) 0%, transparent 55%)' }} />
+                  <span style={{ position: 'absolute', bottom: 12, left: 14, color: '#fff', fontSize: 13, fontWeight: 700 }}>{b.nome}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Serviços (carousel) ── */}
       <section id="home-servicos" style={{ padding: 'clamp(3rem,6vw,5rem) 0', background: 'var(--white)' }}>
         <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>

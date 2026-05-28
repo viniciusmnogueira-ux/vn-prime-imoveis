@@ -227,6 +227,19 @@ export default function ProprietarioPage() {
           )
         )}
 
+        {sec === 'imoveis' && imoveis.some(im => im.status === 'ativo' && !im.destaque) && (
+          <div style={{ marginTop: 20, background: 'linear-gradient(135deg, #1B2733 0%, #2F3E4F 100%)', borderRadius: 16, padding: '24px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap', border: '1px solid rgba(212,168,87,0.3)' }}>
+            <div>
+              <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 6 }}>BOOSTER — Impulsione seu anúncio</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 4 }}>Apareça primeiro nas buscas e receba mais leads</div>
+              <div style={{ fontSize: 13, color: 'rgba(245,248,250,0.65)' }}>Destaque por 7 dias · R$ 49,90 &nbsp;·&nbsp; Destaque por 30 dias · R$ 99</div>
+            </div>
+            <a href={`https://wa.me/5531984144250?text=Olá! Quero impulsionar meu anúncio na VN Prime (Booster).`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+              <Btn variant="accent">Impulsionar agora</Btn>
+            </a>
+          </div>
+        )}
+
         {sec === 'leads' && (
           <LeadsSection proprietarioId={profile?.id ?? ''} />
         )}

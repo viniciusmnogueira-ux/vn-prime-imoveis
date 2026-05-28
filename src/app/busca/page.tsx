@@ -263,12 +263,15 @@ function EmptyState({ onClear }: { onClear: () => void }) {
   )
 }
 
+const AMENIDADES_OPTS = ['Piscina', 'Academia', 'Churrasqueira', 'Varanda', 'Salão de festas', 'Pet-friendly', 'Playground', 'Segurança 24h']
+
 const EMPTY_FILTERS = {
   op: 'compra', q: '', tipo: '',
   bairros: [] as string[],
   quartos: 0, suites: 0, vagas: 0,
   priceMin: '', priceMax: '', priceRange: '',
   areaMin: '', areaMax: '',
+  amenidades: [] as string[],
   onlyFeatured: false, onlyNew: false,
 }
 
@@ -361,6 +364,13 @@ function BuscaContent() {
       if (filters.areaMax && (l.area_m2 ?? 0) > +filters.areaMax) return false
       if (filters.onlyFeatured && !l.destaque) return false
       if (filters.onlyNew && !l.novo) return false
+      if (filters.amenidades.length) {
+        const desc = ((l.descricao ?? '') + ' ' + (l.titulo ?? '')).toLowerCase()
+        const ams: string[] = l.amenidades ?? []
+        for (const a of filters.amenidades) {
+          if (!ams.includes(a) && !desc.includes(a.toLowerCase())) return false
+        }
+      }
       return true
     })
     if (sort === 'price_asc') r.sort((a, b) => (a.preco ?? 0) - (b.preco ?? 0))
@@ -626,6 +636,19 @@ function BuscaContent() {
                 </div>
               </FilterGroup>
             )}
+
+            <FilterGroup title="Amenidades">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {AMENIDADES_OPTS.map(a => (
+                  <label key={a} style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--navy)', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={filters.amenidades.includes(a)}
+                      onChange={e => { const next = e.target.checked ? [...filters.amenidades, a] : filters.amenidades.filter(x => x !== a); setF({ amenidades: next }); setPage(1) }}
+                      style={{ accentColor: 'var(--gold)' }} />
+                    {a}
+                  </label>
+                ))}
+              </div>
+            </FilterGroup>
 
             <FilterGroup title="Outros">
               <label style={{ display: 'flex', alignItems: 'center', gap: 8,
