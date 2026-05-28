@@ -28,7 +28,9 @@ export default function ProprietarioPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [imoveis, setImoveis] = useState<Imovel[]>([])
   const [loading, setLoading] = useState(true)
-  const [sec, setSec] = useState<'imoveis' | 'leads' | 'fotografo' | 'config'>('imoveis')
+  const [sec, setSec] = useState<'imoveis' | 'leads' | 'scripts' | 'fotografo' | 'config'>('imoveis')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editForm, setEditForm] = useState<Record<string, any>>({})
 
   useEffect(() => {
     loadData()
@@ -112,11 +114,11 @@ export default function ProprietarioPage() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: 4, borderBottom: '2px solid var(--border)', marginBottom: 28 }}>
-          {([['imoveis','Meus imóveis'],['leads','Leads recebidos'],['fotografo','📸 Fotógrafo'],['config','Configurações']] as const).map(([id, lbl]) => (
+        <div style={{ display: 'flex', gap: 4, borderBottom: '2px solid var(--border)', marginBottom: 28, overflowX: 'auto' }}>
+          {([['imoveis','Meus imóveis'],['leads','Leads'],['scripts','Scripts'],['fotografo','Fotógrafo'],['config','Configurações']] as const).map(([id, lbl]) => (
             <button key={id} onClick={() => setSec(id)} style={{
               padding: '10px 20px', background: 'none', border: 'none', cursor: 'pointer',
-              fontSize: 13.5, fontWeight: 700,
+              fontSize: 13.5, fontWeight: 700, whiteSpace: 'nowrap',
               color: sec === id ? 'var(--navy)' : 'var(--fg-3)',
               borderBottom: `3px solid ${sec === id ? 'var(--gold)' : 'transparent'}`,
               marginBottom: -2, transition: 'all 0.15s',
@@ -136,29 +138,71 @@ export default function ProprietarioPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {imoveis.map(im => {
                 const st = STATUS_LABEL[im.status] ?? STATUS_LABEL.rascunho
+                const isEditing = editingId === im.id
                 return (
-                  <div key={im.id} style={{ background: '#fff', borderRadius: 14, padding: '20px 24px', boxShadow: 'var(--shadow-soft)', display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                    {im.fotos?.[0] && (
-                      <div style={{ width: 120, height: 90, borderRadius: 10, overflow: 'hidden', flexShrink: 0, background: 'var(--cream)' }}>
-                        <img src={im.fotos[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <div key={im.id} style={{ background: '#fff', borderRadius: 14, boxShadow: 'var(--shadow-soft)', border: `1.5px solid ${isEditing ? 'var(--gold)' : 'transparent'}`, overflow: 'hidden', transition: 'border-color 0.2s' }}>
+                    <div style={{ padding: '20px 24px', display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                      {im.fotos?.[0] && (
+                        <div style={{ width: 120, height: 90, borderRadius: 10, overflow: 'hidden', flexShrink: 0, background: 'var(--cream)' }}>
+                          <img src={im.fotos[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </div>
+                      )}
+                      <div style={{ flex: 1, minWidth: 200 }}>
+                        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 6 }}>
+                          <span style={{ fontWeight: 800, fontSize: 15, color: 'var(--navy)' }}>{im.titulo}</span>
+                          <span style={{ fontSize: 11, fontWeight: 700, background: st.bg, color: st.color, padding: '3px 10px', borderRadius: 99 }}>{st.label}</span>
+                        </div>
+                        <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>{im.bairro}, {im.cidade} · {im.tipo}</div>
+                        <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--gold)', marginTop: 6 }}>{fmtBRL(im.preco)}</div>
+                      </div>
+                      <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap' }}>
+                        <Btn variant="ghost" size="sm" onClick={() => {
+                          if (isEditing) { setEditingId(null); setEditForm({}) }
+                          else { setEditingId(im.id); setEditForm({ titulo: im.titulo, preco: im.preco, bairro: im.bairro, descricao: im.descricao ?? '', quartos: im.quartos ?? '', area_m2: im.area_m2 ?? '' }) }
+                        }}>
+                          {isEditing ? 'Cancelar' : 'Editar'}
+                        </Btn>
+                        {(im.status === 'ativo' || im.status === 'pausado') && (
+                          <Btn variant="ghost" size="sm" onClick={() => toggleStatus(im.id, im.status)}>
+                            {im.status === 'ativo' ? 'Pausar' : 'Ativar'}
+                          </Btn>
+                        )}
+                        <Btn variant="danger" size="sm" onClick={() => deleteImovel(im.id)}>Excluir</Btn>
+                      </div>
+                    </div>
+                    {isEditing && (
+                      <div style={{ borderTop: '1px solid var(--border)', padding: '20px 24px', background: '#FAFAF8' }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--gold-deep)', marginBottom: 16 }}>Editar anúncio</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 14, marginBottom: 14 }}>
+                          {[
+                            { label: 'Título', key: 'titulo' },
+                            { label: 'Preço (R$)', key: 'preco' },
+                            { label: 'Bairro', key: 'bairro' },
+                            { label: 'Quartos', key: 'quartos' },
+                            { label: 'Área m²', key: 'area_m2' },
+                          ].map(({ label, key }) => (
+                            <div key={key}>
+                              <label style={labelStyle}>{label}</label>
+                              <input value={editForm[key] ?? ''} onChange={e => setEditForm(f => ({ ...f, [key]: e.target.value }))}
+                                style={{ ...cfgInput, background: '#fff' }} />
+                            </div>
+                          ))}
+                        </div>
+                        <div style={{ marginBottom: 16 }}>
+                          <label style={labelStyle}>Descrição</label>
+                          <textarea value={editForm.descricao ?? ''} rows={3} onChange={e => setEditForm(f => ({ ...f, descricao: e.target.value }))}
+                            style={{ ...cfgInput, background: '#fff', resize: 'vertical', height: 'auto' }} />
+                        </div>
+                        <div style={{ display: 'flex', gap: 10 }}>
+                          <Btn variant="primary" size="sm" onClick={async () => {
+                            await supabase.from('imoveis').update(editForm).eq('id', im.id)
+                            setImoveis(prev => prev.map(i => i.id === im.id ? { ...i, ...editForm } : i))
+                            setEditingId(null); setEditForm({})
+                          }}>Salvar alterações</Btn>
+                          <Btn variant="ghost" size="sm" onClick={() => { setEditingId(null); setEditForm({}) }}>Cancelar</Btn>
+                        </div>
                       </div>
                     )}
-                    <div style={{ flex: 1, minWidth: 200 }}>
-                      <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 6 }}>
-                        <span style={{ fontWeight: 800, fontSize: 15, color: 'var(--navy)' }}>{im.titulo}</span>
-                        <span style={{ fontSize: 11, fontWeight: 700, background: st.bg, color: st.color, padding: '3px 10px', borderRadius: 99 }}>{st.label}</span>
-                      </div>
-                      <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>{im.bairro}, {im.cidade} · {im.tipo}</div>
-                      <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--gold)', marginTop: 6 }}>{fmtBRL(im.preco)}</div>
-                    </div>
-                    <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                      {(im.status === 'ativo' || im.status === 'pausado') && (
-                        <Btn variant="ghost" size="sm" onClick={() => toggleStatus(im.id, im.status)}>
-                          {im.status === 'ativo' ? 'Pausar' : 'Ativar'}
-                        </Btn>
-                      )}
-                      <Btn variant="danger" size="sm" onClick={() => deleteImovel(im.id)}>Excluir</Btn>
-                    </div>
                   </div>
                 )
               })}
@@ -170,10 +214,12 @@ export default function ProprietarioPage() {
           <LeadsSection proprietarioId={profile?.id ?? ''} />
         )}
 
+        {sec === 'scripts' && <ScriptSection />}
+
         {sec === 'fotografo' && <FotografoSection />}
 
         {sec === 'config' && (
-          <ConfigSection profile={profile} onSave={loadData} />
+          <ConfigSection profile={profile} onSave={loadData} supabase={supabase} />
         )}
       </div>
     </div>
@@ -191,39 +237,56 @@ function LeadsSection({ proprietarioId }: { proprietarioId: string }) {
       .then(({ data }) => { setLeads(data ?? []); setLoading(false) })
   }, [proprietarioId])
 
+  const MOCK_LEADS = [
+    { id: 'mock1', nome: 'Carlos Mendonça', email: 'carlos.m@gmail.com', telefone: '31987654321', mensagem: 'Olá! Tenho interesse no imóvel. Poderia me passar mais detalhes sobre o condomínio e a vaga de garagem?', criado_em: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), mock: true },
+    { id: 'mock2', nome: 'Beatriz Fonseca', email: 'bea.fonseca@outlook.com', telefone: '31999887766', mensagem: 'Vi o anúncio e gostei muito. Moro em São Paulo e vou a BH no próximo fim de semana. Posso agendar visita para sábado?', criado_em: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(), mock: true },
+    { id: 'mock3', nome: 'Rafael Andrade', email: 'r.andrade@empresa.com.br', telefone: '31996543210', mensagem: 'Estou buscando imóvel para investimento. Qual a possibilidade de negociação no preço? Posso pagar à vista.', criado_em: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), mock: true },
+  ]
+
+  const showLeads = leads.length > 0 ? leads : MOCK_LEADS
+
   if (loading) return <LoadingScreen />
-  if (leads.length === 0) return (
-    <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--fg-2)' }}>
-      <div style={{ fontSize: 40, marginBottom: 12 }}>📩</div>
-      <p>Nenhum lead recebido ainda. Ative seu anúncio para começar.</p>
-    </div>
-  )
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {leads.map((l: any) => (
-        <div key={l.id} style={{ background: '#fff', borderRadius: 12, padding: '18px 22px', boxShadow: 'var(--shadow-soft)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-          <div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--navy)' }}>{l.nome}</div>
+      {leads.length === 0 && (
+        <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 12, padding: '12px 18px', fontSize: 13, color: '#92400E', marginBottom: 4 }}>
+          Simulação — veja como seus leads chegam. Quando seu anúncio estiver ativo, leads reais aparecem aqui.
+        </div>
+      )}
+      {showLeads.map((l: any) => (
+        <div key={l.id} style={{ background: '#fff', borderRadius: 12, padding: '18px 22px', boxShadow: 'var(--shadow-soft)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, opacity: l.mock ? 0.85 : 1 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 4 }}>
+              <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--navy)' }}>{l.nome}</span>
+              {l.mock && <span style={{ fontSize: 10, fontWeight: 700, background: '#FEF3C7', color: '#B45309', padding: '2px 8px', borderRadius: 99, letterSpacing: '0.08em' }}>DEMO</span>}
+            </div>
             <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>{l.email} {l.telefone ? `· ${l.telefone}` : ''}</div>
-            {l.mensagem && <div style={{ fontSize: 13, color: 'var(--fg-2)', marginTop: 4, fontStyle: 'italic' }}>"{l.mensagem}"</div>}
-            <div style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 6 }}>Imóvel: {l.imoveis?.titulo ?? '—'} · {new Date(l.criado_em).toLocaleDateString('pt-BR')}</div>
+            {l.mensagem && <div style={{ fontSize: 13, color: 'var(--fg-2)', marginTop: 6, fontStyle: 'italic', lineHeight: 1.5 }}>"{l.mensagem}"</div>}
+            <div style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 6 }}>
+              {l.imoveis?.titulo ? `Imóvel: ${l.imoveis.titulo} · ` : ''}{new Date(l.criado_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+            </div>
           </div>
-          <a href={`https://wa.me/55${l.telefone?.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer">
-            <Btn variant="accent" size="sm">WhatsApp</Btn>
-          </a>
+          <div style={{ display: 'flex', gap: 8, flexDirection: 'column', alignItems: 'flex-end' }}>
+            <a href={`https://wa.me/55${l.telefone?.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer">
+              <Btn variant="accent" size="sm">WhatsApp</Btn>
+            </a>
+            <a href={`mailto:${l.email}`}>
+              <Btn variant="ghost" size="sm">E-mail</Btn>
+            </a>
+          </div>
         </div>
       ))}
     </div>
   )
 }
 
-function ConfigSection({ profile, onSave }: { profile: Profile | null; onSave: () => void }) {
-  const supabase = createClient()
+function ConfigSection({ profile, onSave, supabase }: { profile: Profile | null; onSave: () => void; supabase: any }) {
   const [nome, setNome] = useState(profile?.nome ?? '')
   const [telefone, setTelefone] = useState(profile?.telefone ?? '')
   const [saving, setSaving] = useState(false)
   const [ok, setOk] = useState(false)
+  const [changingPlano, setChangingPlano] = useState(false)
 
   const save = async () => {
     setSaving(true)
@@ -232,10 +295,48 @@ function ConfigSection({ profile, onSave }: { profile: Profile | null; onSave: (
     onSave()
   }
 
+  const selectPlano = async (plano: string) => {
+    setChangingPlano(true)
+    await supabase.from('profiles').update({ plano }).eq('id', profile?.id!)
+    setChangingPlano(false); onSave()
+  }
+
+  const PLANOS_OPCOES = [
+    { id: 'direta', nome: 'Venda Direta', preco: 'R$ 297', sub: 'taxa única', desc: 'Você anuncia e vende. Sem comissão sobre a venda.', color: '#6366F1' },
+    { id: 'assistida', nome: 'Venda Assistida', preco: '3%', sub: 'só ao vender', desc: 'Curadoria VN Prime + qualificação de compradores.', color: '#D4A857', destaque: true },
+    { id: 'completa', nome: 'Venda Completa', preco: '6%', sub: 'sobre a venda', desc: 'Corretor dedicado + toda a estrutura VN Prime.', color: '#2F8674' },
+  ]
+
   return (
-    <div style={{ maxWidth: 480 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 640 }}>
+      {/* Plano atual */}
+      <div style={{ background: '#fff', borderRadius: 14, padding: 28, boxShadow: 'var(--shadow-soft)' }}>
+        <h3 style={{ fontSize: 17, marginBottom: 18 }}>Plano atual</h3>
+        <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))' }}>
+          {PLANOS_OPCOES.map(p => {
+            const isAtual = profile?.plano === p.id || (!profile?.plano && p.id === 'direta')
+            return (
+              <div key={p.id} style={{ border: `2px solid ${isAtual ? p.color : 'var(--border)'}`, borderRadius: 12, padding: '16px 14px', background: isAtual ? `${p.color}08` : '#FAFAF8', transition: 'border-color 0.2s' }}>
+                {isAtual && <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: p.color, marginBottom: 8 }}>Plano atual</div>}
+                <div style={{ fontSize: 22, fontWeight: 900, color: p.color, lineHeight: 1 }}>{p.preco}</div>
+                <div style={{ fontSize: 10, color: 'var(--fg-3)', marginBottom: 8 }}>{p.sub}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>{p.nome}</div>
+                <div style={{ fontSize: 12, color: 'var(--fg-2)', marginBottom: 14, lineHeight: 1.4 }}>{p.desc}</div>
+                {!isAtual && (
+                  <button onClick={() => selectPlano(p.id)} disabled={changingPlano}
+                    style={{ width: '100%', padding: '7px 0', borderRadius: 8, border: `1.5px solid ${p.color}`, background: 'transparent', color: p.color, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    Mudar para este
+                  </button>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Dados pessoais */}
       <div style={{ background: '#fff', borderRadius: 14, padding: 28, boxShadow: 'var(--shadow-soft)', display: 'flex', flexDirection: 'column', gap: 18 }}>
-        <h3 style={{ fontSize: 18 }}>Meus dados</h3>
+        <h3 style={{ fontSize: 17 }}>Meus dados</h3>
         <div>
           <label style={labelStyle}>Nome completo</label>
           <input style={cfgInput} value={nome} onChange={e => setNome(e.target.value)} />
@@ -258,6 +359,91 @@ function ConfigSection({ profile, onSave }: { profile: Profile | null; onSave: (
 
 const labelStyle: React.CSSProperties = { fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 7 }
 const cfgInput: React.CSSProperties = { width: '100%', padding: '11px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 14, outline: 'none' }
+
+const SCRIPTS = [
+  {
+    fase: 'Primeiro contato — WhatsApp',
+    cor: '#2F8674',
+    texto: `Olá, [NOME]! Obrigado pelo interesse no imóvel [TÍTULO/BAIRRO].
+
+Tenho disponibilidade para tirar suas dúvidas agora ou agendar uma visita conforme sua conveniência.
+
+Você prefere conhecer pessoalmente ou quer que eu te envie mais fotos e informações antes?
+
+Aguardo seu retorno!`,
+  },
+  {
+    fase: 'Confirmação de visita',
+    cor: '#D4A857',
+    texto: `Olá, [NOME]! Confirmando nossa visita ao imóvel no [DIA] às [HORÁRIO].
+
+O endereço completo é: [ENDEREÇO].
+
+Estacionamento disponível [na rua / no condomínio / portaria autorizada — ajuste conforme o caso].
+
+Qualquer imprevisto, pode me avisar aqui. Até lá!`,
+  },
+  {
+    fase: 'Follow-up pós-visita',
+    cor: '#6366F1',
+    texto: `Olá, [NOME]! Espero que tenha gostado da visita.
+
+Fiquei à disposição para responder qualquer dúvida que tenha surgido. Casos comuns: financiamento, documentação, histórico do imóvel — posso ajudar com todos.
+
+Se houver interesse em avançar, podemos conversar sobre as condições. O que você achou?`,
+  },
+  {
+    fase: 'Resposta a proposta / Negociação',
+    cor: '#0F1824',
+    texto: `Olá, [NOME]! Recebi sua proposta de R$ [VALOR] e agradeço a consideração.
+
+Analisando o valor atual de mercado da região e as características do imóvel, consigo trabalhar até R$ [CONTRAPROPOSTA], o que já representa uma condição bastante justa.
+
+Posso também incluir [ITEM: armários / vaga extra / prazo de entrega flexível] para facilitar o fechamento.
+
+Me diz o que pensa!`,
+  },
+]
+
+function ScriptSection() {
+  const [copied, setCopied] = useState<string | null>(null)
+
+  const copy = (texto: string, fase: string) => {
+    navigator.clipboard.writeText(texto)
+    setCopied(fase)
+    setTimeout(() => setCopied(null), 2000)
+  }
+
+  return (
+    <div>
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold-deep)', marginBottom: 6 }}>Scripts de venda</div>
+        <h3 style={{ margin: 0, marginBottom: 8 }}>Mensagens prontas para cada etapa</h3>
+        <p style={{ margin: 0, color: 'var(--fg-2)', fontSize: 14 }}>Copie, adapte com os dados do seu imóvel e use no WhatsApp ou e-mail. Textos testados e aprovados para imóveis premium.</p>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {SCRIPTS.map(s => (
+          <div key={s.fase} style={{ background: '#fff', borderRadius: 14, border: '1px solid var(--border)', overflow: 'hidden' }}>
+            <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FAFAF8' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 10, height: 10, borderRadius: '50%', background: s.cor, flexShrink: 0 }} />
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>{s.fase}</span>
+              </div>
+              <button onClick={() => copy(s.texto, s.fase)}
+                style={{ padding: '6px 14px', borderRadius: 8, border: `1.5px solid ${copied === s.fase ? '#059669' : 'var(--border)'}`, background: copied === s.fase ? '#D1FAE5' : '#fff', color: copied === s.fase ? '#065F46' : 'var(--fg-2)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+                {copied === s.fase ? '✓ Copiado!' : 'Copiar'}
+              </button>
+            </div>
+            <pre style={{ margin: 0, padding: '18px 20px', fontSize: 13.5, lineHeight: 1.7, color: 'var(--fg-1)', fontFamily: 'var(--font-body)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{s.texto}</pre>
+          </div>
+        ))}
+      </div>
+      <p style={{ fontSize: 12, color: 'var(--fg-3)', textAlign: 'center', marginTop: 20 }}>
+        Substitua os campos entre colchetes [NOME], [TÍTULO], etc. pelos dados reais antes de enviar.
+      </p>
+    </div>
+  )
+}
 
 const FOTO_PACOTES = [
   { id: 'essencial', nome: 'Essencial', preco: 'R$ 390', duracao: '60 min',

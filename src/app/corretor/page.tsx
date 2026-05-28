@@ -33,9 +33,9 @@ export default function CorretorPage() {
       supabase.from('leads').select('*, imoveis(titulo, preco)').eq('corretor_id', user.id).order('criado_em', { ascending: false }).limit(20),
     ])
 
-    // Proprietário logado → redireciona para o portal certo
+    // Não-corretor logado → mostra landing do corretor (não redireciona)
     if (prof && prof.tipo !== 'corretor' && prof.tipo !== 'admin') {
-      router.replace('/proprietario')
+      setLoading(false)
       return
     }
 
