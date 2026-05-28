@@ -53,6 +53,7 @@ const NAV = [
       { label: 'Due Diligence',        href: '/due-diligence',  desc: 'Análise jurídica e técnica antes de comprar' },
       { label: 'Avaliação de Imóveis', href: '/avaliacao',      desc: 'Laudo judicial, extrajudicial ou estimativa IA' },
       { label: 'Calculadora ITBI',     href: '/calculadora',    desc: 'Calcule ITBI, escritura e registro em segundos' },
+      { label: 'Relatório de Mercado', href: '/relatorio',      desc: 'Dados ao vivo do mercado imobiliário de BH' },
     ],
   },
 ]
