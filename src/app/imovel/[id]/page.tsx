@@ -25,6 +25,7 @@ export default function ImovelPage() {
   const [proposta, setProposta] = useState({ nome: '', email: '', telefone: '', valor: '', condicoes: '' })
   const [propostaSending, setPropostaSending] = useState(false)
   const [propostaSent, setPropostaSent] = useState(false)
+  const [lightbox, setLightbox] = useState<number | null>(null)
 
   useEffect(() => {
     const favs: string[] = JSON.parse(localStorage.getItem('vnp_favs') ?? '[]')
@@ -96,15 +97,30 @@ export default function ImovelPage() {
 
   return (
     <div style={{ background: 'var(--cream)', minHeight: '100vh', paddingBottom: 80 }}>
+      {/* Lightbox */}
+      {lightbox !== null && fotos.length > 0 && (
+        <div onClick={() => setLightbox(null)} style={{ position: 'fixed', inset: 0, zIndex: 9000, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <button onClick={e => { e.stopPropagation(); setLightbox((lightbox - 1 + fotos.length) % fotos.length) }} style={{ position: 'absolute', left: 20, top: '50%', transform: 'translateY(-50%)', ...lbBtn }}>‹</button>
+          <img src={fotos[lightbox]} alt="" onClick={e => e.stopPropagation()} style={{ maxHeight: '90vh', maxWidth: '90vw', objectFit: 'contain', borderRadius: 8, boxShadow: '0 8px 48px rgba(0,0,0,0.6)' }} />
+          <button onClick={e => { e.stopPropagation(); setLightbox((lightbox + 1) % fotos.length) }} style={{ position: 'absolute', right: 20, top: '50%', transform: 'translateY(-50%)', ...lbBtn }}>›</button>
+          <button onClick={() => setLightbox(null)} style={{ position: 'absolute', top: 20, right: 24, ...lbBtn, fontSize: 20 }}>✕</button>
+          <div style={{ position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6 }}>
+            {fotos.map((_, i) => <span key={i} onClick={e => { e.stopPropagation(); setLightbox(i) }} style={{ width: i === lightbox ? 20 : 7, height: 5, borderRadius: 3, background: i === lightbox ? 'var(--gold)' : 'rgba(255,255,255,0.4)', cursor: 'pointer', transition: 'width 0.2s' }} />)}
+          </div>
+          <div style={{ position: 'absolute', bottom: 16, right: 24, color: 'rgba(255,255,255,0.45)', fontSize: 13 }}>{lightbox + 1} / {fotos.length}</div>
+        </div>
+      )}
+
       {/* Fotos */}
-      <div style={{ position: 'relative', height: 'min(520px, 55vw)', background: fotos[photoIdx] ? `url(${fotos[photoIdx]}) center/cover` : 'var(--navy)', overflow: 'hidden' }}>
+      <div onClick={() => fotos.length > 0 && setLightbox(photoIdx)} style={{ position: 'relative', height: 'min(520px, 55vw)', background: fotos[photoIdx] ? `url(${fotos[photoIdx]}) center/cover` : 'var(--navy)', overflow: 'hidden', cursor: fotos.length > 0 ? 'zoom-in' : 'default' }}>
         {fotos.length > 1 && (
           <>
-            <button onClick={() => setPhotoIdx((photoIdx - 1 + fotos.length) % fotos.length)} style={navBtn('left')}>‹</button>
-            <button onClick={() => setPhotoIdx((photoIdx + 1) % fotos.length)} style={navBtn('right')}>›</button>
+            <button onClick={e => { e.stopPropagation(); setPhotoIdx((photoIdx - 1 + fotos.length) % fotos.length) }} style={navBtn('left')}>‹</button>
+            <button onClick={e => { e.stopPropagation(); setPhotoIdx((photoIdx + 1) % fotos.length) }} style={navBtn('right')}>›</button>
             <div style={{ position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6 }}>
               {fotos.map((_, i) => <span key={i} style={{ width: i === photoIdx ? 20 : 7, height: 5, borderRadius: 3, background: i === photoIdx ? 'var(--gold)' : 'rgba(255,255,255,0.5)', transition: 'width 0.2s' }} />)}
             </div>
+            <span style={{ position: 'absolute', bottom: 16, right: 16, background: 'rgba(0,0,0,0.5)', color: '#fff', fontSize: 11.5, fontWeight: 600, padding: '4px 10px', borderRadius: 6 }}>⊞ Ver todas ({fotos.length})</span>
           </>
         )}
         {fotos.length === 0 && <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.3)', fontSize: 64 }}>🏠</div>}
@@ -278,6 +294,12 @@ export default function ImovelPage() {
       </div>
     </div>
   )
+}
+
+const lbBtn: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '50%',
+  width: 44, height: 44, fontSize: 22, cursor: 'pointer', color: '#fff',
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
 }
 
 const navBtn = (side: 'left' | 'right'): React.CSSProperties => ({
