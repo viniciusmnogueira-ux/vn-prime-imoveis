@@ -337,6 +337,34 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Mercado ao vivo ── */}
+      {featured.length > 0 && (() => {
+        const prices = featured.filter(im => im.preco > 0).map(im => im.preco as number)
+        const avgPrice = prices.length ? Math.round(prices.reduce((a, b) => a + b, 0) / prices.length) : 0
+        const minPrice = prices.length ? Math.min(...prices) : 0
+        if (!avgPrice) return null
+        return (
+          <section style={{ padding: '14px 0', background: '#0F1824', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ width: 'min(1280px,94vw)', margin: '0 auto', display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34D399', animation: 'pulse 2s ease-in-out infinite' }} />
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>Mercado ao vivo</span>
+              </div>
+              {[
+                { label: 'Em portfólio', value: `${featured.length} imóveis` },
+                { label: 'Preço médio', value: fmt(avgPrice) },
+                { label: 'A partir de', value: fmt(minPrice) },
+              ].map(s => (
+                <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>{s.label}:</span>
+                  <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--gold)' }}>{s.value}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )
+      })()}
+
       {/* ── Como funciona ── */}
       <section style={{ padding: 'clamp(3rem,5vw,4.5rem) 0', background: '#fff' }}>
         <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
