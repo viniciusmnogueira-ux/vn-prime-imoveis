@@ -229,6 +229,19 @@ export default function ImovelPage() {
             </div>
           )}
 
+          {im.amenidades && im.amenidades.length > 0 && (
+            <div style={{ marginTop: 32 }}>
+              <h3 style={{ fontSize: 18, marginBottom: 16 }}>Amenidades e diferenciais</h3>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                {(im.amenidades as string[]).map(a => (
+                  <span key={a} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 99, background: 'rgba(212,168,87,0.10)', border: '1px solid rgba(212,168,87,0.3)', fontSize: 13, fontWeight: 600, color: 'var(--navy)' }}>
+                    ✓ {a}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Proposta online */}
           <div style={{ marginTop: 40, background: '#fff', borderRadius: 16, padding: 28, border: '1px solid var(--border)', boxShadow: '0 4px 18px rgba(15,34,68,0.06)' }}>
             <h3 style={{ fontSize: 18, marginBottom: 4 }}>📝 Fazer uma proposta</h3>

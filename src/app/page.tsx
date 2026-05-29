@@ -637,6 +637,26 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Números ── */}
+      <section style={{ padding: 'clamp(2.5rem,4vw,3.5rem) 0', background: 'var(--navy)' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 32 }}>
+            {([
+              { val: '200+', label: 'Imóveis curados', sub: 'ativos no portfólio' },
+              { val: '48 h', label: 'Due diligence', sub: 'prazo de entrega do laudo' },
+              { val: '3%', label: 'Comissão mínima', sub: 'somente ao vender' },
+              { val: 'BH & Nova Lima', label: 'Mercados premium', sub: 'cobertura regional completa' },
+            ] as { val: string; label: string; sub: string }[]).map(s => (
+              <div key={s.label} style={{ textAlign: 'center', padding: '8px 0' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.8rem,3vw,2.6rem)', fontWeight: 900, color: 'var(--gold)', lineHeight: 1, marginBottom: 8 }}>{s.val}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{s.label}</div>
+                <div style={{ fontSize: 12, color: 'rgba(245,248,250,0.5)' }}>{s.sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Vistos recentemente ── */}
       {recentImoveis.length > 0 && (
         <section style={{ padding: 'clamp(2rem,4vw,3rem) 0', background: '#fff', borderBottom: '1px solid var(--border)' }}>

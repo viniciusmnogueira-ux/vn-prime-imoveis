@@ -5,6 +5,55 @@ import Btn from '@/components/ui/Btn'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
+const fmtCur = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
+
+function PricingSimulator() {
+  const [valor, setValor] = useState(1000000)
+  const planos = [
+    { nome: 'Venda Direta', custo: 297, pct: 0, color: '#6366F1', descCusto: 'taxa única' },
+    { nome: 'Venda Assistida', custo: 0, pct: 0.03, color: '#D4A857', descCusto: '3% sobre a venda' },
+    { nome: 'Venda Completa', custo: 0, pct: 0.06, color: '#2F8674', descCusto: '6% sobre a venda (corretor + VN)' },
+  ]
+  return (
+    <div style={{ background: '#fff', borderRadius: 20, padding: 'clamp(28px,4vw,44px)', border: '1px solid var(--border)', boxShadow: '0 8px 32px rgba(15,34,68,0.08)' }}>
+      <div style={{ marginBottom: 28 }}>
+        <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', display: 'block', marginBottom: 12 }}>
+          Valor do imóvel: <span style={{ color: 'var(--gold)', fontSize: 20 }}>{fmtCur(valor)}</span>
+        </label>
+        <input type="range" min={200000} max={5000000} step={50000} value={valor}
+          onChange={e => setValor(+e.target.value)}
+          style={{ width: '100%', accentColor: 'var(--gold)', cursor: 'pointer' }} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginTop: 4 }}>
+          <span>R$ 200 mil</span><span>R$ 5 mi</span>
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 14 }}>
+        {planos.map(p => {
+          const comissao = Math.round(valor * p.pct) + p.custo
+          const liquido = valor - comissao
+          return (
+            <div key={p.nome} style={{ border: `2px solid ${p.color}22`, borderRadius: 14, padding: '18px 20px', background: `${p.color}06` }}>
+              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: p.color, marginBottom: 8 }}>{p.nome}</div>
+              <div style={{ fontSize: 11, color: 'var(--fg-3)', marginBottom: 16 }}>{p.descCusto}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                  <span style={{ color: 'var(--fg-2)' }}>Custo VN Prime</span>
+                  <span style={{ fontWeight: 700, color: '#DC2626' }}>{fmtCur(comissao)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
+                  <span style={{ color: 'var(--navy)', fontWeight: 600 }}>Você recebe</span>
+                  <span style={{ fontWeight: 800, color: p.color, fontSize: 16 }}>{fmtCur(liquido)}</span>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+      <p style={{ fontSize: 11.5, color: 'var(--fg-3)', marginTop: 16, textAlign: 'center' }}>Simulação estimada. Valores reais podem variar conforme negociação.</p>
+    </div>
+  )
+}
+
 function FaqList({ items }: { items: { q: string; a: string }[] }) {
   const [open, setOpen] = useState<number | null>(null)
   return (
@@ -323,6 +372,20 @@ export default function VenderPage() {
           </div>
         </section>
       )}
+
+      {/* Pricing Simulator */}
+      <section style={{ padding: 'clamp(3rem,5vw,5rem) 0', background: '#fff' }}>
+        <div style={{ width: 'min(900px,94vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 36 }}>
+            <Eyebrow color="var(--gold-deep)">Simulador interativo</Eyebrow>
+            <h2 style={{ margin: '8px 0 12px' }}>Quanto você recebe em cada plano?</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 15, maxWidth: 440, margin: '0 auto' }}>
+              Arraste o slider e veja o custo real de cada modalidade com base no valor do seu imóvel.
+            </p>
+          </div>
+          <PricingSimulator />
+        </div>
+      </section>
 
       {/* FAQ */}
       {(() => {
