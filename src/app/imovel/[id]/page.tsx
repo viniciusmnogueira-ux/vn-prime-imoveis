@@ -40,6 +40,12 @@ export default function ImovelPage() {
   const [propostaSending, setPropostaSending] = useState(false)
   const [propostaSent, setPropostaSent] = useState(false)
   const [lightbox, setLightbox] = useState<number | null>(null)
+  const [copied, setCopied] = useState(false)
+  const copyLink = () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      setCopied(true); setTimeout(() => setCopied(false), 2000)
+    })
+  }
   const [similares, setSimilares] = useState<any[]>([])
   const [bairroStats, setBairroStats] = useState<{ count: number; avgPreco: number; avgM2: number } | null>(null)
   const mapRef = useRef<HTMLDivElement>(null)
@@ -241,18 +247,21 @@ export default function ImovelPage() {
             </div>
           )}
 
-          {im.amenidades && im.amenidades.length > 0 && (
-            <div style={{ marginTop: 32 }}>
-              <h3 style={{ fontSize: 18, marginBottom: 16 }}>Amenidades e diferenciais</h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-                {(im.amenidades as string[]).map(a => (
-                  <span key={a} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 99, background: 'rgba(212,168,87,0.10)', border: '1px solid rgba(212,168,87,0.3)', fontSize: 13, fontWeight: 600, color: 'var(--navy)' }}>
-                    ✓ {a}
-                  </span>
-                ))}
+          {(() => {
+            const items = [...(im.caracteristicas ?? []), ...(im.amenidades ?? [])].filter((v, i, a) => a.indexOf(v) === i) as string[]
+            return items.length > 0 ? (
+              <div style={{ marginTop: 32 }}>
+                <h3 style={{ fontSize: 18, marginBottom: 16 }}>Características e diferenciais</h3>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                  {items.map(a => (
+                    <span key={a} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 99, background: 'rgba(212,168,87,0.10)', border: '1px solid rgba(212,168,87,0.3)', fontSize: 13, fontWeight: 600, color: 'var(--navy)' }}>
+                      ✓ {a}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            ) : null
+          })()}
 
           {/* Mercado do bairro */}
           {bairroStats && bairroStats.count >= 2 && (
@@ -374,9 +383,9 @@ export default function ImovelPage() {
                 <span>{isFav ? '♥' : '♡'}</span>
                 {isFav ? 'Salvo' : 'Salvar'}
               </button>
-              <a href={`https://wa.me/?text=${encodeURIComponent(`${im.titulo} — ${fmtBRL(im.preco)}\n${typeof window !== 'undefined' ? window.location.href : ''}`)}`} target="_blank" rel="noopener noreferrer" style={{ padding: '8px 0', borderRadius: 8, border: '1.5px solid var(--border)', background: 'transparent', color: 'var(--fg-2)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, textDecoration: 'none', transition: 'all 0.15s' }}>
-                ↗ Compartilhar
-              </a>
+              <button onClick={copyLink} style={{ padding: '8px 0', borderRadius: 8, border: `1.5px solid ${copied ? '#6EE7B7' : 'var(--border)'}`, background: copied ? '#D1FAE5' : 'transparent', color: copied ? '#065F46' : 'var(--fg-2)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, transition: 'all 0.15s' }}>
+                {copied ? '✓ Copiado!' : '🔗 Copiar link'}
+              </button>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
               <button onClick={toggleCompare} style={{ padding: '8px 0', borderRadius: 8, border: `1.5px solid ${inCompare ? 'var(--gold)' : 'var(--border)'}`, background: inCompare ? 'rgba(212,168,87,0.10)' : 'transparent', color: inCompare ? 'var(--gold-deep)' : 'var(--fg-2)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, transition: 'all 0.15s' }}>

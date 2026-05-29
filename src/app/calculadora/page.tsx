@@ -235,8 +235,70 @@ export default function CalculadoraPage() {
         </div>
       </section>
 
-      {/* Info */}
+      {/* Renda necessária */}
       <section style={{ padding: 'clamp(40px,5vw,60px) 0', background: '#fff' }}>
+        <div style={{ width: 'min(1100px,92vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 36 }}>
+            <Eyebrow color="var(--gold-deep)">Qualificação de crédito</Eyebrow>
+            <h2 style={{ margin: '10px 0 12px', fontSize: 'clamp(1.4rem,2.4vw,1.8rem)' }}>Qual renda preciso ter?</h2>
+            <p style={{ color: 'var(--fg-2)', maxWidth: 480, margin: '0 auto' }}>Os bancos limitam a parcela a até 30% da renda familiar bruta. Veja se seu imóvel cabe no orçamento.</p>
+          </div>
+          {(() => {
+            const fin = Math.round(valor * (financiado ? (1 - entradaPct / 100) : 0.8))
+            const taxa = 0.0089
+            const prazo = 360
+            const fator = (taxa * Math.pow(1 + taxa, prazo)) / (Math.pow(1 + taxa, prazo) - 1)
+            const parcelaPrice = Math.round(fin * fator)
+            const rendaMin = Math.round(parcelaPrice / 0.30)
+            const rendaConf = Math.round(parcelaPrice / 0.25)
+            const isFit = true
+            return (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,320px),1fr))', gap: 20 }}>
+                <div style={{ background: 'var(--navy)', borderRadius: 16, padding: '28px 26px', color: '#fff' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold-soft)', marginBottom: 16 }}>Sua simulação</div>
+                  {[
+                    { label: 'Valor financiado', val: fmt(fin) },
+                    { label: 'Parcela PRICE (8,9% a.a.)', val: fmt(parcelaPrice) + '/mês' },
+                  ].map(r => (
+                    <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '9px 0', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                      <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>{r.label}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{r.val}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  <div style={{ background: '#FEF3C7', border: '1.5px solid #FDE68A', borderRadius: 14, padding: '18px 22px' }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#92400E', marginBottom: 8 }}>Renda mínima (30% de comprometimento)</div>
+                    <div style={{ fontSize: 26, fontWeight: 900, color: '#92400E' }}>{fmt(rendaMin)}/mês</div>
+                    <div style={{ fontSize: 12, color: '#B45309', marginTop: 4 }}>Máximo permitido pelos bancos</div>
+                  </div>
+                  <div style={{ background: '#D1FAE5', border: '1.5px solid #6EE7B7', borderRadius: 14, padding: '18px 22px' }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#065F46', marginBottom: 8 }}>Renda confortável (25% de comprometimento)</div>
+                    <div style={{ fontSize: 26, fontWeight: 900, color: '#065F46' }}>{fmt(rendaConf)}/mês</div>
+                    <div style={{ fontSize: 12, color: '#047857', marginTop: 4 }}>Recomendado para folga financeira</div>
+                  </div>
+                </div>
+                <div style={{ background: 'var(--cream)', borderRadius: 16, padding: '22px 24px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>Dica VN Prime</div>
+                  {[
+                    'Some a renda do casal — bancos aceitam composição familiar',
+                    'FGTS pode reduzir o valor financiado e a parcela',
+                    'Renda informal pode ser comprovada com extrato bancário',
+                    'Margem de 5–10% acima da parcela é recomendada',
+                  ].map(d => (
+                    <div key={d} style={{ display: 'flex', gap: 8, fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.4 }}>
+                      <span style={{ color: 'var(--gold)', fontWeight: 700, flexShrink: 0 }}>✓</span>{d}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })()}
+        </div>
+      </section>
+
+      {/* Info */}
+      <section style={{ padding: 'clamp(40px,5vw,60px) 0', background: 'var(--cream)' }}>
         <div style={{ width: 'min(1100px,92vw)', margin: '0 auto', display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))' }}>
           {[
             { t: 'O que é ITBI?', d: 'Imposto de Transmissão de Bens Imóveis — municipal, incide sobre toda compra/venda de imóveis. Em BH é 3%, em Nova Lima 2%, em Contagem 2,5%.' },
