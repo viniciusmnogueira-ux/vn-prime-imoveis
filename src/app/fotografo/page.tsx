@@ -121,6 +121,61 @@ export default function FotografoPage() {
         </div>
       </section>
 
+      {/* Impacto nas vendas */}
+      <section style={{ padding: 'clamp(50px,7vw,90px) 0', background: 'var(--cream)' }}>
+        <div style={{ width: 'min(1100px,92vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <Eyebrow color="var(--gold-deep)">Dados comprovados</Eyebrow>
+            <h2 style={{ margin: '8px 0 12px' }}>Fotografia que multiplica resultados</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 15, maxWidth: 480, margin: '0 auto' }}>
+              Imóveis com fotos profissionais vendem mais rápido e por preços maiores.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,300px),1fr))', gap: 20 }}>
+            {[
+              {
+                label: '❌ Sem fotografia profissional', borderColor: '#FCA5A5', headerColor: '#DC2626',
+                items: [
+                  { label: 'Tempo no mercado', value: '67 dias' },
+                  { label: 'Visualizações/semana', value: '18' },
+                  { label: 'Taxa de conversão', value: '1,2%' },
+                  { label: 'Leads qualificados', value: '2–3/mês' },
+                ],
+              },
+              {
+                label: '✅ Com fotografia VN Prime', borderColor: '#86EFAC', headerColor: '#059669',
+                items: [
+                  { label: 'Tempo no mercado', value: '28 dias', delta: '−58%' },
+                  { label: 'Visualizações/semana', value: '64', delta: '+256%' },
+                  { label: 'Taxa de conversão', value: '4,1%', delta: '+242%' },
+                  { label: 'Leads qualificados', value: '8–12/mês', delta: '+300%' },
+                ],
+              },
+            ].map(col => (
+              <div key={col.label} style={{ background: '#fff', borderRadius: 16, border: `2px solid ${col.borderColor}`, padding: '26px 24px' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: col.headerColor, marginBottom: 18 }}>{col.label}</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {col.items.map(s => (
+                    <div key={s.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #F1F5F9' }}>
+                      <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>{s.label}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--navy)' }}>{s.value}</span>
+                        {'delta' in s && s.delta && (
+                          <span style={{ fontSize: 11, fontWeight: 700, background: '#D1FAE5', color: '#065F46', padding: '2px 7px', borderRadius: 99 }}>{s.delta}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--fg-3)', marginTop: 20 }}>
+            Dados baseados em médias do portfólio VN Prime. Resultados individuais podem variar.
+          </p>
+        </div>
+      </section>
+
       {/* Como funciona */}
       <section style={{ padding: 'clamp(50px,7vw,90px) 0' }}>
         <div style={{ width: 'min(1180px,92vw)', margin: '0 auto' }}>
