@@ -579,11 +579,24 @@ export default function AdminPage() {
         {/* CURADORIA */}
         {tab === 'curadoria' && (
           <div>
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>
-                Curadoria de imóveis — {imoveis.filter(i => i.status === 'pendente' || i.status === 'rascunho').length} pendentes
+            <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+              <div>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>
+                  Curadoria de imóveis — {imoveis.filter(i => i.status === 'pendente' || i.status === 'rascunho').length} pendentes
+                </div>
+                <div style={{ fontSize: 12, color: '#64748B' }}>Revise, edite e aprove cada imóvel antes de publicar.</div>
               </div>
-              <div style={{ fontSize: 12, color: '#64748B' }}>Revise, edite e aprove cada imóvel antes de publicar.</div>
+              {imoveis.filter(i => i.status === 'pendente').length > 1 && (
+                <button onClick={async () => {
+                  if (!confirm(`Aprovar todos os ${imoveis.filter(i => i.status === 'pendente').length} imóveis pendentes?`)) return
+                  const ids = imoveis.filter(i => i.status === 'pendente').map(i => i.id)
+                  await supabase.from('imoveis').update({ status: 'ativo' }).in('id', ids)
+                  setImoveis(prev => prev.map(i => ids.includes(i.id) ? { ...i, status: 'ativo' } : i))
+                  setStats(s => ({ ...s, pendentes: 0 }))
+                }} style={{ padding: '7px 16px', borderRadius: 8, background: '#D1FAE5', color: '#065F46', border: '1px solid #6EE7B7', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  ✓ Aprovar todos pendentes
+                </button>
+              )}
             </div>
             {imoveis.filter(i => i.status === 'pendente' || i.status === 'rascunho').length === 0 ? (
               <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', padding: '60px 24px', textAlign: 'center' }}>
