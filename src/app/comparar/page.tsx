@@ -199,6 +199,16 @@ export default function CompararPage() {
                   <Spec label="Preço/m²" values={imoveis.map(i => i.preco && i.area_m2 ? `${fmtBRL(Math.round(i.preco / i.area_m2))}/m²` : null)} winner={wPorM2} />
                   <Spec label="Condomínio" values={imoveis.map(i => i.condominio ? `${fmtBRL(i.condominio)}/mês` : null)} highlight winner={wCond} />
                   <Spec label="IPTU" values={imoveis.map(i => i.iptu ? `${fmtBRL(i.iptu)}/ano` : null)} />
+                  {(() => {
+                    const taxa = 0.0089
+                    const prazo = 360
+                    const fator = (taxa * Math.pow(1 + taxa, prazo)) / (Math.pow(1 + taxa, prazo) - 1)
+                    const parcelas = imoveis.map(i => {
+                      if (!i.preco) return null
+                      return `~${fmtBRL(Math.round(i.preco * 0.8 * fator))}/mês`
+                    })
+                    return <Spec label="Parcela est." values={parcelas} highlight />
+                  })()}
 
                   <tr style={{ background: 'rgba(212,168,87,0.08)', borderTop: '2px solid var(--border)' }}>
                     <td colSpan={cols + 2} style={{ padding: '8px 16px', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gold-deep)' }}>Localização</td>
