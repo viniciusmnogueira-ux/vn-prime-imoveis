@@ -49,6 +49,7 @@ export default function ImovelPage() {
   const [similares, setSimilares] = useState<any[]>([])
   const [recentes, setRecentes] = useState<any[]>([])
   const [bairroStats, setBairroStats] = useState<{ count: number; avgPreco: number; avgM2: number } | null>(null)
+  const [leadCount, setLeadCount] = useState<number | null>(null)
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstance = useRef<any>(null)
 
@@ -106,6 +107,11 @@ export default function ImovelPage() {
             })
         }
       })
+    supabase.from('leads')
+      .select('id', { count: 'exact', head: true })
+      .eq('imovel_id', id)
+      .neq('origem', 'view')
+      .then(({ count }) => { if (count != null && count > 0) setLeadCount(count) })
   }, [id])
 
   const sendLead = async () => {
@@ -380,7 +386,16 @@ export default function ImovelPage() {
           <div style={{ background: '#fff', borderRadius: 16, padding: 28, boxShadow: 'var(--shadow-strong)', borderTop: '3px solid var(--gold)' }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--fg-2)', marginBottom: 6 }}>Preço de pedida</div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 800, color: 'var(--gold)', lineHeight: 1, marginBottom: 4 }}>{fmtBRL(im.preco)}</div>
-            <div style={{ fontSize: 11.5, color: 'var(--fg-3)', marginBottom: 16 }}>Valor sujeito a negociação</div>
+            <div style={{ fontSize: 11.5, color: 'var(--fg-3)', marginBottom: leadCount ? 10 : 16 }}>Valor sujeito a negociação</div>
+
+            {leadCount && leadCount >= 2 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 14, padding: '8px 12px', borderRadius: 9, background: 'rgba(212,168,87,0.08)', border: '1px solid rgba(212,168,87,0.22)' }}>
+                <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#D4A857', display: 'inline-block', flexShrink: 0 }} />
+                <span style={{ fontSize: 12, color: 'var(--navy)', fontWeight: 600 }}>
+                  {leadCount} pessoa{leadCount !== 1 ? 's' : ''} demonstraram interesse neste imóvel
+                </span>
+              </div>
+            )}
 
             {im.condominio && <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 4 }}>Condomínio: {fmtBRL(im.condominio)}/mês</div>}
             {im.iptu && <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 12 }}>IPTU: {fmtBRL(im.iptu)}/ano</div>}
@@ -412,11 +427,19 @@ export default function ImovelPage() {
                 {!showContact ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     <Btn variant="accent" fullWidth size="lg" onClick={() => setShowContact(true)}>Tenho interesse</Btn>
-                    {im.profiles?.telefone && (
-                      <a href={`https://wa.me/55${im.profiles.telefone.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                        <Btn variant="ghost" fullWidth>WhatsApp direto</Btn>
-                      </a>
-                    )}
+                    {(() => {
+                      const phone = im.profiles?.telefone
+                        ? `55${im.profiles.telefone.replace(/\D/g, '')}`
+                        : '5531984144250'
+                      const msg = encodeURIComponent(
+                        `Olá! Vi o imóvel "${im.titulo}"${im.bairro ? ` em ${im.bairro}` : ''}${im.preco ? ` (${fmtBRL(im.preco)})` : ''} na VN Prime e gostaria de mais informações.`
+                      )
+                      return (
+                        <a href={`https://wa.me/${phone}?text=${msg}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                          <Btn variant="ghost" fullWidth>WhatsApp direto</Btn>
+                        </a>
+                      )
+                    })()}
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
