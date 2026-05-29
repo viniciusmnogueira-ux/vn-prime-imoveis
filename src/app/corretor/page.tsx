@@ -1054,6 +1054,23 @@ function CorretorLanding() {
           </div>
         </div>
       </section>
+      {/* Stats strip */}
+      <section style={{ background: 'var(--navy-deep)', borderTop: '1px solid rgba(255,255,255,0.08)', padding: '22px 0' }}>
+        <div style={{ width: 'min(1100px,92vw)', margin: '0 auto', display: 'flex', gap: 0, justifyContent: 'center', flexWrap: 'wrap' }}>
+          {[
+            { n: '500+', label: 'leads gerados/mês' },
+            { n: '47', label: 'corretores parceiros' },
+            { n: 'D+2', label: 'pagamento garantido' },
+            { n: '4.9★', label: 'avaliação do portal' },
+          ].map((s, i) => (
+            <div key={s.label} style={{ textAlign: 'center', padding: '8px 32px', borderRight: i < 3 ? '1px solid rgba(255,255,255,0.12)' : 'none' }}>
+              <div style={{ fontSize: 'clamp(1.4rem,2.5vw,1.9rem)', fontWeight: 900, color: ACCENT, fontFamily: 'var(--font-display)', letterSpacing: '-0.02em' }}>{s.n}</div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section style={{ padding: 'clamp(60px,8vw,100px) 0', background: 'var(--cream)' }}>
         <div style={{ width: 'min(860px,92vw)', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', maxWidth: 520, margin: '0 auto 44px' }}>

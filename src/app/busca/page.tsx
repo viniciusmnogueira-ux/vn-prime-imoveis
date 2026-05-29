@@ -251,14 +251,30 @@ function MapResults({ listings }: { listings: any[] }) {
 
 function EmptyState({ onClear }: { onClear: () => void }) {
   return (
-    <div style={{ background: '#fff', borderRadius: 14, padding: '60px 30px',
-      textAlign: 'center', border: '1px solid var(--border)' }}>
+    <div style={{ background: '#fff', borderRadius: 14, padding: '48px 30px 36px', textAlign: 'center', border: '1px solid var(--border)' }}>
       <div style={{ fontSize: 40, color: 'var(--gold)' }}>◇</div>
-      <h3 style={{ marginTop: 16 }}>Nenhum imóvel encontrado</h3>
-      <p style={{ color: 'var(--fg-2)', maxWidth: 360, margin: '0 auto 18px' }}>
-        Tente ajustar seus filtros ou ampliar a busca para outros bairros.
+      <h3 style={{ marginTop: 16, marginBottom: 8 }}>Nenhum imóvel encontrado</h3>
+      <p style={{ color: 'var(--fg-2)', maxWidth: 400, margin: '0 auto 20px', lineHeight: 1.6 }}>
+        Nenhum imóvel combina com esses filtros agora. Tente ampliar a busca ou peça ajuda a um especialista.
       </p>
-      <Btn variant="accent" onClick={onClear}>Limpar filtros</Btn>
+      <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 28 }}>
+        <Btn variant="accent" onClick={onClear}>Limpar filtros</Btn>
+        <a href="https://wa.me/5531984144250?text=Ol%C3%A1!%20N%C3%A3o%20encontrei%20o%20im%C3%B3vel%20que%20preciso.%20Pode%20me%20ajudar%3F"
+          target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+          <Btn variant="ghost">Falar com especialista</Btn>
+        </a>
+      </div>
+      <div style={{ borderTop: '1px solid var(--border)', paddingTop: 20, fontSize: 13, color: 'var(--fg-2)', marginBottom: 12 }}>
+        Sugestões de busca
+      </div>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+        {['Savassi', 'Belvedere', 'Lourdes', 'Nova Lima', 'Apartamentos', 'Casas'].map(s => (
+          <a key={s} href={`/busca?q=${encodeURIComponent(s)}`}
+            style={{ padding: '5px 14px', borderRadius: 99, border: '1px solid var(--border)', fontSize: 13, color: 'var(--navy)', textDecoration: 'none', fontWeight: 600 }}>
+            {s}
+          </a>
+        ))}
+      </div>
     </div>
   )
 }
