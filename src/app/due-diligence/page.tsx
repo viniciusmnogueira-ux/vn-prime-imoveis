@@ -343,24 +343,42 @@ export default function DueDiligencePage() {
                 </button>
               </div>
 
-              {/* Progress bar */}
-              {checkedIds.size > 0 && (
-                <div style={{ background: '#fff', borderRadius: 12, border: '1px solid var(--border)', padding: '14px 20px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>Progresso do checklist</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#059669' }}>{checkedIds.size} / {CERTIDOES.length} obtidas</span>
+              {/* Progress bar + risk score */}
+              {checkedIds.size > 0 && (() => {
+                const essencialIds = essenciais.map(c => c.id)
+                const essenciaisObtidas = essencialIds.filter(id => checkedIds.has(id)).length
+                const essenciaisPct = Math.round((essenciaisObtidas / essencialIds.length) * 100)
+                const risco = essenciaisPct >= 100 ? 'Bem protegido' : essenciaisPct >= 60 ? 'Risco moderado' : 'Alto risco'
+                const riscoColor = essenciaisPct >= 100 ? '#059669' : essenciaisPct >= 60 ? '#D97706' : '#DC2626'
+                const riscoBg = essenciaisPct >= 100 ? '#D1FAE5' : essenciaisPct >= 60 ? '#FEF3C7' : '#FEE2E2'
+                return (
+                  <div style={{ background: '#fff', borderRadius: 12, border: '1px solid var(--border)', padding: '14px 20px', marginBottom: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
+                      <div style={{ flex: 1, minWidth: 200 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>Progresso do checklist</span>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: '#059669' }}>{checkedIds.size} / {CERTIDOES.length} obtidas</span>
+                        </div>
+                        <div style={{ height: 8, background: '#E2E8F0', borderRadius: 99 }}>
+                          <div style={{ height: '100%', background: 'linear-gradient(90deg, #059669, #34D399)', borderRadius: 99, transition: 'width 0.3s', width: `${(checkedIds.size / CERTIDOES.length) * 100}%` }} />
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                        <span style={{ background: riscoBg, color: riscoColor, padding: '4px 14px', borderRadius: 99, fontSize: 12, fontWeight: 800 }}>
+                          {risco}
+                        </span>
+                        <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>
+                          {essenciaisObtidas}/{essencialIds.length} essenciais obtidas
+                        </span>
+                      </div>
                     </div>
-                    <div style={{ height: 8, background: '#E2E8F0', borderRadius: 99 }}>
-                      <div style={{ height: '100%', background: 'linear-gradient(90deg, #059669, #34D399)', borderRadius: 99, transition: 'width 0.3s', width: `${(checkedIds.size / CERTIDOES.length) * 100}%` }} />
-                    </div>
+                    <button onClick={() => { setCheckedIds(new Set()); localStorage.removeItem('vnp_dd_checked') }}
+                      style={{ marginTop: 10, fontSize: 11, color: '#94A3B8', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+                      Reiniciar checklist
+                    </button>
                   </div>
-                  <button onClick={() => { setCheckedIds(new Set()); localStorage.removeItem('vnp_dd_checked') }}
-                    style={{ fontSize: 11, color: '#94A3B8', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, fontFamily: 'inherit' }}>
-                    Reiniciar
-                  </button>
-                </div>
-              )}
+                )
+              })()}
 
               {/* Cards grid */}
               <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fill,minmax(520px,1fr))', paddingBottom: 60 }}>
