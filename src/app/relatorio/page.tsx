@@ -24,6 +24,8 @@ interface Stats {
   totalValue: number
   byTipo: { tipo: string; count: number }[]
   byBairro: BairroStat[]
+  byQuartos: { quartos: number; count: number; avgPreco: number }[]
+  priceRanges: { label: string; count: number }[]
   recentes: any[]
   destaques: number
 }
@@ -78,7 +80,28 @@ export default function RelatorioPage() {
 
       const recentes = [...data].sort((a, b) => new Date(b.criado_em).getTime() - new Date(a.criado_em).getTime()).slice(0, 6)
 
-      setStats({ total, ativos, avgPreco, avgM2, totalValue, byTipo, byBairro, recentes, destaques })
+      // by quartos
+      const quartosMap: Record<number, { count: number; prices: number[] }> = {}
+      data.forEach(i => {
+        if (!i.quartos) return
+        if (!quartosMap[i.quartos]) quartosMap[i.quartos] = { count: 0, prices: [] }
+        quartosMap[i.quartos].count++
+        if (i.preco > 0) quartosMap[i.quartos].prices.push(i.preco)
+      })
+      const byQuartos = Object.entries(quartosMap)
+        .map(([k, v]) => ({ quartos: +k, count: v.count, avgPreco: v.prices.length ? v.prices.reduce((a, b) => a + b, 0) / v.prices.length : 0 }))
+        .sort((a, b) => a.quartos - b.quartos)
+
+      // price ranges
+      const RANGES = [
+        { label: 'Até R$500k', min: 0, max: 500_000 },
+        { label: 'R$500k – R$1M', min: 500_000, max: 1_000_000 },
+        { label: 'R$1M – R$2M', min: 1_000_000, max: 2_000_000 },
+        { label: 'Acima R$2M', min: 2_000_000, max: Infinity },
+      ]
+      const priceRanges = RANGES.map(r => ({ label: r.label, count: comPreco.filter(i => i.preco >= r.min && i.preco < r.max).length }))
+
+      setStats({ total, ativos, avgPreco, avgM2, totalValue, byTipo, byBairro, byQuartos, priceRanges, recentes, destaques })
       setLoading(false)
     })
   }, [])
@@ -211,6 +234,54 @@ export default function RelatorioPage() {
               </div>
             </div>
           </div>
+
+          {/* Distribuição de preços + quartos */}
+          {(stats.priceRanges.some(r => r.count > 0) || stats.byQuartos.length > 0) && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,380px),1fr))', gap: 24, marginBottom: 32 }}>
+              {stats.priceRanges.some(r => r.count > 0) && (() => {
+                const maxR = Math.max(...stats.priceRanges.map(r => r.count), 1)
+                return (
+                  <div style={{ background: '#fff', borderRadius: 16, border: '1px solid var(--border)', padding: '18px 22px' }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 16 }}>Distribuição por faixa de preço</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {stats.priceRanges.map(r => (
+                        <div key={r.label}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                            <span style={{ fontSize: 12.5, color: 'var(--navy)', fontWeight: 600 }}>{r.label}</span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--fg-2)' }}>{r.count} {r.count === 1 ? 'imóvel' : 'imóveis'}</span>
+                          </div>
+                          <div style={{ height: 8, background: '#F1F5F9', borderRadius: 4, overflow: 'hidden' }}>
+                            <div style={{ height: '100%', background: 'var(--gold)', borderRadius: 4, width: `${(r.count / maxR) * 100}%`, transition: 'width 0.6s ease' }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
+              {stats.byQuartos.length > 0 && (() => {
+                const maxQ = Math.max(...stats.byQuartos.map(q => q.count), 1)
+                return (
+                  <div style={{ background: '#fff', borderRadius: 16, border: '1px solid var(--border)', padding: '18px 22px' }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 16 }}>Ticket médio por quartos</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {stats.byQuartos.map(q => (
+                        <div key={q.quartos}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                            <span style={{ fontSize: 12.5, color: 'var(--navy)', fontWeight: 600 }}>{q.quartos} {q.quartos === 1 ? 'quarto' : 'quartos'} <span style={{ color: 'var(--fg-3)', fontWeight: 400 }}>({q.count})</span></span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold-deep)' }}>{q.avgPreco > 0 ? fmt(q.avgPreco) : '—'}</span>
+                          </div>
+                          <div style={{ height: 8, background: '#F1F5F9', borderRadius: 4, overflow: 'hidden' }}>
+                            <div style={{ height: '100%', background: 'var(--navy)', borderRadius: 4, width: `${(q.count / maxQ) * 100}%`, transition: 'width 0.6s ease' }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
+            </div>
+          )}
 
           {/* CTA */}
           <div style={{ background: 'var(--gradient-navy-hero)', borderRadius: 20, padding: 'clamp(32px,4vw,52px)', textAlign: 'center', color: '#fff' }}>
