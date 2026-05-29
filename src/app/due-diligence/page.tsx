@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Eyebrow from '@/components/ui/Eyebrow'
 import Btn from '@/components/ui/Btn'
 import { createClient } from '@/lib/supabase/client'
@@ -107,6 +107,23 @@ export default function DueDiligencePage() {
   const [tab, setTab] = useState<'diligencia' | 'certidoes'>('diligencia')
   const [certFilter, setCertFilter] = useState({ cat: 'todas', sobre: 'todos', search: '' })
   const [expandedCert, setExpandedCert] = useState<string | null>(null)
+  const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('vnp_dd_checked') ?? '[]')
+      if (Array.isArray(stored)) setCheckedIds(new Set(stored))
+    } catch {}
+  }, [])
+
+  function toggleChecked(id: string) {
+    setCheckedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id); else next.add(id)
+      localStorage.setItem('vnp_dd_checked', JSON.stringify(Array.from(next)))
+      return next
+    })
+  }
 
   // Lead form state
   const [nome, setNome] = useState('')
@@ -326,6 +343,25 @@ export default function DueDiligencePage() {
                 </button>
               </div>
 
+              {/* Progress bar */}
+              {checkedIds.size > 0 && (
+                <div style={{ background: '#fff', borderRadius: 12, border: '1px solid var(--border)', padding: '14px 20px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>Progresso do checklist</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#059669' }}>{checkedIds.size} / {CERTIDOES.length} obtidas</span>
+                    </div>
+                    <div style={{ height: 8, background: '#E2E8F0', borderRadius: 99 }}>
+                      <div style={{ height: '100%', background: 'linear-gradient(90deg, #059669, #34D399)', borderRadius: 99, transition: 'width 0.3s', width: `${(checkedIds.size / CERTIDOES.length) * 100}%` }} />
+                    </div>
+                  </div>
+                  <button onClick={() => { setCheckedIds(new Set()); localStorage.removeItem('vnp_dd_checked') }}
+                    style={{ fontSize: 11, color: '#94A3B8', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, fontFamily: 'inherit' }}>
+                    Reiniciar
+                  </button>
+                </div>
+              )}
+
               {/* Cards grid */}
               <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fill,minmax(520px,1fr))', paddingBottom: 60 }}>
                 {filteredCerts.length === 0 && (
@@ -335,8 +371,9 @@ export default function DueDiligencePage() {
                 )}
                 {filteredCerts.map(c => {
                   const isExpanded = expandedCert === c.id
+                  const isChecked = checkedIds.has(c.id)
                   return (
-                    <div key={c.id} style={{ background: '#fff', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', overflow: 'hidden', boxShadow: isExpanded ? '0 4px 20px rgba(0,0,0,0.08)' : 'none', transition: 'box-shadow 0.2s' }}>
+                    <div key={c.id} style={{ background: isChecked ? '#F0FDF4' : '#fff', borderRadius: 'var(--radius-lg)', border: `1px solid ${isChecked ? '#86EFAC' : 'var(--border)'}`, overflow: 'hidden', boxShadow: isExpanded ? '0 4px 20px rgba(0,0,0,0.08)' : 'none', transition: 'all 0.2s' }}>
                       <div style={{ display: 'flex', gap: 0, alignItems: 'stretch' }}>
                         <div style={{ flex: 1, padding: '18px 20px' }}>
                           <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--navy)', marginBottom: 3 }}>{c.nome}</div>
@@ -365,6 +402,10 @@ export default function DueDiligencePage() {
                             style={{ display: 'block', textAlign: 'center', padding: '7px 14px', borderRadius: 8, background: 'var(--navy)', color: '#fff', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
                             Abrir portal →
                           </a>
+                          <button onClick={() => toggleChecked(c.id)}
+                            style={{ width: '100%', padding: '7px 0', borderRadius: 8, border: `1.5px solid ${isChecked ? '#059669' : 'var(--border)'}`, background: isChecked ? '#D1FAE5' : 'transparent', color: isChecked ? '#065F46' : 'var(--fg-3)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+                            {isChecked ? '✓ Obtida' : 'Marcar como obtida'}
+                          </button>
                         </div>
                       </div>
                       <button onClick={() => setExpandedCert(isExpanded ? null : c.id)}
