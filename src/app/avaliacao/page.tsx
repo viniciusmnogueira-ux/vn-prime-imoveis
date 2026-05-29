@@ -62,6 +62,7 @@ export default function AvaliacaoPage() {
   const [estimForm, setEstimForm] = useState({ bairro: '', tipo: 'Apartamento', area: '', quartos: '2' })
   const [estimLoading, setEstimLoading] = useState(false)
   const [estimResult, setEstimResult] = useState<{ low: number; high: number; mid: number; m2low: number; m2high: number } | null>(null)
+  const [marketData, setMarketData] = useState<{ count: number; avgPreco: number; avgM2: number } | null>(null)
   const [userEstimValue, setUserEstimValue] = useState('')
   const laudoSectionRef = useRef<HTMLDivElement>(null)
   const [laudoForm, setLaudoForm] = useState({ nome: '', email: '', telefone: '', bairro: '', tipo: 'Apartamento', finalidade: 'Compra ou Venda', modalidade: 'Laudo PTAM (Extrajudicial)' })
@@ -83,6 +84,7 @@ export default function AvaliacaoPage() {
     if (!estimForm.area) return
     setEstimLoading(true)
     setEstimResult(null)
+    setMarketData(null)
     setUserEstimValue('')
     setTimeout(() => {
       const area = parseFloat(estimForm.area) || 80
@@ -102,6 +104,21 @@ export default function AvaliacaoPage() {
       const mid = Math.round((low + high) / 2 / 1000) * 1000
       setEstimResult({ low, high, mid, m2low: Math.round(mBase * 0.92), m2high: Math.round(mBase * 1.08) })
       setEstimLoading(false)
+      if (estimForm.bairro.trim().length >= 3) {
+        const sb = createClient()
+        sb.from('imoveis')
+          .select('preco, area_m2')
+          .eq('status', 'ativo')
+          .ilike('bairro', `%${estimForm.bairro.trim()}%`)
+          .then(({ data }) => {
+            if (!data) return
+            const valid = data.filter(i => i.preco > 0 && i.area_m2 > 0)
+            if (valid.length === 0) return
+            const avgPreco = Math.round(valid.reduce((s, i) => s + i.preco, 0) / valid.length)
+            const avgM2 = Math.round(valid.reduce((s, i) => s + (i.preco / i.area_m2), 0) / valid.length)
+            setMarketData({ count: valid.length, avgPreco, avgM2 })
+          })
+      }
     }, 2200)
   }
 
@@ -388,7 +405,7 @@ export default function AvaliacaoPage() {
                         Intervalo médio: {fmtC(estimResult.mid)} · {fmtC(estimResult.m2low)}–{fmtC(estimResult.m2high)}/m²
                       </div>
                     </div>
-                    <button onClick={() => { setEstimResult(null); setUserEstimValue('') }}
+                    <button onClick={() => { setEstimResult(null); setMarketData(null); setUserEstimValue('') }}
                       style={{ padding: '9px 18px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.2)',
                         background: 'transparent', color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: 600,
                         cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -425,6 +442,47 @@ export default function AvaliacaoPage() {
                     </div>
                   </div>
                 </div>
+
+                {marketData && (
+                  <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 16, padding: 'clamp(20px,3vw,32px)', marginBottom: 24 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#2563EB', marginBottom: 16 }}>
+                      Mercado real — {estimForm.bairro}
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(130px,1fr))', gap: 16, marginBottom: 14 }}>
+                      {[
+                        { label: 'Imóveis ativos', value: String(marketData.count) },
+                        { label: 'Preço médio de lista', value: fmtC(marketData.avgPreco) },
+                        { label: 'Média por m²', value: `${fmtC(marketData.avgM2)}/m²` },
+                      ].map(s => (
+                        <div key={s.label}>
+                          <div style={{ fontSize: 11, color: '#64748B', marginBottom: 4, fontWeight: 500 }}>{s.label}</div>
+                          <div style={{ fontSize: 20, fontWeight: 800, color: '#1E3A5F' }}>{s.value}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {(() => {
+                      if (!estimResult) return null
+                      const estMidM2 = Math.round((estimResult.m2low + estimResult.m2high) / 2)
+                      const diff = marketData.avgM2 - estMidM2
+                      const pct = Math.round((diff / estMidM2) * 100)
+                      if (Math.abs(pct) < 5) return (
+                        <div style={{ fontSize: 13, color: '#059669', fontWeight: 600 }}>
+                          ✓ Estimativa alinhada com o mercado real do bairro
+                        </div>
+                      )
+                      return (
+                        <div style={{ fontSize: 13, color: pct > 0 ? '#B45309' : '#1D4ED8', fontWeight: 600 }}>
+                          {pct > 0
+                            ? `Mercado real ${pct}% acima da estimativa — imóveis mais valorizados que a média regional`
+                            : `Mercado real ${Math.abs(pct)}% abaixo da estimativa — tipologia mais econômica que a média regional`}
+                        </div>
+                      )
+                    })()}
+                    <div style={{ marginTop: 10, fontSize: 11.5, color: '#94A3B8' }}>
+                      {marketData.count} imóvel{marketData.count !== 1 ? 's' : ''} ativo{marketData.count !== 1 ? 's' : ''} VN Prime no bairro · Dados ao vivo
+                    </div>
+                  </div>
+                )}
 
                 <div style={{ background: 'var(--cream)', border: '1px solid var(--border)', borderRadius: 16, padding: 'clamp(24px,3vw,36px)' }}>
                   <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 18 }}>
