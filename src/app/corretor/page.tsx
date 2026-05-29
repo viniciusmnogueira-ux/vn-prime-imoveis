@@ -382,26 +382,54 @@ const CRM_STATUS_OPTS = [
 
 function CRMSection({ leads, crmStatus, setCrmStatus, crmNota, setCrmNota }: any) {
   const [openId, setOpenId] = useState<string | null>(null)
+  const [search, setSearch] = useState('')
+  const [filterStatus, setFilterStatus] = useState('')
   const MOCK = [
     { id: 'mock1', nome: 'Carlos Mendonça', email: 'carlos.m@gmail.com', telefone: '31987654321', mensagem: 'Interesse em apartamento no Savassi', criado_em: new Date(Date.now() - 7200000).toISOString(), mock: true },
     { id: 'mock2', nome: 'Beatriz Fonseca', email: 'bea@gmail.com', telefone: '31999887766', mensagem: 'Quer agendar visita no fim de semana', criado_em: new Date(Date.now() - 86400000).toISOString(), mock: true },
     { id: 'mock3', nome: 'Rafael Andrade', email: 'r.andrade@email.com', telefone: '31996543210', mensagem: 'Compra à vista, urgência alta', criado_em: new Date(Date.now() - 172800000).toISOString(), mock: true },
   ]
-  const show = leads.length > 0 ? leads : MOCK
+  const base = leads.length > 0 ? leads : MOCK
+  const show = base.filter((l: any) => {
+    const q = search.toLowerCase()
+    const matchSearch = !q || l.nome?.toLowerCase().includes(q) || l.email?.toLowerCase().includes(q) || l.telefone?.includes(q)
+    const matchStatus = !filterStatus || (crmStatus[l.id] ?? 'novo') === filterStatus
+    return matchSearch && matchStatus
+  })
+
+  const agingBadge = (criado_em: string) => {
+    const days = Math.floor((Date.now() - new Date(criado_em).getTime()) / 86400000)
+    if (days <= 1) return { label: 'Novo', bg: '#D1FAE5', color: '#065F46' }
+    if (days <= 7) return { label: `${days}d`, bg: '#FEF3C7', color: '#B45309' }
+    return { label: `${days}d`, bg: '#FEE2E2', color: '#991B1B' }
+  }
 
   return (
     <div>
-      <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', marginBottom: 16 }}>CRM Pro — {show.length} contatos</div>
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
+        <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', flex: 1 }}>CRM Pro — {base.length} contatos</div>
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar por nome, e-mail ou telefone…"
+          style={{ padding: '8px 14px', borderRadius: 8, border: '1.5px solid var(--border)', fontSize: 13, fontFamily: 'inherit', outline: 'none', width: 260 }} />
+        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+          style={{ padding: '8px 12px', borderRadius: 8, border: '1.5px solid var(--border)', fontSize: 13, fontFamily: 'inherit', outline: 'none', background: '#fff', color: 'var(--navy)' }}>
+          <option value="">Todos os status</option>
+          {CRM_STATUS_OPTS.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
+        </select>
+      </div>
       {leads.length === 0 && (
         <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 10, padding: '10px 16px', fontSize: 13, color: '#92400E', marginBottom: 16 }}>
           Demonstração — leads reais aparecem aqui quando você receber contatos de imóveis.
         </div>
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {show.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--fg-3)', fontSize: 13 }}>Nenhum contato encontrado.</div>
+        )}
         {show.map((l: any) => {
           const stKey = crmStatus[l.id] ?? 'novo'
           const st = CRM_STATUS_OPTS.find(s => s.key === stKey) ?? CRM_STATUS_OPTS[0]
           const isOpen = openId === l.id
+          const aging = agingBadge(l.criado_em)
           return (
             <div key={l.id} style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-soft)', border: `1.5px solid ${isOpen ? st.color : 'transparent'}`, transition: 'border-color 0.2s' }}>
               <div onClick={() => setOpenId(isOpen ? null : l.id)}
@@ -416,6 +444,7 @@ function CRMSection({ leads, crmStatus, setCrmStatus, crmNota, setCrmNota }: any
                 {l.mock && <span style={{ fontSize: 10, fontWeight: 700, background: '#FEF3C7', color: '#B45309', padding: '2px 8px', borderRadius: 99 }}>DEMO</span>}
                 {l.origem === 'agendamento' && <span style={{ fontSize: 10, fontWeight: 700, background: '#F0FDF4', color: '#16A34A', padding: '2px 8px', borderRadius: 99 }}>📅 Visita</span>}
                 {l.origem === 'proposta' && <span style={{ fontSize: 10, fontWeight: 700, background: '#FAF5FF', color: '#7C3AED', padding: '2px 8px', borderRadius: 99 }}>📝 Proposta</span>}
+                <span style={{ padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 700, background: aging.bg, color: aging.color }}>{aging.label}</span>
                 <span style={{ padding: '3px 10px', borderRadius: 99, fontSize: 11, fontWeight: 700, background: `${st.color}18`, color: st.color }}>{st.label}</span>
                 <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>{isOpen ? '▲' : '▼'}</span>
               </div>
@@ -510,10 +539,18 @@ function PipelineSection({ pipeline, savePipeline, draggingId, setDraggingId, ne
               onDragOver={e => e.preventDefault()}
               onDrop={() => { if (draggingId) { moveCard(draggingId, col.key); setDraggingId(null) } }}
               style={{ background: '#fff', borderRadius: 12, border: `2px solid ${col.color}22`, minHeight: 280 }}>
-              <div style={{ padding: '10px 12px', borderBottom: `2px solid ${col.color}33`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 11, fontWeight: 800, color: col.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{col.label}</span>
-                <span style={{ fontSize: 11, background: `${col.color}22`, color: col.color, padding: '2px 8px', borderRadius: 99, fontWeight: 700 }}>{cards.length}</span>
-              </div>
+              {(() => {
+                const colTotal = cards.reduce((s: number, c: PipelineCard) => s + (Number(c.valor?.replace(/\D/g, '') ?? 0) || 0), 0)
+                return (
+                  <div style={{ padding: '10px 12px', borderBottom: `2px solid ${col.color}33` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: col.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{col.label}</span>
+                      <span style={{ fontSize: 11, background: `${col.color}22`, color: col.color, padding: '2px 8px', borderRadius: 99, fontWeight: 700 }}>{cards.length}</span>
+                    </div>
+                    {colTotal > 0 && <div style={{ fontSize: 10, color: col.color, opacity: 0.75, marginTop: 2, fontWeight: 700 }}>{fmt(colTotal)}</div>}
+                  </div>
+                )
+              })()}
               <div style={{ padding: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {cards.map((card: PipelineCard) => (
                   <div key={card.id} draggable
