@@ -490,6 +490,36 @@ export default function AvaliacaoPage() {
         </div>
       </section>
 
+      {/* Valorize antes de vender */}
+      <section style={{ padding: 'clamp(50px,7vw,80px) 0', background: '#fff' }}>
+        <div style={{ width: 'min(1100px,92vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 48px' }}>
+            <Eyebrow color="var(--gold-deep)">Dicas de valorização</Eyebrow>
+            <h2 style={{ margin: '8px 0 10px' }}>Pequenas melhorias que aumentam o valor</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 15 }}>Imóveis bem preparados vendem mais rápido e por preços até 15% maiores. Veja o que faz diferença.</p>
+          </div>
+          <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))' }}>
+            {[
+              { icon: '🎨', titulo: 'Pintura e acabamento', impacto: '+3–6%', desc: 'Pintura neutra nova elimina marcas e odores. Pequenos reparos em rejuntes, rodapés e tomadas passam sensação de cuidado.' },
+              { icon: '💡', titulo: 'Iluminação', impacto: '+2–4%', desc: 'Lâmpadas de LED quente em pontos estratégicos ampliam visualmente o espaço e valorizam ambientes na visita e nas fotos.' },
+              { icon: '🌿', titulo: 'Home staging', impacto: '+5–10%', desc: 'Imóveis decorados com poucos móveis e plantas fotografam 3× melhor. Desapego de objetos pessoais é o primeiro passo.' },
+              { icon: '📸', titulo: 'Fotografia profissional', impacto: '+12–20% vistas', desc: 'Anúncios com fotos profissionais recebem até 3× mais cliques. Na VN Prime, a fotografia já está incluída nos planos Assistida e Completa.' },
+              { icon: '🏗️', titulo: 'Regularização de área', impacto: 'Segurança jurídica', desc: 'Imóveis com matrícula atualizada e área averbada conforme o real transmitem confiança e facilitam aprovação de financiamento.' },
+              { icon: '🧹', titulo: 'Limpeza e organização', impacto: 'Percepção imediata', desc: 'Banheiros impecáveis, janelas limpas e armários organizados. A primeira impressão em visita define se o comprador quer voltar.' },
+            ].map(d => (
+              <div key={d.titulo} style={{ background: 'var(--cream)', borderRadius: 14, padding: '22px 22px', border: '1px solid var(--border)' }}>
+                <div style={{ fontSize: 28, marginBottom: 10 }}>{d.icon}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--navy)' }}>{d.titulo}</div>
+                  <span style={{ fontSize: 11, fontWeight: 700, background: 'var(--gold)', color: 'var(--navy-deep)', padding: '2px 9px', borderRadius: 99, flexShrink: 0, marginLeft: 8 }}>{d.impacto}</span>
+                </div>
+                <p style={{ fontSize: 13.5, color: 'var(--fg-1)', margin: 0, lineHeight: 1.6 }}>{d.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Bottom CTA */}
       <section style={{ padding: 'clamp(50px,7vw,90px) 0', background: '#fff' }}>
         <div style={{ width: 'min(900px,92vw)', margin: '0 auto',
