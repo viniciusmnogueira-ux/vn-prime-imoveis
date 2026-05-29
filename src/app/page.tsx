@@ -327,6 +327,33 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Como funciona ── */}
+      <section style={{ padding: 'clamp(3rem,5vw,4.5rem) 0', background: '#fff' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 44 }}>
+            <Eyebrow color="var(--gold-deep)">Simples e transparente</Eyebrow>
+            <h2 style={{ margin: '10px 0 12px', fontSize: 'clamp(1.6rem,2.8vw,2.2rem)' }}>Como funciona a VN Prime</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 16, maxWidth: 480, margin: '0 auto', lineHeight: 1.7 }}>
+              Três passos para comprar ou anunciar com segurança e resultado.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 28 }}>
+            {([
+              { n: '01', title: 'Busque ou cadastre', desc: 'Explore o portfólio curado ou anuncie seu imóvel em minutos. Sem burocracia, sem papelada.', icon: '🔍', accent: 'var(--gold)' },
+              { n: '02', title: 'Qualificação e contato', desc: 'Compradores qualificados entram em contato diretamente. Proprietários recebem leads com nome, e-mail e WhatsApp.', icon: '👤', accent: '#059669' },
+              { n: '03', title: 'Feche com segurança', desc: 'Due Diligence opcional, análise jurídica e acompanhamento VN Prime até a assinatura do contrato.', icon: '✓', accent: '#3B82F6' },
+            ] as { n: string; title: string; desc: string; icon: string; accent: string }[]).map(s => (
+              <div key={s.n} style={{ background: 'var(--cream)', borderRadius: 18, padding: '32px 28px', position: 'relative', border: '1px solid var(--border)' }}>
+                <div style={{ position: 'absolute', top: -14, left: 24, background: s.accent, color: '#fff', width: 30, height: 30, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900, letterSpacing: '-0.02em' }}>{s.n}</div>
+                <div style={{ fontSize: 32, marginBottom: 16 }}>{s.icon}</div>
+                <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', marginBottom: 10 }}>{s.title}</div>
+                <p style={{ margin: 0, fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.7 }}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Destaques ── */}
       {featured.length > 0 && (
         <section style={{ padding: 'clamp(2.5rem,5vw,4rem) 0', background: 'var(--cream)' }}>

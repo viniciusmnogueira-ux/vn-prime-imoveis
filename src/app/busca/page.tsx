@@ -295,6 +295,7 @@ function BuscaContent() {
   const [showSavedSearches, setShowSavedSearches] = useState(false)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [compareIds, setCompareIds] = useState<string[]>([])
+  const [shareCopied, setShareCopied] = useState(false)
 
   useEffect(() => {
     try { setSavedSearches(JSON.parse(localStorage.getItem('vnp_saved_searches') ?? '[]')) } catch {}
@@ -460,6 +461,18 @@ function BuscaContent() {
             <Link href="/favoritos" style={{ fontFamily: 'var(--font-body)', fontSize: 12.5, fontWeight: 600, color: 'var(--fg-2)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, padding: '0.5rem 0.75rem', border: '1px solid var(--border)', borderRadius: 8, background: '#fff', whiteSpace: 'nowrap' }}>
               ♡ Favoritos
             </Link>
+            <button onClick={() => {
+              const p = new URLSearchParams()
+              if (filters.op !== 'compra') p.set('op', filters.op)
+              if (filters.q) p.set('q', filters.q)
+              if (filters.tipo) p.set('tipo', filters.tipo)
+              if (filters.priceRange) p.set('pr', filters.priceRange)
+              if (filters.quartos) p.set('qtos', String(filters.quartos))
+              const url = `${window.location.origin}/busca${p.toString() ? '?' + p.toString() : ''}`
+              navigator.clipboard.writeText(url).then(() => { setShareCopied(true); setTimeout(() => setShareCopied(false), 2000) })
+            }} style={{ fontFamily: 'var(--font-body)', fontSize: 12.5, fontWeight: 600, color: shareCopied ? '#059669' : 'var(--fg-2)', display: 'flex', alignItems: 'center', gap: 4, padding: '0.5rem 0.75rem', border: `1px solid ${shareCopied ? '#059669' : 'var(--border)'}`, borderRadius: 8, background: '#fff', whiteSpace: 'nowrap', cursor: 'pointer' }}>
+              {shareCopied ? '✓ Copiado!' : '↗ Compartilhar'}
+            </button>
             <div style={{ position: 'relative' }}>
               <button onClick={() => setShowSavedSearches(s => !s)} style={{ fontFamily: 'var(--font-body)', fontSize: 12.5, fontWeight: 600, color: 'var(--fg-2)', display: 'flex', alignItems: 'center', gap: 4, padding: '0.5rem 0.75rem', border: '1px solid var(--border)', borderRadius: 8, background: '#fff', whiteSpace: 'nowrap', cursor: 'pointer' }}>
                 🔔 Alertas {savedSearches.length > 0 && <span style={{ background: 'var(--gold)', color: 'var(--navy-deep)', borderRadius: 99, fontSize: 10, fontWeight: 800, padding: '1px 5px' }}>{savedSearches.length}</span>}

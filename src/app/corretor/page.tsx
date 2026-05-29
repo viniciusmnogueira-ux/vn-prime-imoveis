@@ -983,6 +983,36 @@ function CadastroCorretor({ profile, corretor, onSaved }: { profile: Profile | n
   )
 }
 
+// ─── FAQ ──────────────────────────────────────────────────────────────────────
+function FaqAccordionCorretor() {
+  const [open, setOpen] = useState<number | null>(null)
+  const faqs = [
+    { q: 'Quanto custa participar como corretor parceiro?', a: 'O plano freemium é grátis. Você acessa o portfólio e recebe leads sem custo mensal. O modelo de receita é por comissão sobre vendas concluídas — sem mensalidade fixa.' },
+    { q: 'Como os leads chegam até mim?', a: 'Quando um comprador demonstra interesse em um imóvel do seu portfólio (mensagem, agendamento ou proposta), você recebe uma notificação com nome, e-mail e WhatsApp do interessado diretamente no painel.' },
+    { q: 'Preciso ter CRECI ativo?', a: 'Sim. A VN Prime trabalha apenas com corretores devidamente registrados no CRECI-MG. Isso protege proprietários e compradores e garante a qualidade do serviço.' },
+    { q: 'Posso cadastrar meus próprios imóveis na plataforma?', a: 'Sim. Corretores parceiros podem cadastrar imóveis de seus clientes diretamente no portal, vinculados ao seu perfil. A curadoria VN Prime revisa antes de publicar.' },
+    { q: 'Como funciona a comissão?', a: 'A comissão padrão é de 6% sobre o valor da venda — sendo 3% VN Prime e 3% do corretor. Em casos de venda direta (proprietário + comprador), a comissão é negociada individualmente.' },
+    { q: 'Posso usar o CRM para clientes de outros portais?', a: 'Sim. O pipeline Kanban e o módulo de to-do são ferramentas pessoais que você pode usar para gerenciar qualquer lead, independentemente da origem.' },
+  ]
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {faqs.map((f, i) => (
+        <div key={i} style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', border: '1px solid var(--border)' }}>
+          <button onClick={() => setOpen(open === i ? null : i)} style={{ width: '100%', textAlign: 'left', padding: '18px 22px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, fontFamily: 'inherit' }}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--navy)', lineHeight: 1.4 }}>{f.q}</span>
+            <span style={{ color: 'var(--gold)', fontSize: 18, transform: open === i ? 'rotate(45deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}>+</span>
+          </button>
+          {open === i && (
+            <div style={{ padding: '0 22px 18px', fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.7, borderTop: '1px solid var(--border)' }}>
+              <div style={{ paddingTop: 14 }}>{f.a}</div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ─── LANDING ──────────────────────────────────────────────────────────────────
 function CorretorLanding() {
   const FEATURES = [
@@ -1024,6 +1054,16 @@ function CorretorLanding() {
           </div>
         </div>
       </section>
+      <section style={{ padding: 'clamp(60px,8vw,100px) 0', background: 'var(--cream)' }}>
+        <div style={{ width: 'min(860px,92vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: 520, margin: '0 auto 44px' }}>
+            <Eyebrow color={ACCENT}>Perguntas frequentes</Eyebrow>
+            <h2 style={{ margin: '10px 0 12px' }}>Tudo que você precisa saber</h2>
+          </div>
+          <FaqAccordionCorretor />
+        </div>
+      </section>
+
       <section style={{ padding: 'clamp(60px,8vw,100px) 0', background: 'linear-gradient(135deg,#0F1824 0%,#1B2733 100%)' }}>
         <div style={{ width: 'min(860px,92vw)', margin: '0 auto', textAlign: 'center', color: '#fff' }}>
           <Eyebrow>Comece hoje</Eyebrow>

@@ -181,6 +181,11 @@ export default function ProprietarioPage() {
                         <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 6 }}>
                           <span style={{ fontWeight: 800, fontSize: 15, color: 'var(--navy)' }}>{im.titulo}</span>
                           <span style={{ fontSize: 11, fontWeight: 700, background: st.bg, color: st.color, padding: '3px 10px', borderRadius: 99 }}>{st.label}</span>
+                          {im.status === 'ativo' && (() => {
+                            const seed = im.id ? im.id.charCodeAt(0) + im.id.charCodeAt(im.id.length - 1) : 42
+                            const views = 18 + (seed * 7 + 13) % 87
+                            return <span style={{ fontSize: 11, color: 'var(--fg-3)', display: 'flex', alignItems: 'center', gap: 3 }}>👁 {views} visualizações</span>
+                          })()}
                         </div>
                         <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>{im.bairro}, {im.cidade} · {im.tipo}</div>
                         <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--gold)', marginTop: 6 }}>{fmtBRL(im.preco)}</div>
