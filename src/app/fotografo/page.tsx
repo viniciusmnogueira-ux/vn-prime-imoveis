@@ -1,5 +1,35 @@
 'use client'
 import { useState } from 'react'
+
+function FaqFotografo() {
+  const [open, setOpen] = useState<number | null>(null)
+  const items = [
+    { q: 'Vocês atendem qual região?', a: 'Atendemos toda a Grande BH — Belo Horizonte, Nova Lima, Contagem, Betim e municípios da RMBH. Para imóveis fora da região metropolitana, consulte disponibilidade.' },
+    { q: 'Como funciona o prazo de entrega?', a: 'Prazos por pacote: Essencial em 48h, Completo em 48h e Premium em 24h após a sessão. Entregamos galeria online com link de acesso e arquivos em alta resolução.' },
+    { q: 'Preciso organizar o imóvel antes?', a: 'Sim! Um imóvel arrumado é fundamental para boas fotos. Nossa equipe orienta sobre organização antes da sessão: remova objetos pessoais, abra cortinas, ligue pontos de luz.' },
+    { q: 'O que está incluso no tour 360°?', a: 'Tour virtual interativo hospedado por 12 meses, link compartilhável para WhatsApp e portais, visualização em desktop e mobile. Disponível nos pacotes Completo e Premium.' },
+    { q: 'Posso usar as fotos em portais e redes sociais?', a: 'Sim, todas as fotos incluem direito de uso comercial irrestrito. Você pode publicar em Zap, Viva Real, OLX, Instagram, WhatsApp e qualquer outro canal.' },
+  ]
+  return (
+    <section style={{ padding: 'clamp(50px,7vw,80px) 0', background: '#fff' }}>
+      <div style={{ width: 'min(760px,92vw)', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold-deep)', marginBottom: 8 }}>Dúvidas frequentes</div>
+          <h2 style={{ margin: 0 }}>Tudo sobre a sessão fotográfica</h2>
+        </div>
+        {items.map((it, i) => (
+          <div key={i} style={{ borderBottom: '1px solid var(--border)' }}>
+            <button onClick={() => setOpen(open === i ? null : i)} style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', padding: '18px 0', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, fontFamily: 'inherit' }}>
+              <span style={{ fontSize: 15.5, fontWeight: 600, color: 'var(--navy)', lineHeight: 1.4 }}>{it.q}</span>
+              <span style={{ fontSize: 18, color: 'var(--gold)', flexShrink: 0, transition: 'transform 0.2s', transform: open === i ? 'rotate(45deg)' : 'none', display: 'inline-block' }}>+</span>
+            </button>
+            {open === i && <p style={{ fontSize: 14.5, color: 'var(--fg-1)', lineHeight: 1.75, margin: '0 0 18px', paddingRight: 32 }}>{it.a}</p>}
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
 import Link from 'next/link'
 import Btn from '@/components/ui/Btn'
 import Eyebrow from '@/components/ui/Eyebrow'
@@ -72,6 +102,25 @@ export default function FotografoPage() {
         </div>
       </section>
 
+      {/* Stats strip */}
+      <section style={{ background: 'var(--navy-deep)', padding: '22px 0' }}>
+        <div style={{ width: 'min(1100px,92vw)', margin: '0 auto' }}>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            {[
+              { n: '500+', label: 'sessões realizadas' },
+              { n: '48h', label: 'entrega média' },
+              { n: '4.9★', label: 'avaliação média' },
+              { n: '3×', label: 'mais visitas com fotos profissionais' },
+            ].map(s => (
+              <div key={s.label} style={{ textAlign: 'center', padding: '8px 28px', borderRight: '1px solid rgba(255,255,255,0.12)' }}>
+                <div style={{ fontSize: 'clamp(1.3rem,2.5vw,1.8rem)', fontWeight: 900, color: 'var(--gold)', fontFamily: 'var(--font-display)', letterSpacing: '-0.02em' }}>{s.n}</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 2, whiteSpace: 'nowrap' }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Como funciona */}
       <section style={{ padding: 'clamp(50px,7vw,90px) 0' }}>
         <div style={{ width: 'min(1180px,92vw)', margin: '0 auto' }}>
@@ -137,6 +186,8 @@ export default function FotografoPage() {
           </p>
         </div>
       </section>
+
+      <FaqFotografo />
 
       {/* Formulário de agendamento */}
       <section style={{ padding: 'clamp(50px,7vw,90px) 0', background: 'var(--cream)' }}>

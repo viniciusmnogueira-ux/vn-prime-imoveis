@@ -344,6 +344,12 @@ function LeadsSection({ proprietarioId }: { proprietarioId: string }) {
               <a href={`https://wa.me/55${l.telefone?.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer">
                 <Btn variant="accent" size="sm">WhatsApp</Btn>
               </a>
+              {!l.mock && l.telefone && (
+                <a href={`https://wa.me/55${l.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(`Olá, ${l.nome?.split(' ')[0] ?? ''}! Tudo bem? Gostaria de agendar uma visita ao imóvel${l.imoveis?.titulo ? ` "${l.imoveis.titulo}"` : ''}. Qual dia e horário ficam melhor para você?`)}`}
+                  target="_blank" rel="noopener noreferrer">
+                  <Btn variant="ghost" size="sm">📅 Agendar visita</Btn>
+                </a>
+              )}
               <a href={`mailto:${l.email}`}>
                 <Btn variant="ghost" size="sm">E-mail</Btn>
               </a>
