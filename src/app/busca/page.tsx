@@ -521,14 +521,7 @@ function BuscaContent() {
               ♡ Favoritos
             </Link>
             <button onClick={() => {
-              const p = new URLSearchParams()
-              if (filters.op !== 'compra') p.set('op', filters.op)
-              if (filters.q) p.set('q', filters.q)
-              if (filters.tipo) p.set('tipo', filters.tipo)
-              if (filters.priceRange) p.set('pr', filters.priceRange)
-              if (filters.quartos) p.set('qtos', String(filters.quartos))
-              const url = `${window.location.origin}/busca${p.toString() ? '?' + p.toString() : ''}`
-              navigator.clipboard.writeText(url).then(() => { setShareCopied(true); setTimeout(() => setShareCopied(false), 2000) })
+              navigator.clipboard.writeText(window.location.href).then(() => { setShareCopied(true); setTimeout(() => setShareCopied(false), 2000) })
             }} style={{ fontFamily: 'var(--font-body)', fontSize: 12.5, fontWeight: 600, color: shareCopied ? '#059669' : 'var(--fg-2)', display: 'flex', alignItems: 'center', gap: 4, padding: '0.5rem 0.75rem', border: `1px solid ${shareCopied ? '#059669' : 'var(--border)'}`, borderRadius: 8, background: '#fff', whiteSpace: 'nowrap', cursor: 'pointer' }}>
               {shareCopied ? '✓ Copiado!' : '↗ Compartilhar'}
             </button>
