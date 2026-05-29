@@ -1072,6 +1072,21 @@ function CorretorLanding() {
             <Link href="/login?redirect=/corretor"><Btn variant="accent" size="lg" style={{ background: ACCENT, boxShadow: `0 6px 24px ${ACCENT}44` }}>Entrar no portal</Btn></Link>
             <Link href="/login?redirect=/corretor&tab=cadastrar&tipo=corretor"><Btn variant="ghost" size="lg" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.35)' }}>Criar conta grátis</Btn></Link>
           </div>
+          {/* Platform preview illustration */}
+          <div style={{ marginTop: 48, display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 12, maxWidth: 560 }}>
+            {[
+              { label: 'Leads hoje', value: '12', icon: '👤', color: '#6EE7B7' },
+              { label: 'Imóveis ativos', value: '47', icon: '🏠', color: '#D4A857' },
+              { label: 'Em negociação', value: '5', icon: '⚖️', color: '#93C5FD' },
+              { label: 'Comissão est.', value: 'R$ 38k', icon: '💰', color: '#6EE7B7' },
+            ].map(s => (
+              <div key={s.label} style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 14, padding: '16px 18px' }}>
+                <div style={{ fontSize: 20, marginBottom: 6 }}>{s.icon}</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.value}</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginTop: 4, fontWeight: 600 }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
       <section style={{ padding: 'clamp(60px,8vw,100px) 0' }}>
@@ -1082,10 +1097,13 @@ function CorretorLanding() {
           </div>
           <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))' }}>
             {FEATURES.map(f => (
-              <div key={f.title} style={{ background: '#fff', padding: '28px 26px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: `${ACCENT}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 16 }}>{f.icon}</div>
-                <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', marginBottom: 8 }}>{f.title}</div>
-                <div style={{ fontSize: 14.5, color: 'var(--fg-2)', lineHeight: 1.6 }}>{f.desc}</div>
+              <div key={f.title} style={{ background: '#fff', padding: '32px 28px', borderRadius: 20, border: '1px solid var(--border)', boxShadow: '0 2px 16px rgba(15,34,68,0.06)', transition: 'transform 0.18s, box-shadow 0.18s' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 36px rgba(15,34,68,0.12)' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 16px rgba(15,34,68,0.06)' }}>
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: 'var(--navy-deep,#0F1824)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, marginBottom: 18 }}>{f.icon}</div>
+                <div style={{ width: 32, height: 3, background: ACCENT, borderRadius: 2, marginBottom: 14 }} />
+                <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--navy)', marginBottom: 10 }}>{f.title}</div>
+                <div style={{ fontSize: 14.5, color: 'var(--fg-2)', lineHeight: 1.7 }}>{f.desc}</div>
               </div>
             ))}
           </div>
@@ -1105,6 +1123,29 @@ function CorretorLanding() {
               <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{s.label}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section style={{ padding: 'clamp(60px,8vw,100px) 0', background: '#fff' }}>
+        <div style={{ width: 'min(1100px,92vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: 540, margin: '0 auto 52px' }}>
+            <Eyebrow color={ACCENT}>Como funciona</Eyebrow>
+            <h2 style={{ margin: '10px 0 12px' }}>Em 3 passos até os seus primeiros leads</h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 0, position: 'relative' }}>
+            {[
+              { n: '01', icon: '✍️', title: 'Crie sua conta', desc: 'Cadastre-se gratuitamente com CRECI-MG válido. Aprovação em até 24h úteis após validação dos dados.', color: ACCENT },
+              { n: '02', icon: '📋', title: 'Complete seu perfil', desc: 'Adicione foto, especialidades e regiões de atuação. Quanto mais completo, mais leads qualificados você recebe.', color: '#D4A857' },
+              { n: '03', icon: '🚀', title: 'Receba e converta', desc: 'Leads chegam com contato completo no seu painel. Gerencie no CRM Kanban e feche vendas mais rápido.', color: '#6366F1' },
+            ].map((step, i) => (
+              <div key={step.n} style={{ padding: 'clamp(28px,4vw,44px)', position: 'relative', borderLeft: i > 0 ? '1px solid var(--border)' : 'none', textAlign: 'center' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 64, height: 64, borderRadius: '50%', background: step.color + '18', border: `2px solid ${step.color}44`, fontSize: 28, marginBottom: 16 }}>{step.icon}</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', color: step.color, textTransform: 'uppercase', marginBottom: 10 }}>Passo {step.n}</div>
+                <div style={{ fontSize: 19, fontWeight: 800, color: 'var(--navy)', marginBottom: 12 }}>{step.title}</div>
+                <p style={{ fontSize: 14.5, color: 'var(--fg-2)', lineHeight: 1.7, margin: 0 }}>{step.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

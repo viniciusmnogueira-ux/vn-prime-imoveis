@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Eyebrow from '@/components/ui/Eyebrow'
 import Btn from '@/components/ui/Btn'
 import { createClient } from '@/lib/supabase/client'
@@ -64,13 +64,21 @@ export default function AvaliacaoPage() {
   const [estimResult, setEstimResult] = useState<{ low: number; high: number; mid: number; m2low: number; m2high: number } | null>(null)
   const [marketData, setMarketData] = useState<{ count: number; avgPreco: number; avgM2: number } | null>(null)
   const [userEstimValue, setUserEstimValue] = useState('')
-  const laudoSectionRef = useRef<HTMLDivElement>(null)
   const [laudoForm, setLaudoForm] = useState({ nome: '', email: '', telefone: '', bairro: '', tipo: 'Apartamento', finalidade: 'Compra ou Venda', modalidade: 'Laudo PTAM (Extrajudicial)' })
   const [laudoLoading, setLaudoLoading] = useState(false)
   const [laudoEnviado, setLaudoEnviado] = useState(false)
+  const [showLaudoModal, setShowLaudoModal] = useState(false)
 
-  function scrollToLaudo() {
-    laudoSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  useEffect(() => {
+    if (laudoEnviado && showLaudoModal) {
+      const t = setTimeout(() => setShowLaudoModal(false), 3000)
+      return () => clearTimeout(t)
+    }
+  }, [laudoEnviado, showLaudoModal])
+
+  function scrollToLaudo(modalidade?: string) {
+    if (modalidade) setLaudoForm(p => ({ ...p, modalidade }))
+    setShowLaudoModal(true)
   }
 
   function scrollToEstimativa() {
@@ -148,7 +156,7 @@ export default function AvaliacaoPage() {
             Três modalidades para cada situação — laudo judicial, extrajudicial ou estimativa instantânea com IA.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <Btn variant="accent" size="lg" onClick={scrollToLaudo}>Solicitar laudo</Btn>
+            <Btn variant="accent" size="lg" onClick={() => scrollToLaudo()}>Solicitar laudo</Btn>
             <Btn variant="ghost-light" size="lg" onClick={scrollToEstimativa}>Estimar agora</Btn>
           </div>
         </div>
@@ -227,7 +235,7 @@ export default function AvaliacaoPage() {
                 </div>
                 <div style={{ padding: '16px 28px 28px' }}>
                   <button
-                    onClick={m.id === 'ia' ? scrollToEstimativa : scrollToLaudo}
+                    onClick={m.id === 'ia' ? scrollToEstimativa : m.id === 'judicial' ? () => scrollToLaudo('Laudo Judicial') : () => scrollToLaudo('Laudo PTAM (Extrajudicial)')}
                     style={{
                       width: '100%', padding: '13px 20px', borderRadius: 10, border: 'none',
                       background: m.destaque ? '#D4A857' : 'var(--navy)',
@@ -242,82 +250,6 @@ export default function AvaliacaoPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Laudo Request Form */}
-      <section ref={laudoSectionRef} style={{ padding: 'clamp(60px,8vw,100px) 0', background: '#fff', scrollMarginTop: 80 }}>
-        <div style={{ width: 'min(720px,92vw)', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <Eyebrow color="var(--gold-deep)">Solicitar Laudo</Eyebrow>
-            <h2 style={{ margin: '8px 0 10px' }}>Peça seu laudo agora</h2>
-            <p style={{ color: 'var(--fg-2)', fontSize: 15 }}>
-              Um especialista VN Prime entrará em contato em até 2h úteis com prazo e proposta.
-            </p>
-          </div>
-          {laudoEnviado ? (
-            <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 18, padding: '44px 28px', textAlign: 'center' }}>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
-              <div style={{ fontSize: 19, fontWeight: 700, color: '#065F46', marginBottom: 8 }}>Solicitação recebida!</div>
-              <div style={{ fontSize: 14, color: '#065F46', lineHeight: 1.55, marginBottom: 24 }}>Nossa equipe entrará em contato em até 2h úteis com prazo e proposta personalizada.</div>
-              <a href={`https://wa.me/5531984144250?text=${encodeURIComponent(`Olá! Solicitei um laudo de avaliação pelo site. Meu nome é ${laudoForm.nome}.`)}`}
-                target="_blank" rel="noopener noreferrer"
-                style={{ fontSize: 14, color: '#25D366', fontWeight: 700, textDecoration: 'none' }}>
-                Ou fale agora pelo WhatsApp →
-              </a>
-            </div>
-          ) : (
-            <form onSubmit={async e => {
-              e.preventDefault()
-              setLaudoLoading(true)
-              const sb = createClient()
-              await sb.from('leads').insert({ nome: laudoForm.nome, email: laudoForm.email, telefone: laudoForm.telefone, mensagem: `Laudo: ${laudoForm.modalidade} · ${laudoForm.tipo} em ${laudoForm.bairro} · Finalidade: ${laudoForm.finalidade}`, origem: 'avaliacao' })
-              setLaudoEnviado(true)
-              setLaudoLoading(false)
-            }}
-              style={{ background: 'var(--cream)', borderRadius: 18, padding: 'clamp(28px,4vw,44px)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))' }}>
-                {([
-                  { label: 'Nome completo', key: 'nome', type: 'text', ph: 'Seu nome' },
-                  { label: 'E-mail', key: 'email', type: 'email', ph: 'seu@email.com' },
-                  { label: 'WhatsApp', key: 'telefone', type: 'tel', ph: '(31) 99999-9999' },
-                  { label: 'Bairro / Cidade', key: 'bairro', type: 'text', ph: 'Ex.: Savassi, BH' },
-                ] as const).map(f => (
-                  <div key={f.key}>
-                    <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>{f.label}</label>
-                    <input type={f.type} placeholder={f.ph} required value={laudoForm[f.key]}
-                      onChange={e => setLaudoForm(p => ({ ...p, [f.key]: e.target.value }))}
-                      style={IS} />
-                  </div>
-                ))}
-              </div>
-              <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))' }}>
-                <div>
-                  <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>Tipo do imóvel</label>
-                  <select value={laudoForm.tipo} onChange={e => setLaudoForm(p => ({ ...p, tipo: e.target.value }))} style={IS}>
-                    {['Apartamento','Casa','Cobertura','Sala Comercial','Terreno','Loteamento'].map(t => <option key={t}>{t}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>Finalidade</label>
-                  <select value={laudoForm.finalidade} onChange={e => setLaudoForm(p => ({ ...p, finalidade: e.target.value }))} style={IS}>
-                    {['Compra ou Venda','Inventário / Herança','Financiamento / Garantia','Processo Judicial','Outro'].map(t => <option key={t}>{t}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>Modalidade desejada</label>
-                  <select value={laudoForm.modalidade} onChange={e => setLaudoForm(p => ({ ...p, modalidade: e.target.value }))} style={IS}>
-                    {['Laudo PTAM (Extrajudicial)','Laudo Judicial','Não sei — quero indicação'].map(t => <option key={t}>{t}</option>)}
-                  </select>
-                </div>
-              </div>
-              <button type="submit" disabled={laudoLoading}
-                style={{ padding: '14px 0', borderRadius: 10, border: 'none', background: 'var(--navy)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: laudoLoading ? 0.7 : 1 }}>
-                {laudoLoading ? 'Enviando…' : 'Solicitar laudo — sem compromisso'}
-              </button>
-              <div style={{ fontSize: 11.5, color: 'var(--fg-3)', textAlign: 'center' }}>Resposta em até 2h úteis · Dados protegidos · Sem compromisso</div>
-            </form>
-          )}
         </div>
       </section>
 
@@ -599,6 +531,79 @@ export default function AvaliacaoPage() {
       </section>
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+
+      {/* Laudo Modal */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(15,24,36,0.65)', backdropFilter: 'blur(6px)', display: showLaudoModal ? 'flex' : 'none', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
+        onClick={e => { if (e.target === e.currentTarget) setShowLaudoModal(false) }}>
+        <div style={{ background: '#fff', borderRadius: 20, width: 'min(640px,94vw)', maxHeight: '90vh', overflowY: 'auto', padding: 'clamp(24px,4vw,44px)', position: 'relative' }}>
+          <button onClick={() => setShowLaudoModal(false)} style={{ position: 'absolute', top: 16, right: 16, width: 36, height: 36, borderRadius: '50%', border: '1px solid var(--border)', background: '#fff', cursor: 'pointer', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fg-2)', fontFamily: 'inherit' }}>×</button>
+          <Eyebrow color="var(--gold-deep)">Solicitar Laudo</Eyebrow>
+          <h2 style={{ margin: '8px 0 20px' }}>Solicitar Laudo Agora</h2>
+          {laudoEnviado ? (
+            <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 18, padding: '44px 28px', textAlign: 'center' }}>
+              <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
+              <div style={{ fontSize: 19, fontWeight: 700, color: '#065F46', marginBottom: 8 }}>Solicitação recebida!</div>
+              <div style={{ fontSize: 14, color: '#065F46', lineHeight: 1.55, marginBottom: 24 }}>Nossa equipe entrará em contato em até 2h úteis com prazo e proposta personalizada.</div>
+              <a href={`https://wa.me/5531984144250?text=${encodeURIComponent(`Olá! Solicitei um laudo de avaliação pelo site. Meu nome é ${laudoForm.nome}.`)}`}
+                target="_blank" rel="noopener noreferrer"
+                style={{ fontSize: 14, color: '#25D366', fontWeight: 700, textDecoration: 'none' }}>
+                Ou fale agora pelo WhatsApp →
+              </a>
+            </div>
+          ) : (
+            <form onSubmit={async e => {
+              e.preventDefault()
+              setLaudoLoading(true)
+              const sb = createClient()
+              await sb.from('leads').insert({ nome: laudoForm.nome, email: laudoForm.email, telefone: laudoForm.telefone, mensagem: `Laudo: ${laudoForm.modalidade} · ${laudoForm.tipo} em ${laudoForm.bairro} · Finalidade: ${laudoForm.finalidade}`, origem: 'avaliacao' })
+              setLaudoEnviado(true)
+              setLaudoLoading(false)
+            }}
+              style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))' }}>
+                {([
+                  { label: 'Nome completo', key: 'nome', type: 'text', ph: 'Seu nome' },
+                  { label: 'E-mail', key: 'email', type: 'email', ph: 'seu@email.com' },
+                  { label: 'WhatsApp', key: 'telefone', type: 'tel', ph: '(31) 99999-9999' },
+                  { label: 'Bairro / Cidade', key: 'bairro', type: 'text', ph: 'Ex.: Savassi, BH' },
+                ] as const).map(f => (
+                  <div key={f.key}>
+                    <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>{f.label}</label>
+                    <input type={f.type} placeholder={f.ph} required value={laudoForm[f.key]}
+                      onChange={e => setLaudoForm(p => ({ ...p, [f.key]: e.target.value }))}
+                      style={IS} />
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))' }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>Tipo do imóvel</label>
+                  <select value={laudoForm.tipo} onChange={e => setLaudoForm(p => ({ ...p, tipo: e.target.value }))} style={IS}>
+                    {['Apartamento','Casa','Cobertura','Sala Comercial','Terreno','Loteamento'].map(t => <option key={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>Finalidade</label>
+                  <select value={laudoForm.finalidade} onChange={e => setLaudoForm(p => ({ ...p, finalidade: e.target.value }))} style={IS}>
+                    {['Compra ou Venda','Inventário / Herança','Financiamento / Garantia','Processo Judicial','Outro'].map(t => <option key={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>Modalidade desejada</label>
+                  <select value={laudoForm.modalidade} onChange={e => setLaudoForm(p => ({ ...p, modalidade: e.target.value }))} style={IS}>
+                    {['Laudo PTAM (Extrajudicial)','Laudo Judicial','Não sei — quero indicação'].map(t => <option key={t}>{t}</option>)}
+                  </select>
+                </div>
+              </div>
+              <button type="submit" disabled={laudoLoading}
+                style={{ padding: '14px 0', borderRadius: 10, border: 'none', background: 'var(--navy)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: laudoLoading ? 0.7 : 1 }}>
+                {laudoLoading ? 'Enviando…' : 'Solicitar laudo — sem compromisso'}
+              </button>
+              <div style={{ fontSize: 11.5, color: 'var(--fg-3)', textAlign: 'center' }}>Resposta em até 2h úteis · Dados protegidos · Sem compromisso</div>
+            </form>
+          )}
+        </div>
+      </div>
     </main>
   )
 }

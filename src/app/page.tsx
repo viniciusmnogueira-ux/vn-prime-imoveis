@@ -117,6 +117,7 @@ const SERVICE_PILLS = [
   { label: 'Lançamentos',       href: '/lancamentos',    accent: '#D4A857' },
   { label: 'Avaliação',         href: '/avaliacao',      accent: '#6B7280' },
   { label: 'Calculadora ITBI',  href: '/calculadora',    accent: '#6B7280' },
+  { label: '📊 Relatório de Mercado', href: '/relatorio', accent: '#6366F1' },
 ]
 
 const QUICK_LINKS = ['Apartamentos em BH', 'Casas Grande BH', 'Coberturas BH', 'Lançamentos Grande BH', 'Aluguel BH', 'Acima de R$ 5 mi']
@@ -372,28 +373,61 @@ export default function HomePage() {
       })()}
 
       {/* ── Como funciona ── */}
-      <section style={{ padding: 'clamp(3rem,5vw,4.5rem) 0', background: '#fff' }}>
+      <section style={{ padding: 'clamp(3rem,5vw,4.5rem) 0', background: 'var(--navy-deep,#0F1824)' }}>
         <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 44 }}>
-            <Eyebrow color="var(--gold-deep)">Simples e transparente</Eyebrow>
-            <h2 style={{ margin: '10px 0 12px', fontSize: 'clamp(1.6rem,2.8vw,2.2rem)' }}>Como funciona a VN Prime</h2>
-            <p style={{ color: 'var(--fg-2)', fontSize: 16, maxWidth: 480, margin: '0 auto', lineHeight: 1.7 }}>
+          <div style={{ textAlign: 'center', marginBottom: 52 }}>
+            <Eyebrow color="var(--gold)">Simples e transparente</Eyebrow>
+            <h2 style={{ margin: '10px 0 12px', color: '#fff', fontSize: 'clamp(1.6rem,2.8vw,2.2rem)' }}>Como funciona a VN Prime</h2>
+            <p style={{ color: 'rgba(245,248,250,0.65)', fontSize: 16, maxWidth: 480, margin: '0 auto', lineHeight: 1.7 }}>
               Três passos para comprar ou anunciar com segurança e resultado.
             </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 28 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 2 }}>
             {([
-              { n: '01', title: 'Busque ou cadastre', desc: 'Explore o portfólio curado ou anuncie seu imóvel em minutos. Sem burocracia, sem papelada.', icon: '🔍', accent: 'var(--gold)' },
-              { n: '02', title: 'Qualificação e contato', desc: 'Compradores qualificados entram em contato diretamente. Proprietários recebem leads com nome, e-mail e WhatsApp.', icon: '👤', accent: '#059669' },
-              { n: '03', title: 'Feche com segurança', desc: 'Due Diligence opcional, análise jurídica e acompanhamento VN Prime até a assinatura do contrato.', icon: '✓', accent: '#3B82F6' },
-            ] as { n: string; title: string; desc: string; icon: string; accent: string }[]).map(s => (
-              <div key={s.n} style={{ background: 'var(--cream)', borderRadius: 18, padding: '32px 28px', position: 'relative', border: '1px solid var(--border)' }}>
-                <div style={{ position: 'absolute', top: -14, left: 24, background: s.accent, color: '#fff', width: 30, height: 30, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900, letterSpacing: '-0.02em' }}>{s.n}</div>
-                <div style={{ fontSize: 32, marginBottom: 16 }}>{s.icon}</div>
-                <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', marginBottom: 10 }}>{s.title}</div>
-                <p style={{ margin: 0, fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.7 }}>{s.desc}</p>
+              {
+                n: '01', title: 'Busque ou cadastre',
+                desc: 'Explore o portfólio curado ou anuncie seu imóvel em minutos. Sem burocracia, sem papelada.',
+                accent: 'var(--gold)',
+                svgPath: 'M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z',
+              },
+              {
+                n: '02', title: 'Qualificação e contato',
+                desc: 'Compradores qualificados entram em contato diretamente. Proprietários recebem leads com nome, e-mail e WhatsApp.',
+                accent: '#6EE7B7',
+                svgPath: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
+              },
+              {
+                n: '03', title: 'Feche com segurança',
+                desc: 'Due Diligence opcional, análise jurídica e acompanhamento VN Prime até a assinatura do contrato.',
+                accent: '#93C5FD',
+                svgPath: 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z',
+              },
+            ] as { n: string; title: string; desc: string; accent: string; svgPath: string }[]).map((s) => (
+              <div key={s.n} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', padding: 'clamp(28px,4vw,44px)', position: 'relative', textAlign: 'center' }}>
+                {/* Step number */}
+                <div style={{ position: 'absolute', top: 20, right: 24, fontFamily: 'var(--font-display)', fontSize: 56, fontWeight: 900, color: 'rgba(255,255,255,0.04)', lineHeight: 1 }}>{s.n}</div>
+                {/* Icon circle */}
+                <div style={{ width: 64, height: 64, borderRadius: '50%', background: s.accent + '20', border: `1.5px solid ${s.accent}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={s.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d={s.svgPath} />
+                  </svg>
+                </div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', color: s.accent, textTransform: 'uppercase', marginBottom: 10 }}>Passo {s.n}</div>
+                <div style={{ fontSize: 19, fontWeight: 800, color: '#fff', marginBottom: 12, lineHeight: 1.25 }}>{s.title}</div>
+                <p style={{ margin: 0, fontSize: 14.5, color: 'rgba(245,248,250,0.68)', lineHeight: 1.75 }}>{s.desc}</p>
               </div>
             ))}
+          </div>
+          {/* Banner footer CTA */}
+          <div style={{ marginTop: 40, padding: '28px 36px', background: 'rgba(212,168,87,0.08)', border: '1px solid rgba(212,168,87,0.20)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+            <div>
+              <div style={{ fontSize: 17, fontWeight: 700, color: '#fff', marginBottom: 4 }}>Pronto para começar?</div>
+              <div style={{ fontSize: 14, color: 'rgba(245,248,250,0.60)' }}>Curadoria premium · Segurança jurídica · Sem burocracia</div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <Link href="/busca"><Btn variant="accent">Ver imóveis</Btn></Link>
+              <Link href="/vender"><button style={{ padding: '10px 22px', borderRadius: 10, border: '1px solid rgba(212,168,87,0.40)', background: 'transparent', color: 'var(--gold)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Anunciar meu imóvel</button></Link>
+            </div>
           </div>
         </div>
       </section>
