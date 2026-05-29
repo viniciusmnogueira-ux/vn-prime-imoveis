@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 function FaqFotografo() {
   const [open, setOpen] = useState<number | null>(null)
@@ -61,8 +61,18 @@ export default function FotografoPage() {
   const [form, setForm] = useState({ nome: '', telefone: '', email: '', pacote: 'Completo', endereco: '', mensagem: '' })
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
+  const [demanda, setDemanda] = useState<{ total: number; semFotos: number } | null>(null)
 
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
+
+  useEffect(() => {
+    const sb = createClient()
+    sb.from('imoveis').select('fotos').eq('status', 'ativo').then(({ data }) => {
+      if (!data) return
+      const semFotos = data.filter(i => !i.fotos || (i.fotos as any[]).length === 0).length
+      setDemanda({ total: data.length, semFotos })
+    })
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -120,6 +130,19 @@ export default function FotografoPage() {
           </div>
         </div>
       </section>
+
+      {/* Demanda ao vivo */}
+      {demanda && demanda.semFotos > 0 && (
+        <div style={{ background: 'rgba(212,168,87,0.10)', borderBottom: '1px solid rgba(212,168,87,0.22)', padding: '14px 0' }}>
+          <div style={{ width: 'min(1100px,92vw)', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap', textAlign: 'center' }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#D4A857', display: 'inline-block', boxShadow: '0 0 6px #D4A857' }} />
+            <span style={{ fontSize: 13, color: 'var(--navy)', fontWeight: 700 }}>
+              {demanda.semFotos} imóve{demanda.semFotos !== 1 ? 'is' : 'l'} ativ{demanda.semFotos !== 1 ? 'os' : 'o'} no portfólio VN Prime ainda {demanda.semFotos !== 1 ? 'precisam' : 'precisa'} de fotografia profissional.
+            </span>
+            <span style={{ fontSize: 12, color: 'var(--fg-2)' }}>({demanda.total} no total)</span>
+          </div>
+        </div>
+      )}
 
       {/* Impacto nas vendas */}
       <section style={{ padding: 'clamp(50px,7vw,90px) 0', background: 'var(--cream)' }}>
