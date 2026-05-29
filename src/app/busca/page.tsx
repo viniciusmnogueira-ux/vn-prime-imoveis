@@ -312,10 +312,12 @@ function BuscaContent() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [compareIds, setCompareIds] = useState<string[]>([])
   const [shareCopied, setShareCopied] = useState(false)
+  const [recentIds, setRecentIds] = useState<string[]>([])
 
   useEffect(() => {
     try { setSavedSearches(JSON.parse(localStorage.getItem('vnp_saved_searches') ?? '[]')) } catch {}
     try { setCompareIds(JSON.parse(localStorage.getItem('vnp_compare') ?? '[]')) } catch {}
+    try { setRecentIds(JSON.parse(localStorage.getItem('vnp_recent') ?? '[]')) } catch {}
   }, [])
 
   const saveSearch = () => {
@@ -766,6 +768,34 @@ function BuscaContent() {
               <EmptyState onClear={clearFilters} />
             ) : (
               <>
+                {(() => {
+                  const hasFilter = filters.q || filters.tipo || filters.bairros.length || filters.quartos || filters.priceRange || filters.priceMin || filters.priceMax || filters.amenidades.length || filters.onlyFeatured || filters.onlyNew
+                  const recItems = recentIds.length > 0 && !hasFilter
+                    ? allImoveis.filter(im => recentIds.includes(im.id)).slice(0, 4)
+                    : []
+                  if (!recItems.length) return null
+                  return (
+                    <div style={{ marginBottom: 24 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--fg-3)', marginBottom: 12 }}>Vistos recentemente</div>
+                      <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 4 }}>
+                        {recItems.map(im => (
+                          <Link key={im.id} href={`/imovel/${im.id}`} style={{ textDecoration: 'none', flexShrink: 0, width: 200 }}>
+                            <div style={{ background: '#fff', borderRadius: 12, border: '1px solid var(--border)', overflow: 'hidden', transition: 'transform 0.15s, box-shadow 0.15s' }}
+                              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(15,34,68,0.12)' }}
+                              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = 'none' }}>
+                              <div style={{ height: 110, background: im.fotos?.[0] ? `url(${im.fotos[0]}) center/cover` : 'var(--cream)' }} />
+                              <div style={{ padding: '10px 12px' }}>
+                                <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 800, color: 'var(--gold)', marginBottom: 2 }}>{fmtBRL(im.preco)}</div>
+                                <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--navy)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{im.titulo}</div>
+                                <div style={{ fontSize: 11, color: 'var(--fg-2)', marginTop: 2 }}>{im.bairro}</div>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })()}
                 {results.length >= 2 && (() => {
                   const prices = results.filter(r => r.preco > 0).map(r => r.preco)
                   const avg = prices.length ? Math.round(prices.reduce((a, b) => a + b, 0) / prices.length) : 0
