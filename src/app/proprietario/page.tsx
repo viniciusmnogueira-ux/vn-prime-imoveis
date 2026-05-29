@@ -68,6 +68,12 @@ export default function ProprietarioPage() {
     setImoveis(prev => prev.filter(im => im.id !== id))
   }
 
+  async function markAsVendido(id: string) {
+    if (!confirm('Marcar este imóvel como vendido?')) return
+    await supabase.from('imoveis').update({ status: 'vendido' as any }).eq('id', id)
+    setImoveis(prev => prev.map(im => im.id === id ? { ...im, status: 'vendido' as any } : im))
+  }
+
   if (loading) return <LoadingScreen />
   if (!profile) return <ProprietarioLanding />
 
@@ -189,6 +195,39 @@ export default function ProprietarioPage() {
                         </div>
                         <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>{im.bairro}, {im.cidade} · {im.tipo}</div>
                         <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--gold)', marginTop: 6 }}>{fmtBRL(im.preco)}</div>
+                        {(() => {
+                          const pts = [
+                            im.titulo ? 15 : 0,
+                            (im.fotos?.length ?? 0) >= 3 ? 30 : (im.fotos?.length ?? 0) >= 1 ? 20 : 0,
+                            im.descricao ? 20 : 0,
+                            im.area_m2 ? 10 : 0,
+                            im.quartos ? 10 : 0,
+                            im.bairro ? 10 : 0,
+                            im.preco ? 5 : 0,
+                          ].reduce((a, b) => a + b, 0)
+                          const missing = [
+                            !(im.fotos?.length) && 'fotos',
+                            (im.fotos?.length ?? 0) > 0 && (im.fotos?.length ?? 0) < 3 && 'mais fotos (mín. 3)',
+                            !im.descricao && 'descrição',
+                            !im.area_m2 && 'área m²',
+                            !im.quartos && 'nº quartos',
+                          ].filter(Boolean) as string[]
+                          const barColor = pts >= 80 ? '#059669' : pts >= 50 ? '#D97706' : '#DC2626'
+                          return (
+                            <div style={{ marginTop: 10 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                                <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>Completude do anúncio</span>
+                                <span style={{ fontSize: 11, fontWeight: 700, color: barColor }}>{pts}%</span>
+                              </div>
+                              <div style={{ height: 4, background: '#F1F5F9', borderRadius: 2, overflow: 'hidden' }}>
+                                <div style={{ height: '100%', width: `${pts}%`, background: barColor, borderRadius: 2 }} />
+                              </div>
+                              {missing.length > 0 && (
+                                <div style={{ fontSize: 10.5, color: 'var(--fg-3)', marginTop: 4 }}>Falta: {missing.join(', ')}</div>
+                              )}
+                            </div>
+                          )
+                        })()}
                       </div>
                       <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap' }}>
                         <Btn variant="ghost" size="sm" onClick={() => {
@@ -206,6 +245,9 @@ export default function ProprietarioPage() {
                           <Btn variant="ghost" size="sm" onClick={() => toggleStatus(im.id, im.status)}>
                             {im.status === 'ativo' ? 'Pausar' : 'Ativar'}
                           </Btn>
+                        )}
+                        {(im.status === 'ativo' || im.status === 'pausado') && (
+                          <Btn variant="ghost" size="sm" onClick={() => markAsVendido(im.id)}>🏆 Vendido</Btn>
                         )}
                         <Btn variant="danger" size="sm" onClick={() => deleteImovel(im.id)}>Excluir</Btn>
                       </div>
