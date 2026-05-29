@@ -122,9 +122,42 @@ export default function CompararPage() {
       <div style={{ width: 'min(1200px,94vw)', margin: '32px auto 0' }}>
 
         {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
-            <div className="animate-spin" style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid var(--border)', borderTopColor: 'var(--gold)' }} />
-          </div>
+          <>
+            <style>{`@keyframes shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }`}</style>
+            <div style={{ background: '#fff', borderRadius: 16, border: '1px solid var(--border)', overflow: 'hidden' }}>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 660 }}>
+                  <thead>
+                    <tr>
+                      <th style={{ width: 140 }} />
+                      {Array.from({ length: 2 }).map((_, i) => (
+                        <th key={i} style={{ padding: '20px 16px', verticalAlign: 'top', borderLeft: '1px solid var(--border)' }}>
+                          <div style={{ height: 180, borderRadius: 10, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite', marginBottom: 12 }} />
+                          {[{ w: '80%', h: 14 }, { w: '55%', h: 20 }, { w: '70%', h: 30 }].map((s, j) => (
+                            <div key={j} style={{ height: s.h, width: s.w, borderRadius: 6, margin: '0 auto 10px', background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
+                          ))}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <tr key={i} style={{ borderBottom: '1px solid var(--border)', background: i % 2 === 0 ? 'rgba(212,168,87,0.03)' : 'transparent' }}>
+                        <td style={{ padding: '12px 16px' }}>
+                          <div style={{ height: 11, width: '70%', borderRadius: 4, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
+                        </td>
+                        {Array.from({ length: 2 }).map((_, j) => (
+                          <td key={j} style={{ padding: '12px 16px', textAlign: 'center', borderLeft: '1px solid var(--border)' }}>
+                            <div style={{ height: 14, width: '50%', borderRadius: 4, margin: '0 auto', background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
         ) : cols === 0 ? (
           <div style={{ background: '#fff', borderRadius: 16, padding: '60px 30px', textAlign: 'center', border: '1px solid var(--border)' }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>⚖️</div>
