@@ -395,6 +395,11 @@ function BuscaContent() {
     if (sort === 'price_desc') r.sort((a, b) => (b.preco ?? 0) - (a.preco ?? 0))
     if (sort === 'area_desc') r.sort((a, b) => (b.area_m2 ?? 0) - (a.area_m2 ?? 0))
     if (sort === 'newest') r.sort((a, b) => (b.novo ? 1 : 0) - (a.novo ? 1 : 0))
+    if (sort === 'price_m2_asc') r.sort((a, b) => {
+      const aM2 = (a.area_m2 && a.preco) ? a.preco / a.area_m2 : Infinity
+      const bM2 = (b.area_m2 && b.preco) ? b.preco / b.area_m2 : Infinity
+      return aM2 - bM2
+    })
     return r
   }, [allImoveis, filters, sort])
 
@@ -521,6 +526,7 @@ function BuscaContent() {
               <option value="relevance">Mais relevantes</option>
               <option value="price_asc">Menor preço</option>
               <option value="price_desc">Maior preço</option>
+              <option value="price_m2_asc">Menor preço/m²</option>
               <option value="area_desc">Maior área</option>
               <option value="newest">Recém adicionados</option>
             </select>
@@ -760,6 +766,26 @@ function BuscaContent() {
               <EmptyState onClear={clearFilters} />
             ) : (
               <>
+                {results.length >= 2 && (() => {
+                  const prices = results.filter(r => r.preco > 0).map(r => r.preco)
+                  const avg = prices.length ? Math.round(prices.reduce((a, b) => a + b, 0) / prices.length) : 0
+                  const minP = prices.length ? Math.min(...prices) : 0
+                  const maxP = prices.length ? Math.max(...prices) : 0
+                  return (
+                    <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', marginBottom: 14, padding: '10px 16px', background: 'rgba(212,168,87,0.07)', border: '1px solid rgba(212,168,87,0.22)', borderRadius: 10, alignItems: 'center' }}>
+                      {[
+                        { label: 'Preço médio', value: fmtBRL(avg) },
+                        { label: 'Menor preço', value: fmtBRL(minP) },
+                        { label: 'Maior preço', value: fmtBRL(maxP) },
+                      ].map(s => (
+                        <div key={s.label} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                          <span style={{ fontSize: 11, color: 'var(--fg-3)', fontWeight: 600 }}>{s.label}:</span>
+                          <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--navy)' }}>{s.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })()}
                 <div style={{
                   display: 'grid', gap: 20,
                   gridTemplateColumns: layout === 'list'
