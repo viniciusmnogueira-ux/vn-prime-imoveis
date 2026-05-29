@@ -69,6 +69,7 @@ export default function SiteHeader() {
   const [sessionAck, setSessionAck] = useState(true)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQ, setSearchQ] = useState('')
+  const [topBairros, setTopBairros] = useState<string[]>(['Savassi', 'Lourdes', 'Nova Lima', 'Belvedere', 'Funcionários'])
 
   const handleSignOut = () => { window.location.href = '/api/auth/signout' }
 
@@ -83,6 +84,14 @@ export default function SiteHeader() {
         if (!sessionStorage.getItem('vnp_session_ack')) setSessionAck(false)
       }
     })
+    supabase.from('imoveis').select('bairro').eq('status', 'ativo').then(({ data }) => {
+      if (!data) return
+      const counts: Record<string, number> = {}
+      data.forEach(i => { if (i.bairro) counts[i.bairro] = (counts[i.bairro] ?? 0) + 1 })
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([b]) => b)
+      if (sorted.length >= 3) setTopBairros(sorted)
+    })
+
     const { data: listener } = supabase.auth.onAuthStateChange(async (_, session) => {
       setUser(session?.user ?? null)
       if (session?.user) {
@@ -197,12 +206,16 @@ export default function SiteHeader() {
             </form>
             <div style={{ padding: '12px 20px', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 11.5, color: 'var(--fg-3)', width: '100%', marginBottom: 4 }}>Buscas rápidas</span>
-              {['Apartamento Savassi', 'Cobertura BH', 'Studio Centro', 'Casa Lourdes', 'Lançamentos'].map(s => (
-                <Link key={s} href={`/busca?q=${encodeURIComponent(s)}`} onClick={() => setSearchOpen(false)}
+              {topBairros.map(b => (
+                <Link key={b} href={`/busca?q=${encodeURIComponent(b)}`} onClick={() => setSearchOpen(false)}
                   style={{ padding: '5px 12px', borderRadius: 99, border: '1px solid var(--border)', fontSize: 12.5, fontWeight: 600, color: 'var(--navy)', textDecoration: 'none', background: '#F8FAFC', fontFamily: 'var(--font-body)' }}>
-                  {s}
+                  {b}
                 </Link>
               ))}
+              <Link href="/lancamentos" onClick={() => setSearchOpen(false)}
+                style={{ padding: '5px 12px', borderRadius: 99, border: '1px solid var(--gold)', fontSize: 12.5, fontWeight: 700, color: 'var(--gold-deep)', textDecoration: 'none', background: 'rgba(212,168,87,0.08)', fontFamily: 'var(--font-body)' }}>
+                Lançamentos
+              </Link>
             </div>
           </div>
         </div>
