@@ -186,21 +186,45 @@ export default function AdminPage() {
         {/* DASHBOARD */}
         {tab === 'dashboard' && (
           <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 16, marginBottom: 32 }}>
-              {[
-                { label: 'Imóveis ativos', value: imoveis.filter(i => i.status === 'ativo').length, accent: 'var(--navy)' },
-                { label: 'Pendentes', value: stats.pendentes, accent: '#D97706' },
-                { label: 'Verificados', value: imoveis.filter(i => i.verificado).length, accent: '#059669' },
-                { label: 'Leads totais', value: stats.leads, accent: '#7C3AED' },
-                { label: 'Não lidos', value: leads.filter(l => !leadLido[l.id]).length, accent: '#DC2626' },
-                { label: 'Usuários', value: stats.usuarios, accent: '#0369A1' },
-              ].map(s => (
+            {(() => {
+              const ativos = imoveis.filter(i => i.status === 'ativo')
+              const comPreco = ativos.filter(i => i.preco > 0)
+              const portfolioTotal = comPreco.reduce((s, i) => s + i.preco, 0)
+              const avgPreco = comPreco.length ? Math.round(portfolioTotal / comPreco.length) : 0
+              const fmtM = (n: number) => n >= 1_000_000 ? `R$ ${(n / 1_000_000).toFixed(1).replace('.', ',')} mi` : `R$ ${(n / 1_000).toFixed(0)} mil`
+              const numStats = [
+                { label: 'Imóveis ativos', value: ativos.length, accent: 'var(--navy)', isNum: true },
+                { label: 'Pendentes', value: stats.pendentes, accent: '#D97706', isNum: true },
+                { label: 'Verificados', value: imoveis.filter(i => i.verificado).length, accent: '#059669', isNum: true },
+                { label: 'Leads totais', value: stats.leads, accent: '#7C3AED', isNum: true },
+                { label: 'Não lidos', value: leads.filter(l => !leadLido[l.id]).length, accent: '#DC2626', isNum: true },
+                { label: 'Usuários', value: stats.usuarios, accent: '#0369A1', isNum: true },
+              ]
+              const moneyStats = [
+                { label: 'Portfólio ativo', display: comPreco.length ? fmtM(portfolioTotal) : '—', accent: '#059669' },
+                { label: 'Preço médio', display: avgPreco ? fmtM(avgPreco) : '—', accent: 'var(--gold-deep)' },
+              ]
+              return (
+                <>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 16, marginBottom: 16 }}>
+              {numStats.map(s => (
                 <div key={s.label} style={{ background: '#fff', borderRadius: 14, padding: '20px 22px', border: '1px solid #E2E8F0' }}>
                   <div style={{ fontSize: 28, fontWeight: 900, color: s.accent, letterSpacing: '-0.03em' }}>{s.value}</div>
                   <div style={{ fontSize: 12, color: '#64748B', marginTop: 4 }}>{s.label}</div>
                 </div>
               ))}
             </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 16, marginBottom: 32 }}>
+              {moneyStats.map(s => (
+                <div key={s.label} style={{ background: '#fff', borderRadius: 14, padding: '20px 22px', border: '1px solid #E2E8F0', borderLeft: `4px solid ${s.accent}` }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#94A3B8', marginBottom: 8 }}>{s.label}</div>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: s.accent, letterSpacing: '-0.02em' }}>{s.display}</div>
+                </div>
+              ))}
+            </div>
+                </>
+              )
+            })()}
             {/* Leads por origem */}
             {leads.length > 0 && (() => {
               const byOrig: Record<string, number> = {}
