@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Eyebrow from '@/components/ui/Eyebrow'
 import Btn from '@/components/ui/Btn'
 import Link from 'next/link'
@@ -128,6 +128,19 @@ const BENEFICIOS_CORRETOR = [
 export default function VenderPage() {
   const [perfil, setPerfil] = useState<null | 'proprietario' | 'corretor'>(null)
   const [showCompleta6Form, setShowCompleta6Form] = useState(false)
+  const [liveStats, setLiveStats] = useState<{ ativos: number; vendidos: number; avgPreco: number } | null>(null)
+
+  useEffect(() => {
+    const sb = createClient()
+    sb.from('imoveis').select('status, preco').in('status', ['ativo', 'vendido']).then(({ data }) => {
+      if (!data) return
+      const ativos = data.filter(i => i.status === 'ativo').length
+      const vendidos = data.filter(i => i.status === 'vendido').length
+      const comPreco = data.filter(i => i.status === 'ativo' && i.preco > 0)
+      const avgPreco = comPreco.length ? Math.round(comPreco.reduce((s, i) => s + i.preco, 0) / comPreco.length) : 0
+      setLiveStats({ ativos, vendidos, avgPreco })
+    })
+  }, [])
   const [completa6, setCompleta6] = useState({ nome: '', email: '', telefone: '', endereco: '' })
   const [completa6Loading, setCompleta6Loading] = useState(false)
   const [completa6Enviado, setCompleta6Enviado] = useState(false)
@@ -184,6 +197,27 @@ export default function VenderPage() {
           )}
         </div>
       </section>
+
+      {/* Live market stats strip */}
+      {liveStats && (
+        <section style={{ background: 'var(--navy-deep)', padding: '18px 0' }}>
+          <div style={{ width: 'min(1100px,92vw)', margin: '0 auto', display: 'flex', gap: 0, justifyContent: 'center', flexWrap: 'wrap' }}>
+            {[
+              { n: liveStats.ativos.toString(), label: 'imóveis ativos na vitrine' },
+              { n: liveStats.vendidos.toString(), label: 'vendidos pela VN Prime' },
+              { n: liveStats.avgPreco >= 1_000_000
+                  ? `R$ ${(liveStats.avgPreco / 1_000_000).toFixed(1).replace('.', ',')} mi`
+                  : `R$ ${(liveStats.avgPreco / 1_000).toFixed(0)} mil`,
+                label: 'ticket médio do portfólio' },
+            ].map((s, i) => (
+              <div key={s.label} style={{ textAlign: 'center', padding: '8px 32px', borderRight: i < 2 ? '1px solid rgba(255,255,255,0.1)' : 'none' }}>
+                <div style={{ fontSize: 'clamp(1.3rem,2.2vw,1.6rem)', fontWeight: 900, color: 'var(--gold)', fontFamily: 'var(--font-display)', letterSpacing: '-0.02em' }}>{s.n}</div>
+                <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── BLOCO PROPRIETÁRIO ── */}
       {(!perfil || perfil === 'proprietario') && (
