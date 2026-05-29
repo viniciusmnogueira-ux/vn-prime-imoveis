@@ -166,9 +166,21 @@ export default function FavoritosPage() {
           )
         })()}
         {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid var(--border)', borderTopColor: 'var(--gold)', animation: 'spin 0.8s linear infinite' }} />
-          </div>
+          <>
+            <style>{`@keyframes shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }`}</style>
+            <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} style={{ background: '#fff', borderRadius: 16, border: '1px solid var(--border)', overflow: 'hidden' }}>
+                  <div style={{ height: 200, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
+                  <div style={{ padding: '18px 22px 14px' }}>
+                    {[{ w: '40%', h: 11 }, { w: '55%', h: 22 }, { w: '75%', h: 14 }, { w: '50%', h: 12 }].map((s, j) => (
+                      <div key={j} style={{ height: s.h, width: s.w, borderRadius: 5, marginBottom: 10, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : imoveis.length === 0 ? (
           <div style={{ background: '#fff', borderRadius: 16, padding: '60px 30px', textAlign: 'center', border: '1px solid var(--border)' }}>
             <div style={{ fontSize: 48, color: 'var(--gold)', marginBottom: 16 }}>♡</div>

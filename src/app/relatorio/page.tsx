@@ -129,8 +129,21 @@ export default function RelatorioPage() {
       </section>
 
       {loading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
-          <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid var(--border)', borderTopColor: 'var(--gold)', animation: 'spin 0.8s linear infinite' }} />
+        <div style={{ width: 'min(1100px,92vw)', margin: '0 auto', padding: '40px 0 80px' }}>
+          <style>{`@keyframes shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }`}</style>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 16, marginBottom: 40 }}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} style={{ background: '#fff', borderRadius: 14, padding: '20px', border: '1px solid var(--border)', height: 90 }}>
+                <div style={{ height: 28, width: '60%', borderRadius: 6, marginBottom: 8, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
+                <div style={{ height: 12, width: '80%', borderRadius: 4, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,480px),1fr))', gap: 24 }}>
+            {[320, 260].map((h, i) => (
+              <div key={i} style={{ borderRadius: 16, border: '1px solid var(--border)', height: h, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' } as React.CSSProperties} />
+            ))}
+          </div>
         </div>
       ) : !stats ? (
         <div style={{ textAlign: 'center', padding: '80px 24px', color: 'var(--fg-2)' }}>Sem dados disponíveis.</div>
