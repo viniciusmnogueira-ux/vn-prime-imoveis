@@ -1,7 +1,7 @@
 'use client'
 import 'leaflet/dist/leaflet.css'
 import { useEffect, useState, useMemo, useRef, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { fmtBRL } from '@/lib/utils'
 import Link from 'next/link'
@@ -293,6 +293,7 @@ const EMPTY_FILTERS = {
 
 function BuscaContent() {
   const params = useSearchParams()
+  const router = useRouter()
   const supabase = createClient()
   const isMobile = useIsMobile()
 
@@ -303,6 +304,16 @@ function BuscaContent() {
     op: params.get('op') ?? 'compra',
     q: params.get('q') ?? '',
     tipo: params.get('tipo') ?? '',
+    bairros: params.get('bairros') ? params.get('bairros')!.split(',') : [],
+    quartos: params.get('quartos') ? parseInt(params.get('quartos')!) : 0,
+    priceMin: params.get('pmin') ?? '',
+    priceMax: params.get('pmax') ?? '',
+    priceRange: params.get('pr') ?? '',
+    areaMin: params.get('amin') ?? '',
+    areaMax: params.get('amax') ?? '',
+    onlyFeatured: params.get('destaque') === '1',
+    onlyNew: params.get('novo') === '1',
+    onlyWithPhotos: params.get('fotos') === '1',
   })
   const [sort, setSort] = useState('relevance')
   const [layout, setLayout] = useState<'grid' | 'list' | 'map'>('grid')
@@ -334,6 +345,25 @@ function BuscaContent() {
     setSavedSearches(next)
     localStorage.setItem('vnp_saved_searches', JSON.stringify(next))
   }
+
+  useEffect(() => {
+    const p = new URLSearchParams()
+    if (filters.op && filters.op !== 'compra') p.set('op', filters.op)
+    if (filters.q) p.set('q', filters.q)
+    if (filters.tipo) p.set('tipo', filters.tipo)
+    if (filters.bairros.length) p.set('bairros', filters.bairros.join(','))
+    if (filters.quartos) p.set('quartos', String(filters.quartos))
+    if (filters.priceMin) p.set('pmin', filters.priceMin)
+    if (filters.priceMax) p.set('pmax', filters.priceMax)
+    if (filters.priceRange) p.set('pr', filters.priceRange)
+    if (filters.areaMin) p.set('amin', filters.areaMin)
+    if (filters.areaMax) p.set('amax', filters.areaMax)
+    if (filters.onlyFeatured) p.set('destaque', '1')
+    if (filters.onlyNew) p.set('novo', '1')
+    if (filters.onlyWithPhotos) p.set('fotos', '1')
+    const qs = p.toString()
+    router.replace(qs ? `/busca?${qs}` : '/busca', { scroll: false })
+  }, [filters])
 
   useEffect(() => {
     if (!supabase) return
