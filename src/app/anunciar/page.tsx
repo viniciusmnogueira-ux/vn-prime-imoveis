@@ -49,6 +49,7 @@ export default function AnunciarPage() {
     condominio: '', iptu: '',
     endereco: '', bairro: '', cidade: 'Belo Horizonte', estado: 'MG', cep: '',
     plano: '',
+    caracteristicas: [] as string[],
     pitches: [] as { label: string; text: string }[],
     pitchEscolhido: '',
   })
@@ -123,7 +124,7 @@ export default function AnunciarPage() {
         iptu: form.iptu ? parseFloat(form.iptu.replace(/\D/g, '')) : null,
         endereco: form.endereco, bairro: form.bairro,
         cidade: form.cidade, estado: form.estado, cep: form.cep,
-        fotos: fotoUrls, caracteristicas: [],
+        fotos: fotoUrls, caracteristicas: form.caracteristicas,
         status: 'pendente',
         plano_label: form.plano,
         destaque: false,
@@ -232,6 +233,19 @@ export default function AnunciarPage() {
               <Field label="Bairro" required><input style={iStyle} value={form.bairro} onChange={e => set('bairro', e.target.value)} placeholder="Savassi" /></Field>
               <Field label="Cidade"><input style={iStyle} value={form.cidade} onChange={e => set('cidade', e.target.value)} /></Field>
             </div>
+            <Field label="Características (opcional)">
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 10px', marginTop: 4 }}>
+                {['Piscina','Academia','Churrasqueira','Portaria 24h','Varanda','Armários embutidos','Ar-condicionado','Elevador','Playground','Pet-friendly','Sauna','Salão de festas','Quadra','Vista privilegiada','Jardim'].map(c => {
+                  const on = form.caracteristicas.includes(c)
+                  return (
+                    <button key={c} type="button" onClick={() => setForm(f => ({ ...f, caracteristicas: on ? f.caracteristicas.filter(x => x !== c) : [...f.caracteristicas, c] }))}
+                      style={{ padding: '5px 13px', borderRadius: 99, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', border: `1.5px solid ${on ? '#D4A857' : '#E5E7EB'}`, background: on ? 'rgba(212,168,87,0.12)' : '#fff', color: on ? '#92650A' : '#6B7280', transition: 'all 0.15s' }}>
+                      {on ? '✓ ' : ''}{c}
+                    </button>
+                  )
+                })}
+              </div>
+            </Field>
             <NavBtns onBack={() => setStep('voce')} onNext={() => setStep('fotos')} canNext={!!form.titulo && !!form.preco && !!form.bairro} />
           </Card>
         )}

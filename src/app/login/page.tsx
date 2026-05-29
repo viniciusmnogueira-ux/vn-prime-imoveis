@@ -19,7 +19,21 @@ function LoginContent() {
   const [tipo, setTipo] = useState<'proprietario' | 'corretor'>(tipoParam ?? 'proprietario')
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState('')
+  const [resetMode, setResetMode] = useState(false)
+  const [resetEmail, setResetEmail] = useState('')
+  const [resetSent, setResetSent] = useState(false)
   const supabase = createClient()
+
+  const sendReset = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: `${window.location.origin}/auth/callback?next=/login`,
+    })
+    setLoading(false)
+    if (error) setMsg(error.message)
+    else setResetSent(true)
+  }
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -220,13 +234,44 @@ function LoginContent() {
             </div>
           )}
 
-          {tab === 'entrar' ? (
+          {resetMode ? (
+            resetSent ? (
+              <div style={{ background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 10, padding: '20px 18px', textAlign: 'center' }}>
+                <div style={{ fontSize: 28, marginBottom: 10 }}>✉️</div>
+                <div style={{ fontWeight: 700, color: '#065F46', marginBottom: 6 }}>Link enviado!</div>
+                <div style={{ fontSize: 13, color: '#047857', lineHeight: 1.55 }}>
+                  Verifique sua caixa de entrada em <strong>{resetEmail}</strong>. O link expira em 1 hora.
+                </div>
+                <button onClick={() => { setResetMode(false); setResetSent(false); setMsg('') }} style={{ marginTop: 16, fontSize: 13, color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
+                  Voltar ao login
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={sendReset} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 4px', lineHeight: 1.5 }}>
+                  Informe seu e-mail cadastrado e enviaremos um link para redefinir a senha.
+                </p>
+                <input type="email" placeholder="seu@email.com" value={resetEmail} onChange={e => setResetEmail(e.target.value)} required style={inp} />
+                <button type="submit" disabled={loading || !resetEmail} style={btnPrimary}>
+                  {loading ? 'Enviando…' : 'Enviar link de redefinição'}
+                </button>
+                <button type="button" onClick={() => { setResetMode(false); setMsg('') }} style={{ fontSize: 13, color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center', textDecoration: 'underline' }}>
+                  Cancelar
+                </button>
+              </form>
+            )
+          ) : tab === 'entrar' ? (
             <form onSubmit={signInEmail} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <input type="email" placeholder="E-mail" value={email} onChange={e => setEmail(e.target.value)} required style={inp} />
               <input type="password" placeholder="Senha" value={password} onChange={e => setPassword(e.target.value)} required style={inp} />
               <button type="submit" disabled={loading} style={btnPrimary}>
                 {loading ? 'Entrando…' : 'Entrar'}
               </button>
+              <div style={{ textAlign: 'right', marginTop: -4 }}>
+                <button type="button" onClick={() => { setResetMode(true); setResetEmail(email); setMsg('') }} style={{ fontSize: 13, color: '#D4A857', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit' }}>
+                  Esqueci minha senha
+                </button>
+              </div>
             </form>
           ) : (
             <form onSubmit={signUp} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

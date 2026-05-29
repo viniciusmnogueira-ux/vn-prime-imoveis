@@ -122,6 +122,29 @@ export default function FavoritosPage() {
       </div>
 
       <div style={{ width: 'min(1280px,94vw)', margin: '40px auto 0' }}>
+        {!loading && imoveis.length >= 2 && (() => {
+          const prices = imoveis.map(im => im.preco).filter(Boolean) as number[]
+          const areas = imoveis.map(im => im.area_m2).filter(Boolean) as number[]
+          const minP = Math.min(...prices)
+          const maxP = Math.max(...prices)
+          const avgArea = areas.length ? Math.round(areas.reduce((a, b) => a + b, 0) / areas.length) : null
+          const fmt = (n: number) => n >= 1_000_000 ? `R$ ${(n / 1_000_000).toFixed(1).replace('.', ',')} mi` : `R$ ${(n / 1_000).toFixed(0)} mil`
+          return (
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 28 }}>
+              {[
+                { label: 'Imóveis salvos', value: String(imoveis.length) },
+                { label: 'Menor preço', value: prices.length ? fmt(minP) : '—' },
+                { label: 'Maior preço', value: prices.length ? fmt(maxP) : '—' },
+                { label: 'Área média', value: avgArea ? `${avgArea} m²` : '—' },
+              ].map(({ label, value }) => (
+                <div key={label} style={{ flex: '1 1 140px', background: '#fff', border: '1px solid var(--border)', borderRadius: 12, padding: '16px 20px' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--fg-3)', marginBottom: 6 }}>{label}</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800, color: 'var(--gold)' }}>{value}</div>
+                </div>
+              ))}
+            </div>
+          )
+        })()}
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
             <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid var(--border)', borderTopColor: 'var(--gold)', animation: 'spin 0.8s linear infinite' }} />
