@@ -8,15 +8,24 @@ import Btn from '@/components/ui/Btn'
 
 const MAX = 3
 
-function Spec({ label, values, highlight }: { label: string; values: (string | null)[]; highlight?: boolean }) {
+function Spec({ label, values, highlight, winner }: { label: string; values: (string | null)[]; highlight?: boolean; winner?: number }) {
   return (
     <tr style={{ borderBottom: '1px solid var(--border)', background: highlight ? 'rgba(212,168,87,0.05)' : 'transparent' }}>
       <td style={{ padding: '12px 16px', fontSize: 12, fontWeight: 700, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap', width: 140, verticalAlign: 'middle' }}>
         {label}
       </td>
       {values.map((v, i) => (
-        <td key={i} style={{ padding: '12px 16px', fontSize: 14, fontWeight: 600, color: v ? 'var(--navy)' : 'var(--fg-3)', textAlign: 'center', verticalAlign: 'middle' }}>
+        <td key={i} style={{
+          padding: '12px 16px', fontSize: 14, fontWeight: winner === i ? 800 : 600,
+          color: v ? (winner === i ? '#065F46' : 'var(--navy)') : 'var(--fg-3)',
+          textAlign: 'center', verticalAlign: 'middle',
+          background: winner === i ? 'rgba(16,185,129,0.09)' : 'transparent',
+          position: 'relative',
+        }}>
           {v ?? '—'}
+          {winner === i && v && (
+            <span style={{ position: 'absolute', top: 5, right: 8, fontSize: 9, fontWeight: 800, color: '#059669', letterSpacing: '0.06em', textTransform: 'uppercase' }}>★</span>
+          )}
         </td>
       ))}
     </tr>
@@ -56,6 +65,27 @@ export default function CompararPage() {
   }
 
   const cols = imoveis.length
+
+  function winnerOf(nums: (number | null | undefined)[], prefer: 'min' | 'max'): number | undefined {
+    if (nums.length < 2) return undefined
+    const valid = nums.map((n, i) => ({ n, i })).filter(x => x.n != null && !isNaN(x.n as number)) as { n: number; i: number }[]
+    if (valid.length < 2) return undefined
+    const best = prefer === 'min'
+      ? valid.reduce((a, b) => (b.n < a.n ? b : a))
+      : valid.reduce((a, b) => (b.n > a.n ? b : a))
+    const isTie = valid.filter(x => x.n === best.n).length > 1
+    return isTie ? undefined : best.i
+  }
+
+  const wPreco    = winnerOf(imoveis.map(i => i.preco), 'min')
+  const wArea     = winnerOf(imoveis.map(i => i.area_m2), 'max')
+  const wQuartos  = winnerOf(imoveis.map(i => i.quartos), 'max')
+  const wSuites   = winnerOf(imoveis.map(i => i.suites), 'max')
+  const wVagas    = winnerOf(imoveis.map(i => i.vagas), 'max')
+  const wPorM2    = winnerOf(imoveis.map(i => (i.preco && i.area_m2) ? i.preco / i.area_m2 : null), 'min')
+  const wCond     = winnerOf(imoveis.map(i => i.condominio), 'min')
+
+  const winCounts = imoveis.map((_, i) => [wPreco, wArea, wQuartos, wSuites, wVagas, wPorM2, wCond].filter(w => w === i).length)
 
   return (
     <main style={{ background: 'var(--cream)', minHeight: '100vh', paddingBottom: 80 }}>
@@ -156,18 +186,18 @@ export default function CompararPage() {
                   </tr>
                   <Spec label="Tipo" values={imoveis.map(i => i.tipo ? i.tipo.charAt(0).toUpperCase() + i.tipo.slice(1) : null)} />
                   <Spec label="Operação" values={imoveis.map(i => i.operacao ?? null)} />
-                  <Spec label="Área" values={imoveis.map(i => i.area_m2 ? `${i.area_m2} m²` : null)} highlight />
-                  <Spec label="Quartos" values={imoveis.map(i => i.quartos ? `${i.quartos}` : null)} />
-                  <Spec label="Suítes" values={imoveis.map(i => i.suites ? `${i.suites}` : null)} highlight />
+                  <Spec label="Área" values={imoveis.map(i => i.area_m2 ? `${i.area_m2} m²` : null)} highlight winner={wArea} />
+                  <Spec label="Quartos" values={imoveis.map(i => i.quartos ? `${i.quartos}` : null)} winner={wQuartos} />
+                  <Spec label="Suítes" values={imoveis.map(i => i.suites ? `${i.suites}` : null)} highlight winner={wSuites} />
                   <Spec label="Banheiros" values={imoveis.map(i => i.banheiros ? `${i.banheiros}` : null)} />
-                  <Spec label="Vagas" values={imoveis.map(i => i.vagas ? `${i.vagas}` : null)} highlight />
+                  <Spec label="Vagas" values={imoveis.map(i => i.vagas ? `${i.vagas}` : null)} highlight winner={wVagas} />
 
                   <tr style={{ background: 'rgba(212,168,87,0.08)', borderTop: '2px solid var(--border)' }}>
                     <td colSpan={cols + 2} style={{ padding: '8px 16px', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gold-deep)' }}>Financeiro</td>
                   </tr>
-                  <Spec label="Preço" values={imoveis.map(i => fmtBRL(i.preco))} highlight />
-                  <Spec label="Preço/m²" values={imoveis.map(i => i.preco && i.area_m2 ? `${fmtBRL(Math.round(i.preco / i.area_m2))}/m²` : null)} />
-                  <Spec label="Condomínio" values={imoveis.map(i => i.condominio ? `${fmtBRL(i.condominio)}/mês` : null)} highlight />
+                  <Spec label="Preço" values={imoveis.map(i => fmtBRL(i.preco))} highlight winner={wPreco} />
+                  <Spec label="Preço/m²" values={imoveis.map(i => i.preco && i.area_m2 ? `${fmtBRL(Math.round(i.preco / i.area_m2))}/m²` : null)} winner={wPorM2} />
+                  <Spec label="Condomínio" values={imoveis.map(i => i.condominio ? `${fmtBRL(i.condominio)}/mês` : null)} highlight winner={wCond} />
                   <Spec label="IPTU" values={imoveis.map(i => i.iptu ? `${fmtBRL(i.iptu)}/ano` : null)} />
 
                   <tr style={{ background: 'rgba(212,168,87,0.08)', borderTop: '2px solid var(--border)' }}>
@@ -182,6 +212,26 @@ export default function CompararPage() {
                   <Spec label="Verificado" values={imoveis.map(i => i.verificado ? '✓ Sim' : 'Não')} highlight />
                   <Spec label="Destaque" values={imoveis.map(i => i.destaque ? '★ Sim' : 'Não')} />
                   <Spec label="Lançamento" values={imoveis.map(i => i.operacao === 'lancamento' ? 'Sim' : 'Não')} highlight />
+
+                  {/* Placar */}
+                  {cols > 1 && winCounts.some(c => c > 0) && (
+                    <tr style={{ background: 'rgba(5,150,105,0.07)', borderTop: '2px solid var(--border)' }}>
+                      <td style={{ padding: '12px 16px', fontSize: 12, fontWeight: 800, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                        Pontuação geral
+                      </td>
+                      {winCounts.map((c, i) => (
+                        <td key={i} style={{ padding: '12px 16px', textAlign: 'center' }}>
+                          <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                            <span style={{ fontSize: 22, fontWeight: 900, color: c === Math.max(...winCounts) && c > 0 ? '#059669' : 'var(--fg-3)' }}>{c}</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9CA3AF' }}>vitórias</span>
+                            {c === Math.max(...winCounts) && c > 0 && winCounts.filter(x => x === c).length === 1 && (
+                              <span style={{ fontSize: 9, fontWeight: 800, background: '#059669', color: '#fff', padding: '2px 7px', borderRadius: 99, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Melhor escolha</span>
+                            )}
+                          </div>
+                        </td>
+                      ))}
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

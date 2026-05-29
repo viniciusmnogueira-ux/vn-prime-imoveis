@@ -460,6 +460,24 @@ export default function LancamentosPage() {
         </div>
       </div>
 
+      {/* ── ROI Strip ────────────────────────────────────────────────── */}
+      <div style={{ background: 'rgba(212,168,87,0.08)', borderBottom: '1px solid rgba(212,168,87,0.2)' }}>
+        <div style={{ width: 'min(1200px,92vw)', margin: '0 auto', padding: '12px 0', display: 'flex', gap: 32, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+          {[
+            { icon: '📈', label: 'Valorização média BH (5 anos)', value: '+47%' },
+            { icon: '🏗️', label: 'Ganho planta → pronto', value: '20–35%' },
+            { icon: '💰', label: 'Aluguel yield estimado', value: '4–6% a.a.' },
+            { icon: '⏱️', label: 'Tempo médio de valorização', value: '36 meses' },
+          ].map(({ icon, label, value }) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 16 }}>{icon}</span>
+              <span style={{ fontSize: 12, color: '#6B7280' }}>{label}:</span>
+              <span style={{ fontSize: 13, fontWeight: 800, color: '#92650A' }}>{value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* ── Grid ─────────────────────────────────────────────────────── */}
       <section style={{ width: 'min(1200px,92vw)', margin: '0 auto', padding: 'clamp(48px,6vw,80px) 0' }}>
         <AnimatePresence mode="popLayout">
