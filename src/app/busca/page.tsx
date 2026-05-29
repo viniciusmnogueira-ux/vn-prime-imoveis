@@ -307,7 +307,7 @@ function BuscaContent() {
     bairros: params.get('bairros') ? params.get('bairros')!.split(',') : [],
     quartos: params.get('quartos') ? parseInt(params.get('quartos')!) : 0,
     priceMin: params.get('pmin') ?? '',
-    priceMax: params.get('pmax') ?? '',
+    priceMax: params.get('pmax') ?? params.get('valor') ?? '',
     priceRange: params.get('pr') ?? '',
     areaMin: params.get('amin') ?? '',
     areaMax: params.get('amax') ?? '',

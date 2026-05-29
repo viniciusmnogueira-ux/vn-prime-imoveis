@@ -199,7 +199,7 @@ export default function HomePage() {
   }
 
   const searchHref = `/busca${searchQ || searchTipo || searchValor
-    ? `?q=${encodeURIComponent(searchQ)}&tipo=${searchTipo}&valor=${searchValor}`
+    ? `?q=${encodeURIComponent(searchQ)}${searchTipo ? `&tipo=${searchTipo}` : ''}${searchValor ? `&pmax=${searchValor}` : ''}`
     : ''}`
 
   return (
