@@ -245,6 +245,38 @@ export default function AdminPage() {
               </div>
             )}
 
+            {/* Leads últimos 7 dias sparkline */}
+            {leads.length > 0 && (() => {
+              const days: { label: string; count: number; date: string }[] = []
+              for (let d = 6; d >= 0; d--) {
+                const dt = new Date()
+                dt.setDate(dt.getDate() - d)
+                const dateStr = dt.toISOString().slice(0, 10)
+                const label = dt.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric' })
+                const count = leads.filter(l => (l.criado_em ?? '').slice(0, 10) === dateStr).length
+                days.push({ label, count, date: dateStr })
+              }
+              const maxCount = Math.max(...days.map(d => d.count), 1)
+              const total7 = days.reduce((s, d) => s + d.count, 0)
+              return (
+                <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', padding: '18px 24px', marginBottom: 20 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>Leads — últimos 7 dias</div>
+                    <div style={{ fontSize: 12, color: '#64748B' }}>{total7} total no período</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', height: 60 }}>
+                    {days.map(d => (
+                      <div key={d.date} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: d.count > 0 ? '#7C3AED' : 'transparent' }}>{d.count || ''}</div>
+                        <div style={{ width: '100%', background: d.count > 0 ? '#7C3AED' : '#F1F5F9', borderRadius: '4px 4px 0 0', height: `${Math.max((d.count / maxCount) * 48, d.count > 0 ? 8 : 4)}px`, transition: 'height 0.3s' }} />
+                        <div style={{ fontSize: 9, color: '#94A3B8', textAlign: 'center', lineHeight: 1.2 }}>{d.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
+
             {/* Activity feed + Últimos leads — side by side */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(320px,1fr))', gap: 20, marginBottom: 24 }}>
               {/* Feed de atividade recente */}
