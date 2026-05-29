@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -369,9 +369,25 @@ function AnimatedSection({ children, style }: { children: React.ReactNode; style
 
 // ─── Página ───────────────────────────────────────────────────────────────────
 
+const fmtBRL = (n: number) => n >= 1_000_000
+  ? `R$ ${(n / 1_000_000).toFixed(1).replace('.', ',')} mi`
+  : `R$ ${(n / 1_000).toFixed(0)} mil`
+
 export default function LancamentosPage() {
   const [filtroStatus, setFiltroStatus] = useState<Status | 'Todos'>('Todos')
   const [filtroTipo, setFiltroTipo] = useState('Todos')
+  const [livePortfolio, setLivePortfolio] = useState<any[]>([])
+
+  useEffect(() => {
+    const sb = createClient()
+    sb.from('imoveis')
+      .select('id, titulo, tipo, bairro, cidade, preco, area_m2, quartos, fotos')
+      .eq('status', 'ativo')
+      .order('destaque', { ascending: false })
+      .order('criado_em', { ascending: false })
+      .limit(4)
+      .then(({ data }) => setLivePortfolio(data ?? []))
+  }, [])
 
   const filtrados = LANCAMENTOS.filter(l => {
     const okStatus = filtroStatus === 'Todos' || l.status === filtroStatus
@@ -536,6 +552,57 @@ export default function LancamentosPage() {
           )}
         </AnimatePresence>
       </section>
+
+      {/* ── Portfólio disponível agora ───────────────────────────────── */}
+      {livePortfolio.length > 0 && (
+        <section style={{ background: '#F5F8FA', borderTop: '1px solid #E5E7EB', padding: 'clamp(48px,7vw,72px) 0' }}>
+          <div style={{ width: 'min(1200px,92vw)', margin: '0 auto' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 28 }}>
+              <div>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#34D399', display: 'inline-block', boxShadow: '0 0 6px #34D399' }} />
+                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#059669' }}>Disponível agora</span>
+                </div>
+                <h2 style={{ margin: 0, fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: 'clamp(1.6rem,2.8vw,2.2rem)', fontWeight: 700, color: '#0F1824' }}>
+                  Do nosso portfólio pronto
+                </h2>
+                <p style={{ margin: '6px 0 0', fontSize: 14, color: '#6B7280' }}>Imóveis disponíveis para visita e entrega imediata.</p>
+              </div>
+              <Link href="/busca" style={{ fontSize: 13, fontWeight: 700, color: '#0F1824', textDecoration: 'none', borderBottom: '1.5px solid #D4A857', paddingBottom: 2, whiteSpace: 'nowrap' }}>
+                Ver portfólio completo →
+              </Link>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,260px),1fr))', gap: 20 }}>
+              {livePortfolio.map(im => (
+                <Link key={im.id} href={`/imovel/${im.id}`} style={{ textDecoration: 'none' }}>
+                  <div style={{ background: '#fff', borderRadius: 14, overflow: 'hidden', border: '1.5px solid #E5E7EB', boxShadow: '0 2px 12px rgba(27,39,51,0.06)', transition: 'border-color 0.2s, box-shadow 0.2s' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#D4A857'; (e.currentTarget as HTMLElement).style.boxShadow = '0 16px 40px rgba(27,39,51,0.13)' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#E5E7EB'; (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 12px rgba(27,39,51,0.06)' }}>
+                    <div style={{ height: 170, background: im.fotos?.[0] ? `url(${im.fotos[0]}) center/cover` : '#F3F4F6', position: 'relative' }}>
+                      {im.tipo && (
+                        <span style={{ position: 'absolute', bottom: 10, left: 12, background: 'rgba(15,24,36,0.82)', color: '#D4A857', fontSize: 10, fontWeight: 700, padding: '3px 9px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.09em' }}>
+                          {im.tipo}
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ padding: '16px 18px 18px' }}>
+                      <div style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: 20, fontWeight: 800, color: '#D4A857', marginBottom: 4 }}>{im.preco ? fmtBRL(im.preco) : '—'}</div>
+                      <div style={{ fontSize: 13.5, fontWeight: 600, color: '#0F1824', marginBottom: 3, lineHeight: 1.3 }}>{im.titulo}</div>
+                      <div style={{ fontSize: 12, color: '#9CA3AF' }}>{im.bairro}{im.cidade && im.bairro ? ', ' : ''}{im.cidade}</div>
+                      {(im.area_m2 || im.quartos) && (
+                        <div style={{ marginTop: 8, display: 'flex', gap: 12, fontSize: 12, color: '#6B7280' }}>
+                          {im.area_m2 && <span>{im.area_m2} m²</span>}
+                          {im.quartos && <span>{im.quartos} qto{im.quartos !== 1 ? 's' : ''}</span>}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── CTA Banner ───────────────────────────────────────────────── */}
       <section style={{ background: '#F5F8FA', borderTop: '1px solid #E5E7EB', padding: 'clamp(64px,9vw,96px) 0' }}>
