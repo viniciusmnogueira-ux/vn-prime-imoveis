@@ -327,6 +327,16 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Portais parceiros ── */}
+      <section style={{ background: 'var(--cream)', borderBottom: '1px solid var(--border)', padding: '18px 0' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
+          <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--fg-3)', flexShrink: 0 }}>Distribuído em</span>
+          {['ZAP Imóveis', 'Viva Real', 'ImovelWeb', 'OLX', 'Mercado Livre'].map(p => (
+            <span key={p} style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--fg-2)', padding: '5px 14px', border: '1px solid var(--border)', borderRadius: 8, background: '#fff', whiteSpace: 'nowrap' }}>{p}</span>
+          ))}
+        </div>
+      </section>
+
       {/* ── Como funciona ── */}
       <section style={{ padding: 'clamp(3rem,5vw,4.5rem) 0', background: '#fff' }}>
         <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>

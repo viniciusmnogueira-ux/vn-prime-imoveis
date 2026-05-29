@@ -41,6 +41,7 @@ export default function ImovelPage() {
   const [propostaSent, setPropostaSent] = useState(false)
   const [lightbox, setLightbox] = useState<number | null>(null)
   const [similares, setSimilares] = useState<any[]>([])
+  const [bairroStats, setBairroStats] = useState<{ count: number; avgPreco: number; avgM2: number } | null>(null)
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstance = useRef<any>(null)
 
@@ -80,6 +81,17 @@ export default function ImovelPage() {
           supabase.from('imoveis').select('id, titulo, tipo, bairro, cidade, preco, fotos')
             .eq('status', 'ativo').eq('tipo', data.tipo).neq('id', id).limit(4)
             .then(({ data: sims }) => setSimilares(sims ?? []))
+          supabase.from('imoveis').select('preco, area_m2').eq('status', 'ativo').eq('bairro', data.bairro).neq('id', id)
+            .then(({ data: nb }) => {
+              if (!nb || nb.length === 0) return
+              const withPreco = nb.filter(i => i.preco > 0)
+              const withM2 = nb.filter(i => i.preco > 0 && i.area_m2 > 0)
+              if (withPreco.length > 0) setBairroStats({
+                count: withPreco.length,
+                avgPreco: withPreco.reduce((s, i) => s + i.preco, 0) / withPreco.length,
+                avgM2: withM2.length > 0 ? withM2.reduce((s, i) => s + i.preco / i.area_m2, 0) / withM2.length : 0,
+              })
+            })
         }
       })
   }, [id])
@@ -239,6 +251,31 @@ export default function ImovelPage() {
                   </span>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Mercado do bairro */}
+          {bairroStats && bairroStats.count >= 2 && (
+            <div style={{ marginTop: 32, background: 'var(--cream)', borderRadius: 14, padding: '20px 24px', border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--gold-deep)', marginBottom: 14 }}>Mercado em {im.bairro}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(130px,1fr))', gap: 12 }}>
+                {[
+                  { label: 'Imóveis ativos', val: bairroStats.count.toString() },
+                  { label: 'Preço médio', val: fmtBRL(Math.round(bairroStats.avgPreco)) },
+                  bairroStats.avgM2 > 0 ? { label: 'Médio R$/m²', val: fmtBRL(Math.round(bairroStats.avgM2)) } : null,
+                  im.preco && bairroStats.avgPreco > 0 ? {
+                    label: 'Vs. mercado',
+                    val: im.preco < bairroStats.avgPreco ? `${Math.round((1 - im.preco / bairroStats.avgPreco) * 100)}% abaixo` : `${Math.round((im.preco / bairroStats.avgPreco - 1) * 100)}% acima`,
+                    color: im.preco < bairroStats.avgPreco ? '#059669' : '#D97706',
+                  } : null,
+                ].filter(Boolean).map(s => s && (
+                  <div key={s.label} style={{ background: '#fff', borderRadius: 10, padding: '12px 14px', border: '1px solid var(--border)' }}>
+                    <div style={{ fontSize: 11, color: 'var(--fg-3)', marginBottom: 4 }}>{s.label}</div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: (s as any).color ?? 'var(--navy)' }}>{s.val}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: 12, fontSize: 11, color: 'var(--fg-3)' }}>Baseado em {bairroStats.count} imóvel(is) ativo(s) no bairro.</div>
             </div>
           )}
 
