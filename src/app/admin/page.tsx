@@ -99,6 +99,16 @@ export default function AdminPage() {
     }))
   }
 
+  async function toggleDestaque(id: string, current: boolean) {
+    await supabase.from('imoveis').update({ destaque: !current }).eq('id', id)
+    setImoveis(prev => prev.map(i => i.id === id ? { ...i, destaque: !current } : i))
+  }
+
+  async function toggleVerificado(id: string, current: boolean) {
+    await supabase.from('imoveis').update({ verificado: !current }).eq('id', id)
+    setImoveis(prev => prev.map(i => i.id === id ? { ...i, verificado: !current } : i))
+  }
+
   async function deleteImovel(id: string) {
     if (!confirm('Excluir este imóvel?')) return
     await supabase.from('imoveis').delete().eq('id', id)
@@ -380,6 +390,14 @@ export default function AdminPage() {
                               Reativar
                             </button>
                           )}
+                          <button onClick={() => toggleDestaque(im.id, !!im.destaque)}
+                            style={{ padding: '4px 10px', borderRadius: 6, background: im.destaque ? '#FFFBEB' : '#F8FAFC', color: im.destaque ? '#D97706' : '#64748B', border: `1px solid ${im.destaque ? '#FDE68A' : '#E2E8F0'}`, fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                            {im.destaque ? '★ Dest' : '☆ Dest'}
+                          </button>
+                          <button onClick={() => toggleVerificado(im.id, !!im.verificado)}
+                            style={{ padding: '4px 10px', borderRadius: 6, background: im.verificado ? '#ECFDF5' : '#F8FAFC', color: im.verificado ? '#059669' : '#64748B', border: `1px solid ${im.verificado ? '#6EE7B7' : '#E2E8F0'}`, fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                            {im.verificado ? '✓ Ver' : '○ Ver'}
+                          </button>
                           <Link href={`/imovel/${im.id}`} target="_blank"
                             style={{ padding: '4px 10px', borderRadius: 6, background: '#F1F5F9', color: 'var(--navy)', border: 'none', fontSize: 11, fontWeight: 600, textDecoration: 'none' }}>
                             Ver

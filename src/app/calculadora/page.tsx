@@ -167,6 +167,74 @@ export default function CalculadoraPage() {
         </div>
       </section>
 
+      {/* SAC vs PRICE */}
+      <section style={{ padding: 'clamp(40px,5vw,60px) 0', background: 'var(--cream)' }}>
+        <div style={{ width: 'min(1100px,92vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 36 }}>
+            <Eyebrow color="var(--gold-deep)">Comparativo de financiamento</Eyebrow>
+            <h2 style={{ margin: '10px 0 12px', fontSize: 'clamp(1.4rem,2.4vw,1.8rem)' }}>SAC vs PRICE — qual é melhor para você?</h2>
+            <p style={{ color: 'var(--fg-2)', maxWidth: 480, margin: '0 auto' }}>Simulação baseada no valor e entrada que você informou.</p>
+          </div>
+          {(() => {
+            const fin = Math.round(valor * (1 - entradaPct / 100))
+            const prazo = 360
+            const taxa = 0.0089
+            if (fin <= 0) return <div style={{ textAlign: 'center', color: 'var(--fg-3)', fontSize: 14 }}>Ajuste o valor do imóvel e a entrada para ver a comparação.</div>
+
+            // PRICE
+            const fator = (taxa * Math.pow(1 + taxa, prazo)) / (Math.pow(1 + taxa, prazo) - 1)
+            const parcelaPrice = fin * fator
+            const totalPrice = parcelaPrice * prazo
+            const jurosPrice = totalPrice - fin
+
+            // SAC
+            const amort = fin / prazo
+            const primeiraSAC = amort + fin * taxa
+            const ultimaSAC = amort + amort * taxa
+            const totalSAC = prazo * amort + (taxa * fin * (prazo + 1)) / 2
+            const jurosSAC = totalSAC - fin
+
+            const cols = [
+              { label: 'Sistema PRICE', sub: 'Parcela fixa durante todo o prazo', prim: parcelaPrice, ult: parcelaPrice, juros: jurosPrice, total: totalPrice, color: '#3B82F6', pros: 'Parcela constante — fácil de planejar', contras: 'Juros totais mais altos' },
+              { label: 'Sistema SAC', sub: 'Parcelas decrescentes — amortização constante', prim: primeiraSAC, ult: ultimaSAC, juros: jurosSAC, total: totalSAC, color: '#059669', pros: 'Menos juros totais pagos', contras: 'Primeira parcela mais alta' },
+            ]
+            return (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,360px),1fr))', gap: 20 }}>
+                {cols.map(c => (
+                  <div key={c.label} style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', border: '1px solid var(--border)', boxShadow: '0 4px 18px rgba(15,34,68,0.06)' }}>
+                    <div style={{ background: c.color, padding: '18px 24px' }}>
+                      <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', marginBottom: 2 }}>{c.label}</div>
+                      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)' }}>{c.sub}</div>
+                    </div>
+                    <div style={{ padding: '20px 24px' }}>
+                      {[
+                        { label: 'Financiado', val: fmt(fin) },
+                        { label: '1ª parcela', val: fmt(Math.round(c.prim)) },
+                        { label: 'Última parcela', val: fmt(Math.round(c.ult)) },
+                        { label: 'Juros totais', val: fmt(Math.round(c.juros)), highlight: true },
+                        { label: 'Total pago', val: fmt(Math.round(c.total)) },
+                      ].map(r => (
+                        <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 0', borderBottom: '1px solid #F1F5F9' }}>
+                          <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>{r.label}</span>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: r.highlight ? '#DC2626' : 'var(--navy)' }}>{r.val}</span>
+                        </div>
+                      ))}
+                      <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <div style={{ fontSize: 12, color: '#059669', fontWeight: 600 }}>✓ {c.pros}</div>
+                        <div style={{ fontSize: 12, color: '#DC2626', fontWeight: 600 }}>✗ {c.contras}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          })()}
+          <div style={{ textAlign: 'center', marginTop: 20, fontSize: 11.5, color: 'var(--fg-3)' }}>
+            Simulação estimada · Taxa 8,9% a.a. (0,89% a.m.) · 360 meses · Sujeita a aprovação de crédito
+          </div>
+        </div>
+      </section>
+
       {/* Info */}
       <section style={{ padding: 'clamp(40px,5vw,60px) 0', background: '#fff' }}>
         <div style={{ width: 'min(1100px,92vw)', margin: '0 auto', display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))' }}>
