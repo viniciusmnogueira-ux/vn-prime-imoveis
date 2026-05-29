@@ -1,6 +1,57 @@
+'use client'
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import Eyebrow from '@/components/ui/Eyebrow'
 import Btn from '@/components/ui/Btn'
 import Link from 'next/link'
+
+function LiveStats() {
+  const [stats, setStats] = useState<{ imoveis: number; bairros: number; avgPreco: number } | null>(null)
+
+  useEffect(() => {
+    const sb = createClient()
+    sb.from('imoveis').select('preco, bairro').eq('status', 'ativo').then(({ data }) => {
+      if (!data) return
+      const withPreco = data.filter(i => i.preco > 0)
+      setStats({
+        imoveis: data.length,
+        bairros: new Set(data.map(i => i.bairro).filter(Boolean)).size,
+        avgPreco: withPreco.length ? Math.round(withPreco.reduce((s, i) => s + i.preco, 0) / withPreco.length) : 0,
+      })
+    })
+  }, [])
+
+  if (!stats) return null
+  const fmtM = (n: number) => n >= 1_000_000 ? `R$ ${(n / 1_000_000).toFixed(1).replace('.', ',')} mi` : `R$ ${(n / 1_000).toFixed(0)} mil`
+
+  return (
+    <section style={{ background: 'var(--navy)', padding: 'clamp(28px,4vw,44px) 0', borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 4 }}>Números ao vivo</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34D399', animation: 'pulse 2s ease-in-out infinite' }} />
+            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 500 }}>atualizado em tempo real</span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 0, justifyContent: 'center', flexWrap: 'wrap' }}>
+          {[
+            { label: 'Imóveis em vitrine', value: String(stats.imoveis), sub: 'curados e ativos' },
+            { label: 'Bairros atendidos', value: String(stats.bairros), sub: 'na Grande BH' },
+            { label: 'Preço médio', value: stats.avgPreco ? fmtM(stats.avgPreco) : '—', sub: 'do portfólio ativo' },
+          ].map((s, i) => (
+            <div key={s.label} style={{ flex: '1 1 200px', textAlign: 'center', padding: '20px 28px', borderRight: i < 2 ? '1px solid rgba(255,255,255,0.08)' : 'none' }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.8rem,3.5vw,3rem)', fontWeight: 800, color: 'var(--gold)', lineHeight: 1.1, marginBottom: 6 }}>{s.value}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginBottom: 3 }}>{s.label}</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{s.sub}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <style>{`@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }`}</style>
+    </section>
+  )
+}
 
 export default function SobrePage() {
   return (
@@ -37,6 +88,8 @@ export default function SobrePage() {
           </p>
         </div>
       </section>
+
+      <LiveStats />
 
       {/* Quem somos */}
       <section style={{ padding: 'clamp(60px,8vw,100px) 0' }}>
