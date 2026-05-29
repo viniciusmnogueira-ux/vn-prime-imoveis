@@ -187,6 +187,41 @@ export default function SobrePage() {
         </div>
       </section>
 
+      {/* Portais & Certificações */}
+      <section style={{ background: '#fff', borderTop: '1px solid var(--border)', padding: 'clamp(40px,6vw,70px) 0' }}>
+        <div style={{ width: 'min(1100px,92vw)', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <Eyebrow color="var(--gold-deep)">Integração e credenciais</Eyebrow>
+            <h2 style={{ margin: '8px 0 10px', fontSize: 'clamp(1.4rem,2.4vw,2rem)' }}>Distribuição e credenciais</h2>
+            <p style={{ color: 'var(--fg-2)', fontSize: 15, maxWidth: 460, margin: '0 auto' }}>Nossos imóveis são distribuídos automaticamente nas maiores plataformas do Brasil.</p>
+          </div>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 40 }}>
+            {['ZAP Imóveis', 'Viva Real', 'ImovelWeb', 'OLX Imóveis', 'Mercado Livre'].map(p => (
+              <div key={p} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--cream)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 20px' }}>
+                <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{p}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ borderTop: '1px solid var(--border)', paddingTop: 32 }}>
+            <div style={{ textAlign: 'center', marginBottom: 20, fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--fg-3)' }}>Credenciais e conformidade</div>
+            <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', justifyContent: 'center' }}>
+              {[
+                { badge: 'CRECI-MG', desc: 'Corretores credenciados' },
+                { badge: 'COFECI', desc: 'Conselho Federal' },
+                { badge: 'LGPD', desc: 'Dados protegidos' },
+                { badge: 'SSL 256-bit', desc: 'Conexão criptografada' },
+                { badge: 'PCI DSS', desc: 'Pagamento seguro' },
+              ].map(c => (
+                <div key={c.badge} style={{ textAlign: 'center', padding: '12px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--cream)', minWidth: 120 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--navy)', marginBottom: 4 }}>{c.badge}</div>
+                  <div style={{ fontSize: 11, color: 'var(--fg-3)' }}>{c.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section style={{
         background: 'var(--cream)', borderTop: '1px solid var(--border)',
