@@ -151,6 +151,7 @@ export default function HomePage() {
   const [nlEmail, setNlEmail] = useState('')
   const [nlSent, setNlSent] = useState(false)
   const [nlSending, setNlSending] = useState(false)
+  const [totalAtivos, setTotalAtivos] = useState<number | null>(null)
 
   useEffect(() => {
     const t = setInterval(() => setSlide(s => (s + 1) % HERO_PHOTOS.length), 7000)
@@ -166,6 +167,11 @@ export default function HomePage() {
       .order('criado_em', { ascending: false })
       .limit(6)
       .then(({ data }) => setFeatured(data || []))
+
+    supabase.from('imoveis')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'ativo')
+      .then(({ count }) => { if (count != null) setTotalAtivos(count) })
 
     // Recently viewed
     const ids: string[] = JSON.parse(localStorage.getItem('vnp_recent') ?? '[]')
@@ -351,7 +357,7 @@ export default function HomePage() {
                 <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>Mercado ao vivo</span>
               </div>
               {[
-                { label: 'Em portfólio', value: `${featured.length} imóveis` },
+                { label: 'Em portfólio', value: `${totalAtivos ?? featured.length} imóveis` },
                 { label: 'Preço médio', value: fmt(avgPrice) },
                 { label: 'A partir de', value: fmt(minPrice) },
               ].map(s => (
