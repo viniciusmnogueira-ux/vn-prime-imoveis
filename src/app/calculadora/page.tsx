@@ -1,6 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
 import Eyebrow from '@/components/ui/Eyebrow'
+import { createClient } from '@/lib/supabase/client'
 
 const fmt = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
 
@@ -24,6 +26,22 @@ export default function CalculadoraPage() {
   const [taxaItbi, setTaxaItbi] = useState(3)
   const [financiado, setFinanciado] = useState(false)
   const [entradaPct, setEntradaPct] = useState(20)
+  const [matchImoveis, setMatchImoveis] = useState<any[]>([])
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      const sb = createClient()
+      sb.from('imoveis').select('id, titulo, tipo, bairro, preco, fotos')
+        .eq('status', 'ativo')
+        .gte('preco', Math.round(valor * 0.78))
+        .lte('preco', Math.round(valor * 1.22))
+        .limit(4)
+        .then(({ data }) => setMatchImoveis(data ?? []))
+    }, 700)
+    return () => { if (timerRef.current) clearTimeout(timerRef.current) }
+  }, [valor])
 
   const itbi = Math.round(valor * taxaItbi / 100)
   const em = getEmolumentos(valor)
@@ -164,6 +182,33 @@ export default function CalculadoraPage() {
               </button>
             </div>
           </div>
+
+        {matchImoveis.length > 0 && (
+          <div style={{ marginTop: 32 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--fg-3)', marginBottom: 14 }}>
+              Imóveis nessa faixa de preço — portfólio VN Prime
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: 14 }}>
+              {matchImoveis.map(im => (
+                <Link key={im.id} href={`/imovel/${im.id}`} style={{ textDecoration: 'none' }}>
+                  <div style={{ background: '#fff', borderRadius: 12, border: '1px solid var(--border)', overflow: 'hidden', transition: 'box-shadow 0.15s' }}
+                    onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 6px 24px rgba(15,34,68,0.1)')}
+                    onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}>
+                    <div style={{ height: 120, background: im.fotos?.[0] ? `url(${im.fotos[0]}) center/cover` : 'var(--navy)', position: 'relative' }}>
+                      <div style={{ position: 'absolute', bottom: 6, left: 8, background: 'var(--gold)', color: 'var(--navy-deep)', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 99 }}>
+                        {fmt(im.preco)}
+                      </div>
+                    </div>
+                    <div style={{ padding: '10px 12px' }}>
+                      <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--navy)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{im.titulo}</div>
+                      <div style={{ fontSize: 11, color: 'var(--fg-2)', marginTop: 3 }}>{im.bairro ?? im.tipo}</div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
         </div>
       </section>
 
