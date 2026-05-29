@@ -446,16 +446,22 @@ function BuscaContent() {
           alignItems: 'center', gap: 14, flexWrap: 'wrap', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <OperationTabsLight value={filters.op} onChange={v => { setF({ op: v }); setPage(1) }} />
-            {isMobile && (
-              <button onClick={() => setMobileFiltersOpen(o => !o)} style={{
-                display: 'flex', alignItems: 'center', gap: 6, padding: '0.5rem 0.9rem',
-                border: mobileFiltersOpen ? '1px solid var(--gold)' : '1px solid var(--border)',
-                borderRadius: 8,
-                background: mobileFiltersOpen ? 'rgba(212,168,87,0.12)' : '#fff',
-                color: mobileFiltersOpen ? 'var(--gold-deep)' : 'var(--navy)',
-                fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-              }}>⊞ Filtros</button>
-            )}
+            {isMobile && (() => {
+              const activeCount = [filters.tipo, filters.priceRange || filters.priceMin || filters.priceMax, filters.quartos || null, filters.suites || null, filters.vagas || null, filters.areaMin || filters.areaMax || null, ...filters.bairros, ...filters.amenidades, filters.onlyFeatured || null, filters.onlyNew || null, filters.onlyWithPhotos || null].filter(Boolean).length
+              return (
+                <button onClick={() => setMobileFiltersOpen(o => !o)} style={{
+                  display: 'flex', alignItems: 'center', gap: 6, padding: '0.5rem 0.9rem',
+                  border: mobileFiltersOpen ? '1px solid var(--gold)' : '1px solid var(--border)',
+                  borderRadius: 8,
+                  background: mobileFiltersOpen ? 'rgba(212,168,87,0.12)' : '#fff',
+                  color: mobileFiltersOpen ? 'var(--gold-deep)' : 'var(--navy)',
+                  fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600, cursor: 'pointer', position: 'relative',
+                }}>
+                  ⊞ Filtros
+                  {activeCount > 0 && <span style={{ background: 'var(--gold)', color: 'var(--navy-deep)', borderRadius: 99, fontSize: 10, fontWeight: 800, padding: '1px 5px', marginLeft: 2 }}>{activeCount}</span>}
+                </button>
+              )
+            })()}
           </div>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             <Link href="/favoritos" style={{ fontFamily: 'var(--font-body)', fontSize: 12.5, fontWeight: 600, color: 'var(--fg-2)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, padding: '0.5rem 0.75rem', border: '1px solid var(--border)', borderRadius: 8, background: '#fff', whiteSpace: 'nowrap' }}>

@@ -320,7 +320,23 @@ export default function AnunciarPage() {
                 </div>
               ))}
             </div>
-            <div style={{ marginTop: 28, display: 'flex', gap: 12 }}>
+            <div style={{ marginTop: 24, background: 'rgba(5,150,105,0.06)', border: '1px solid rgba(5,150,105,0.2)', borderRadius: 12, padding: '16px 20px' }}>
+              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#059669', marginBottom: 10 }}>O que acontece depois de publicar</div>
+              {[
+                { n: '1', t: 'Revisão em até 24h', d: 'Nossa curadoria analisa as informações e fotos antes de publicar na vitrine.' },
+                { n: '2', t: 'Aparece nas buscas', d: 'Aprovado, seu imóvel entra na vitrine pública e é distribuído nos portais parceiros.' },
+                { n: '3', t: 'Leads chegam para você', d: 'Compradores entram em contato pelo painel. Você recebe nome, e-mail e WhatsApp.' },
+              ].map(s => (
+                <div key={s.n} style={{ display: 'flex', gap: 10, marginBottom: 10, alignItems: 'flex-start' }}>
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#059669', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, flexShrink: 0, marginTop: 1 }}>{s.n}</div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', marginBottom: 2 }}>{s.t}</div>
+                    <div style={{ fontSize: 12, color: 'var(--fg-2)', lineHeight: 1.5 }}>{s.d}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 20, display: 'flex', gap: 12 }}>
               <Btn variant="ghost" onClick={() => setStep('plano')}>← Plano</Btn>
               <Btn variant="accent" size="lg" onClick={handleSubmit} loading={loading} style={{ flex: 1 }}>
                 Publicar anúncio
