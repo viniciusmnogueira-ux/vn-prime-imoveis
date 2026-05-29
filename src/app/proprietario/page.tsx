@@ -853,6 +853,8 @@ function CalculadorasSection({ imoveis, supabase }: { imoveis: any[]; supabase: 
   const [invValor, setInvValor] = useState('')
   const [invAluguel, setInvAluguel] = useState('')
   const [invVacancia, setInvVacancia] = useState('10')
+  const [custo, setCusto] = useState('')
+  const [custoPlano, setCustoPlano] = useState('assistida')
 
   const itbiNum = Number(itbiValor.replace(/\D/g, ''))
   const aliqNum = Number(itbiAliq)
@@ -1017,6 +1019,77 @@ function CalculadorasSection({ imoveis, supabase }: { imoveis: any[]; supabase: 
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      })()}
+
+      {/* Custo de venda */}
+      {(() => {
+        const IS3: React.CSSProperties = { width: '100%', padding: '11px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', background: '#fff' }
+        const vNum = Number(custo.replace(/\D/g, ''))
+        const plano = custoPlano
+        const comissaoPct = plano === 'direta' ? 0 : plano === 'assistida' ? 0.03 : 0.06
+        const comissao = vNum * comissaoPct
+        const direta = plano === 'direta' ? 297 : 0
+        const itbiComprador = vNum * 0.02
+        const escritura = vNum * 0.01
+        const corretagem = vNum * 0.05
+        const liquido = vNum - comissao - direta - corretagem * (plano === 'completa' ? 0 : 0)
+        const custoTotal = comissao + direta + corretagem * 0
+        return (
+          <div style={{ background: '#fff', borderRadius: 16, padding: '28px 28px', boxShadow: 'var(--shadow-soft)' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--gold-deep)', marginBottom: 6 }}>Calculadora</div>
+            <h3 style={{ margin: '0 0 6px', fontSize: 18 }}>Custo de venda</h3>
+            <p style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 20, lineHeight: 1.5 }}>Simule quanto você paga para vender e quanto fica no seu bolso ao final.</p>
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>Valor de venda esperado (R$)</label>
+              <input value={custo} onChange={e => setCusto(e.target.value)} placeholder="Ex: 1000000" style={IS3} />
+            </div>
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>Seu plano VN Prime</label>
+              <select value={custoPlano} onChange={e => setCustoPlano(e.target.value)} style={IS3}>
+                <option value="direta">Venda Direta — R$ 297 fixo</option>
+                <option value="assistida">Venda Assistida — 3% do valor</option>
+                <option value="completa">Venda Completa — 6% do valor</option>
+              </select>
+            </div>
+            {vNum > 0 && (
+              <div style={{ background: '#F8FAFC', borderRadius: 10, padding: '16px 18px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>Valor de venda</span>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--navy)' }}>{fmt(vNum)}</span>
+                  </div>
+                  {plano === 'direta' && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>Taxa VN Prime (fixa)</span>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: '#DC2626' }}>- {fmt(297)}</span>
+                    </div>
+                  )}
+                  {comissaoPct > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>Comissão VN Prime ({(comissaoPct * 100).toFixed(0)}%)</span>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: '#DC2626' }}>- {fmt(comissao)}</span>
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>ITBI (estimado — pago pelo comprador)</span>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--fg-3)' }}>{fmt(itbiComprador)}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>Escritura estimada (1%)</span>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--fg-3)' }}>{fmt(escritura)}</span>
+                  </div>
+                  <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10, display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>Você recebe líquido</span>
+                    <span style={{ fontSize: 20, fontWeight: 900, color: '#059669' }}>{fmt(vNum - comissao - (plano === 'direta' ? 297 : 0))}</span>
+                  </div>
+                </div>
+                <div style={{ marginTop: 10, fontSize: 11, color: 'var(--fg-3)', lineHeight: 1.5 }}>
+                  ITBI e escritura são encargos do comprador. Valores estimados — consulte o cartório da sua comarca.
                 </div>
               </div>
             )}

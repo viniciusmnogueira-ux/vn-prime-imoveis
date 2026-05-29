@@ -810,10 +810,19 @@ export default function AdminPage() {
                             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', marginBottom: 2 }}>{l.nome}</div>
                             <div style={{ fontSize: 11, color: '#64748B', marginBottom: 6 }}>{l.origem ?? '—'} · {fmtDate(l.criado_em)}</div>
                             {leadNota[l.id] && <div style={{ fontSize: 11, color: '#64748B', fontStyle: 'italic', marginBottom: 6 }}>"{leadNota[l.id].slice(0, 60)}{leadNota[l.id].length > 60 ? '…' : ''}"</div>}
-                            {l.telefone && (
-                              <a href={`https://wa.me/55${l.telefone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer"
-                                style={{ fontSize: 11, color: '#25D366', textDecoration: 'none', fontWeight: 700 }}>WhatsApp →</a>
-                            )}
+                            <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6, flexWrap: 'wrap' }}>
+                              {l.telefone && (
+                                <a href={`https://wa.me/55${l.telefone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer"
+                                  style={{ fontSize: 11, color: '#25D366', textDecoration: 'none', fontWeight: 700 }}>WhatsApp →</a>
+                              )}
+                              <select value={leadStatus[l.id] ?? 'novo'} onChange={e => {
+                                const ns = { ...leadStatus, [l.id]: e.target.value }
+                                setLeadStatus(ns)
+                                localStorage.setItem('vnp_admin_leadstatus', JSON.stringify(ns))
+                              }} style={{ marginLeft: 'auto', padding: '2px 6px', borderRadius: 5, border: '1px solid #E2E8F0', fontSize: 10, fontFamily: 'inherit', cursor: 'pointer', color: COL_COLORS[leadStatus[l.id] ?? 'novo'] ?? '#64748B', fontWeight: 700 }}>
+                                {COLS.map(c => <option key={c} value={c}>{COL_LABELS[c]}</option>)}
+                              </select>
+                            </div>
                           </div>
                         ))}
                         {colLeads.length === 0 && (
