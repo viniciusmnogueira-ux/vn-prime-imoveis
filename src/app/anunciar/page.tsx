@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Btn from '@/components/ui/Btn'
@@ -55,6 +55,27 @@ export default function AnunciarPage() {
   })
 
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
+
+  const [bairroCompete, setBairroCompete] = useState<{ count: number; avgPreco: number } | null>(null)
+  const bairroTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    if (bairroTimer.current) clearTimeout(bairroTimer.current)
+    const b = form.bairro.trim()
+    if (b.length < 3) { setBairroCompete(null); return }
+    bairroTimer.current = setTimeout(() => {
+      const sb = createClient()
+      sb.from('imoveis').select('preco').eq('status', 'ativo').ilike('bairro', `%${b}%`)
+        .then(({ data }) => {
+          if (!data || data.length === 0) { setBairroCompete(null); return }
+          const comPreco = data.filter(i => i.preco > 0)
+          setBairroCompete({
+            count: data.length,
+            avgPreco: comPreco.length ? Math.round(comPreco.reduce((s, i) => s + i.preco, 0) / comPreco.length) : 0,
+          })
+        })
+    }, 700)
+    return () => { if (bairroTimer.current) clearTimeout(bairroTimer.current) }
+  }, [form.bairro])
 
   const stepIndex = STEPS.indexOf(step)
   const progress = ((stepIndex + 1) / STEPS.length) * 100
@@ -230,7 +251,17 @@ export default function AnunciarPage() {
               <input style={iStyle} value={form.endereco} onChange={e => set('endereco', e.target.value)} placeholder="Rua, número" />
             </Field>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              <Field label="Bairro" required><input style={iStyle} value={form.bairro} onChange={e => set('bairro', e.target.value)} placeholder="Savassi" /></Field>
+              <div>
+                <Field label="Bairro" required><input style={iStyle} value={form.bairro} onChange={e => set('bairro', e.target.value)} placeholder="Savassi" /></Field>
+                {bairroCompete && (
+                  <div style={{ marginTop: 6, padding: '8px 12px', borderRadius: 8, background: 'rgba(212,168,87,0.08)', border: '1px solid rgba(212,168,87,0.22)', fontSize: 12, color: '#92650A', display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <span>📊 <strong>{bairroCompete.count}</strong> imóvel{bairroCompete.count !== 1 ? 'is' : ''} ativo{bairroCompete.count !== 1 ? 's' : ''} no portfólio VN Prime neste bairro</span>
+                    {bairroCompete.avgPreco > 0 && (
+                      <span style={{ color: '#6B5A1E' }}>· Preço médio: <strong>R$ {bairroCompete.avgPreco.toLocaleString('pt-BR')}</strong></span>
+                    )}
+                  </div>
+                )}
+              </div>
               <Field label="Cidade"><input style={iStyle} value={form.cidade} onChange={e => set('cidade', e.target.value)} /></Field>
             </div>
             <Field label="Características (opcional)">
