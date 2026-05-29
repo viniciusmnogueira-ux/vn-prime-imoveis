@@ -1,5 +1,6 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
 import Eyebrow from '@/components/ui/Eyebrow'
 import Btn from '@/components/ui/Btn'
 import { createClient } from '@/lib/supabase/client'
@@ -37,6 +38,22 @@ function SimuladorConsorcio() {
   const [email, setEmail] = useState('')
   const [enviado, setEnviado] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [matchImoveis, setMatchImoveis] = useState<any[]>([])
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      const sb = createClient()
+      sb.from('imoveis').select('id, titulo, tipo, bairro, preco, fotos')
+        .eq('status', 'ativo')
+        .gte('preco', Math.round(credito * 0.78))
+        .lte('preco', Math.round(credito * 1.22))
+        .limit(4)
+        .then(({ data }) => setMatchImoveis(data ?? []))
+    }, 700)
+    return () => { if (timerRef.current) clearTimeout(timerRef.current) }
+  }, [credito])
 
   const totalPagar = credito * (1 + TAX)
   const parcela = totalPagar / prazo
@@ -180,6 +197,33 @@ function SimuladorConsorcio() {
             )}
           </div>
         </div>
+
+        {matchImoveis.length > 0 && (
+          <div style={{ marginTop: 40 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--fg-3)', marginBottom: 14 }}>
+              Imóveis compatíveis com sua carta de crédito
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: 14 }}>
+              {matchImoveis.map(im => (
+                <Link key={im.id} href={`/imovel/${im.id}`} style={{ textDecoration: 'none' }}>
+                  <div style={{ background: 'var(--cream)', borderRadius: 12, border: '1px solid var(--border)', overflow: 'hidden', transition: 'box-shadow 0.15s' }}
+                    onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 6px 24px rgba(15,34,68,0.1)')}
+                    onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}>
+                    <div style={{ height: 120, background: im.fotos?.[0] ? `url(${im.fotos[0]}) center/cover` : '#1B2733', position: 'relative' }}>
+                      <div style={{ position: 'absolute', bottom: 6, left: 8, background: 'var(--gold)', color: 'var(--navy-deep)', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 99 }}>
+                        {fmt(im.preco)}
+                      </div>
+                    </div>
+                    <div style={{ padding: '10px 12px' }}>
+                      <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--navy)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{im.titulo}</div>
+                      <div style={{ fontSize: 11, color: 'var(--fg-2)', marginTop: 3 }}>{im.bairro ?? im.tipo}</div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )
