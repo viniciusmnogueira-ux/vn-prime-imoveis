@@ -319,6 +319,43 @@ export default function AnunciarPage() {
 
         {step === 'publicar' && (
           <Card title="Revisar e publicar" desc="Confira tudo antes de publicar.">
+            {(() => {
+              const pts = [
+                form.titulo ? 15 : 0,
+                photos.length >= 3 ? 30 : photos.length >= 1 ? 20 : 0,
+                form.descricao ? 20 : 0,
+                form.area_m2 ? 10 : 0,
+                form.quartos ? 10 : 0,
+                form.bairro ? 10 : 0,
+                form.preco ? 5 : 0,
+              ].reduce((a, b) => a + b, 0)
+              const missing = [
+                !form.titulo && 'título',
+                photos.length === 0 && 'fotos',
+                photos.length > 0 && photos.length < 3 && 'mais fotos (mín. 3)',
+                !form.descricao && 'descrição',
+                !form.area_m2 && 'área m²',
+                !form.bairro && 'bairro',
+              ].filter(Boolean) as string[]
+              const barColor = pts >= 80 ? '#059669' : pts >= 50 ? '#D97706' : '#DC2626'
+              return (
+                <div style={{ background: 'var(--cream)', borderRadius: 12, padding: '16px 20px', border: '1px solid var(--border)', marginBottom: 6 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--fg-3)' }}>Qualidade do anúncio</span>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: barColor }}>{pts}%</span>
+                  </div>
+                  <div style={{ height: 5, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden', marginBottom: 6 }}>
+                    <div style={{ height: '100%', width: `${pts}%`, background: barColor, borderRadius: 3, transition: 'width 0.3s' }} />
+                  </div>
+                  {missing.length > 0 && (
+                    <div style={{ fontSize: 11.5, color: 'var(--fg-3)' }}>Para melhorar: {missing.join(', ')}</div>
+                  )}
+                  {pts >= 80 && (
+                    <div style={{ fontSize: 11.5, color: '#059669', fontWeight: 600 }}>✓ Anúncio de alta qualidade — mais chances de contato!</div>
+                  )}
+                </div>
+              )
+            })()}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {[
                 ['Título', form.titulo],

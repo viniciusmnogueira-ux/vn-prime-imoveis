@@ -150,6 +150,23 @@ const cardVariants = {
   exit:    { opacity: 0, y: -16, scale: 0.97, transition: { duration: 0.28 } },
 }
 
+function parsePreco(s: string): number {
+  const n = parseFloat(s.replace('R$', '').replace(/\s/g, '').replace(',', '.').replace(/[^0-9.]/g, ''))
+  if (s.toLowerCase().includes(' mi')) return n * 1_000_000
+  if (s.toLowerCase().includes('mil')) return n * 1_000
+  return n
+}
+
+function installment(precoFrom: string): number {
+  const v = parsePreco(precoFrom)
+  if (!v) return 0
+  const fin = v * 0.8
+  const taxa = 0.0089
+  const prazo = 360
+  const fator = (taxa * Math.pow(1 + taxa, prazo)) / (Math.pow(1 + taxa, prazo) - 1)
+  return Math.round(fin * fator)
+}
+
 // ─── Card ─────────────────────────────────────────────────────────────────────
 
 function LancamentoCard({ item, index }: { item: Lancamento; index: number }) {
@@ -276,12 +293,25 @@ function LancamentoCard({ item, index }: { item: Lancamento; index: number }) {
           ))}
         </div>
 
-        <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1px solid #F3F4F6', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-          <div>
-            <div style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>A partir de</div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: '#D4A857', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>{item.precoFrom}</div>
+        <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1px solid #F3F4F6' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 10 }}>
+            <div>
+              <div style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>A partir de</div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: '#D4A857', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>{item.precoFrom}</div>
+            </div>
+            <div style={{ fontSize: 12, color: '#6B7280', fontWeight: 500 }}>{item.entrega}</div>
           </div>
-          <div style={{ fontSize: 12, color: '#6B7280', fontWeight: 500 }}>{item.entrega}</div>
+          {(() => {
+            const inst = installment(item.precoFrom)
+            if (!inst) return null
+            const fmtInst = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(inst)
+            return (
+              <div style={{ background: 'rgba(15,24,36,0.04)', borderRadius: 8, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 11, color: '#6B7280' }}>Parcela est. (80% · PRICE 8,9% · 360m)</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#1B2733' }}>~{fmtInst}/mês</span>
+              </div>
+            )
+          })()}
         </div>
 
         {/* Notificar-me */}

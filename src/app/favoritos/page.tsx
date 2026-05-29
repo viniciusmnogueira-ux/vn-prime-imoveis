@@ -48,10 +48,19 @@ function ImovelCard({ im, onRemove }: { im: any; onRemove: (id: string) => void 
   )
 }
 
+type FavSort = 'price_asc' | 'price_desc' | 'area_desc' | 'recent'
+const SORT_OPTS: { value: FavSort; label: string }[] = [
+  { value: 'recent', label: 'Mais recentes' },
+  { value: 'price_asc', label: 'Menor preço' },
+  { value: 'price_desc', label: 'Maior preço' },
+  { value: 'area_desc', label: 'Maior área' },
+]
+
 export default function FavoritosPage() {
   const [ids, setIds] = useState<string[]>([])
   const [imoveis, setImoveis] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [sort, setSort] = useState<FavSort>('recent')
 
   useEffect(() => {
     const saved: string[] = JSON.parse(localStorage.getItem('vnp_favs') ?? '[]')
@@ -122,6 +131,17 @@ export default function FavoritosPage() {
       </div>
 
       <div style={{ width: 'min(1280px,94vw)', margin: '40px auto 0' }}>
+        {imoveis.length > 1 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 12, color: 'var(--fg-3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Ordenar:</span>
+            {SORT_OPTS.map(o => (
+              <button key={o.value} onClick={() => setSort(o.value)}
+                style={{ padding: '6px 14px', borderRadius: 8, border: `1.5px solid ${sort === o.value ? 'var(--gold)' : 'var(--border)'}`, background: sort === o.value ? 'rgba(212,168,87,0.10)' : '#fff', color: sort === o.value ? 'var(--gold-deep)' : 'var(--fg-2)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
+                {o.label}
+              </button>
+            ))}
+          </div>
+        )}
         {!loading && imoveis.length >= 2 && (() => {
           const prices = imoveis.map(im => im.preco).filter(Boolean) as number[]
           const areas = imoveis.map(im => im.area_m2).filter(Boolean) as number[]
@@ -160,7 +180,12 @@ export default function FavoritosPage() {
           </div>
         ) : (
           <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
-            {imoveis.map(im => <ImovelCard key={im.id} im={im} onRemove={remove} />)}
+            {[...imoveis].sort((a, b) => {
+              if (sort === 'price_asc') return (a.preco ?? Infinity) - (b.preco ?? Infinity)
+              if (sort === 'price_desc') return (b.preco ?? 0) - (a.preco ?? 0)
+              if (sort === 'area_desc') return (b.area_m2 ?? 0) - (a.area_m2 ?? 0)
+              return 0
+            }).map(im => <ImovelCard key={im.id} im={im} onRemove={remove} />)}
           </div>
         )}
       </div>
