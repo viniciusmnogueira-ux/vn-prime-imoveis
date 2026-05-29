@@ -57,11 +57,18 @@ export default function SiteFooter() {
   const [email, setEmail] = useState('')
   const [saved, setSaved] = useState(false)
   const [showTop, setShowTop] = useState(false)
+  const [liveCount, setLiveCount] = useState<number | null>(null)
 
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 400)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.from('imoveis').select('id', { count: 'exact', head: true }).eq('status', 'ativo')
+      .then(({ count }) => { if (count != null) setLiveCount(count) })
   }, [])
 
   if (pathname === '/login') return null
@@ -99,6 +106,12 @@ export default function SiteFooter() {
             </p>
             <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgba(245,248,250,0.62)' }}>
               Sem precisar criar uma conta — só nome e e-mail.
+              {liveCount != null && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginLeft: 10 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#34D399', display: 'inline-block', boxShadow: '0 0 6px #34D399' }} />
+                  <span style={{ color: '#34D399', fontWeight: 600 }}>{liveCount} imóveis ativos agora</span>
+                </span>
+              )}
             </p>
           </div>
           {saved ? (
