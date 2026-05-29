@@ -757,10 +757,18 @@ function BuscaContent() {
           {/* Results */}
           <div>
             {loading ? (
-              <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
-                <div style={{ width: 40, height: 40, borderRadius: '50%',
-                  border: '3px solid var(--border)', borderTopColor: 'var(--gold)',
-                  animation: 'spin 0.8s linear infinite' }} />
+              <div style={{ display: 'grid', gap: 18, gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))' }}>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} style={{ background: '#fff', borderRadius: 16, border: '1px solid var(--border)', overflow: 'hidden' }}>
+                    <div style={{ height: 220, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
+                    <div style={{ padding: '18px 20px' }}>
+                      <div style={{ height: 10, width: '45%', borderRadius: 4, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite', marginBottom: 8 }} />
+                      <div style={{ height: 22, width: '60%', borderRadius: 6, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite', marginBottom: 8 }} />
+                      <div style={{ height: 14, width: '80%', borderRadius: 4, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite', marginBottom: 6 }} />
+                      <div style={{ height: 12, width: '55%', borderRadius: 4, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : layout === 'map' ? (
               <MapResults listings={results} />
@@ -878,6 +886,7 @@ function BuscaContent() {
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }
         .vnp-map-pin {
           background: var(--navy-deep); color: var(--gold);
           font-family: var(--font-body); font-size: 11px; font-weight: 700;

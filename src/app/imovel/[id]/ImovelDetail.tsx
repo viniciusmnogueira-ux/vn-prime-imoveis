@@ -171,8 +171,25 @@ export default function ImovelPage() {
   }
 
   if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 400 }}>
-      <div className="animate-spin" style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid var(--border)', borderTopColor: 'var(--gold)' }} />
+    <div style={{ background: 'var(--cream)', minHeight: '100vh' }}>
+      <style>{`@keyframes shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }`}</style>
+      <div style={{ height: 'min(520px,55vw)', background: 'linear-gradient(90deg,#e8e8e8 25%,#d8d8d8 50%,#e8e8e8 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
+      <div style={{ width: 'min(1200px,92vw)', margin: '40px auto', display: 'grid', gridTemplateColumns: '1fr min(380px,38%)', gap: 40 }}>
+        <div>
+          {[{ w: '30%', h: 20 }, { w: '70%', h: 36 }, { w: '55%', h: 16 }].map((s, i) => (
+            <div key={i} style={{ height: s.h, width: s.w, borderRadius: 8, marginBottom: 16, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
+          ))}
+          <div style={{ height: 1, background: 'var(--border)', margin: '24px 0' }} />
+          {[{ w: '100%', h: 14 }, { w: '90%', h: 14 }, { w: '75%', h: 14 }].map((s, i) => (
+            <div key={i} style={{ height: s.h, width: s.w, borderRadius: 6, marginBottom: 12, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
+          ))}
+        </div>
+        <div style={{ background: '#fff', borderRadius: 16, padding: 28, height: 320, boxShadow: 'var(--shadow-strong)' }}>
+          {[{ w: '40%', h: 12 }, { w: '65%', h: 32 }, { w: '50%', h: 12 }].map((s, i) => (
+            <div key={i} style={{ height: s.h, width: s.w, borderRadius: 8, marginBottom: 16, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
+          ))}
+        </div>
+      </div>
     </div>
   )
   if (!im) return <div style={{ textAlign: 'center', padding: '80px 0' }}><h2>Imóvel não encontrado.</h2></div>
