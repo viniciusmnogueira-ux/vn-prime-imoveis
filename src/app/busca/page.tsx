@@ -482,7 +482,9 @@ function BuscaContent() {
             </span>
           </div>
           <h1 style={{ fontSize: 'clamp(1.4rem,2.4vw,1.9rem)', margin: 0 }}>
-            {loading ? 'Buscando…' : (
+            {loading ? (
+              filters.q ? `Buscando "${filters.q}"…` : 'Imóveis à venda em BH e Grande BH'
+            ) : (
               <>
                 {results.length} {results.length === 1 ? 'imóvel encontrado' : 'imóveis encontrados'}
                 {filters.q && <span style={{ color: 'var(--gold)' }}> em "{filters.q}"</span>}
@@ -904,6 +906,37 @@ function BuscaContent() {
               </>
             )}
           </div>
+        </div>
+      </section>
+
+      {/* SEO: categorias indexáveis */}
+      <section style={{ background: '#fff', borderTop: '1px solid var(--border)', padding: 'clamp(28px,4vw,44px) 0' }}>
+        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+          <h2 style={{ fontSize: 'clamp(1rem,1.8vw,1.3rem)', color: 'var(--navy)', marginBottom: 18, fontWeight: 700 }}>
+            Categorias de imóveis em BH e região
+          </h2>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+            {([
+              { label: 'Apartamentos em BH', q: 'Apartamento' },
+              { label: 'Casas em Nova Lima', q: 'Casa Nova Lima' },
+              { label: 'Coberturas no Belvedere', q: 'Cobertura Belvedere' },
+              { label: 'Imóveis direto com proprietário em BH', q: '' },
+              { label: 'Casas em condomínio em BH', q: 'Casa condominio' },
+              { label: 'Apartamentos no Savassi', q: 'Apartamento Savassi' },
+              { label: 'Lançamentos em BH', q: 'lancamento' },
+              { label: 'Studios em BH', q: 'Studio' },
+              { label: 'Alto padrão em Belo Horizonte', q: '' },
+              { label: 'Imóveis em Lourdes', q: 'Lourdes' },
+            ] as { label: string; q: string }[]).map(c => (
+              <Link key={c.label} href={`/busca?q=${encodeURIComponent(c.q)}`}
+                style={{ padding: '7px 16px', border: '1px solid var(--border)', borderRadius: 999, fontSize: 13, color: 'var(--navy)', textDecoration: 'none', background: 'var(--cream)', whiteSpace: 'nowrap' }}>
+                {c.label}
+              </Link>
+            ))}
+          </div>
+          <p style={{ marginTop: 18, fontSize: 13, color: 'var(--fg-3)', lineHeight: 1.6 }}>
+            Imóveis de alto padrão em Belo Horizonte, Nova Lima, Savassi, Belvedere, Lourdes e toda a Grande BH. Apartamentos, casas, coberturas e lançamentos com curadoria VN Prime.
+          </p>
         </div>
       </section>
 

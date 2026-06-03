@@ -1053,70 +1053,76 @@ function FaqAccordionCorretor() {
 // ─── LANDING ──────────────────────────────────────────────────────────────────
 function CorretorLanding() {
   const FEATURES = [
-    { icon: '🎯', title: 'Leads Qualificados', desc: 'Compradores verificados com perfil e orçamento compatível com seu portfólio. Sem spam, sem perda de tempo.' },
-    { icon: '📊', title: 'CRM Visual', desc: 'Pipeline kanban, histórico completo de contatos, agendamento de visitas e alertas automáticos por WhatsApp.' },
-    { icon: '🏠', title: 'Portfólio Exclusivo', desc: 'Acesso antecipado a imóveis premium em BH antes de irem ao mercado público — vantagem competitiva real.' },
-    { icon: '💳', title: 'Comissões Transparentes', desc: 'Extrato mensal detalhado com histórico de vendas e comissões. Sem surpresas.' },
+    { title: 'Carteira VN Prime', desc: 'Acesso ao portfólio curado com imóveis premium em BH. Veja os imóveis disponíveis, entre em contato com o proprietário e feche com suporte da plataforma.', img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=700&q=80', accent: ACCENT },
+    { title: 'CRM Integrado', desc: 'Pipeline kanban com 5 etapas, histórico completo de contatos, agendamento de visitas e acompanhamento do funil de vendas em tempo real.', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=700&q=80', accent: '#D4A857' },
+    { title: 'Carteira 6%', desc: 'Imóveis do plano Venda Completa com dados do proprietário visíveis. Você capta, conduz e fecha — a VN Prime cuida da estrutura.', img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=700&q=80', accent: '#93C5FD' },
+    { title: 'Comissão Transparente', desc: 'Extrato detalhado com histórico de vendas e comissões. Sem surpresas. Você fecha o negócio e recebe ao concluir.', img: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=700&q=80', accent: '#6EE7B7' },
   ]
   return (
     <main style={{ background: 'var(--cream)' }}>
-      <section style={{ position: 'relative', background: `linear-gradient(160deg, rgba(15,22,32,0.72) 0%, rgba(15,22,32,0.88) 60%, rgba(15,22,32,0.96) 100%), url(https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1400&q=85)`, backgroundSize: 'cover', backgroundPosition: 'center top', color: '#fff', padding: 'clamp(90px,14vw,160px) 0 clamp(70px,10vw,110px)' }}>
+      <section style={{ position: 'relative', background: `linear-gradient(160deg, rgba(15,22,32,0.80) 0%, rgba(15,22,32,0.90) 60%, rgba(15,22,32,0.96) 100%), url(https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1400&q=85)`, backgroundSize: 'cover', backgroundPosition: 'center top', color: '#fff', padding: 'clamp(90px,14vw,160px) 0 clamp(70px,10vw,110px)' }}>
         <div style={{ position: 'relative', zIndex: 1, width: 'min(1180px,92vw)', margin: '0 auto', maxWidth: 780 }}>
-          <Eyebrow>Portal do Corretor</Eyebrow>
+          <Eyebrow>Portal do Corretor · VN Prime</Eyebrow>
           <h1 style={{ color: '#fff', fontSize: 'clamp(2.2rem,4.5vw,3.6rem)', lineHeight: 1.06, margin: '14px 0 20px' }}>
-            Leads qualificados, CRM completo e portfólio{' '}
-            <em style={{ color: '#6EE7B7', fontStyle: 'italic' }}>premium</em>{' '}— tudo em um só lugar.
+            Estrutura completa de captação e vendas —{' '}
+            <em style={{ color: '#6EE7B7', fontStyle: 'italic' }}>sem precisar montar uma imobiliária.</em>
           </h1>
-          <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.86)', maxWidth: 600, marginBottom: 32, lineHeight: 1.6 }}>Acesse imóveis exclusivos VN Prime, receba leads qualificados diretamente no seu painel e acompanhe suas vendas em tempo real.</p>
+          <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.86)', maxWidth: 600, marginBottom: 32, lineHeight: 1.6 }}>
+            O corretor autônomo ganha vitrine premium, CRM integrado, pipeline de vendas e acesso à carteira VN Prime — num só portal. Você fecha o negócio. A plataforma cuida do resto.
+          </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 44 }}>
             <Link href="/login?redirect=/corretor"><Btn variant="accent" size="lg" style={{ background: ACCENT, boxShadow: `0 6px 24px ${ACCENT}44` }}>Entrar no portal</Btn></Link>
             <Link href="/login?redirect=/corretor&tab=cadastrar&tipo=corretor"><Btn variant="ghost" size="lg" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.35)' }}>Criar conta grátis</Btn></Link>
           </div>
-          {/* Platform preview illustration */}
-          <div style={{ marginTop: 48, display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 12, maxWidth: 560 }}>
+          {/* Preview do portal */}
+          <div style={{ marginTop: 48, display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 12, maxWidth: 560 }}>
             {[
-              { label: 'Leads hoje', value: '12', icon: '👤', color: '#6EE7B7' },
-              { label: 'Imóveis ativos', value: '47', icon: '🏠', color: '#D4A857' },
-              { label: 'Em negociação', value: '5', icon: '⚖️', color: '#93C5FD' },
-              { label: 'Comissão est.', value: 'R$ 38k', icon: '💰', color: '#6EE7B7' },
+              { label: 'Portfólio ativo', value: '47+', color: '#D4A857' },
+              { label: 'Carteira 6%', value: '12', color: '#6EE7B7' },
+              { label: 'Em negociação', value: '5', color: '#93C5FD' },
+              { label: 'Comissão est.', value: 'R$ 38k', color: '#6EE7B7' },
             ].map(s => (
-              <div key={s.label} style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 14, padding: '16px 18px' }}>
-                <div style={{ fontSize: 20, marginBottom: 6 }}>{s.icon}</div>
+              <div key={s.label} style={{ background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 14, padding: '16px 18px' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.value}</div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginTop: 4, fontWeight: 600 }}>{s.label}</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.50)', marginTop: 6, fontWeight: 600 }}>{s.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
+
+      {/* Features */}
       <section style={{ padding: 'clamp(60px,8vw,100px) 0' }}>
         <div style={{ width: 'min(1180px,92vw)', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 52px' }}>
             <Eyebrow color="var(--gold-deep)">O que você encontra</Eyebrow>
             <h2 style={{ margin: '10px 0 12px' }}>Tudo que você precisa em um só lugar</h2>
           </div>
-          <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))' }}>
+          <div style={{ display: 'grid', gap: 2, gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))' }}>
             {FEATURES.map(f => (
-              <div key={f.title} style={{ background: '#fff', padding: '32px 28px', borderRadius: 20, border: '1px solid var(--border)', boxShadow: '0 2px 16px rgba(15,34,68,0.06)', transition: 'transform 0.18s, box-shadow 0.18s' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 36px rgba(15,34,68,0.12)' }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 16px rgba(15,34,68,0.06)' }}>
-                <div style={{ width: 52, height: 52, borderRadius: 14, background: 'var(--navy-deep,#0F1824)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, marginBottom: 18 }}>{f.icon}</div>
-                <div style={{ width: 32, height: 3, background: ACCENT, borderRadius: 2, marginBottom: 14 }} />
-                <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--navy)', marginBottom: 10 }}>{f.title}</div>
-                <div style={{ fontSize: 14.5, color: 'var(--fg-2)', lineHeight: 1.7 }}>{f.desc}</div>
+              <div key={f.title} style={{ background: '#fff', border: '1px solid var(--border)', overflow: 'hidden' }}>
+                <div style={{ height: 160, backgroundImage: `url(${f.img})`, backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 40%, rgba(15,22,32,0.7) 100%)' }} />
+                </div>
+                <div style={{ padding: '24px 24px 28px' }}>
+                  <div style={{ width: 32, height: 3, background: f.accent, borderRadius: 2, marginBottom: 14 }} />
+                  <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--navy)', marginBottom: 10 }}>{f.title}</div>
+                  <div style={{ fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.7 }}>{f.desc}</div>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
+
       {/* Stats strip */}
       <section style={{ background: 'var(--navy-deep)', borderTop: '1px solid rgba(255,255,255,0.08)', padding: '22px 0' }}>
         <div style={{ width: 'min(1100px,92vw)', margin: '0 auto', display: 'flex', gap: 0, justifyContent: 'center', flexWrap: 'wrap' }}>
           {[
-            { n: '500+', label: 'leads gerados/mês' },
-            { n: '47', label: 'corretores parceiros' },
+            { n: 'R$ 0', label: 'para começar' },
             { n: 'D+2', label: 'pagamento garantido' },
-            { n: '4.9★', label: 'avaliação do portal' },
+            { n: '100%', label: 'da comissão para você' },
+            { n: 'BH', label: 'mercado premium' },
           ].map((s, i) => (
             <div key={s.label} style={{ textAlign: 'center', padding: '8px 32px', borderRight: i < 3 ? '1px solid rgba(255,255,255,0.12)' : 'none' }}>
               <div style={{ fontSize: 'clamp(1.4rem,2.5vw,1.9rem)', fontWeight: 900, color: ACCENT, fontFamily: 'var(--font-display)', letterSpacing: '-0.02em' }}>{s.n}</div>
@@ -1126,23 +1132,33 @@ function CorretorLanding() {
         </div>
       </section>
 
-      <section style={{ padding: 'clamp(60px,8vw,100px) 0', background: '#fff' }}>
+      {/* Como funciona */}
+      <section style={{ position: 'relative', overflow: 'hidden', padding: 'clamp(60px,8vw,100px) 0', background: '#fff' }}>
         <div style={{ width: 'min(1100px,92vw)', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', maxWidth: 540, margin: '0 auto 52px' }}>
             <Eyebrow color={ACCENT}>Como funciona</Eyebrow>
-            <h2 style={{ margin: '10px 0 12px' }}>Em 3 passos até os seus primeiros leads</h2>
+            <h2 style={{ margin: '10px 0 12px' }}>Três passos para acessar o portal</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 0, position: 'relative' }}>
-            {[
-              { n: '01', icon: '✍️', title: 'Crie sua conta', desc: 'Cadastre-se gratuitamente com CRECI-MG válido. Aprovação em até 24h úteis após validação dos dados.', color: ACCENT },
-              { n: '02', icon: '📋', title: 'Complete seu perfil', desc: 'Adicione foto, especialidades e regiões de atuação. Quanto mais completo, mais leads qualificados você recebe.', color: '#D4A857' },
-              { n: '03', icon: '🚀', title: 'Receba e converta', desc: 'Leads chegam com contato completo no seu painel. Gerencie no CRM Kanban e feche vendas mais rápido.', color: '#6366F1' },
-            ].map((step, i) => (
-              <div key={step.n} style={{ padding: 'clamp(28px,4vw,44px)', position: 'relative', borderLeft: i > 0 ? '1px solid var(--border)' : 'none', textAlign: 'center' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 64, height: 64, borderRadius: '50%', background: step.color + '18', border: `2px solid ${step.color}44`, fontSize: 28, marginBottom: 16 }}>{step.icon}</div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', color: step.color, textTransform: 'uppercase', marginBottom: 10 }}>Passo {step.n}</div>
-                <div style={{ fontSize: 19, fontWeight: 800, color: 'var(--navy)', marginBottom: 12 }}>{step.title}</div>
-                <p style={{ fontSize: 14.5, color: 'var(--fg-2)', lineHeight: 1.7, margin: 0 }}>{step.desc}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 2 }}>
+            {([
+              { n: '01', title: 'Crie sua conta', desc: 'Cadastre-se gratuitamente. Aprovação em até 24h úteis após validação dos dados de corretor.', color: ACCENT, img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=700&q=80' },
+              { n: '02', title: 'Complete seu perfil', desc: 'Adicione especialidades e regiões de atuação. Quanto mais completo, maior a visibilidade no portfólio.', color: '#D4A857', img: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=700&q=80' },
+              { n: '03', title: 'Acesse e feche', desc: 'Explore a carteira VN Prime, gerencie no CRM Kanban e conduza suas vendas com suporte da plataforma.', color: '#6366F1', img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=700&q=80' },
+            ] as { n: string; title: string; desc: string; color: string; img: string }[]).map(step => (
+              <div key={step.n} style={{ border: '1px solid var(--border)', overflow: 'hidden', background: '#fff' }}>
+                <div style={{ height: 180, position: 'relative', backgroundImage: `url(${step.img})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, rgba(15,22,32,0.75) 100%)' }} />
+                  <div style={{ position: 'absolute', top: 14, right: 18, fontFamily: 'var(--font-display)', fontSize: 72, fontWeight: 900, color: 'rgba(255,255,255,0.08)', lineHeight: 1 }}>{step.n}</div>
+                  <div style={{ position: 'absolute', bottom: 18, left: 24 }}>
+                    <div style={{ display: 'inline-block', background: step.color + '22', border: `1px solid ${step.color}55`, borderRadius: 999, padding: '4px 13px', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: step.color }}>
+                      Passo {step.n}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ padding: 'clamp(22px,3vw,32px)' }}>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--navy)', marginBottom: 10 }}>{step.title}</div>
+                  <p style={{ fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.7, margin: 0 }}>{step.desc}</p>
+                </div>
               </div>
             ))}
           </div>
