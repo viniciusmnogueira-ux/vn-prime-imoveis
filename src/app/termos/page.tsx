@@ -22,7 +22,7 @@ export default function TermosPage() {
             <span>Termos e Condições</span>
           </div>
           <h1 style={{ color: '#fff', margin: 0, fontSize: 'clamp(1.6rem,3vw,2.2rem)' }}>Termos e Condições de Uso</h1>
-          <p style={{ color: 'rgba(255,255,255,0.55)', marginTop: 10, fontSize: 14 }}>Última atualização: maio de 2026</p>
+          <p style={{ color: 'rgba(255,255,255,0.55)', marginTop: 10, fontSize: 14 }}>Última atualização: junho de 2026</p>
         </div>
       </div>
 
@@ -32,7 +32,7 @@ export default function TermosPage() {
         </Section>
 
         <Section title="2. Sobre a plataforma">
-          <p>A VN Prime Imóveis é uma plataforma de intermediação imobiliária que conecta proprietários, corretores e compradores/locatários de imóveis em Belo Horizonte e região metropolitana. A Plataforma não é parte nas transações imobiliárias realizadas entre usuários.</p>
+          <p>A VN Prime Imóveis é uma plataforma imobiliária híbrida que conecta proprietários, corretores parceiros e compradores em Belo Horizonte e região metropolitana. O proprietário escolhe o modelo de venda: direto (sem intermediação), assistido (com apoio da plataforma) ou completo (com corretor parceiro dedicado). A Plataforma não é parte contratante nas transações imobiliárias realizadas entre seus usuários — atua como facilitadora tecnológica e de qualificação.</p>
         </Section>
 
         <Section title="3. Cadastro e conta">
@@ -61,23 +61,49 @@ export default function TermosPage() {
           <p>A VN Prime Imóveis atua como correspondente de administradoras de consórcio regulamentadas pelo Banco Central do Brasil. As condições específicas de cada consórcio — taxas de administração, prazos e regras de contemplação — constam no contrato de adesão da administradora.</p>
         </Section>
 
-        <Section title="8. Leads e dados pessoais">
-          <p>As informações fornecidas em formulários de contato, agendamento e proposta são compartilhadas com o proprietário ou corretor responsável pelo imóvel. Tratamos seus dados conforme nossa Política de Privacidade e a Lei Geral de Proteção de Dados (LGPD — Lei 13.709/2018).</p>
+        <Section title="8. Política de leads">
+          <p style={{ marginBottom: 10 }}>As informações fornecidas em formulários de contato, agendamento e proposta ("leads") são tratadas da seguinte forma:</p>
+          <ul style={{ paddingLeft: 20 }}>
+            <li style={{ marginBottom: 6 }}>Leads gerados por imóveis do plano Venda Direta e Venda Assistida são encaminhados diretamente ao proprietário cadastrado.</li>
+            <li style={{ marginBottom: 6 }}>Leads gerados por imóveis do plano Venda Completa são encaminhados ao corretor parceiro responsável pelo imóvel.</li>
+            <li style={{ marginBottom: 6 }}>O lead consente, ao enviar o formulário, que seus dados sejam compartilhados com o responsável pelo imóvel para fins de contato comercial.</li>
+            <li style={{ marginBottom: 6 }}>A VN Prime Imóveis não vende, aluga ou cede dados de leads a terceiros não relacionados à transação.</li>
+          </ul>
+          <p style={{ marginTop: 10 }}>Tratamos todos os dados conforme nossa Política de Privacidade e a Lei Geral de Proteção de Dados (LGPD — Lei 13.709/2018).</p>
         </Section>
 
-        <Section title="9. Conteúdo dos anúncios">
-          <p>O responsável pelo anúncio é inteiramente responsável pela veracidade das informações, fotos e valores publicados. A VN Prime Imóveis pode remover anúncios que violem estes Termos ou a legislação aplicável sem aviso prévio.</p>
+        <Section title="9. Responsabilidades">
+          <p style={{ marginBottom: 10 }}>A responsabilidade de cada parte é delimitada da seguinte forma:</p>
+          <ul style={{ paddingLeft: 20 }}>
+            <li style={{ marginBottom: 6 }}><strong>Plataforma (VN Prime Imóveis):</strong> responsável pela infraestrutura tecnológica, curadoria de anúncios, qualificação básica de compradores e suporte operacional. Não é responsável por negociações, contratos ou atos praticados diretamente entre usuários.</li>
+            <li style={{ marginBottom: 6 }}><strong>Proprietário:</strong> responsável pela veracidade das informações do imóvel, documentação, regularidade jurídica e pelos termos de venda estabelecidos diretamente com o comprador.</li>
+            <li style={{ marginBottom: 6 }}><strong>Corretor parceiro:</strong> responsável pelo atendimento ao lead, condução das visitas, negociação e intermediação nos imóveis sob sua responsabilidade. Deve possuir registro ativo no CRECI.</li>
+            <li style={{ marginBottom: 6 }}><strong>Comprador:</strong> responsável pela diligência prévia antes de assinar qualquer contrato, podendo contratar o serviço de Due Diligence oferecido pela Plataforma.</li>
+          </ul>
         </Section>
 
-        <Section title="10. Limitação de responsabilidade">
-          <p>A VN Prime Imóveis não garante a disponibilidade contínua da Plataforma e não se responsabiliza por perdas decorrentes de falhas técnicas, atos de terceiros ou informações incorretas fornecidas por usuários.</p>
+        <Section title="10. Comissionamento do corretor parceiro">
+          <p style={{ marginBottom: 10 }}>Corretores parceiros que atuam em imóveis do plano Venda Completa têm direito à comissão conforme as seguintes condições:</p>
+          <ul style={{ paddingLeft: 20 }}>
+            <li style={{ marginBottom: 6 }}>A comissão é devida exclusivamente em caso de fechamento — assinatura de contrato de compra e venda ou instrumento equivalente.</li>
+            <li style={{ marginBottom: 6 }}>O percentual, prazo e forma de pagamento são definidos no acordo firmado entre o corretor e a VN Prime Imóveis no momento do cadastro.</li>
+            <li style={{ marginBottom: 6 }}>A VN Prime Imóveis não se responsabiliza por comissões de transações realizadas fora da Plataforma ou sem o aceite formal das condições do imóvel.</li>
+          </ul>
         </Section>
 
-        <Section title="11. Foro e legislação aplicável">
+        <Section title="11. Conteúdo dos anúncios">
+          <p>O responsável pelo anúncio é inteiramente responsável pela veracidade das informações, fotos e valores publicados. A VN Prime Imóveis realiza curadoria editorial e pode remover ou pausar anúncios que violem estes Termos ou a legislação aplicável, sem aviso prévio.</p>
+        </Section>
+
+        <Section title="12. Limitação de responsabilidade">
+          <p>A VN Prime Imóveis não garante a disponibilidade contínua da Plataforma e não se responsabiliza por perdas decorrentes de falhas técnicas, atos de terceiros, informações incorretas fornecidas por usuários ou por resultados de negociações realizadas fora do ambiente da Plataforma.</p>
+        </Section>
+
+        <Section title="13. Foro e legislação aplicável">
           <p>Estes Termos são regidos pela legislação brasileira. Eventuais litígios serão dirimidos no Foro da Comarca de Belo Horizonte, Minas Gerais, com renúncia a qualquer outro, por mais privilegiado que seja.</p>
         </Section>
 
-        <Section title="12. Contato">
+        <Section title="14. Contato">
           <p>Dúvidas sobre estes Termos podem ser enviadas para: <strong>contato@vnprimeimoveis.com.br</strong> ou via WhatsApp disponível na Plataforma.</p>
         </Section>
 

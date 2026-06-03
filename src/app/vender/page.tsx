@@ -119,10 +119,10 @@ const PLANOS_PROP = [
 ]
 
 const BENEFICIOS_CORRETOR = [
-  { icon: '🎯', title: 'Leads qualificados direto no painel', desc: 'Compradores verificados com perfil e orçamento confirmados. Alerta imediato por WhatsApp.' },
-  { icon: '📊', title: 'CRM visual completo', desc: 'Pipeline kanban, histórico de contatos, agendamento de visitas e relatório de comissões.' },
-  { icon: '🏠', title: 'Portfólio exclusivo VN Prime', desc: 'Acesso antecipado a imóveis premium em BH 72h antes do mercado público.' },
-  { icon: '💳', title: 'Comissão 3% + pagamento D+2', desc: 'Extrato detalhado, NF automática e pagamento em até 2 dias úteis após o fechamento.' },
+  { title: 'Carteira VN Prime', desc: 'Acesso ao portfólio curado com imóveis disponíveis para intermediação — com dados do proprietário.' },
+  { title: 'CRM e Pipeline', desc: 'Pipeline kanban, histórico de contatos, agendamento de visitas e acompanhamento do funil de vendas.' },
+  { title: 'Estrutura sem imobiliária', desc: 'Vitrine premium, suporte técnico e estrutura de captação — sem custos fixos de escritório.' },
+  { title: 'Comissão integral', desc: 'Você fecha o negócio e recebe a comissão. Sem desconto de franquia ou taxa de plataforma.' },
 ]
 
 export default function VenderPage() {
@@ -168,8 +168,8 @@ export default function VenderPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,300px),1fr))',
             gap: 20, maxWidth: 700, margin: '0 auto' }}>
             {[
-              { id: 'proprietario' as const, label: 'Sou proprietário', sub: 'Quero vender meu imóvel', icon: '🏠', accent: '#D4A857', detail: 'Taxa fixa R$ 297 · 3% assistida · 6% completa' },
-              { id: 'corretor' as const, label: 'Sou corretor', sub: 'Quero trabalhar com a VN Prime', icon: '🤝', accent: '#10B981', detail: 'Leve sua carteira · receba leads · R$ 49,90/mês' },
+              { id: 'proprietario' as const, label: 'Sou proprietário', sub: 'Quero vender meu imóvel', accent: '#D4A857', detail: 'R$ 297 direto · 3% assistida · 6% completa com corretor' },
+              { id: 'corretor' as const, label: 'Sou corretor', sub: 'Quero trabalhar com a VN Prime', accent: '#10B981', detail: 'CRM + carteira VN Prime · Comissão integral ao fechar' },
             ].map(p => (
               <button key={p.id} onClick={() => setPerfil(perfil === p.id ? null : p.id)} style={{
                 border: perfil === p.id ? `2px solid ${p.accent}` : '2px solid rgba(255,255,255,0.15)',
@@ -177,7 +177,7 @@ export default function VenderPage() {
                 background: perfil === p.id ? `${p.accent}18` : 'rgba(255,255,255,0.06)',
                 backdropFilter: 'blur(10px)', transition: 'all 0.2s', color: '#fff',
               }}>
-                <div style={{ fontSize: 30, marginBottom: 12 }}>{p.icon}</div>
+                <div style={{ width: 36, height: 3, background: p.accent, borderRadius: 2, marginBottom: 16 }} />
                 <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 5 }}>{p.label}</div>
                 <div style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.72)', marginBottom: 10 }}>{p.sub}</div>
                 <div style={{ fontSize: 11.5, color: p.accent, fontWeight: 600, letterSpacing: '0.04em' }}>{p.detail}</div>
@@ -339,13 +339,13 @@ export default function VenderPage() {
                   <em className="italic-accent">Receba leads qualificados.</em>
                 </h2>
                 <p style={{ fontSize: 15.5, color: 'var(--fg-2)', lineHeight: 1.75, marginBottom: 28 }}>
-                  Na VN Prime o corretor parceiro trabalha com a melhor base de imóveis de alto padrão de BH, recebe leads verificados e usa CRM profissional — por R$ 49,90/mês.
+                  Na VN Prime o corretor parceiro acessa a carteira VN Prime, usa CRM integrado e pipeline de vendas profissional — sem precisar montar uma imobiliária. Você fecha o negócio e recebe a comissão integral.
                 </p>
                 <div style={{ display: 'grid', gap: 18, gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,220px),1fr))', marginBottom: 32 }}>
                   {BENEFICIOS_CORRETOR.map(b => (
                     <div key={b.title} style={{ background: '#fff', borderRadius: 14, padding: '20px 18px',
                       border: '1px solid var(--border)', boxShadow: '0 2px 8px rgba(15,34,68,0.05)' }}>
-                      <div style={{ fontSize: 24, marginBottom: 10 }}>{b.icon}</div>
+                      <div style={{ width: 28, height: 3, background: '#10B981', borderRadius: 2, marginBottom: 12 }} />
                       <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 6 }}>{b.title}</div>
                       <div style={{ fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.55 }}>{b.desc}</div>
                     </div>
