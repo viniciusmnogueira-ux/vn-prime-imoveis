@@ -76,7 +76,7 @@ export default function SiteFooter() {
   const saveNewsletter = async () => {
     if (!email.includes('@')) return
     const supabase = createClient()
-    await supabase.from('leads').insert({ tipo: 'newsletter', contato: email, mensagem: 'Newsletter signup' })
+    await supabase.from('leads').insert({ email, nome: 'Newsletter', origem: 'newsletter', mensagem: 'Newsletter signup' })
     setSaved(true)
   }
 

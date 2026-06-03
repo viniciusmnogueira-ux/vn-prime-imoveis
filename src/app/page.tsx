@@ -18,7 +18,7 @@ const SERVICOS = [
     subtitle: 'Venda com autonomia total',
     desc: 'Você define o preço, cadastra seu imóvel e conduz a venda. A VN Prime cuida da plataforma, suporte e qualificação de compradores. Fotografia e mídia são pacotes adicionais.',
     bullets: ['R$ 297 taxa fixa · ou 3% somente ao vender', 'Cadastro e gestão do anúncio pelo proprietário', 'Qualificação de compradores pela plataforma', 'Pacotes de fotografia e mídia à parte'],
-    cta: 'Anunciar meu imóvel', href: '/proprietario',
+    cta: 'Anunciar meu imóvel', href: '/vender',
     img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=80',
     accent: '#D4A857',
   },
