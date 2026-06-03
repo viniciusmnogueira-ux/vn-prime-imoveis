@@ -162,7 +162,7 @@ export default function SiteFooter() {
         </div>
 
         <div style={{ borderTop: '1px solid rgba(245,248,250,0.10)', paddingTop: 22, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12, fontSize: 12 }}>
-          <span>© {new Date().getFullYear()} VN Prime Imóveis · CRECI-MG 12.345-J</span>
+          <span>© {new Date().getFullYear()} VN Prime Imóveis</span>
           <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
             <span style={{ fontStyle: 'italic', color: 'var(--gold-soft)', fontSize: 14, letterSpacing: '0.04em' }}>
               Curadoria silenciosa

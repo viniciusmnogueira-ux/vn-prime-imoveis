@@ -223,7 +223,7 @@ export default function SobrePage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 24 }}>
             {([
-              { nome: 'Vinicius Nogueira', cargo: 'Fundador & CEO', desc: 'Especialista em mercado imobiliário premium da Grande BH, com foco em tecnologia e curadoria de alto padrão.', inicial: 'VN' },
+              { nome: 'VN Prime', cargo: 'Fundador & CEO', desc: 'Especialista em mercado imobiliário premium da Grande BH, com foco em tecnologia e curadoria de alto padrão.', inicial: 'VN' },
               { nome: 'Equipe Comercial', cargo: 'Corretores Parceiros', desc: 'Rede de corretores CRECI certificados, especializados nos mercados de Nova Lima, Belvedere e Savassi.', inicial: 'CC' },
               { nome: 'Equipe de Curadoria', cargo: 'Análise & Qualidade', desc: 'Responsáveis pela revisão de cada anúncio — fotos, descrição e documentação — antes de entrar na vitrine.', inicial: 'CQ' },
             ] as { nome: string; cargo: string; desc: string; inicial: string }[]).map(m => (
@@ -259,7 +259,7 @@ export default function SobrePage() {
             <div style={{ textAlign: 'center', marginBottom: 20, fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--fg-3)' }}>Credenciais e conformidade</div>
             <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', justifyContent: 'center' }}>
               {[
-                { badge: 'CRECI-MG', desc: 'Corretores credenciados' },
+                { badge: 'CRECI-MG', desc: 'Corretores parceiros credenciados' },
                 { badge: 'COFECI', desc: 'Conselho Federal' },
                 { badge: 'LGPD', desc: 'Dados protegidos' },
                 { badge: 'SSL 256-bit', desc: 'Conexão criptografada' },
@@ -409,7 +409,7 @@ export default function SobrePage() {
             alignItems: 'center', flexWrap: 'wrap', gap: 12,
           }}>
             <div style={{ fontSize: 12, color: 'rgba(245,248,250,0.35)' }}>
-              © 2026 VN Prime Imóveis · CRECI-MG · Todos os direitos reservados
+              © {new Date().getFullYear()} VN Prime Imóveis · Todos os direitos reservados
             </div>
             <div style={{ fontSize: 12, color: 'rgba(245,248,250,0.35)' }}>
               Belo Horizonte · MG · Brasil
