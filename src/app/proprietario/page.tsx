@@ -726,10 +726,10 @@ function FotografoSection() {
 function ProprietarioLanding() {
   const ACCENT = '#D4A857'
   const FEATURES = [
-    { icon: '📸', title: 'Fotos Profissionais', desc: 'Sessão fotográfica inclusa nos planos Assistida e Completa. Imagens que destacam seu imóvel e aceleram a venda.' },
-    { icon: '📣', title: 'Mídia Paga Gerenciada', desc: 'Anúncios no Google, Meta e portais imobiliários. A VN Prime gerencia o tráfego para você.' },
-    { icon: '👥', title: 'Leads Qualificados', desc: 'Compradores verificados com perfil compatível com seu imóvel chegam direto no seu painel de controle.' },
-    { icon: '⚖️', title: 'Suporte Jurídico', desc: 'Revisão de contratos, ITBI, cartório e escritura. Profissionais parceiros cuidam da parte burocrática.' },
+    { title: 'Fotos Profissionais', desc: 'Sessão fotográfica disponível como pacote adicional ou inclusa nos planos Assistida e Completa. Imagens que destacam seu imóvel e aceleram a venda.', img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80' },
+    { title: 'Mídia Paga Gerenciada', desc: 'Anúncios no Google, Meta e portais imobiliários. A VN Prime gerencia o tráfego e distribui automaticamente para você.', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80' },
+    { title: 'Leads com Contato Direto', desc: 'Compradores com interesse real chegam ao seu painel com nome, e-mail e WhatsApp. Você decide quem contatar.', img: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80' },
+    { title: 'Suporte Jurídico', desc: 'Revisão de contratos, ITBI, cartório e escritura. Profissionais parceiros cuidam da parte burocrática.', img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80' },
   ]
   const BENEFITS = [
     {
@@ -819,12 +819,17 @@ function ProprietarioLanding() {
             <h2 style={{ margin: '10px 0 12px' }}>Tudo que você precisa em um só lugar</h2>
             <p style={{ color: 'var(--fg-2)', fontSize: 15.5 }}>Ferramentas criadas especificamente para o mercado imobiliário premium de Belo Horizonte.</p>
           </div>
-          <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))' }}>
+          <div style={{ display: 'grid', gap: 2, gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))' }}>
             {FEATURES.map(f => (
-              <div key={f.title} style={{ background: '#fff', padding: '28px 26px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: `${ACCENT}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 16 }}>{f.icon}</div>
-                <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', marginBottom: 8 }}>{f.title}</div>
-                <div style={{ fontSize: 14.5, color: 'var(--fg-2)', lineHeight: 1.6 }}>{f.desc}</div>
+              <div key={f.title} style={{ background: '#fff', border: '1px solid var(--border)', overflow: 'hidden' }}>
+                <div style={{ height: 150, backgroundImage: `url(${f.img})`, backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 40%, rgba(15,22,32,0.6) 100%)' }} />
+                </div>
+                <div style={{ padding: '20px 22px 24px' }}>
+                  <div style={{ width: 28, height: 3, background: ACCENT, borderRadius: 2, marginBottom: 12 }} />
+                  <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--navy)', marginBottom: 8 }}>{f.title}</div>
+                  <div style={{ fontSize: 13.5, color: 'var(--fg-2)', lineHeight: 1.65 }}>{f.desc}</div>
+                </div>
               </div>
             ))}
           </div>

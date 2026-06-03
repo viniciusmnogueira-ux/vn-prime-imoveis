@@ -47,8 +47,9 @@ const NAV = [
   {
     label: 'Serviços', href: '#',
     dropdown: [
-      { label: 'Proprietário Direto',  href: '/proprietario',  desc: 'Anuncie seu imóvel · taxa fixa ou comissão' },
-      { label: 'Portal do Corretor',   href: '/corretor',       desc: 'Leads, CRM e portfólio premium de BH' },
+      { label: 'Como funciona',        href: '/como-funciona',  desc: 'Entenda os três modelos de venda da VN Prime' },
+      { label: 'Para Proprietários',   href: '/proprietarios',  desc: 'Três planos — direto, assistido ou completo' },
+      { label: 'Para Corretores',      href: '/corretores',     desc: 'Carteira, CRM e pipeline sem imobiliária' },
       { label: 'Consórcio',            href: '/consorcio',      desc: 'Compre seu imóvel com parcelas acessíveis' },
       { label: 'Due Diligence',        href: '/due-diligence',  desc: 'Análise jurídica e técnica antes de comprar' },
       { label: 'Avaliação de Imóveis', href: '/avaliacao',      desc: 'Laudo judicial, extrajudicial ou estimativa IA' },

@@ -146,8 +146,9 @@ export default function SiteFooter() {
           ]} />
           <FootCol title="Anuncie" links={[
             { label: 'Anunciar imóvel', href: '/anunciar' },
-            { label: 'Modalidades', href: '/vender' },
-            { label: 'Para corretores', href: '/corretor' },
+            { label: 'Como funciona', href: '/como-funciona' },
+            { label: 'Para proprietários', href: '/proprietarios' },
+            { label: 'Para corretores', href: '/corretores' },
             { label: 'Consórcio', href: '/consorcio' },
           ]} />
           <FootCol title="Empresa" links={[
