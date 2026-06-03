@@ -380,43 +380,59 @@ export default function HomePage() {
             <Eyebrow color="var(--gold)">Simples e transparente</Eyebrow>
             <h2 style={{ margin: '10px 0 14px', color: '#fff', fontSize: 'clamp(1.6rem,2.8vw,2.2rem)' }}>Como funciona a VN Prime</h2>
             <p style={{ color: 'rgba(245,248,250,0.65)', fontSize: 16, maxWidth: 580, margin: '0 auto', lineHeight: 1.7 }}>
-              Uma plataforma imobiliária híbrida: o proprietário escolhe vender direto, vender com apoio da plataforma ou contratar a venda completa com corretor parceiro.
+              Escolha o modelo que faz mais sentido para você — do mais autônomo ao totalmente assistido. Cada caminho tem seu custo e nível de envolvimento da plataforma.
             </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 2 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {([
               {
-                n: '01', title: 'Busque ou cadastre',
-                desc: 'Explore o portfólio curado ou anuncie seu imóvel em minutos. Sem burocracia, sem papelada. Você define o modelo de venda.',
+                nome: 'Venda Direta',
+                custo: 'R$ 297 taxa única',
+                subtitulo: 'Você no controle — 0% de comissão',
+                desc: 'Ideal para quem quer autonomia total e não quer pagar comissão. Você cadastra o imóvel, conduz as visitas e fecha direto com o comprador. A VN Prime garante a vitrine e a qualificação básica.',
+                accent: '#6366F1',
+                img: 'https://images.unsplash.com/photo-1611095973763-414019e72400?w=1000&q=85',
+                cta: 'Anunciar direto',
+                href: '/vender',
+              },
+              {
+                nome: 'Venda Assistida',
+                custo: '3% somente no sucesso',
+                subtitulo: 'Apoio da plataforma — você paga somente se vender',
+                desc: 'A VN Prime qualifica compradores ativamente e mantém o anúncio otimizado. Você conduz as negociações. Paga apenas ao fechar o negócio — zero risco.',
                 accent: '#D4A857',
-                img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
+                img: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1000&q=85',
+                cta: 'Escolher este plano',
+                href: '/vender',
               },
               {
-                n: '02', title: 'Qualificação e contato',
-                desc: 'Compradores qualificados entram em contato diretamente. Proprietários recebem leads com nome, e-mail e WhatsApp.',
-                accent: '#6EE7B7',
-                img: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&q=80',
+                nome: 'Venda Completa',
+                custo: '6% somente no sucesso',
+                subtitulo: 'Mãos livres — corretor dedicado — você só aprova',
+                desc: 'Um corretor parceiro VN Prime assume tudo: fotos profissionais, mídia paga, visitas acompanhadas e negociação conduzida. Você aprova a proposta e assina a escritura.',
+                accent: '#2F8674',
+                img: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1000&q=85',
+                cta: 'Quero mãos livres',
+                href: '/vender',
               },
-              {
-                n: '03', title: 'Feche com segurança',
-                desc: 'Due Diligence, análise jurídica e acompanhamento VN Prime até a assinatura. Você aprova cada etapa antes de avançar.',
-                accent: '#93C5FD',
-                img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80',
-              },
-            ] as { n: string; title: string; desc: string; accent: string; img: string }[]).map((s) => (
-              <div key={s.n} style={{ overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
-                <div style={{ height: 200, position: 'relative', backgroundImage: `url(${s.img})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(15,22,32,0.15) 0%, rgba(15,22,32,0.85) 100%)' }} />
-                  <div style={{ position: 'absolute', top: 14, right: 18, fontFamily: 'var(--font-display)', fontSize: 72, fontWeight: 900, color: 'rgba(255,255,255,0.09)', lineHeight: 1 }}>{s.n}</div>
-                  <div style={{ position: 'absolute', bottom: 18, left: 24 }}>
-                    <div style={{ display: 'inline-block', background: s.accent + '22', border: `1px solid ${s.accent}55`, borderRadius: 999, padding: '4px 13px', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: s.accent }}>
-                      Passo {s.n}
-                    </div>
+            ] as { nome: string; custo: string; subtitulo: string; desc: string; accent: string; img: string; cta: string; href: string }[]).map((c, idx) => (
+              <div key={c.nome} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,340px),1fr))', gap: 0, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', direction: idx % 2 === 1 ? 'rtl' : 'ltr' }}>
+                <div style={{ height: 'min(260px,55vw)', minHeight: 220, position: 'relative', backgroundImage: `url(${c.img})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(15,22,32,0.10) 0%, rgba(15,22,32,0.75) 100%)' }} />
+                  <div style={{ position: 'absolute', bottom: 20, left: 24, direction: 'ltr' }}>
+                    <div style={{ display: 'inline-block', background: c.accent + '22', border: `1px solid ${c.accent}55`, borderRadius: 999, padding: '4px 13px', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: c.accent, marginBottom: 8 }}>{c.nome}</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.4rem,2.2vw,1.9rem)', fontWeight: 700, color: '#fff', lineHeight: 1.1, marginBottom: 4 }}>{c.custo}</div>
+                    <div style={{ fontSize: 12, color: 'rgba(245,248,250,0.65)' }}>{c.subtitulo}</div>
                   </div>
                 </div>
-                <div style={{ padding: 'clamp(24px,3.5vw,36px)', background: 'rgba(255,255,255,0.03)' }}>
-                  <div style={{ fontSize: 19, fontWeight: 800, color: '#fff', marginBottom: 12, lineHeight: 1.25 }}>{s.title}</div>
-                  <p style={{ margin: 0, fontSize: 14.5, color: 'rgba(245,248,250,0.68)', lineHeight: 1.75 }}>{s.desc}</p>
+                <div style={{ background: 'rgba(255,255,255,0.04)', padding: 'clamp(24px,3.5vw,40px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', direction: 'ltr' }}>
+                  <div style={{ width: 36, height: 3, background: c.accent, borderRadius: 2, marginBottom: 16 }} />
+                  <p style={{ fontSize: 14.5, color: 'rgba(245,248,250,0.78)', lineHeight: 1.75, margin: '0 0 24px' }}>{c.desc}</p>
+                  <Link href={c.href}>
+                    <button style={{ padding: '11px 22px', borderRadius: 10, border: 'none', cursor: 'pointer', background: c.accent, color: c.accent === '#D4A857' ? 'var(--navy-deep)' : '#fff', fontWeight: 700, fontSize: 14, fontFamily: 'inherit' }}>
+                      {c.cta} →
+                    </button>
+                  </Link>
                 </div>
               </div>
             ))}
