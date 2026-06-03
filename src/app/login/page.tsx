@@ -128,7 +128,7 @@ function LoginContent() {
             Alto padrão · Belo Horizonte
           </div>
           <h2 style={{ color: '#fff', fontSize: 'clamp(1.6rem,2.8vw,2.4rem)', lineHeight: 1.1, margin: '0 0 16px', fontFamily: 'Cormorant Garamond, serif' }}>
-            Imóveis que cabem<br/>no seu estilo de vida.
+            Imóveis que cabem{' '}<br/>no seu estilo de vida.
           </h2>
           <p style={{ color: 'rgba(245,248,250,0.7)', fontSize: 15, lineHeight: 1.65, maxWidth: 380 }}>
             Acesse seu portal e gerencie seus imóveis, leads e negócios em um só lugar.

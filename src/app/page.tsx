@@ -15,18 +15,18 @@ const HERO_PHOTOS = [
 const SERVICOS = [
   {
     title: 'Área do Proprietário',
-    subtitle: 'Venda com autonomia total',
-    desc: 'Você define o preço, cadastra seu imóvel e conduz a venda. A VN Prime cuida da plataforma, suporte e qualificação de compradores. Fotografia e mídia são pacotes adicionais.',
-    bullets: ['R$ 297 taxa fixa · ou 3% somente ao vender', 'Cadastro e gestão do anúncio pelo proprietário', 'Qualificação de compradores pela plataforma', 'Pacotes de fotografia e mídia à parte'],
+    subtitle: 'Venda direto, assistido ou completo',
+    desc: 'Uma plataforma imobiliária híbrida: você escolhe o modelo de venda. Anuncie com autonomia total, venda com apoio da equipe VN Prime ou conte com um corretor parceiro dedicado.',
+    bullets: ['Cadastro e gestão do anúncio em minutos', 'Qualificação de compradores pela plataforma', 'Leads com nome, e-mail e WhatsApp', 'Escolha o plano conforme seu nível de envolvimento'],
     cta: 'Anunciar meu imóvel', href: '/vender',
     img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=80',
     accent: '#D4A857',
   },
   {
     title: 'Portal do Corretor',
-    subtitle: 'Leads qualificados e comissão garantida',
-    desc: 'Acesse o portfólio VN Prime, receba leads com contato completo e gerencie seu funil de vendas com CRM Kanban integrado. Comissão integral em cada venda.',
-    bullets: ['Leads com WhatsApp + e-mail qualificados', 'CRM Kanban de funil de vendas', 'Portfólio premium VN Prime', 'Comissão integral garantida'],
+    subtitle: 'Estrutura profissional sem montar uma imobiliária',
+    desc: 'O corretor autônomo ganha estrutura de captação, CRM, vitrine premium e pipeline de vendas integrado — tudo numa plataforma. Você fecha o negócio, a VN Prime cuida da estrutura.',
+    bullets: ['Acesso ao portfólio VN Prime curado', 'CRM Kanban e pipeline de vendas', 'Carteira 6% — imóveis com contato do proprietário', 'Comissão integral ao fechar o negócio'],
     cta: 'Entrar como corretor parceiro', href: '/corretor',
     img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&q=80',
     accent: '#2F8674',
@@ -43,8 +43,8 @@ const SERVICOS = [
   {
     title: 'Due Diligence',
     subtitle: 'Compre com segurança jurídica total',
-    desc: 'Antes de assinar qualquer contrato, a VN Prime analisa toda a documentação e realiza vistoria técnica. Relatório executivo completo entregue em até 48 horas.',
-    bullets: ['30+ itens verificados', 'Relatório em até 48 horas', 'Análise jurídica + vistoria técnica', 'Sem surpresas no pós-venda'],
+    desc: 'Antes de assinar qualquer contrato, a VN Prime analisa toda a documentação e realiza vistoria técnica. Laudo executivo completo com semáforo de risco e recomendações por item.',
+    bullets: ['70+ itens verificados em 4 frentes', 'Laudo entregue em até 7 dias úteis', 'Análise jurídica + vistoria técnica', 'Sem surpresas no pós-venda'],
     cta: 'Solicitar análise', href: '/due-diligence',
     img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&q=80',
     accent: '#6366F1',
@@ -53,16 +53,16 @@ const SERVICOS = [
     title: 'Lançamentos',
     subtitle: 'Alta valorização, condições exclusivas',
     desc: 'Apartamentos, casas em condomínio e lotes no melhor da Grande BH. Compre na planta com entrada facilitada, fluxo baixo durante as obras e financiamento na entrega.',
-    bullets: ['3 empreendimentos exclusivos em carteira', 'Valorização de 50–60% até as chaves', 'Entrada facilitada + financiamento bancário', 'Unidades a partir de R$ 320 mil'],
+    bullets: ['3 empreendimentos exclusivos em carteira', 'Potencial de valorização expressivo — conforme região, estágio e mercado', 'Entrada facilitada + financiamento bancário na entrega', 'Unidades a partir de R$ 320 mil'],
     cta: 'Ver lançamentos', href: '/lancamentos',
     img: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=900&q=80',
     accent: '#D4A857',
   },
   {
-    title: 'Calculadora ITBI',
-    subtitle: 'Calcule todos os custos antes de fechar',
+    title: 'Calculadora de ITBI e Custos',
+    subtitle: 'Saiba tudo antes de assinar',
     desc: 'Saiba exatamente quanto vai pagar de ITBI, registro, escritura e demais custos cartorários antes de assinar qualquer contrato. Cálculo preciso em segundos.',
-    bullets: ['ITBI + escritura + registro tudo junto', 'Resultado instantâneo e gratuito', 'Simule por valor de venda ou avaliação', 'Referência para negociação e planejamento'],
+    bullets: ['ITBI + escritura + registro em um só cálculo', 'Resultado instantâneo e gratuito', 'Simule por valor de venda ou avaliação', 'Referência para negociação e planejamento'],
     cta: 'Calcular agora', href: '/calculadora',
     img: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=900&q=80',
     accent: '#6366F1',
@@ -104,7 +104,7 @@ const PLANOS = [
 
 const STATS = [
   { value: 'BH e Grande BH', label: 'Área de atuação' },
-  { value: '3 planos', label: 'De venda — sem custo de entrada' },
+  { value: '3 planos', label: 'Direto, assistido ou completo' },
   { value: '0%', label: 'De comissão no plano direto' },
   { value: 'Jurídico', label: 'Due diligence + consórcio incluso' },
 ]
@@ -117,7 +117,7 @@ const SERVICE_PILLS = [
   { label: 'Lançamentos',       href: '/lancamentos',    accent: '#D4A857' },
   { label: 'Avaliação',         href: '/avaliacao',      accent: '#6B7280' },
   { label: 'Calculadora ITBI',  href: '/calculadora',    accent: '#6B7280' },
-  { label: '📊 Relatório de Mercado', href: '/relatorio', accent: '#6366F1' },
+  { label: 'Relatório de Mercado', href: '/relatorio', accent: '#6366F1' },
 ]
 
 const QUICK_LINKS = ['Apartamentos em BH', 'Casas Grande BH', 'Coberturas BH', 'Lançamentos Grande BH', 'Aluguel BH', 'Acima de R$ 5 mi']
@@ -373,53 +373,56 @@ export default function HomePage() {
       })()}
 
       {/* ── Como funciona ── */}
-      <section style={{ padding: 'clamp(3rem,5vw,4.5rem) 0', background: 'var(--navy-deep,#0F1824)' }}>
-        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto' }}>
+      <section style={{ position: 'relative', overflow: 'hidden', padding: 'clamp(3rem,5vw,4.5rem) 0', background: 'var(--navy-deep,#0F1824)' }}>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, backgroundImage: 'url(https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=2000&q=70)', backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.07 }} />
+        <div style={{ position: 'relative', zIndex: 1, width: 'min(1280px,94vw)', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 52 }}>
             <Eyebrow color="var(--gold)">Simples e transparente</Eyebrow>
-            <h2 style={{ margin: '10px 0 12px', color: '#fff', fontSize: 'clamp(1.6rem,2.8vw,2.2rem)' }}>Como funciona a VN Prime</h2>
-            <p style={{ color: 'rgba(245,248,250,0.65)', fontSize: 16, maxWidth: 480, margin: '0 auto', lineHeight: 1.7 }}>
-              Três passos para comprar ou anunciar com segurança e resultado.
+            <h2 style={{ margin: '10px 0 14px', color: '#fff', fontSize: 'clamp(1.6rem,2.8vw,2.2rem)' }}>Como funciona a VN Prime</h2>
+            <p style={{ color: 'rgba(245,248,250,0.65)', fontSize: 16, maxWidth: 580, margin: '0 auto', lineHeight: 1.7 }}>
+              Uma plataforma imobiliária híbrida: o proprietário escolhe vender direto, vender com apoio da plataforma ou contratar a venda completa com corretor parceiro.
             </p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 2 }}>
             {([
               {
                 n: '01', title: 'Busque ou cadastre',
-                desc: 'Explore o portfólio curado ou anuncie seu imóvel em minutos. Sem burocracia, sem papelada.',
-                accent: 'var(--gold)',
-                svgPath: 'M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z',
+                desc: 'Explore o portfólio curado ou anuncie seu imóvel em minutos. Sem burocracia, sem papelada. Você define o modelo de venda.',
+                accent: '#D4A857',
+                img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
               },
               {
                 n: '02', title: 'Qualificação e contato',
                 desc: 'Compradores qualificados entram em contato diretamente. Proprietários recebem leads com nome, e-mail e WhatsApp.',
                 accent: '#6EE7B7',
-                svgPath: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
+                img: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&q=80',
               },
               {
                 n: '03', title: 'Feche com segurança',
-                desc: 'Due Diligence opcional, análise jurídica e acompanhamento VN Prime até a assinatura do contrato.',
+                desc: 'Due Diligence, análise jurídica e acompanhamento VN Prime até a assinatura. Você aprova cada etapa antes de avançar.',
                 accent: '#93C5FD',
-                svgPath: 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z',
+                img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80',
               },
-            ] as { n: string; title: string; desc: string; accent: string; svgPath: string }[]).map((s) => (
-              <div key={s.n} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', padding: 'clamp(28px,4vw,44px)', position: 'relative', textAlign: 'center' }}>
-                {/* Step number */}
-                <div style={{ position: 'absolute', top: 20, right: 24, fontFamily: 'var(--font-display)', fontSize: 56, fontWeight: 900, color: 'rgba(255,255,255,0.04)', lineHeight: 1 }}>{s.n}</div>
-                {/* Icon circle */}
-                <div style={{ width: 64, height: 64, borderRadius: '50%', background: s.accent + '20', border: `1.5px solid ${s.accent}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={s.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d={s.svgPath} />
-                  </svg>
+            ] as { n: string; title: string; desc: string; accent: string; img: string }[]).map((s) => (
+              <div key={s.n} style={{ overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ height: 200, position: 'relative', backgroundImage: `url(${s.img})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(15,22,32,0.15) 0%, rgba(15,22,32,0.85) 100%)' }} />
+                  <div style={{ position: 'absolute', top: 14, right: 18, fontFamily: 'var(--font-display)', fontSize: 72, fontWeight: 900, color: 'rgba(255,255,255,0.09)', lineHeight: 1 }}>{s.n}</div>
+                  <div style={{ position: 'absolute', bottom: 18, left: 24 }}>
+                    <div style={{ display: 'inline-block', background: s.accent + '22', border: `1px solid ${s.accent}55`, borderRadius: 999, padding: '4px 13px', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: s.accent }}>
+                      Passo {s.n}
+                    </div>
+                  </div>
                 </div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', color: s.accent, textTransform: 'uppercase', marginBottom: 10 }}>Passo {s.n}</div>
-                <div style={{ fontSize: 19, fontWeight: 800, color: '#fff', marginBottom: 12, lineHeight: 1.25 }}>{s.title}</div>
-                <p style={{ margin: 0, fontSize: 14.5, color: 'rgba(245,248,250,0.68)', lineHeight: 1.75 }}>{s.desc}</p>
+                <div style={{ padding: 'clamp(24px,3.5vw,36px)', background: 'rgba(255,255,255,0.03)' }}>
+                  <div style={{ fontSize: 19, fontWeight: 800, color: '#fff', marginBottom: 12, lineHeight: 1.25 }}>{s.title}</div>
+                  <p style={{ margin: 0, fontSize: 14.5, color: 'rgba(245,248,250,0.68)', lineHeight: 1.75 }}>{s.desc}</p>
+                </div>
               </div>
             ))}
           </div>
           {/* Banner footer CTA */}
-          <div style={{ marginTop: 40, padding: '28px 36px', background: 'rgba(212,168,87,0.08)', border: '1px solid rgba(212,168,87,0.20)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+          <div style={{ marginTop: 2, padding: '28px 36px', background: 'rgba(212,168,87,0.08)', border: '1px solid rgba(212,168,87,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
             <div>
               <div style={{ fontSize: 17, fontWeight: 700, color: '#fff', marginBottom: 4 }}>Pronto para começar?</div>
               <div style={{ fontSize: 14, color: 'rgba(245,248,250,0.60)' }}>Curadoria premium · Segurança jurídica · Sem burocracia</div>
@@ -649,7 +652,7 @@ export default function HomePage() {
                           </div>
                           <div style={{ fontSize: 13, color: 'rgba(245,248,250,0.7)', marginBottom: 24 }}>{p.priceLabel}</div>
                           <p style={{ fontSize: 15, color: 'rgba(245,248,250,0.88)', lineHeight: 1.75, margin: '0 0 28px' }}>{p.desc}</p>
-                          <Link href="/proprietario">
+                          <Link href="/vender">
                             <button style={{ background: 'var(--gold)', color: 'var(--navy-deep)', border: 'none', borderRadius: 10, padding: '14px 28px', fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: 'inherit' }}>{p.cta} →</button>
                           </Link>
                           <div style={{ marginTop: 14, fontSize: 12, color: 'rgba(245,248,250,0.5)', letterSpacing: '0.01em' }}>
@@ -701,7 +704,7 @@ export default function HomePage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 2 }}>
             {[
               { num: '01', title: 'Você só paga se vender', desc: 'Nos planos Assistida e Completa, zero adiantado. Comissão cobrada exclusivamente na conclusão do negócio.' },
-              { num: '02', title: 'Due diligence incluso', desc: 'Análise de 30+ itens jurídicos e técnicos antes de qualquer assinatura. Sem surpresas no pós-venda.' },
+              { num: '02', title: 'Due Diligence disponível', desc: 'Análise de 70+ itens jurídicos e técnicos antes de qualquer assinatura. Laudo entregue em até 7 dias úteis. Sem surpresas no pós-venda.' },
               { num: '03', title: 'Dados protegidos', desc: 'Seus documentos e informações pessoais trafegam com criptografia. Nunca repassamos dados a terceiros sem autorização.' },
               { num: '04', title: 'Contrato transparente', desc: 'Termos claros, sem cláusulas surpresa. Você revisa e aprova tudo antes de assinar qualquer documento.' },
             ].map(item => (

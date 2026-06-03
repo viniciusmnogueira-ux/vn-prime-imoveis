@@ -42,9 +42,9 @@ export default function TermosPage() {
         <Section title="4. Planos de anúncio">
           <p style={{ marginBottom: 12 }}>A Plataforma oferece os seguintes planos para proprietários:</p>
           <ul style={{ paddingLeft: 20 }}>
-            <li style={{ marginBottom: 6 }}><strong>Plano Direta (R$ 97/mês):</strong> anúncio na plataforma com suporte básico. O proprietário conduz as negociações de forma autônoma.</li>
-            <li style={{ marginBottom: 6 }}><strong>Plano Assistida (3% de comissão):</strong> a VN Prime Imóveis auxilia nas negociações. Comissão devida somente em caso de fechamento.</li>
-            <li style={{ marginBottom: 6 }}><strong>Plano Completa (6% de comissão):</strong> gestão completa da venda, incluindo marketing, atendimento e documentação. Comissão devida somente em caso de fechamento.</li>
+            <li style={{ marginBottom: 6 }}><strong>Plano Venda Direta (R$ 297 — taxa única por 90 dias):</strong> anúncio na vitrine VN Prime com suporte por WhatsApp. O proprietário conduz as negociações de forma autônoma e fica com 100% do valor da venda.</li>
+            <li style={{ marginBottom: 6 }}><strong>Plano Venda Assistida (3% de comissão):</strong> a VN Prime Imóveis qualifica compradores e acompanha o processo. Comissão devida somente em caso de fechamento — zero risco antecipado.</li>
+            <li style={{ marginBottom: 6 }}><strong>Plano Venda Completa (6% de comissão):</strong> gestão completa com corretor parceiro dedicado, marketing, atendimento e documentação. Comissão devida somente em caso de fechamento.</li>
           </ul>
           <p style={{ marginTop: 12 }}>Valores e condições podem ser alterados mediante aviso prévio de 30 dias.</p>
         </Section>
