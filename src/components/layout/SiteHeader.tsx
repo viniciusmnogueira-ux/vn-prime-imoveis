@@ -39,15 +39,15 @@ function BrandLockup({ onNavy = false }: { onNavy?: boolean }) {
 }
 
 const NAV = [
-  { label: 'Início',      href: '/' },
-  { label: 'Comprar',     href: '/busca' },
-  { label: 'Anuncie',     href: '/vender' },
-  { label: 'Lançamentos', href: '/lancamentos' },
-  { label: 'Sobre',       href: '/sobre' },
+  { label: 'Início',        href: '/' },
+  { label: 'Comprar',       href: '/busca' },
+  { label: 'Anuncie',       href: '/vender' },
+  { label: 'Como funciona', href: '/como-funciona' },
+  { label: 'Lançamentos',   href: '/lancamentos' },
+  { label: 'Sobre',         href: '/sobre' },
   {
-    label: 'Serviços', href: '#',
+    label: 'Serviços', href: '/sobre',
     dropdown: [
-      { label: 'Como funciona',        href: '/como-funciona',  desc: 'Entenda os três modelos de venda da VN Prime' },
       { label: 'Para Proprietários',   href: '/proprietarios',  desc: 'Três planos — direto, assistido ou completo' },
       { label: 'Para Corretores',      href: '/corretores',     desc: 'Carteira, CRM e pipeline sem imobiliária' },
       { label: 'Consórcio',            href: '/consorcio',      desc: 'Compre seu imóvel com parcelas acessíveis' },

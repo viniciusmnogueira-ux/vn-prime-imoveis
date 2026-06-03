@@ -724,7 +724,7 @@ export default function HomePage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 32 }}>
             {([
               { val: '200+', label: 'Imóveis curados', sub: 'ativos no portfólio' },
-              { val: '48 h', label: 'Due diligence', sub: 'prazo de entrega do laudo' },
+              { val: '7 dias', label: 'Due diligence', sub: 'prazo de entrega do laudo' },
               { val: '3%', label: 'Comissão mínima', sub: 'somente ao vender' },
               { val: 'BH & Nova Lima', label: 'Mercados premium', sub: 'cobertura regional completa' },
             ] as { val: string; label: string; sub: string }[]).map(s => (
