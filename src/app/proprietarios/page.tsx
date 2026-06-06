@@ -3,65 +3,62 @@ import Eyebrow from '@/components/ui/Eyebrow'
 import Btn from '@/components/ui/Btn'
 
 export const metadata = {
-  title: 'Para Proprietários — Venda seu imóvel com a VN Prime',
-  description: 'Venda seu imóvel em BH direto, com apoio ou com corretor dedicado. Três planos claros, sem burocracia e sem pagar comissão antes de vender.',
+  title: 'Para Proprietários — Anuncie seu imóvel com a VN Prime',
+  description: 'Planos de assinatura sem comissão: Essencial, Plus ou Pro. Anuncie na vitrine VN Prime, receba leads qualificados e venda com autonomia em BH e região.',
 }
 
 const PLANOS = [
   {
-    nome: 'Venda Direta',
-    custo: 'R$ 297',
-    label: 'taxa única por 90 dias',
-    pct: null,
+    nome: 'Plano Essencial',
+    custo: 'R$ 99',
+    label: '/mês · 1 imóvel ativo',
     destaque: false,
-    desc: 'Você cadastra, define o preço e conduz as negociações. A VN Prime cuida da vitrine, da distribuição nos portais e da qualificação básica dos compradores.',
+    desc: 'Publique na vitrine VN Prime com autonomia total. Você define o preço, agenda visitas e fecha direto com o comprador — sem pagar comissão sobre a venda.',
     bullets: [
+      'Até 1 imóvel ativo',
       '0% de comissão — você fica com 100%',
-      'Anúncio por 90 dias na vitrine VN Prime',
-      'Distribuição automática em ZAP, Viva Real e OLX',
       'Leads com nome, e-mail e WhatsApp',
-      'Gerador de descrição editorial com IA',
-      'Suporte por WhatsApp',
+      'Descrição editorial gerada por IA',
+      'Endereço protegido — exibe só o bairro',
+      'Suporte por chat',
     ],
     cta: 'Começar agora',
     img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=85',
     accent: '#6366F1',
   },
   {
-    nome: 'Venda Assistida',
-    custo: '3%',
-    label: 'somente no sucesso — zero risco antecipado',
-    pct: '3%',
+    nome: 'Plano Plus',
+    custo: 'R$ 399',
+    label: '/ 6 meses · até 3 imóveis ativos',
     destaque: true,
-    desc: 'A VN Prime qualifica os compradores, otimiza o anúncio e mantém tudo em ordem até o fechamento. Você acompanha cada etapa pelo painel e decide quando fechar.',
+    desc: 'Para quem tem mais de um imóvel. A VN Prime cuida da curadoria dos anúncios, qualifica compradores e entrega relatório de desempenho mensal.',
     bullets: [
-      'Você paga somente ao vender',
-      'Qualificação ativa de compradores',
-      'Curadoria e descrição editorial com IA',
-      'Time VN Prime nos bastidores',
-      'Leads entregues com histórico de interesse',
-      'Pacotes de fotografia e mídia à parte',
+      'Até 3 imóveis ativos',
+      '0% de comissão — você fica com 100%',
+      'Curadoria ativa dos anúncios',
+      'Qualificação de leads antes do contato',
+      'Relatório de desempenho mensal',
+      'Suporte prioritário',
     ],
-    cta: 'Escolher este plano',
+    cta: 'Escolher Plus',
     img: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1200&q=85',
     accent: '#D4A857',
   },
   {
-    nome: 'Venda Completa',
-    custo: '6%',
-    label: 'somente no sucesso — você só aprova e assina',
-    pct: '6%',
+    nome: 'Plano Pro',
+    custo: 'R$ 799',
+    label: '/ 12 meses · até 10 imóveis ativos',
     destaque: false,
-    desc: 'Corretor parceiro dedicado, fotos profissionais, mídia paga gerenciada, visitas acompanhadas e suporte jurídico até a escritura. Você não precisa se preocupar com nada.',
+    desc: 'Estrutura completa para investidores. Painel gerencial consolidado, curadoria dedicada em todos os anúncios, relatórios mensais e suporte direto da equipe VN Prime.',
     bullets: [
-      'Corretor parceiro dedicado à sua venda',
-      'Fotos profissionais incluídas',
-      'Mídia paga em Meta, Google e portais',
-      'Visitas acompanhadas pelo corretor',
-      'Negociação conduzida pelo time VN Prime',
-      'Suporte jurídico até a escritura',
+      'Até 10 imóveis ativos',
+      '0% de comissão — você fica com 100%',
+      'Painel gerencial consolidado',
+      'Curadoria dedicada em todos os anúncios',
+      'Relatório de mercado e benchmarks mensais',
+      'Suporte dedicado da equipe VN Prime',
     ],
-    cta: 'Quero mãos livres',
+    cta: 'Assinar Pro',
     img: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=85',
     accent: '#2F8674',
   },
@@ -83,17 +80,17 @@ const ETAPAS = [
   {
     n: '03',
     title: 'Feche com segurança',
-    desc: 'Due Diligence disponível antes de assinar. Suporte jurídico até a escritura. Você aprova cada etapa antes de avançar.',
+    desc: 'Due Diligence disponível antes de assinar. Materiais de apoio em cada etapa. Você aprova cada etapa antes de avançar.',
     img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80',
   },
 ]
 
 const FAQ = [
-  { q: 'Preciso de corretor para vender?', a: 'Não. No plano Venda Direta você conduz as negociações de forma autônoma. A VN Prime cuida da vitrine, distribuição e qualificação. Se preferir suporte ou um corretor dedicado, temos os planos Assistida e Completa.' },
-  { q: 'Quando pago a taxa ou comissão?', a: 'No plano Venda Direta: R$ 297 no ato do cadastro. Nos planos Assistida (3%) e Completa (6%): você paga somente quando o imóvel for vendido — zero risco antecipado.' },
+  { q: 'Preciso de corretor para vender?', a: 'Não. Em todos os planos você conduz as negociações de forma autônoma. A VN Prime cuida da vitrine, qualificação de leads e suporte de plataforma — sem intermediários obrigatórios.' },
+  { q: 'Como funciona a cobrança?', a: 'Os planos são de assinatura: Essencial (R$ 99/mês · 1 imóvel), Plus (R$ 399 / 6 meses · até 3 imóveis) e Pro (R$ 799 / 12 meses · até 10 imóveis). Nenhum cobra comissão sobre a venda — você fica com 100% do valor.' },
   { q: 'Posso trocar de plano depois?', a: 'Sim. Faça o upgrade quando quiser pelo seu painel, sem burocracia e sem penalidade.' },
   { q: 'Meu endereço fica visível no anúncio?', a: 'Não. Exibimos apenas o bairro e a cidade até que o comprador demonstre interesse qualificado.' },
-  { q: 'A fotografia profissional está incluída?', a: 'No plano Venda Direta e Assistida, a fotografia é um pacote adicional. No plano Venda Completa, as fotos profissionais estão incluídas.' },
+  { q: 'A fotografia profissional está incluída?', a: 'A fotografia profissional é um serviço adicional disponível para todos os proprietários VN Prime. Acesse o portal do proprietário para solicitar um pacote.' },
 ]
 
 export default function ProprietariosPage() {
@@ -122,7 +119,7 @@ export default function ProprietariosPage() {
             </em>
           </h1>
           <p style={{ color: 'rgba(245,248,250,0.88)', fontSize: 17, maxWidth: 520, lineHeight: 1.7, marginBottom: 36 }}>
-            Direto, com apoio da plataforma ou com corretor dedicado. Três planos transparentes — você paga somente quando faz sentido para você.
+            Planos de assinatura sem comissão sobre a venda — Essencial, Plus ou Pro. Você anuncia, recebe leads qualificados e negocia direto com o comprador.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <Link href="/anunciar"><Btn variant="accent" size="lg">Publicar meu imóvel</Btn></Link>
@@ -135,10 +132,10 @@ export default function ProprietariosPage() {
       <section style={{ background: '#0F1824', padding: '18px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ width: 'min(1200px,92vw)', margin: '0 auto', display: 'flex', gap: 0, justifyContent: 'center', flexWrap: 'wrap' }}>
           {[
-            { val: 'R$ 0', label: 'adiantado nos planos 3% e 6%' },
-            { val: 'R$ 297', label: 'taxa única no plano direto' },
-            { val: '90 dias', label: 'de vitrine ativa' },
-            { val: '100%', label: 'da venda fica com você no plano direto' },
+            { val: 'R$ 99/mês', label: 'Plano Essencial · 1 imóvel ativo' },
+            { val: 'R$ 399', label: 'Plano Plus · 6 meses · até 3 imóveis' },
+            { val: 'R$ 799', label: 'Plano Pro · 12 meses · até 10 imóveis' },
+            { val: '0%', label: 'de comissão sobre a venda' },
           ].map((s, i) => (
             <div key={s.label} style={{ textAlign: 'center', padding: '10px 28px', borderRight: i < 3 ? '1px solid rgba(255,255,255,0.10)' : 'none' }}>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.2rem,2.2vw,1.7rem)', fontWeight: 800, color: 'var(--gold)', lineHeight: 1 }}>{s.val}</div>

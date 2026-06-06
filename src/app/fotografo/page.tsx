@@ -260,7 +260,7 @@ export default function FotografoPage() {
             ))}
           </div>
           <p style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: 'var(--fg-3)' }}>
-            Fotografia inclusa nos planos Venda Assistida e Venda Completa · <Link href="/vender" style={{ color: 'var(--gold-deep)', fontWeight: 600 }}>Ver planos</Link>
+            Pacotes de fotografia disponíveis para proprietários VN Prime · <Link href="/vender" style={{ color: 'var(--gold-deep)', fontWeight: 600 }}>Ver planos</Link>
           </p>
         </div>
       </section>

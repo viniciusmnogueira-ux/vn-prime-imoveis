@@ -40,11 +40,11 @@ export default function TermosPage() {
         </Section>
 
         <Section title="4. Planos de anúncio">
-          <p style={{ marginBottom: 12 }}>A Plataforma oferece os seguintes planos para proprietários:</p>
+          <p style={{ marginBottom: 12 }}>A Plataforma oferece os seguintes planos de assinatura para proprietários, sem cobrança de comissão sobre o valor da venda:</p>
           <ul style={{ paddingLeft: 20 }}>
-            <li style={{ marginBottom: 6 }}><strong>Plano Venda Direta (R$ 297 — taxa única por 90 dias):</strong> anúncio na vitrine VN Prime com suporte por WhatsApp. O proprietário conduz as negociações de forma autônoma e fica com 100% do valor da venda.</li>
-            <li style={{ marginBottom: 6 }}><strong>Plano Venda Assistida (3% de comissão):</strong> a VN Prime Imóveis qualifica compradores e acompanha o processo. Comissão devida somente em caso de fechamento — zero risco antecipado.</li>
-            <li style={{ marginBottom: 6 }}><strong>Plano Venda Completa (6% de comissão):</strong> gestão completa com corretor parceiro dedicado, marketing, atendimento e documentação. Comissão devida somente em caso de fechamento.</li>
+            <li style={{ marginBottom: 6 }}><strong>Plano Essencial (R$ 99/mês · 1 imóvel ativo):</strong> anúncio na vitrine VN Prime, leads qualificados e suporte por chat. O proprietário conduz as negociações de forma autônoma e fica com 100% do valor da venda.</li>
+            <li style={{ marginBottom: 6 }}><strong>Plano Plus (R$ 399 / 6 meses · até 3 imóveis ativos):</strong> curadoria ativa dos anúncios, qualificação de leads e relatório de desempenho mensal. Sem comissão sobre a venda.</li>
+            <li style={{ marginBottom: 6 }}><strong>Plano Pro (R$ 799 / 12 meses · até 10 imóveis ativos):</strong> painel gerencial consolidado, curadoria dedicada, relatórios de mercado e suporte dedicado da equipe VN Prime. Sem comissão sobre a venda.</li>
           </ul>
           <p style={{ marginTop: 12 }}>Valores e condições podem ser alterados mediante aviso prévio de 30 dias.</p>
         </Section>
@@ -64,8 +64,8 @@ export default function TermosPage() {
         <Section title="8. Política de leads">
           <p style={{ marginBottom: 10 }}>As informações fornecidas em formulários de contato, agendamento e proposta ("leads") são tratadas da seguinte forma:</p>
           <ul style={{ paddingLeft: 20 }}>
-            <li style={{ marginBottom: 6 }}>Leads gerados por imóveis do plano Venda Direta e Venda Assistida são encaminhados diretamente ao proprietário cadastrado.</li>
-            <li style={{ marginBottom: 6 }}>Leads gerados por imóveis do plano Venda Completa são encaminhados ao corretor parceiro responsável pelo imóvel.</li>
+            <li style={{ marginBottom: 6 }}>Leads gerados por imóveis dos planos Essencial e Plus são encaminhados diretamente ao proprietário cadastrado.</li>
+            <li style={{ marginBottom: 6 }}>Leads gerados por imóveis do plano Pro com curadoria dedicada podem ser encaminhados ao responsável designado pela equipe VN Prime.</li>
             <li style={{ marginBottom: 6 }}>O lead consente, ao enviar o formulário, que seus dados sejam compartilhados com o responsável pelo imóvel para fins de contato comercial.</li>
             <li style={{ marginBottom: 6 }}>A VN Prime Imóveis não vende, aluga ou cede dados de leads a terceiros não relacionados à transação.</li>
           </ul>
@@ -83,7 +83,7 @@ export default function TermosPage() {
         </Section>
 
         <Section title="10. Comissionamento do corretor parceiro">
-          <p style={{ marginBottom: 10 }}>Corretores parceiros que atuam em imóveis do plano Venda Completa têm direito à comissão conforme as seguintes condições:</p>
+          <p style={{ marginBottom: 10 }}>Corretores parceiros que atuam na intermediação de imóveis pela Plataforma têm direito à comissão conforme as seguintes condições:</p>
           <ul style={{ paddingLeft: 20 }}>
             <li style={{ marginBottom: 6 }}>A comissão é devida exclusivamente em caso de fechamento — assinatura de contrato de compra e venda ou instrumento equivalente.</li>
             <li style={{ marginBottom: 6 }}>O percentual, prazo e forma de pagamento são definidos no acordo firmado entre o corretor e a VN Prime Imóveis no momento do cadastro.</li>
