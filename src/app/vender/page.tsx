@@ -5,54 +5,6 @@ import Btn from '@/components/ui/Btn'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
-const fmtCur = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
-
-function PricingSimulator() {
-  const [valor, setValor] = useState(1000000)
-  const planos = [
-    { nome: 'Venda Direta', custo: 297, pct: 0, color: '#6366F1', descCusto: 'taxa única' },
-    { nome: 'Venda Assistida', custo: 0, pct: 0.03, color: '#D4A857', descCusto: '3% sobre a venda' },
-    { nome: 'Venda Completa', custo: 0, pct: 0.06, color: '#2F8674', descCusto: '6% sobre a venda (corretor + VN)' },
-  ]
-  return (
-    <div style={{ background: '#fff', borderRadius: 20, padding: 'clamp(28px,4vw,44px)', border: '1px solid var(--border)', boxShadow: '0 8px 32px rgba(15,34,68,0.08)' }}>
-      <div style={{ marginBottom: 28 }}>
-        <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', display: 'block', marginBottom: 12 }}>
-          Valor do imóvel: <span style={{ color: 'var(--gold)', fontSize: 20 }}>{fmtCur(valor)}</span>
-        </label>
-        <input type="range" min={200000} max={5000000} step={50000} value={valor}
-          onChange={e => setValor(+e.target.value)}
-          style={{ width: '100%', accentColor: 'var(--gold)', cursor: 'pointer' }} />
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginTop: 4 }}>
-          <span>R$ 200 mil</span><span>R$ 5 mi</span>
-        </div>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 14 }}>
-        {planos.map(p => {
-          const comissao = Math.round(valor * p.pct) + p.custo
-          const liquido = valor - comissao
-          return (
-            <div key={p.nome} style={{ border: `2px solid ${p.color}22`, borderRadius: 14, padding: '18px 20px', background: `${p.color}06` }}>
-              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: p.color, marginBottom: 8 }}>{p.nome}</div>
-              <div style={{ fontSize: 11, color: 'var(--fg-3)', marginBottom: 16 }}>{p.descCusto}</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-                  <span style={{ color: 'var(--fg-2)' }}>Custo VN Prime</span>
-                  <span style={{ fontWeight: 700, color: '#DC2626' }}>{fmtCur(comissao)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
-                  <span style={{ color: 'var(--navy)', fontWeight: 600 }}>Você recebe</span>
-                  <span style={{ fontWeight: 800, color: p.color, fontSize: 16 }}>{fmtCur(liquido)}</span>
-                </div>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-      <p style={{ fontSize: 11.5, color: 'var(--fg-3)', marginTop: 16, textAlign: 'center' }}>Simulação estimada. Valores reais podem variar conforme negociação.</p>
-    </div>
-  )
-}
 
 function FaqList({ items }: { items: { q: string; a: string }[] }) {
   const [open, setOpen] = useState<number | null>(null)
@@ -362,29 +314,16 @@ export default function VenderPage() {
         </section>
       )}
 
-      {/* Pricing Simulator */}
-      <section style={{ padding: 'clamp(3rem,5vw,5rem) 0', background: '#fff' }}>
-        <div style={{ width: 'min(900px,94vw)', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 36 }}>
-            <Eyebrow color="var(--gold-deep)">Simulador interativo</Eyebrow>
-            <h2 style={{ margin: '8px 0 12px' }}>Quanto você recebe em cada plano?</h2>
-            <p style={{ color: 'var(--fg-2)', fontSize: 15, maxWidth: 440, margin: '0 auto' }}>
-              Arraste o slider e veja o custo real de cada modalidade com base no valor do seu imóvel.
-            </p>
-          </div>
-          <PricingSimulator />
-        </div>
-      </section>
 
       {/* FAQ */}
       {(() => {
         const FAQS = [
           { q: 'Quanto tempo leva para meu imóvel aparecer na vitrine?', a: 'Após o envio, nossa equipe de curadoria revisa em até 24 horas úteis. Imóveis com fotos profissionais e descrição completa são aprovados mais rápido.' },
-          { q: 'Posso anunciar sem usar corretor?', a: 'Sim. No plano Venda Direta você mantém controle total da negociação. A VN Prime entra com a vitrine, distribuição em portais e suporte de plataforma.' },
+          { q: 'Posso anunciar sem usar corretor?', a: 'Sim. Em todos os planos você mantém o controle da negociação. A VN Prime entra com a vitrine, leads qualificados e suporte de plataforma.' },
           { q: 'Como a VN Prime garante que o comprador é qualificado?', a: 'Todo comprador que entra em contato passa pelo nosso formulário de qualificação — perfil, faixa de orçamento e intenção de compra. Você recebe o lead pré-filtrado.' },
-          { q: 'O que está incluso no plano de 6%?', a: 'Sessão fotográfica profissional, mídia paga em Meta e Google, corretor dedicado para visitas e negociação, e suporte jurídico da minuta até a escritura.' },
-          { q: 'Posso pausar ou cancelar a qualquer momento?', a: 'Sim. No plano Direta você tem 90 dias de vigência e pode pausar a qualquer momento pelo painel. Nos planos de comissão não há prazo mínimo.' },
-          { q: 'E se meu imóvel não vender?', a: 'No plano Direta você paga apenas a taxa de publicação (R$ 297). Nos planos de comissão (3% ou 6%) não há cobrança se não houver venda.' },
+          { q: 'Qual a diferença entre Essencial, Plus e Pro?', a: 'A diferença principal é o número de imóveis ativos: Essencial (1 imóvel · R$ 99/mês), Plus (até 3 imóveis · R$ 399 / 6 meses) e Pro (até 10 imóveis · R$ 799 / 12 meses). Os planos superiores incluem curadoria ativa e relatórios de desempenho.' },
+          { q: 'Posso cancelar ou mudar de plano?', a: 'Sim. Você pode cancelar quando quiser ou fazer upgrade de plano pelo painel do proprietário — sem burocracia.' },
+          { q: 'E se meu imóvel não vender?', a: 'Os planos são de assinatura — você paga pela visibilidade e pelas ferramentas da plataforma, sem comissão sobre a venda. Cancele quando quiser.' },
         ]
         return (
           <section style={{ padding: 'clamp(3rem,5vw,5rem) 0', background: 'var(--cream)' }}>
