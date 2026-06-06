@@ -89,9 +89,7 @@ export default function ProprietarioPage() {
             </h1>
             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', marginTop: 4 }}>
               Plano: <span style={{ color: 'var(--gold)', fontWeight: 700 }}>{
-                (['direta','assistida','completa'].includes(profile?.plano)
-                  ? { direta: 'Venda Direta', assistida: 'Venda Assistida', completa: 'Venda Completa' }[profile.plano as string]
-                  : 'Venda Direta')
+                ({ essencial: 'Plano Essencial', plus: 'Plano Plus', pro: 'Plano Pro', direta: 'Plano Essencial', assistida: 'Plano Plus', completa: 'Plano Pro' } as Record<string, string>)[profile?.plano] ?? 'Plano Essencial'
               }</span>
             </div>
           </div>
@@ -408,7 +406,7 @@ function ConfigSection({ profile, onSave, supabase }: { profile: Profile | null;
   const [telefone, setTelefone] = useState(profile?.telefone ?? '')
   const [saving, setSaving] = useState(false)
   const [ok, setOk] = useState(false)
-  const [changingPlano, setChangingPlano] = useState(false)
+  const [upgradePlano, setUpgradePlano] = useState<string | null>(null)
 
   const save = async () => {
     setSaving(true)
@@ -417,42 +415,87 @@ function ConfigSection({ profile, onSave, supabase }: { profile: Profile | null;
     onSave()
   }
 
-  const selectPlano = async (plano: string) => {
-    setChangingPlano(true)
-    await supabase.from('profiles').update({ plano }).eq('id', profile?.id!)
-    setChangingPlano(false); onSave()
-  }
-
   const PLANOS_OPCOES = [
-    { id: 'direta', nome: 'Venda Direta', preco: 'R$ 297', sub: 'taxa única', desc: 'Você anuncia e vende. Sem comissão sobre a venda.', color: '#6366F1' },
-    { id: 'assistida', nome: 'Venda Assistida', preco: '3%', sub: 'só ao vender', desc: 'Curadoria VN Prime + qualificação de compradores.', color: '#D4A857', destaque: true },
-    { id: 'completa', nome: 'Venda Completa', preco: '6%', sub: 'sobre a venda', desc: 'Corretor dedicado + toda a estrutura VN Prime.', color: '#2F8674' },
+    { id: 'essencial', nome: 'Plano Essencial', preco: 'R$ 99/mês', periodo: 'mensal · 1 imóvel ativo', desc: 'Anúncio na vitrine VN Prime, leads qualificados e suporte por chat. Sem comissão.', color: '#6366F1' },
+    { id: 'plus', nome: 'Plano Plus', preco: 'R$ 399', periodo: '6 meses · até 3 imóveis', desc: 'Curadoria ativa dos anúncios, qualificação de leads e relatório de desempenho mensal.', color: '#D4A857', destaque: true },
+    { id: 'pro', nome: 'Plano Pro', preco: 'R$ 799', periodo: '12 meses · até 10 imóveis', desc: 'Painel gerencial consolidado, curadoria dedicada e suporte direto da equipe VN Prime.', color: '#2F8674' },
   ]
 
+  const LEGACY: Record<string, string> = { direta: 'essencial', assistida: 'plus', completa: 'pro' }
+  const planoAtual = LEGACY[profile?.plano] ?? profile?.plano ?? 'essencial'
+  const planoAtualObj = PLANOS_OPCOES.find(p => p.id === planoAtual) ?? PLANOS_OPCOES[0]
+  const planoUpgradeObj = PLANOS_OPCOES.find(p => p.id === upgradePlano)
+
+  const waMsg = (p: typeof PLANOS_OPCOES[0]) =>
+    encodeURIComponent(`Olá! Sou ${profile?.nome ?? 'usuário'} (${profile?.email ?? ''}) e quero fazer upgrade para o ${p.nome} — ${p.preco} · ${p.periodo}. Pode me ajudar?`)
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 640 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 640, position: 'relative' }}>
+      {/* Upgrade modal */}
+      {upgradePlano && planoUpgradeObj && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,22,32,0.55)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+          onClick={() => setUpgradePlano(null)}>
+          <div style={{ background: '#fff', borderRadius: 20, padding: 36, maxWidth: 440, width: '100%', boxShadow: '0 24px 64px rgba(15,22,32,0.22)' }}
+            onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: planoUpgradeObj.color, marginBottom: 10 }}>Upgrade de plano</div>
+            <h3 style={{ margin: '0 0 6px', fontSize: 22, color: 'var(--navy)' }}>{planoUpgradeObj.nome}</h3>
+            <div style={{ fontSize: 28, fontWeight: 900, color: planoUpgradeObj.color, lineHeight: 1, marginBottom: 4 }}>{planoUpgradeObj.preco}</div>
+            <div style={{ fontSize: 13, color: 'var(--fg-3)', marginBottom: 16 }}>{planoUpgradeObj.periodo}</div>
+            <div style={{ fontSize: 13.5, color: 'var(--fg-2)', lineHeight: 1.65, marginBottom: 20 }}>{planoUpgradeObj.desc}</div>
+            <div style={{ background: 'var(--cream)', borderRadius: 12, padding: '14px 16px', marginBottom: 22, fontSize: 13, color: 'var(--fg-1)', lineHeight: 1.55 }}>
+              <strong style={{ color: 'var(--navy)' }}>Como funciona:</strong> Entre em contato pelo WhatsApp, informe seu e-mail cadastrado e conclua o pagamento. Seu plano é ativado em até 2 horas úteis.
+            </div>
+            <a href={`https://wa.me/5531984144250?text=${waMsg(planoUpgradeObj)}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', display: 'block', marginBottom: 10 }}>
+              <button style={{ width: '100%', padding: '14px 0', borderRadius: 12, border: 'none', background: '#25D366', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                Falar no WhatsApp
+              </button>
+            </a>
+            <button onClick={() => setUpgradePlano(null)}
+              style={{ width: '100%', padding: '11px 0', borderRadius: 12, border: '1.5px solid var(--border)', background: 'transparent', color: 'var(--fg-2)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Plano atual */}
       <div style={{ background: '#fff', borderRadius: 14, padding: 28, boxShadow: 'var(--shadow-soft)' }}>
-        <h3 style={{ fontSize: 17, marginBottom: 18 }}>Plano atual</h3>
-        <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))' }}>
-          {PLANOS_OPCOES.map(p => {
-            const isAtual = profile?.plano === p.id || (!profile?.plano && p.id === 'direta')
-            return (
-              <div key={p.id} style={{ border: `2px solid ${isAtual ? p.color : 'var(--border)'}`, borderRadius: 12, padding: '16px 14px', background: isAtual ? `${p.color}08` : '#FAFAF8', transition: 'border-color 0.2s' }}>
-                {isAtual && <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: p.color, marginBottom: 8 }}>Plano atual</div>}
-                <div style={{ fontSize: 22, fontWeight: 900, color: p.color, lineHeight: 1 }}>{p.preco}</div>
-                <div style={{ fontSize: 10, color: 'var(--fg-3)', marginBottom: 8 }}>{p.sub}</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>{p.nome}</div>
-                <div style={{ fontSize: 12, color: 'var(--fg-2)', marginBottom: 14, lineHeight: 1.4 }}>{p.desc}</div>
-                {!isAtual && (
-                  <button onClick={() => selectPlano(p.id)} disabled={changingPlano}
-                    style={{ width: '100%', padding: '7px 0', borderRadius: 8, border: `1.5px solid ${p.color}`, background: 'transparent', color: p.color, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-                    Mudar para este
-                  </button>
-                )}
+        <div style={{ marginBottom: 20 }}>
+          <h3 style={{ fontSize: 17, margin: '0 0 4px' }}>Plano atual</h3>
+          <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>Todos os planos têm <strong>0% de comissão</strong> sobre o valor da venda.</div>
+        </div>
+
+        {/* Current plan banner */}
+        <div style={{ border: `2px solid ${planoAtualObj.color}`, borderRadius: 14, padding: '18px 20px', background: `${planoAtualObj.color}08`, marginBottom: 16 }}>
+          <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: planoAtualObj.color, marginBottom: 8 }}>Plano ativo</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--navy)', marginBottom: 2 }}>{planoAtualObj.nome}</div>
+              <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>{planoAtualObj.periodo}</div>
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 900, color: planoAtualObj.color, lineHeight: 1 }}>{planoAtualObj.preco}</div>
+          </div>
+        </div>
+
+        {/* Upgrade options */}
+        <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--fg-3)', marginBottom: 10 }}>Fazer upgrade</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {PLANOS_OPCOES.filter(p => p.id !== planoAtual).map(p => (
+            <div key={p.id} style={{ border: '1.5px solid var(--border)', borderRadius: 12, padding: '14px 16px', background: '#FAFAF8', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+              <div style={{ flex: 1 }}>
+                {p.destaque && <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: p.color, marginBottom: 4 }}>Mais popular</div>}
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 2 }}>{p.nome}</div>
+                <div style={{ fontSize: 12, color: 'var(--fg-3)' }}>{p.periodo}</div>
               </div>
-            )
-          })}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{ fontSize: 18, fontWeight: 800, color: p.color }}>{p.preco}</div>
+                <button onClick={() => setUpgradePlano(p.id)}
+                  style={{ padding: '8px 16px', borderRadius: 9, border: `1.5px solid ${p.color}`, background: 'transparent', color: p.color, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+                  Fazer upgrade
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -717,7 +760,7 @@ function FotografoSection() {
         </div>
       </div>
       <p style={{ fontSize: 12.5, color: 'var(--fg-3)', textAlign: 'center' }}>
-        Fotografia inclusa nos planos Venda Assistida e Venda Completa · <Link href="/vender" style={{ color: 'var(--gold-deep)', fontWeight: 600 }}>Ver planos</Link>
+        Pacotes de fotografia disponíveis para assinantes VN Prime · <Link href="/vender" style={{ color: 'var(--gold-deep)', fontWeight: 600 }}>Ver planos</Link>
       </p>
     </div>
   )
@@ -726,7 +769,7 @@ function FotografoSection() {
 function ProprietarioLanding() {
   const ACCENT = '#D4A857'
   const FEATURES = [
-    { title: 'Fotos Profissionais', desc: 'Sessão fotográfica disponível como pacote adicional ou inclusa nos planos Assistida e Completa. Imagens que destacam seu imóvel e aceleram a venda.', img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80' },
+    { title: 'Fotos Profissionais', desc: 'Pacotes fotográficos disponíveis para assinantes VN Prime. Imagens que destacam seu imóvel e aceleram a venda.', img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80' },
     { title: 'Mídia Paga Gerenciada', desc: 'Anúncios no Google, Meta e portais imobiliários. A VN Prime gerencia o tráfego e distribui automaticamente para você.', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80' },
     { title: 'Leads com Contato Direto', desc: 'Compradores com interesse real chegam ao seu painel com nome, e-mail e WhatsApp. Você decide quem contatar.', img: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80' },
     { title: 'Suporte Jurídico', desc: 'Revisão de contratos, ITBI, cartório e escritura. Profissionais parceiros cuidam da parte burocrática.', img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80' },
@@ -736,12 +779,12 @@ function ProprietarioLanding() {
       tag: '0% Comissão',
       img: 'https://images.unsplash.com/photo-1611095973763-414019e72400?w=900&q=80',
       title: 'Você vende sem pagar comissão',
-      desc: 'Na VN Prime, o proprietário direto paga apenas uma taxa fixa de R$ 297 — e fica com 100% do valor de venda. Sem percentual, sem surpresa no fechamento.',
+      desc: 'Na VN Prime, o proprietário paga uma assinatura fixa e fica com 100% do valor de venda. Sem percentual sobre o negócio, sem surpresa no fechamento.',
       points: [
-        'Taxa fixa R$ 297 — vigência de 90 dias',
+        'Plano Essencial a partir de R$ 99/mês · 1 imóvel ativo',
         'Você define o preço e as condições de negociação',
-        'Nenhum corretor entre você e o comprador',
-        'Para o plano 3%: você paga somente ao vender — zero adiantado',
+        'Nenhuma comissão sobre o valor da venda',
+        'Upgrade ou cancelamento a qualquer momento',
       ],
       cta: 'Anunciar meu imóvel',
     },
@@ -764,7 +807,7 @@ function ProprietarioLanding() {
       title: 'Seu imóvel na maior vitrine premium de BH',
       desc: 'A VN Prime distribui seu anúncio nos principais portais, Google, Meta e na base qualificada de compradores ativos — gerando leads reais.',
       points: [
-        'Distribuição automática em ZAP, Viva Real e OLX',
+        'Vitrine VN Prime com compradores qualificados de BH',
         'Campanha de mídia paga gerenciada pela VN Prime',
         'Fotos profissionais que aumentam em 3× o interesse',
         'Código exclusivo VN para rastreabilidade do anúncio',
@@ -790,7 +833,7 @@ function ProprietarioLanding() {
             {' '}— sem comissão, sem intermediários.
           </h1>
           <p style={{ fontSize: 18, color: 'rgba(245,248,250,0.86)', maxWidth: 600, marginBottom: 32, lineHeight: 1.6 }}>
-            Você define o preço, conduz as visitas e fecha direto com o comprador. A VN Prime entra com plataforma, fotos profissionais, mídia paga e suporte jurídico.
+            Você define o preço, conduz as visitas e fecha direto com o comprador. A VN Prime entra com plataforma, leads qualificados, materiais de apoio e suporte em cada etapa.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 44 }}>
             <Link href="/login?redirect=/proprietario">
@@ -801,7 +844,7 @@ function ProprietarioLanding() {
             </Link>
           </div>
           <div style={{ display: 'flex', gap: 40, flexWrap: 'wrap' }}>
-            {[['R$ 297','Venda Direta'],['0%','De comissão'],['3%','Plano Assistida'],['90 dias','De vigência']].map(([v,l]) => (
+            {[['R$ 99/mês','Plano Essencial'],['R$ 399','Plano Plus · 6 meses'],['R$ 799','Plano Pro · 12 meses'],['0%','Comissão sobre a venda']].map(([v,l]) => (
               <div key={l}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800, color: ACCENT, lineHeight: 1 }}>{v}</div>
                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 5 }}>{l}</div>
