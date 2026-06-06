@@ -3,22 +3,22 @@ import Eyebrow from '@/components/ui/Eyebrow'
 import Btn from '@/components/ui/Btn'
 
 export const metadata = {
-  title: 'Como Funciona a VN Prime — Venda direto, assistida ou completa',
-  description: 'Entenda o modelo híbrido da VN Prime: você escolhe entre vender direto, com apoio da plataforma ou com corretor dedicado. Simples, transparente e sem burocracia.',
+  title: 'Como Funciona a VN Prime — Planos Essencial, Plus e Pro',
+  description: 'Entenda o modelo da VN Prime: escolha o plano que faz mais sentido para você — Essencial, Plus ou Pro. Anuncie, receba leads qualificados e venda com autonomia.',
 }
 
 const CAMINHOS = [
   {
-    id: 'direta',
-    nome: 'Venda Direta',
-    subtitulo: 'Você no controle — 0% de comissão',
-    custo: 'R$ 297 taxa única',
+    id: 'essencial',
+    nome: 'Plano Essencial',
+    subtitulo: '1 imóvel ativo — sem comissão sobre a venda',
+    custo: 'R$ 99/mês',
     img: 'https://images.unsplash.com/photo-1611095973763-414019e72400?w=1000&q=85',
     accent: '#6366F1',
-    desc: 'Ideal para quem quer autonomia total e não quer pagar comissão. Você define o preço, cadastra o imóvel e conduz as negociações diretamente com o comprador. A VN Prime garante a vitrine, a distribuição e a qualificação básica.',
+    desc: 'Ideal para quem quer autonomia total e não quer pagar comissão. Você define o preço, cadastra o imóvel e conduz as negociações diretamente com o comprador. A VN Prime garante a vitrine, a qualificação básica e o suporte de plataforma.',
     como: [
       'Cadastre seu imóvel pela plataforma em minutos',
-      'Seu anúncio é distribuído em ZAP, Viva Real e OLX automaticamente',
+      'Seu anúncio entra na vitrine VN Prime imediatamente',
       'Leads chegam com nome, e-mail e WhatsApp',
       'Você conduz as visitas e negocia direto com o comprador',
       'A VN Prime acompanha a qualidade do processo — sem se interpor',
@@ -26,49 +26,49 @@ const CAMINHOS = [
     paradquem: 'Proprietário com experiência em negociação e tempo para conduzir o processo.',
   },
   {
-    id: 'assistida',
-    nome: 'Venda Assistida',
-    subtitulo: 'Apoio da plataforma — você paga somente se vender',
-    custo: '3% somente no sucesso',
+    id: 'plus',
+    nome: 'Plano Plus',
+    subtitulo: 'Até 3 imóveis ativos — curadoria e qualificação ativa',
+    custo: 'R$ 399 / 6 meses',
     img: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1000&q=85',
     accent: '#D4A857',
-    desc: 'A VN Prime assume a qualificação ativa dos compradores, mantém o anúncio otimizado e garante que apenas interessados reais cheguem até você. Zero risco: você paga somente ao fechar o negócio.',
+    desc: 'A VN Prime assume a qualificação ativa dos compradores, mantém os anúncios otimizados e garante que apenas interessados reais cheguem até você. Para quem tem mais de um imóvel e quer resultado sem abrir mão do controle.',
     como: [
-      'Cadastre seu imóvel — a equipe VN Prime revisa e otimiza',
+      'Cadastre seus imóveis — a equipe VN Prime revisa e otimiza',
       'Compradores são qualificados antes do primeiro contato',
       'Leads chegam com histórico de interesse e perfil verificado',
       'Você acompanha pelo painel e decide quando negociar',
-      'Comissão de 3% cobrada somente na conclusão da venda',
+      'Relatório mensal de desempenho e benchmarks do mercado',
     ],
     paradquem: 'Proprietário que quer resultado sem ocupar tempo excessivo com o processo.',
   },
   {
-    id: 'completa',
-    nome: 'Venda Completa',
-    subtitulo: 'Mãos livres — corretor dedicado — você só aprova',
-    custo: '6% somente no sucesso',
+    id: 'pro',
+    nome: 'Plano Pro',
+    subtitulo: 'Até 10 imóveis ativos — para investidores',
+    custo: 'R$ 799 / 12 meses',
     img: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1000&q=85',
     accent: '#2F8674',
-    desc: 'Um corretor parceiro VN Prime assume a venda do início ao fim: fotos profissionais, mídia paga, visitas acompanhadas e negociação conduzida. Você recebe a proposta para aprovar e assina a escritura.',
+    desc: 'Estrutura completa para investidores com múltiplos imóveis. Painel gerencial consolidado, curadoria dedicada em todos os anúncios, relatórios detalhados e suporte direto da equipe VN Prime.',
     como: [
-      'Corretor parceiro dedicado assume a gestão da venda',
-      'Fotos profissionais realizadas no imóvel',
-      'Mídia paga gerenciada em Meta, Google e portais',
-      'Visitas acompanhadas e negociação conduzida pelo corretor',
-      'Você aprova a proposta — suporte jurídico até a escritura',
+      'Gerencie até 10 imóveis ativos pelo painel consolidado',
+      'Curadoria dedicada em cada anúncio da carteira',
+      'Relatório de mercado e benchmarks mensais por imóvel',
+      'Suporte dedicado da equipe VN Prime',
+      'Materiais de apoio e indicações disponíveis em cada etapa',
     ],
-    paradquem: 'Proprietário que prefere delegar e não quer se preocupar com o processo.',
+    paradquem: 'Investidor ou proprietário com múltiplos imóveis que prefere estrutura e relatórios.',
   },
 ]
 
 const COMPARATIVO = [
-  { feature: 'Custo antecipado', direta: 'R$ 297', assistida: 'R$ 0', completa: 'R$ 0' },
-  { feature: 'Comissão na venda', direta: '0%', assistida: '3%', completa: '6%' },
-  { feature: 'Você fica com', direta: '100%', assistida: '97%', completa: '94%' },
-  { feature: 'Qualificação de leads', direta: 'Básica', assistida: 'Ativa', completa: 'Completa' },
-  { feature: 'Fotos profissionais', direta: 'Pacote à parte', assistida: 'Pacote à parte', completa: 'Incluso' },
-  { feature: 'Corretor dedicado', direta: '—', assistida: '—', completa: 'Sim' },
-  { feature: 'Materiais de apoio', direta: 'Disponível', assistida: 'Disponível', completa: 'Indicações' },
+  { feature: 'Assinatura', essencial: 'R$ 99/mês', plus: 'R$ 399/6m', pro: 'R$ 799/12m' },
+  { feature: 'Imóveis ativos', essencial: '1', plus: 'Até 3', pro: 'Até 10' },
+  { feature: 'Comissão na venda', essencial: '0%', plus: '0%', pro: '0%' },
+  { feature: 'Qualificação de leads', essencial: 'Básica', plus: 'Ativa', pro: 'Completa' },
+  { feature: 'Curadoria dedicada', essencial: '—', plus: 'Sim', pro: 'Sim' },
+  { feature: 'Relatório de desempenho', essencial: '—', plus: 'Mensal', pro: 'Mensal' },
+  { feature: 'Materiais de apoio', essencial: 'Disponível', plus: 'Disponível', pro: 'Indicações' },
 ]
 
 export default function ComoFuncionaPage() {
@@ -151,14 +151,14 @@ export default function ComoFuncionaPage() {
         <div style={{ width: 'min(1000px,92vw)', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 44 }}>
             <Eyebrow color="var(--gold-deep)">Comparativo</Eyebrow>
-            <h2 style={{ margin: '10px 0 0', fontSize: 'clamp(1.4rem,2.3vw,1.8rem)' }}>Venda Direta vs Assistida vs Completa</h2>
+            <h2 style={{ margin: '10px 0 0', fontSize: 'clamp(1.4rem,2.3vw,1.8rem)' }}>Essencial vs Plus vs Pro</h2>
           </div>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
               <thead>
                 <tr>
                   <th style={{ textAlign: 'left', padding: '14px 16px', background: '#0F1824', color: '#fff', fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', borderRight: '1px solid rgba(255,255,255,0.08)' }}>Comparativo</th>
-                  {['Venda Direta', 'Venda Assistida', 'Venda Completa'].map(n => (
+                  {['Plano Essencial', 'Plano Plus', 'Plano Pro'].map(n => (
                     <th key={n} style={{ textAlign: 'center', padding: '14px 16px', background: '#0F1824', color: 'var(--gold)', fontSize: 12, fontWeight: 700, borderRight: '1px solid rgba(255,255,255,0.08)' }}>{n}</th>
                   ))}
                 </tr>
@@ -167,9 +167,9 @@ export default function ComoFuncionaPage() {
                 {COMPARATIVO.map((row, i) => (
                   <tr key={row.feature} style={{ background: i % 2 === 0 ? '#fff' : 'var(--cream)' }}>
                     <td style={{ padding: '13px 16px', color: 'var(--navy)', fontWeight: 600, borderRight: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>{row.feature}</td>
-                    <td style={{ padding: '13px 16px', textAlign: 'center', color: '#6366F1', fontWeight: 700, borderRight: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>{row.direta}</td>
-                    <td style={{ padding: '13px 16px', textAlign: 'center', color: '#D4A857', fontWeight: 700, borderRight: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>{row.assistida}</td>
-                    <td style={{ padding: '13px 16px', textAlign: 'center', color: '#2F8674', fontWeight: 700, borderBottom: '1px solid var(--border)' }}>{row.completa}</td>
+                    <td style={{ padding: '13px 16px', textAlign: 'center', color: '#6366F1', fontWeight: 700, borderRight: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>{row.essencial}</td>
+                    <td style={{ padding: '13px 16px', textAlign: 'center', color: '#D4A857', fontWeight: 700, borderRight: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>{row.plus}</td>
+                    <td style={{ padding: '13px 16px', textAlign: 'center', color: '#2F8674', fontWeight: 700, borderBottom: '1px solid var(--border)' }}>{row.pro}</td>
                   </tr>
                 ))}
               </tbody>
