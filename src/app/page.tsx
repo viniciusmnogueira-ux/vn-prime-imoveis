@@ -5,6 +5,11 @@ import Btn from '@/components/ui/Btn'
 import Eyebrow from '@/components/ui/Eyebrow'
 import { createClient } from '@/lib/supabase/client'
 
+const HERO_TITLES: { pre: string; accent: string; post?: string }[] = [
+  { pre: 'Compre e venda imóveis com ', accent: 'mais autonomia e segurança' },
+  { pre: 'Compre e venda ', accent: 'direto', post: ', sem comissão tradicional' },
+]
+
 const HERO_PHOTOS = [
   'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=2400&q=85',
   'https://images.unsplash.com/photo-1582268611958-ebfd161df9d8?w=2400&q=85',
@@ -106,7 +111,7 @@ const STATS = [
   { value: 'BH e Grande BH', label: 'Área de atuação' },
   { value: '3 planos', label: 'Direto, assistido ou completo' },
   { value: '0%', label: 'De comissão no plano direto' },
-  { value: 'Jurídico', label: 'Due diligence + consórcio incluso' },
+  { value: 'Apoio', label: 'Checklists, simulações e parceiros' },
 ]
 
 const SERVICE_PILLS = [
@@ -141,6 +146,7 @@ function ArrowBtn({ dir, onClick }: { dir: 'left' | 'right'; onClick: () => void
 
 export default function HomePage() {
   const [slide, setSlide] = useState(0)
+  const [titleIdx, setTitleIdx] = useState(0)
   const [serviceIdx, setServiceIdx] = useState(0)
   const [planoIdx, setPlanoIdx] = useState(0)
   const [searchQ, setSearchQ] = useState('')
@@ -156,6 +162,11 @@ export default function HomePage() {
 
   useEffect(() => {
     const t = setInterval(() => setSlide(s => (s + 1) % HERO_PHOTOS.length), 7000)
+    return () => clearInterval(t)
+  }, [])
+
+  useEffect(() => {
+    const t = setInterval(() => setTitleIdx(i => (i + 1) % HERO_TITLES.length), 3000)
     return () => clearInterval(t)
   }, [])
 
@@ -234,18 +245,20 @@ export default function HomePage() {
           <h1 style={{
             color: '#fff', fontSize: 'clamp(2rem,4.4vw,3.4rem)',
             textShadow: '0 2px 24px rgba(0,0,0,0.4)', margin: '0 0 16px',
-            maxWidth: '20ch', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.15,
+            maxWidth: '22ch', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.15,
+            transition: 'opacity 0.4s ease',
           }}>
-            Encontre seu próximo endereço{' '}
+            {HERO_TITLES[titleIdx].pre}
             <em className="italic-accent" style={{
               background: 'var(--gradient-gold)',
               WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent',
             }}>
-              de alto padrão
+              {HERO_TITLES[titleIdx].accent}
             </em>
+            {HERO_TITLES[titleIdx].post ?? ''}
           </h1>
-          <p style={{ color: 'rgba(250,249,246,0.92)', fontSize: 16, maxWidth: 580, margin: '0 auto 28px', textShadow: '0 1px 10px rgba(0,0,0,0.3)' }}>
-            Compre, venda ou invista em imóveis com curadoria, tecnologia e segurança jurídica em BH e região.
+          <p style={{ color: 'rgba(250,249,246,0.92)', fontSize: 16, maxWidth: 600, margin: '0 auto 28px', textShadow: '0 1px 10px rgba(0,0,0,0.3)' }}>
+            Planos diretos, assistidos ou completos para anunciar, negociar e encontrar imóveis em BH e região — com tecnologia, curadoria e apoio em cada etapa.
           </p>
 
           {/* Search card */}
@@ -330,16 +343,6 @@ export default function HomePage() {
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--gold)'; (e.currentTarget as HTMLElement).style.color = 'var(--gold)' }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLElement).style.color = 'var(--navy)' }}
             >{q}</Link>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Portais parceiros ── */}
-      <section style={{ background: 'var(--cream)', borderBottom: '1px solid var(--border)', padding: '18px 0' }}>
-        <div style={{ width: 'min(1280px,94vw)', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--fg-3)', flexShrink: 0 }}>Distribuído em</span>
-          {['ZAP Imóveis', 'Viva Real', 'ImovelWeb', 'OLX', 'Mercado Livre'].map(p => (
-            <span key={p} style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--fg-2)', padding: '5px 14px', border: '1px solid var(--border)', borderRadius: 8, background: '#fff', whiteSpace: 'nowrap' }}>{p}</span>
           ))}
         </div>
       </section>

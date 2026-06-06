@@ -75,46 +75,52 @@ function FaqList({ items }: { items: { q: string; a: string }[] }) {
 
 const PLANOS_PROP = [
   {
-    id: 'direta', tag: 'Venda Direta', tagColor: '#D4A857',
-    title: 'Você no comando.', sub: 'Taxa fixa R$ 297',
-    desc: 'Você publica, define o preço e conduz a negociação. A VN Prime entra com a vitrine, a distribuição em portais e o suporte de plataforma.',
+    id: 'essencial', tag: 'Plano Essencial', tagColor: '#6366F1',
+    title: 'Anuncie seu imóvel.', sub: 'R$ 99/mês',
+    period: 'Até 1 imóvel ativo',
+    desc: 'Publique na vitrine VN Prime com autonomia total. Você define o preço, agenda visitas e negocia diretamente com o comprador — sem pagar comissão.',
     bullets: [
-      'Taxa fixa R$ 297 — vigência de 90 dias',
-      'Cadastro e gestão de anúncio pelo portal do proprietário',
+      'Até 1 imóvel ativo',
+      'Gestão completa pelo portal do proprietário',
+      'Leads com nome, e-mail e WhatsApp',
+      'Endereço protegido — exibe só o bairro',
       'Descrição editorial gerada por IA',
-      'Agenda de visitas e leads pelo painel',
-      'Endereço protegido — exibe só o bairro na vitrine',
-      'Pacotes de fotografia e mídia disponíveis à parte',
+      'Suporte por chat',
     ],
-    cta: 'Anunciar agora — R$ 297', accent: '#D4A857',
+    img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&q=80',
+    cta: 'Começar agora', accent: '#6366F1',
   },
   {
-    id: 'assistida', tag: 'Venda Assistida', tagColor: '#2F8674',
-    title: 'A VN Prime apoia.', sub: '3% somente ao vender',
-    desc: 'Você continua à frente, mas a VN Prime entra com IA de curadoria, sugestões de preço, análise de leads e acompanhamento ativo do anúncio.',
+    id: 'plus', tag: 'Plano Plus', tagColor: '#D4A857',
+    title: 'Venda mais de um imóvel.', sub: 'R$ 399 / 6 meses',
+    period: 'Até 3 imóveis ativos',
+    desc: 'Para proprietários com mais de um imóvel. Curadoria VN Prime nos anúncios, análise de precificação por IA e relatório de desempenho mensal.',
     bullets: [
-      '3% de comissão — você paga somente ao vender',
-      'Análise de precificação por IA com comparativos da região',
-      'Curadoria ativa do anúncio e sugestões de melhoria',
-      'Qualificação de leads antes de chegar até você',
-      'Relatório semanal de desempenho e benchmarks',
-      '30 dias grátis de FactorOne incluso',
+      'Até 3 imóveis ativos',
+      'Curadoria ativa dos anúncios',
+      'Análise de precificação por IA',
+      'Qualificação de leads antes do contato',
+      'Relatório de desempenho mensal',
+      'Suporte prioritário',
     ],
-    cta: 'Começar — sem custo inicial', accent: '#2F8674',
+    img: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=900&q=80',
+    cta: 'Escolher Plus', accent: '#D4A857',
   },
   {
-    id: 'completa', tag: 'Venda Completa', tagColor: '#B8862E',
-    title: 'Corretor dedicado.', sub: '6% sobre a venda',
-    desc: 'Um corretor credenciado VN Prime assume tudo: fotos profissionais, mídia paga, visitas acompanhadas, negociação e suporte jurídico até a escritura.',
+    id: 'pro', tag: 'Plano Pro', tagColor: '#2F8674',
+    title: 'Para investidores.', sub: 'R$ 799 / 12 meses',
+    period: 'Até 10 imóveis ativos',
+    desc: 'Estrutura completa para quem tem múltiplos imóveis. Painel gerencial consolidado, curadoria dedicada e suporte direto da equipe VN Prime.',
     bullets: [
-      '6% de comissão — 3% corretor + 3% VN Prime',
-      'Corretor parceiro credenciado e dedicado ao seu imóvel',
-      'Sessão fotográfica profissional inclusa',
-      'Mídia paga gerenciada em Meta, Google e portais',
-      'Visitas acompanhadas e compradores qualificados',
-      'Suporte jurídico da minuta até a escritura',
+      'Até 10 imóveis ativos',
+      'Painel gerencial com performance consolidada',
+      'Curadoria dedicada em todos os anúncios',
+      'Relatório de mercado e benchmarks mensais',
+      'Suporte dedicado da equipe VN Prime',
+      'Materiais de apoio e indicações',
     ],
-    cta: 'Contratar corretor', accent: '#B8862E',
+    img: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900&q=80',
+    cta: 'Assinar Pro', accent: '#2F8674',
   },
 ]
 
@@ -127,7 +133,6 @@ const BENEFICIOS_CORRETOR = [
 
 export default function VenderPage() {
   const [perfil, setPerfil] = useState<null | 'proprietario' | 'corretor'>(null)
-  const [showCompleta6Form, setShowCompleta6Form] = useState(false)
   const [liveStats, setLiveStats] = useState<{ ativos: number; vendidos: number; avgPreco: number } | null>(null)
 
   useEffect(() => {
@@ -141,10 +146,6 @@ export default function VenderPage() {
       setLiveStats({ ativos, vendidos, avgPreco })
     })
   }, [])
-  const [completa6, setCompleta6] = useState({ nome: '', email: '', telefone: '', endereco: '' })
-  const [completa6Loading, setCompleta6Loading] = useState(false)
-  const [completa6Enviado, setCompleta6Enviado] = useState(false)
-
   return (
     <main style={{ background: 'var(--cream)', minHeight: '100vh' }}>
 
@@ -168,7 +169,7 @@ export default function VenderPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,300px),1fr))',
             gap: 20, maxWidth: 700, margin: '0 auto' }}>
             {[
-              { id: 'proprietario' as const, label: 'Sou proprietário', sub: 'Quero vender meu imóvel', accent: '#D4A857', detail: 'R$ 297 direto · 3% assistida · 6% completa com corretor' },
+              { id: 'proprietario' as const, label: 'Sou proprietário', sub: 'Quero vender meu imóvel', accent: '#D4A857', detail: 'R$ 99/mês Essencial · R$ 399 / 6 meses Plus · R$ 799 / 12 meses Pro' },
               { id: 'corretor' as const, label: 'Sou corretor', sub: 'Quero trabalhar com a VN Prime', accent: '#10B981', detail: 'CRM + carteira VN Prime · Comissão integral ao fechar' },
             ].map(p => (
               <button key={p.id} onClick={() => setPerfil(perfil === p.id ? null : p.id)} style={{
@@ -221,100 +222,54 @@ export default function VenderPage() {
 
       {/* ── BLOCO PROPRIETÁRIO ── */}
       {(!perfil || perfil === 'proprietario') && (
-        <section style={{ padding: 'clamp(3rem,5vw,4.5rem) 0',
-          borderTop: '1px solid var(--border)', background: '#fff' }}>
+        <section style={{ padding: 'clamp(3rem,5vw,4.5rem) 0', borderTop: '1px solid var(--border)', background: '#fff' }}>
           <div style={{ width: 'min(1180px,94vw)', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: 36 }}>
+            <div style={{ textAlign: 'center', marginBottom: 44 }}>
               <Eyebrow>Para proprietários</Eyebrow>
               <h2 style={{ margin: '8px 0 12px' }}>Escolha o seu plano</h2>
               <p style={{ color: 'var(--fg-2)', fontSize: 15.5, maxWidth: 520, margin: '0 auto' }}>
-                Todos os planos incluem vitrine VN Prime, distribuição em portais e suporte de plataforma.
+                Todos os planos incluem vitrine VN Prime, leads qualificados e suporte de plataforma.
               </p>
             </div>
-            <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,300px),1fr))' }}>
-              {PLANOS_PROP.map((p, i) => (
-                <div key={p.id} style={{
-                  background: '#fff', borderRadius: 20,
-                  border: i === 2 ? `2px solid ${p.accent}` : '1px solid var(--border)',
-                  padding: '28px 26px', display: 'flex', flexDirection: 'column',
-                  boxShadow: i === 2 ? `0 8px 32px ${p.accent}22` : '0 2px 12px rgba(15,34,68,0.06)',
-                  position: 'relative', overflow: 'hidden',
-                }}>
-                  {i === 2 && (
-                    <div style={{ position: 'absolute', top: 16, right: 16,
-                      background: p.accent, color: '#fff', borderRadius: 999,
-                      padding: '3px 12px', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                      Mais vendido
+
+            {/* Banners empilhados — mesmo padrão do Como Funciona */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {(PLANOS_PROP as typeof PLANOS_PROP).map((p, idx) => (
+                <div key={p.id} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,340px),1fr))', gap: 0, overflow: 'hidden', border: '1px solid rgba(27,39,51,0.10)', direction: idx % 2 === 1 ? 'rtl' : 'ltr' }}>
+                  {/* Imagem */}
+                  <div style={{ height: 'min(280px,60vw)', minHeight: 220, position: 'relative', backgroundImage: `url(${'img' in p ? p.img : ''})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(15,22,32,0.08) 0%, rgba(15,22,32,0.80) 100%)' }} />
+                    {idx === 1 && (
+                      <div style={{ position: 'absolute', top: 16, left: 16, direction: 'ltr', background: p.accent, color: idx === 1 ? 'var(--navy-deep)' : '#fff', borderRadius: 999, padding: '4px 14px', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                        Mais popular
+                      </div>
+                    )}
+                    <div style={{ position: 'absolute', bottom: 24, left: 24, direction: 'ltr' }}>
+                      <div style={{ display: 'inline-block', background: p.accent + '22', border: `1px solid ${p.accent}55`, borderRadius: 999, padding: '4px 13px', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: p.accent, marginBottom: 8 }}>{p.tag}</div>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.6rem,2.4vw,2.2rem)', fontWeight: 700, color: '#fff', lineHeight: 1.1, marginBottom: 4 }}>{'sub' in p ? p.sub : ''}</div>
+                      <div style={{ fontSize: 13, color: 'rgba(245,248,250,0.75)', fontWeight: 600 }}>{'period' in p ? p.period : ''}</div>
                     </div>
-                  )}
-                  <div style={{ marginBottom: 4 }}>
-                    <span style={{ background: `${p.accent}18`, color: p.accent, borderRadius: 999,
-                      padding: '4px 12px', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                      {p.tag}
-                    </span>
                   </div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800,
-                    color: 'var(--navy)', margin: '14px 0 4px', letterSpacing: '-0.02em' }}>{p.sub}</div>
-                  <p style={{ fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.65, margin: '0 0 20px', flex: 1 }}>{p.desc}</p>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 9 }}>
-                    {p.bullets.map(b => (
-                      <li key={b} style={{ display: 'flex', gap: 9, alignItems: 'flex-start', fontSize: 13.5, color: 'var(--fg-1)', lineHeight: 1.5 }}>
-                        <span style={{ color: p.accent, fontWeight: 700, flexShrink: 0, marginTop: 1 }}>✓</span>
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                  {p.id === 'completa' ? (
-                    <>
-                      <button onClick={() => setShowCompleta6Form(s => !s)}
-                        style={{ width: '100%', padding: '13px 0', borderRadius: 10, border: 'none', cursor: 'pointer',
-                          background: p.accent, color: '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 14,
-                          boxShadow: `0 6px 20px ${p.accent}44` }}>{p.cta}</button>
-                      {showCompleta6Form && (
-                        <div style={{ marginTop: 14 }}>
-                          {completa6Enviado ? (
-                            <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 12, padding: '20px 16px', textAlign: 'center' }}>
-                              <div style={{ fontSize: 24, marginBottom: 8 }}>✓</div>
-                              <div style={{ fontSize: 15, fontWeight: 700, color: '#065F46', marginBottom: 6 }}>Recebemos seu contato!</div>
-                              <div style={{ fontSize: 13, color: '#065F46' }}>Um corretor VN Prime entrará em contato em até 2h úteis.</div>
-                            </div>
-                          ) : (
-                            <form onSubmit={async e => {
-                              e.preventDefault()
-                              setCompleta6Loading(true)
-                              const sb = createClient()
-                              await sb.from('leads').insert({ nome: completa6.nome, email: completa6.email, telefone: completa6.telefone, mensagem: `Venda Completa (6%) — ${completa6.endereco}`, origem: 'vender_completa' })
-                              setCompleta6Enviado(true)
-                              setCompleta6Loading(false)
-                            }} style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
-                              {([
-                                { ph: 'Seu nome', key: 'nome', type: 'text' },
-                                { ph: 'WhatsApp', key: 'telefone', type: 'tel' },
-                                { ph: 'E-mail', key: 'email', type: 'email' },
-                                { ph: 'Endereço / bairro do imóvel', key: 'endereco', type: 'text' },
-                              ] as const).map(f => (
-                                <input key={f.key} type={f.type} placeholder={f.ph} required
-                                  value={completa6[f.key]}
-                                  onChange={e => setCompleta6(s => ({ ...s, [f.key]: e.target.value }))}
-                                  style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, fontFamily: 'inherit', outline: 'none', background: '#fff' }} />
-                              ))}
-                              <button type="submit" disabled={completa6Loading}
-                                style={{ padding: '11px 0', borderRadius: 8, border: 'none', background: p.accent, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: completa6Loading ? 0.7 : 1 }}>
-                                {completa6Loading ? 'Enviando…' : 'Quero um corretor dedicado'}
-                              </button>
-                            </form>
-                          )}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <Link href={`/login?tab=cadastrar&plano=${p.id}`} style={{ display: 'block' }}>
-                      <button style={{ width: '100%', padding: '13px 0', borderRadius: 10, border: 'none', cursor: 'pointer',
-                        background: 'var(--navy)', color: '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 14 }}>{p.cta}</button>
-                    </Link>
-                  )}
-                  <div style={{ marginTop: 12, textAlign: 'center', fontSize: 11.5, color: 'var(--fg-3)', letterSpacing: '0.01em' }}>
-                    Faça o upgrade quando quiser — sem burocracia.
+                  {/* Conteúdo */}
+                  <div style={{ background: idx === 1 ? `${p.accent}06` : '#fff', padding: 'clamp(28px,4vw,44px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', direction: 'ltr', borderLeft: idx === 1 ? `3px solid ${p.accent}` : 'none' }}>
+                    <div style={{ width: 36, height: 3, background: p.accent, borderRadius: 2, marginBottom: 16 }} />
+                    <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.2rem,1.8vw,1.5rem)', fontWeight: 700, color: 'var(--navy)', margin: '0 0 10px' }}>{p.title}</h3>
+                    <p style={{ fontSize: 14.5, color: 'var(--fg-2)', lineHeight: 1.75, margin: '0 0 20px' }}>{p.desc}</p>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 9 }}>
+                      {p.bullets.map(b => (
+                        <li key={b} style={{ display: 'flex', gap: 9, alignItems: 'flex-start', fontSize: 13.5, color: 'var(--fg-1)', lineHeight: 1.5 }}>
+                          <span style={{ color: p.accent, fontWeight: 700, flexShrink: 0, marginTop: 1 }}>✓</span>{b}
+                        </li>
+                      ))}
+                    </ul>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                      <Link href="/anunciar">
+                        <button style={{ padding: '12px 26px', borderRadius: 10, border: 'none', cursor: 'pointer', background: p.accent, color: p.accent === '#D4A857' ? 'var(--navy-deep)' : '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 14, boxShadow: `0 6px 20px ${p.accent}33` }}>
+                          {p.cta} →
+                        </button>
+                      </Link>
+                      <span style={{ fontSize: 11.5, color: 'var(--fg-3)' }}>Cancele quando quiser</span>
+                    </div>
                   </div>
                 </div>
               ))}

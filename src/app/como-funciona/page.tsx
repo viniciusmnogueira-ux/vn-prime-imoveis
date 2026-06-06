@@ -68,7 +68,7 @@ const COMPARATIVO = [
   { feature: 'Qualificação de leads', direta: 'Básica', assistida: 'Ativa', completa: 'Completa' },
   { feature: 'Fotos profissionais', direta: 'Pacote à parte', assistida: 'Pacote à parte', completa: 'Incluso' },
   { feature: 'Corretor dedicado', direta: '—', assistida: '—', completa: 'Sim' },
-  { feature: 'Suporte jurídico', direta: 'Disponível', assistida: 'Disponível', completa: 'Incluso' },
+  { feature: 'Materiais de apoio', direta: 'Disponível', assistida: 'Disponível', completa: 'Indicações' },
 ]
 
 export default function ComoFuncionaPage() {
