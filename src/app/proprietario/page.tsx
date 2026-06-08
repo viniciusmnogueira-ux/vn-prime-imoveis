@@ -944,7 +944,7 @@ function CalculadorasSection({ imoveis, supabase }: { imoveis: any[]; supabase: 
   const [invAluguel, setInvAluguel] = useState('')
   const [invVacancia, setInvVacancia] = useState('10')
   const [custo, setCusto] = useState('')
-  const [custoPlano, setCustoPlano] = useState('assistida')
+  const [custoPlano, setCustoPlano] = useState('essencial')
 
   const itbiNum = Number(itbiValor.replace(/\D/g, ''))
   const aliqNum = Number(itbiAliq)
@@ -1120,20 +1120,19 @@ function CalculadorasSection({ imoveis, supabase }: { imoveis: any[]; supabase: 
       {(() => {
         const IS3: React.CSSProperties = { width: '100%', padding: '11px 14px', borderRadius: 9, border: '1.5px solid var(--border)', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', background: '#fff' }
         const vNum = Number(custo.replace(/\D/g, ''))
-        const plano = custoPlano
-        const comissaoPct = plano === 'direta' ? 0 : plano === 'assistida' ? 0.03 : 0.06
-        const comissao = vNum * comissaoPct
-        const direta = plano === 'direta' ? 297 : 0
-        const itbiComprador = vNum * 0.02
-        const escritura = vNum * 0.01
-        const corretagem = vNum * 0.05
-        const liquido = vNum - comissao - direta - corretagem * (plano === 'completa' ? 0 : 0)
-        const custoTotal = comissao + direta + corretagem * 0
+        const PLANOS_CALC = [
+          { id: 'essencial', label: 'Plano Essencial — R$ 99/mês', custo: 99 },
+          { id: 'plus', label: 'Plano Plus — R$ 399 / 6 meses', custo: 399 },
+          { id: 'pro', label: 'Plano Pro — R$ 799 / 12 meses', custo: 799 },
+        ]
+        const planoCalc = PLANOS_CALC.find(p => p.id === custoPlano) ?? PLANOS_CALC[0]
+        const comissaoTradicional = vNum * 0.06
+        const economia = vNum > 0 ? comissaoTradicional - planoCalc.custo : 0
         return (
           <div style={{ background: '#fff', borderRadius: 16, padding: '28px 28px', boxShadow: 'var(--shadow-soft)' }}>
             <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--gold-deep)', marginBottom: 6 }}>Calculadora</div>
             <h3 style={{ margin: '0 0 6px', fontSize: 18 }}>Custo de venda</h3>
-            <p style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 20, lineHeight: 1.5 }}>Simule quanto você paga para vender e quanto fica no seu bolso ao final.</p>
+            <p style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 20, lineHeight: 1.5 }}>Compare o custo da VN Prime com a comissão de um corretor tradicional (6%).</p>
             <div style={{ marginBottom: 14 }}>
               <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>Valor de venda esperado (R$)</label>
               <input value={custo} onChange={e => setCusto(e.target.value)} placeholder="Ex: 1000000" style={IS3} />
@@ -1141,45 +1140,31 @@ function CalculadorasSection({ imoveis, supabase }: { imoveis: any[]; supabase: 
             <div style={{ marginBottom: 20 }}>
               <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--fg-3)', display: 'block', marginBottom: 5 }}>Seu plano VN Prime</label>
               <select value={custoPlano} onChange={e => setCustoPlano(e.target.value)} style={IS3}>
-                <option value="direta">Venda Direta — R$ 297 fixo</option>
-                <option value="assistida">Venda Assistida — 3% do valor</option>
-                <option value="completa">Venda Completa — 6% do valor</option>
+                {PLANOS_CALC.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
               </select>
             </div>
             {vNum > 0 && (
-              <div style={{ background: '#F8FAFC', borderRadius: 10, padding: '16px 18px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>Valor de venda</span>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--navy)' }}>{fmt(vNum)}</span>
-                  </div>
-                  {plano === 'direta' && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>Taxa VN Prime (fixa)</span>
-                      <span style={{ fontSize: 14, fontWeight: 600, color: '#DC2626' }}>- {fmt(297)}</span>
-                    </div>
-                  )}
-                  {comissaoPct > 0 && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>Comissão VN Prime ({(comissaoPct * 100).toFixed(0)}%)</span>
-                      <span style={{ fontSize: 14, fontWeight: 600, color: '#DC2626' }}>- {fmt(comissao)}</span>
-                    </div>
-                  )}
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>ITBI (estimado — pago pelo comprador)</span>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--fg-3)' }}>{fmt(itbiComprador)}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>Escritura estimada (1%)</span>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--fg-3)' }}>{fmt(escritura)}</span>
-                  </div>
-                  <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10, display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>Você recebe líquido</span>
-                    <span style={{ fontSize: 20, fontWeight: 900, color: '#059669' }}>{fmt(vNum - comissao - (plano === 'direta' ? 297 : 0))}</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ background: '#FEF2F2', borderRadius: 10, padding: '14px 16px' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#B91C1C', marginBottom: 8 }}>Corretor tradicional (6%)</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: '#7F1D1D' }}>Comissão sobre a venda</span>
+                    <span style={{ fontSize: 18, fontWeight: 800, color: '#DC2626' }}>- {fmt(comissaoTradicional)}</span>
                   </div>
                 </div>
-                <div style={{ marginTop: 10, fontSize: 11, color: 'var(--fg-3)', lineHeight: 1.5 }}>
-                  ITBI e escritura são encargos do comprador. Valores estimados — consulte o cartório da sua comarca.
+                <div style={{ background: '#F0FDF4', borderRadius: 10, padding: '14px 16px' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#15803D', marginBottom: 8 }}>VN Prime — {planoCalc.label.split('—')[0].trim()}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: '#166534' }}>Assinatura (sem comissão sobre a venda)</span>
+                    <span style={{ fontSize: 18, fontWeight: 800, color: '#059669' }}>- {fmt(planoCalc.custo)}</span>
+                  </div>
+                </div>
+                <div style={{ background: 'var(--navy-deep)', borderRadius: 10, padding: '16px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Você economiza com a VN Prime</span>
+                  <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--gold)' }}>{fmt(economia)}</span>
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--fg-3)', lineHeight: 1.5 }}>
+                  Comparativo entre a assinatura VN Prime e comissão de 6% de um corretor tradicional. ITBI e escritura são encargos do comprador.
                 </div>
               </div>
             )}
