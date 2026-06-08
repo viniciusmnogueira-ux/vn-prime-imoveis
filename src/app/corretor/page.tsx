@@ -99,7 +99,7 @@ export default function CorretorPage() {
     const { data: imvs6 } = await supabase
       .from('imoveis')
       .select('*, profiles(nome, email, telefone)')
-      .eq('plano_label', 'completa')
+      .in('plano_label', ['completa', 'pro'])
       .eq('status', 'ativo')
       .neq('proprietario_id', user.id)
       .order('criado_em', { ascending: false })
@@ -130,7 +130,7 @@ export default function CorretorPage() {
   const TABS: [Sec, string][] = [
     ['dashboard', 'Dashboard'],
     ['imoveis', 'Meus Imóveis'],
-    ['carteira6', `Carteira 6% (${imoveis6.length})`],
+    ['carteira6', `Carteira Pro (${imoveis6.length})`],
     ['crm', `CRM (${leads.length})`],
     ['pipeline', 'Pipeline'],
     ['todo', 'To-do'],
@@ -225,7 +225,7 @@ function DashboardSection({ profile, corretor, leads, imoveis, imoveis6, pipelin
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 16, marginBottom: 24 }}>
         {[
           { label: 'Leads recebidos', value: leads.length, color: ACCENT, sec: 'crm' },
-          { label: 'Carteira 6%', value: imoveis6.length, color: '#D4A857', sec: 'carteira6' },
+          { label: 'Carteira Pro', value: imoveis6.length, color: '#D4A857', sec: 'carteira6' },
           { label: 'No pipeline', value: pipeline.length, color: '#6366F1', sec: 'pipeline' },
           { label: 'Fechamentos', value: fechados.length, color: '#059669', sec: 'financas' },
         ].map(s => (
@@ -240,7 +240,7 @@ function DashboardSection({ profile, corretor, leads, imoveis, imoveis6, pipelin
 
       {comissaoPotencial > 0 && (
         <div style={{ background: 'linear-gradient(135deg,#0F1824,#1E3A2F)', borderRadius: 16, padding: '24px 28px', marginBottom: 20, color: '#fff' }}>
-          <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.6, marginBottom: 8 }}>Comissão potencial — carteira 6% ativa</div>
+          <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.6, marginBottom: 8 }}>Comissão potencial estimada — Carteira Pro</div>
           <div style={{ fontSize: 32, fontWeight: 800 }}>{fmt(comissaoPotencial)}</div>
           <div style={{ fontSize: 13, opacity: 0.55, marginTop: 4 }}>{imoveis6.length} imóveis disponíveis para negociar</div>
         </div>
@@ -317,19 +317,19 @@ function ImoveisSection({ imoveis }: { imoveis: any[] }) {
   )
 }
 
-// ─── CARTEIRA 6% ─────────────────────────────────────────────────────────────
+// ─── CARTEIRA PRO ─────────────────────────────────────────────────────────────
 function Carteira6Section({ imoveis6 }: { imoveis6: any[] }) {
   return (
     <div>
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>Carteira 6% — Imóveis disponíveis ({imoveis6.length})</div>
-        <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>Proprietários no plano Venda Completa. Sua comissão garantida: 6% sobre o valor de venda.</div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>Carteira Pro — Imóveis disponíveis ({imoveis6.length})</div>
+        <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>Proprietários no Plano Pro com corretor parceiro dedicado. Comissão definida no acordo de parceria.</div>
       </div>
       {imoveis6.length === 0 ? (
         <div style={{ background: '#fff', borderRadius: 14, padding: '60px 24px', textAlign: 'center', boxShadow: 'var(--shadow-soft)' }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>📋</div>
           <div style={{ fontWeight: 700, marginBottom: 8 }}>Nenhum imóvel disponível no momento</div>
-          <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>Imóveis do plano 6% aprovados aparecerão aqui automaticamente.</div>
+          <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>Imóveis do Plano Pro aprovados aparecerão aqui automaticamente.</div>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: 18 }}>
@@ -344,7 +344,7 @@ function Carteira6Section({ imoveis6 }: { imoveis6: any[] }) {
                 <div style={{ fontSize: 13, color: 'var(--fg-2)', marginBottom: 8 }}>{im.bairro}, {im.cidade} · {im.tipo}</div>
                 {im.quartos && <div style={{ fontSize: 12, color: 'var(--fg-3)', marginBottom: 8 }}>{im.quartos} quartos · {im.area_m2 ?? im.area ?? '—'} m²</div>}
                 <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--gold)', marginBottom: 4 }}>{fmt(im.preco ?? 0)}</div>
-                <div style={{ fontSize: 12, color: '#059669', fontWeight: 700, marginBottom: 12 }}>Sua comissão: {fmt((im.preco ?? 0) * 0.06)}</div>
+                <div style={{ fontSize: 12, color: '#059669', fontWeight: 700, marginBottom: 12 }}>Comissão est. (6%): {fmt((im.preco ?? 0) * 0.06)}</div>
                 {im.profiles?.nome && (
                   <div style={{ fontSize: 12, color: 'var(--fg-3)', marginBottom: 14, padding: '8px 12px', background: '#F8FAFC', borderRadius: 8 }}>
                     Proprietário: <strong>{im.profiles.nome}</strong>
@@ -653,7 +653,7 @@ function FinancasSection({ leads, imoveis, pipeline }: any) {
         {[
           { label: 'Deals fechados', value: fechados.length.toString(), color: '#059669' },
           { label: 'Volume fechado', value: fmt(totalFechado), color: '#059669' },
-          { label: 'Comissão (6%)', value: fmt(totalFechado * 0.06), color: '#D4A857' },
+          { label: 'Comissão est. (6%)', value: fmt(totalFechado * 0.06), color: '#D4A857' },
           { label: 'Volume potencial', value: fmt(potencial), color: '#6366F1' },
         ].map(s => (
           <div key={s.label} style={{ background: '#fff', borderRadius: 14, padding: '20px 22px', boxShadow: 'var(--shadow-soft)', borderLeft: `4px solid ${s.color}` }}>
@@ -671,7 +671,7 @@ function FinancasSection({ leads, imoveis, pipeline }: any) {
         </div>
         {calcNum > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {[{ pct: 3, label: 'Plano Assistida (3%)' }, { pct: 6, label: 'Plano Completo (6%)' }].map(p => (
+            {[{ pct: 3, label: '3% sobre o valor' }, { pct: 6, label: '6% sobre o valor' }].map(p => (
               <div key={p.pct} style={{ background: '#F8FAFC', borderRadius: 8, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>{p.label}</span>
                 <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--gold)' }}>{fmt(calcNum * p.pct / 100)}</span>
@@ -1024,11 +1024,11 @@ function CadastroCorretor({ profile, corretor, onSaved }: { profile: Profile | n
 function FaqAccordionCorretor() {
   const [open, setOpen] = useState<number | null>(null)
   const faqs = [
-    { q: 'Quanto custa participar como corretor parceiro?', a: 'O plano freemium é grátis. Você acessa o portfólio e recebe leads sem custo mensal. O modelo de receita é por comissão sobre vendas concluídas — sem mensalidade fixa.' },
+    { q: 'Quanto custa participar como corretor parceiro?', a: 'Participar como corretor parceiro VN Prime é gratuito. Você acessa o portfólio e recebe leads sem custo mensal. O modelo de receita é por comissão sobre vendas concluídas — sem mensalidade fixa.' },
     { q: 'Como os leads chegam até mim?', a: 'Quando um comprador demonstra interesse em um imóvel do seu portfólio (mensagem, agendamento ou proposta), você recebe uma notificação com nome, e-mail e WhatsApp do interessado diretamente no painel.' },
     { q: 'Preciso ter CRECI ativo?', a: 'Sim. A VN Prime trabalha apenas com corretores devidamente registrados no CRECI-MG. Isso protege proprietários e compradores e garante a qualidade do serviço.' },
     { q: 'Posso cadastrar meus próprios imóveis na plataforma?', a: 'Sim. Corretores parceiros podem cadastrar imóveis de seus clientes diretamente no portal, vinculados ao seu perfil. A curadoria VN Prime revisa antes de publicar.' },
-    { q: 'Como funciona a comissão?', a: 'A comissão padrão é de 6% sobre o valor da venda — sendo 3% VN Prime e 3% do corretor. Em casos de venda direta (proprietário + comprador), a comissão é negociada individualmente.' },
+    { q: 'Como funciona a comissão?', a: 'A comissão é definida no acordo de parceria firmado com a VN Prime. O percentual padrão varia entre 3% e 6% sobre o valor da venda, conforme o imóvel e a negociação. Ela é devida exclusivamente no fechamento — assinatura do contrato de compra e venda.' },
     { q: 'Posso usar o CRM para clientes de outros portais?', a: 'Sim. O pipeline Kanban e o módulo de to-do são ferramentas pessoais que você pode usar para gerenciar qualquer lead, independentemente da origem.' },
   ]
   return (
@@ -1055,7 +1055,7 @@ function CorretorLanding() {
   const FEATURES = [
     { title: 'Carteira VN Prime', desc: 'Acesso ao portfólio curado com imóveis premium em BH. Veja os imóveis disponíveis, entre em contato com o proprietário e feche com suporte da plataforma.', img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=700&q=80', accent: ACCENT },
     { title: 'CRM Integrado', desc: 'Pipeline kanban com 5 etapas, histórico completo de contatos, agendamento de visitas e acompanhamento do funil de vendas em tempo real.', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=700&q=80', accent: '#D4A857' },
-    { title: 'Carteira 6%', desc: 'Imóveis do plano Venda Completa com dados do proprietário visíveis. Você capta, conduz e fecha — a VN Prime cuida da estrutura.', img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=700&q=80', accent: '#93C5FD' },
+    { title: 'Carteira Pro', desc: 'Imóveis do Plano Pro com dados do proprietário visíveis. Você capta, conduz e fecha — a VN Prime cuida da estrutura e do suporte.', img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=700&q=80', accent: '#93C5FD' },
     { title: 'Comissão Transparente', desc: 'Extrato detalhado com histórico de vendas e comissões. Sem surpresas. Você fecha o negócio e recebe ao concluir.', img: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=700&q=80', accent: '#6EE7B7' },
   ]
   return (
@@ -1078,7 +1078,7 @@ function CorretorLanding() {
           <div style={{ marginTop: 48, display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 12, maxWidth: 560 }}>
             {[
               { label: 'Portfólio ativo', value: '47+', color: '#D4A857' },
-              { label: 'Carteira 6%', value: '12', color: '#6EE7B7' },
+              { label: 'Carteira Pro', value: '12', color: '#6EE7B7' },
               { label: 'Em negociação', value: '5', color: '#93C5FD' },
               { label: 'Comissão est.', value: 'R$ 38k', color: '#6EE7B7' },
             ].map(s => (
