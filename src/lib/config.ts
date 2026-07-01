@@ -9,3 +9,21 @@ export const SITE_CONFIG = {
     city:    process.env.NEXT_PUBLIC_BRAND_CITY    || 'BH e Grande BH',
   },
 }
+
+// Flag helper — default true, seta como "false" no .env para desligar
+const on = (key: string) => (process.env[`NEXT_PUBLIC_MODULE_${key}`] ?? 'true') !== 'false'
+
+export const MODULES = {
+  lancamentos:         on('LANCAMENTOS'),
+  consorcio:           on('CONSORCIO'),
+  dueDiligence:        on('DUE_DILIGENCE'),
+  avaliacao:           on('AVALIACAO'),
+  calculadora:         on('CALCULADORA'),
+  relatorio:           on('RELATORIO'),
+  fotografo:           on('FOTOGRAFO'),
+  portalCorretor:      on('PORTAL_CORRETOR'),
+  portalProprietario:  on('PORTAL_PROPRIETARIO'),
+  vender:              on('VENDER'),
+  comoFunciona:        on('COMO_FUNCIONA'),
+  sobre:               on('SOBRE'),
+}

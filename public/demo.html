@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VN Prime — Plataforma Demo</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#F1F5F9; color:#1B2733; display:flex; height:100vh; overflow:hidden; }
+:root { --navy:#1B2733; --navy2:#0F1824; --gold:#D4A857; --hot:#EF4444; --warm:#F59E0B; --cold:#64748B; }
+
+/* SIDEBAR */
+.sidebar { width:220px; background:var(--navy2); display:flex; flex-direction:column; flex-shrink:0; height:100vh; }
+.sb-logo { padding:22px 18px 18px; border-bottom:1px solid rgba(255,255,255,0.07); }
+.sb-logo .brand { font-size:17px; font-weight:800; color:var(--gold); letter-spacing:.4px; }
+.sb-logo .client { font-size:11px; color:rgba(255,255,255,.35); margin-top:3px; }
+.sb-nav { flex:1; padding:14px 10px; display:flex; flex-direction:column; gap:2px; }
+.nav-btn { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; cursor:pointer; color:rgba(255,255,255,.5); font-size:13.5px; border:none; background:none; width:100%; text-align:left; transition:all .15s; }
+.nav-btn:hover { background:rgba(255,255,255,.06); color:rgba(255,255,255,.85); }
+.nav-btn.active { background:rgba(212,168,87,.15); color:var(--gold); }
+.nav-icon { font-size:15px; width:20px; text-align:center; }
+.ai-pill { margin:12px; padding:9px 12px; background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.25); border-radius:8px; display:flex; align-items:center; gap:8px; font-size:12px; color:#4ADE80; }
+.ai-dot { width:6px; height:6px; background:#4ADE80; border-radius:50%; animation:blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* MAIN */
+.main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.topbar { background:#fff; border-bottom:1px solid #E2E8F0; padding:0 26px; height:58px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.topbar-title { font-size:15px; font-weight:700; color:var(--navy); }
+.topbar-right { display:flex; align-items:center; gap:14px; }
+.notif { background:var(--hot); color:#fff; font-size:11px; font-weight:700; padding:2px 7px; border-radius:99px; }
+.avatar { width:32px; height:32px; background:var(--navy); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--gold); font-weight:700; font-size:13px; }
+.content { flex:1; overflow-y:auto; padding:24px; }
+
+/* VIEWS */
+.view { display:none; }
+.view.active { display:block; }
+
+/* UTILITIES */
+.card { background:#fff; border-radius:12px; padding:20px; border:1px solid #E2E8F0; }
+.sec-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+.sec-title { font-size:19px; font-weight:700; color:var(--navy); }
+.btn { padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all .15s; }
+.btn-navy { background:var(--navy); color:#fff; } .btn-navy:hover { background:#253648; }
+.btn-gold { background:var(--gold); color:var(--navy); } .btn-gold:hover { opacity:.9; }
+.divider { height:1px; background:#E2E8F0; margin:14px 0; }
+.tag { font-size:10px; font-weight:700; padding:3px 8px; border-radius:99px; text-transform:uppercase; letter-spacing:.4px; }
+.tag-hot { background:#FEF2F2; color:var(--hot); }
+.tag-warm { background:#FFFBEB; color:#D97706; }
+.tag-cold { background:#F1F5F9; color:var(--cold); }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width:4px; height:4px; }
+::-webkit-scrollbar-thumb { background:#CBD5E1; border-radius:99px; }
+
+/* ── DASHBOARD ── */
+.kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+.kpi { background:#fff; border-radius:12px; padding:18px 20px; border:1px solid #E2E8F0; }
+.kpi-lbl { font-size:11px; color:#64748B; text-transform:uppercase; letter-spacing:.5px; }
+.kpi-val { font-size:30px; font-weight:800; color:var(--navy); margin:5px 0 3px; }
+.kpi-d { font-size:12px; } .kpi-d.up{color:#22C55E;} .kpi-d.dn{color:var(--hot);}
+
+.dash-grid { display:grid; grid-template-columns:1fr 300px; gap:18px; }
+
+.lead-row { display:flex; align-items:center; gap:12px; padding:11px; background:#F8FAFC; border-radius:8px; cursor:pointer; transition:background .15s; margin-bottom:8px; }
+.lead-row:hover { background:#EFF6FF; }
+.lead-av { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:#fff; flex-shrink:0; }
+.lead-inf { flex:1; min-width:0; }
+.lead-nm { font-size:13.5px; font-weight:600; color:var(--navy); }
+.lead-msg { font-size:12px; color:#64748B; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lead-meta { text-align:right; flex-shrink:0; }
+.lead-time { font-size:10.5px; color:#94A3B8; margin-top:4px; }
+
+.temp-bar-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.temp-lbl { font-size:13px; font-weight:500; color:var(--navy); width:60px; }
+.bar-wrap { flex:1; height:8px; background:#F1F5F9; border-radius:99px; overflow:hidden; }
+.bar { height:100%; border-radius:99px; }
+.temp-cnt { font-size:13px; font-weight:700; color:var(--navy); width:22px; text-align:right; }
+
+.act-item { display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; font-size:13px; }
+.act-ic { font-size:15px; flex-shrink:0; margin-top:1px; }
+.act-t { color:#374151; line-height:1.45; }
+.act-tm { color:#94A3B8; font-size:11px; margin-top:2px; }
+
+/* ── CRM KANBAN ── */
+.kanban { display:flex; gap:12px; overflow-x:auto; padding-bottom:10px; }
+.k-col { flex-shrink:0; width:210px; background:#F8FAFC; border-radius:10px; padding:12px; }
+.k-col-hd { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#64748B; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
+.k-cnt { background:#E2E8F0; color:#64748B; font-size:10px; padding:2px 6px; border-radius:99px; }
+.k-card { background:#fff; border-radius:8px; padding:11px; margin-bottom:7px; border:1px solid #E2E8F0; cursor:pointer; transition:box-shadow .15s; }
+.k-card:hover { box-shadow:0 4px 12px rgba(0,0,0,.08); }
+.k-name { font-size:13px; font-weight:600; color:var(--navy); margin-bottom:3px; }
+.k-prop { font-size:11.5px; color:#64748B; margin-bottom:7px; }
+.k-ft { display:flex; align-items:center; justify-content:space-between; }
+.k-tm { font-size:10px; color:#94A3B8; }
+.sched-badge { font-size:10.5px; background:#EFF6FF; color:#1D4ED8; padding:3px 7px; border-radius:4px; margin-bottom:6px; display:inline-block; }
+.closed-val { font-size:12px; color:#22C55E; font-weight:700; margin-top:4px; }
+
+/* ── IMÓVEIS ── */
+.props-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.p-card { background:#fff; border-radius:12px; border:1px solid #E2E8F0; overflow:hidden; cursor:pointer; transition:box-shadow .15s; }
+.p-card:hover { box-shadow:0 6px 20px rgba(0,0,0,.1); }
+.p-img { height:140px; background:linear-gradient(135deg,#1B2733,#2a3f52); display:flex; align-items:center; justify-content:center; font-size:34px; position:relative; }
+.p-score { position:absolute; top:10px; right:10px; background:rgba(0,0,0,.6); color:#fff; font-size:11px; font-weight:700; padding:4px 8px; border-radius:6px; }
+.p-score.high { background:rgba(34,197,94,.85); }
+.p-score.mid { background:rgba(245,158,11,.85); }
+.p-score.low { background:rgba(239,68,68,.85); }
+.p-body { padding:14px; }
+.p-title { font-size:14px; font-weight:700; color:var(--navy); margin-bottom:3px; }
+.p-price { font-size:16px; font-weight:800; color:var(--navy); }
+.p-det { font-size:12px; color:#64748B; margin-top:3px; }
+.p-status { display:flex; align-items:center; gap:6px; margin-top:9px; }
+.s-dot { width:6px; height:6px; border-radius:50%; }
+.s-txt { font-size:11px; color:#64748B; }
+.ai-alert { margin-top:10px; font-size:11.5px; background:#FEF9C3; color:#92400E; padding:6px 10px; border-radius:6px; border-left:3px solid #F59E0B; }
+
+/* ── IA CHAT ── */
+.chat-layout { display:grid; grid-template-columns:1fr 295px; gap:18px; height:calc(100vh - 172px); }
+.chat-wrap { background:#fff; border-radius:12px; border:1px solid #E2E8F0; display:flex; flex-direction:column; overflow:hidden; }
+.chat-hd { padding:14px 18px; border-bottom:1px solid #E2E8F0; display:flex; align-items:center; gap:12px; }
+.chat-hd-av { width:36px; height:36px; background:var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:17px; }
+.chat-hd-nm { font-size:14px; font-weight:600; color:var(--navy); }
+.chat-hd-st { font-size:11px; color:#22C55E; }
+.chat-msgs { flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:12px; }
+.msg { display:flex; flex-direction:column; max-width:78%; }
+.msg.user { align-self:flex-end; align-items:flex-end; }
+.msg.ai { align-self:flex-start; align-items:flex-start; }
+.msg-sndr { font-size:10px; color:#94A3B8; font-weight:700; text-transform:uppercase; letter-spacing:.3px; margin-bottom:3px; }
+.bubble { padding:10px 14px; border-radius:12px; font-size:13.5px; line-height:1.5; }
+.msg.user .bubble { background:var(--navy); color:#fff; border-bottom-right-radius:3px; }
+.msg.ai .bubble { background:#F1F5F9; color:var(--navy); border-bottom-left-radius:3px; }
+.msg-tm { font-size:10px; color:#94A3B8; margin-top:3px; }
+.typing { display:flex; align-items:center; gap:4px; padding:11px 15px; background:#F1F5F9; border-radius:12px; border-bottom-left-radius:3px; width:fit-content; }
+.t-dot { width:6px; height:6px; background:#94A3B8; border-radius:50%; animation:tdot 1.2s infinite; }
+.t-dot:nth-child(2){animation-delay:.2s} .t-dot:nth-child(3){animation-delay:.4s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.chat-input-row { padding:14px; border-top:1px solid #E2E8F0; display:flex; gap:10px; }
+.chat-inp { flex:1; border:1.5px solid #E2E8F0; border-radius:8px; padding:9px 13px; font-size:13.5px; outline:none; font-family:inherit; resize:none; height:40px; transition:border .15s; }
+.chat-inp:focus { border-color:var(--gold); }
+.chat-send { background:var(--navy); color:#fff; border:none; border-radius:8px; padding:0 18px; cursor:pointer; font-size:14px; font-weight:600; transition:background .15s; }
+.chat-send:hover { background:#253648; }
+
+/* Lead profile card */
+.profile-card { background:#fff; border-radius:12px; border:1px solid #E2E8F0; overflow:hidden; display:flex; flex-direction:column; }
+.profile-hd { background:var(--navy); padding:18px; text-align:center; }
+.profile-av { width:52px; height:52px; background:var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; color:var(--navy); margin:0 auto 10px; }
+.profile-nm { color:#fff; font-size:15px; font-weight:700; }
+.profile-tm { color:rgba(255,255,255,.4); font-size:11px; margin-top:3px; }
+.profile-body { padding:14px; flex:1; overflow-y:auto; }
+.temp-box { text-align:center; padding:12px; border-radius:10px; margin-bottom:14px; transition:all .4s; }
+.temp-box.hot { background:#FEF2F2; border:1.5px solid #FECACA; }
+.temp-box.warm { background:#FFFBEB; border:1.5px solid #FDE68A; }
+.temp-box.cold { background:#F1F5F9; border:1.5px solid #CBD5E1; }
+.temp-em { font-size:26px; margin-bottom:2px; }
+.temp-nm { font-size:17px; font-weight:800; }
+.temp-box.hot .temp-nm{color:var(--hot)} .temp-box.warm .temp-nm{color:#D97706} .temp-box.cold .temp-nm{color:var(--cold)}
+.temp-why { font-size:11px; color:#64748B; margin-top:3px; line-height:1.4; }
+.info-row { display:flex; align-items:flex-start; gap:8px; font-size:12.5px; margin-bottom:8px; }
+.info-ic { color:#94A3B8; flex-shrink:0; }
+.info-lbl { color:#64748B; margin-bottom:1px; font-size:11px; }
+.info-val { color:var(--navy); font-weight:600; }
+.ai-sug { background:linear-gradient(135deg,#EFF6FF,#F0FDF4); border:1px solid #BFDBFE; border-radius:8px; padding:11px; font-size:12px; color:#1E40AF; line-height:1.5; margin-top:10px; }
+.ai-sug-lbl { font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:4px; }
+
+/* ── CONFIG MÓDULOS ── */
+.mod-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.mod-card { background:#fff; border-radius:12px; padding:18px; border:1px solid #E2E8F0; display:flex; align-items:flex-start; gap:14px; }
+.mod-ic { font-size:26px; flex-shrink:0; }
+.mod-info { flex:1; }
+.mod-nm { font-size:14px; font-weight:700; color:var(--navy); margin-bottom:3px; }
+.mod-desc { font-size:12px; color:#64748B; line-height:1.4; }
+.toggle { flex-shrink:0; width:40px; height:22px; background:#CBD5E1; border-radius:99px; position:relative; cursor:pointer; transition:background .2s; margin-top:2px; }
+.toggle.on { background:#22C55E; }
+.toggle::after { content:''; position:absolute; width:16px; height:16px; background:#fff; border-radius:50%; top:3px; left:3px; transition:transform .2s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+.toggle.on::after { transform:translateX(18px); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="brand">VN Prime</div>
+    <div class="client">Imobiliária Demo · white label</div>
+  </div>
+  <nav class="sb-nav">
+    <button class="nav-btn active" onclick="go('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</button>
+    <button class="nav-btn" onclick="go('crm',this)"><span class="nav-icon">👥</span>CRM / Leads</button>
+    <button class="nav-btn" onclick="go('imoveis',this)"><span class="nav-icon">🏠</span>Imóveis</button>
+    <button class="nav-btn" onclick="go('chat',this)"><span class="nav-icon">🤖</span>IA Atendimento</button>
+    <button class="nav-btn" onclick="go('config',this)"><span class="nav-icon">⚙️</span>Módulos</button>
+  </nav>
+  <div class="ai-pill"><div class="ai-dot"></div>IA ativa 24/7</div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="pg-title">Dashboard</div>
+    <div class="topbar-right">
+      <span style="font-size:13px;color:#64748B;">1 Jul 2026 · 08:47</span>
+      <span class="notif">4</span>
+      <div class="avatar">V</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="view active" id="view-dashboard">
+      <div class="sec-hd">
+        <div class="sec-title">Visão Geral</div>
+        <button class="btn btn-gold">+ Novo Imóvel</button>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-lbl">Leads hoje</div><div class="kpi-val">12</div><div class="kpi-d up">↑ 3 vs ontem</div></div>
+        <div class="kpi"><div class="kpi-lbl">Visitas agendadas</div><div class="kpi-val">5</div><div class="kpi-d up">↑ 2 esta semana</div></div>
+        <div class="kpi"><div class="kpi-lbl">Imóveis ativos</div><div class="kpi-val">47</div><div class="kpi-d up">↑ 3 novos</div></div>
+        <div class="kpi"><div class="kpi-lbl">Conversão</div><div class="kpi-val">8.3%</div><div class="kpi-d dn">↓ 1.2% vs mês</div></div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:14px;font-weight:700;color:var(--navy);">Leads recentes</div>
+            <span style="font-size:11.5px;color:#64748B;">IA classificou automaticamente</span>
+          </div>
+          <div class="lead-row" onclick="go('chat',document.querySelectorAll('.nav-btn')[3])">
+            <div class="lead-av" style="background:#EF4444;">M</div>
+            <div class="lead-inf">
+              <div class="lead-nm">Marcos Oliveira</div>
+              <div class="lead-msg">"Tenho carta de crédito aprovada, quero visitar essa semana"</div>
+            </div>
+            <div class="lead-meta"><span class="tag tag-hot">🔥 Quente</span><div class="lead-time">há 8 min</div></div>
+          </div>
+          <div class="lead-row">
+            <div class="lead-av" style="background:#F59E0B;">A</div>
+            <div class="lead-inf">
+              <div class="lead-nm">Ana Ferreira</div>
+              <div class="lead-msg">"Você tem mais fotos? Estou comparando com outros apartamentos"</div>
+            </div>
+            <div class="lead-meta"><span class="tag tag-warm">🌡 Morno</span><div class="lead-time">há 42 min</div></div>
+          </div>
+          <div class="lead-row">
+            <div class="lead-av" style="background:#EF4444;">C</div>
+            <div class="lead-inf">
+              <div class="lead-nm">Carla Mendes</div>
+              <div class="lead-msg">"Aceita permuta? Tenho um apartamento no Savassi"</div>
+            </div>
+            <div class="lead-meta"><span class="tag tag-hot">🔥 Quente</span><div class="lead-time">há 3h</div></div>
+          </div>
+          <div class="lead-row">
+            <div class="lead-av" style="background:#64748B;">R</div>
+            <div class="lead-inf">
+              <div class="lead-nm">Roberto Souza</div>
+              <div class="lead-msg">"Qual o preço?"</div>
+            </div>
+            <div class="lead-meta"><span class="tag tag-cold">❄️ Frio</span><div class="lead-time">há 5h</div></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="card">
+            <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:14px;">Temperatura dos leads</div>
+            <div class="temp-bar-row"><span class="temp-lbl">🔥 Quentes</span><div class="bar-wrap"><div class="bar" style="width:32%;background:#EF4444;"></div></div><span class="temp-cnt">4</span></div>
+            <div class="temp-bar-row"><span class="temp-lbl">🌡 Mornos</span><div class="bar-wrap"><div class="bar" style="width:48%;background:#F59E0B;"></div></div><span class="temp-cnt">6</span></div>
+            <div class="temp-bar-row"><span class="temp-lbl">❄️ Frios</span><div class="bar-wrap"><div class="bar" style="width:100%;background:#CBD5E1;"></div></div><span class="temp-cnt">15</span></div>
+          </div>
+          <div class="card">
+            <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:12px;">IA — atividade recente</div>
+            <div class="act-item"><span class="act-ic">🤖</span><div><div class="act-t">IA atendeu <strong>Marcos</strong> às 22h43 e agendou visita para hoje 14h</div><div class="act-tm">há 8 min</div></div></div>
+            <div class="act-item"><span class="act-ic">📈</span><div><div class="act-t"><strong>Roberto</strong> voltou ao chat — temperatura subiu para Morno</div><div class="act-tm">há 1h</div></div></div>
+            <div class="act-item"><span class="act-ic">📩</span><div><div class="act-t">3 follow-ups automáticos enviados via WhatsApp</div><div class="act-tm">há 2h</div></div></div>
+            <div class="act-item"><span class="act-ic">⚠️</span><div><div class="act-t">Studio Funcionários parado há 18 dias — IA sugere ajuste de preço</div><div class="act-tm">há 3h</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CRM ══ -->
+    <div class="view" id="view-crm">
+      <div class="sec-hd">
+        <div class="sec-title">CRM — Pipeline de Leads</div>
+        <button class="btn btn-navy">+ Adicionar Lead</button>
+      </div>
+      <div class="kanban">
+        <div class="k-col">
+          <div class="k-col-hd">Novo <span class="k-cnt">3</span></div>
+          <div class="k-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;"><div class="k-name">Roberto Souza</div><span class="tag tag-cold">❄️</span></div><div class="k-prop">Apt 3q — Savassi</div><div class="k-ft"><div class="k-tm">há 5h</div></div></div>
+          <div class="k-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;"><div class="k-name">Paulo Lima</div><span class="tag tag-cold">❄️</span></div><div class="k-prop">Casa — Buritis</div><div class="k-ft"><div class="k-tm">há 7h</div></div></div>
+          <div class="k-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;"><div class="k-name">Fernanda Costa</div><span class="tag tag-warm">🌡</span></div><div class="k-prop">Apt 2q — Lourdes</div><div class="k-ft"><div class="k-tm">ontem</div></div></div>
+        </div>
+        <div class="k-col">
+          <div class="k-col-hd">Qualificado <span class="k-cnt">3</span></div>
+          <div class="k-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;"><div class="k-name">Ana Ferreira</div><span class="tag tag-warm">🌡</span></div><div class="k-prop">Cobertura — Funcionários</div><div class="k-ft"><div class="k-tm">há 42 min</div></div></div>
+          <div class="k-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;"><div class="k-name">Carla Mendes</div><span class="tag tag-hot">🔥</span></div><div class="k-prop">Casa 4q — Belvedere</div><div class="k-ft"><div class="k-tm">há 3h</div></div></div>
+          <div class="k-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;"><div class="k-name">Jorge Almeida</div><span class="tag tag-warm">🌡</span></div><div class="k-prop">Apt Studio — Centro</div><div class="k-ft"><div class="k-tm">há 5h</div></div></div>
+        </div>
+        <div class="k-col">
+          <div class="k-col-hd">Visita Agendada <span class="k-cnt">2</span></div>
+          <div class="k-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;"><div class="k-name">Marcos Oliveira</div><span class="tag tag-hot">🔥</span></div><div class="k-prop">Apt 3q — Savassi</div><div class="sched-badge">📅 Hoje 14h</div><div class="k-ft"><div class="k-tm" style="color:#22C55E;font-weight:600;">agendado pela IA</div></div></div>
+          <div class="k-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;"><div class="k-name">Juliana Ramos</div><span class="tag tag-hot">🔥</span></div><div class="k-prop">Apt 2q — Sion</div><div class="sched-badge">📅 Sex 10h</div><div class="k-ft"><div class="k-tm">há 1 dia</div></div></div>
+        </div>
+        <div class="k-col">
+          <div class="k-col-hd">Proposta <span class="k-cnt">1</span></div>
+          <div class="k-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;"><div class="k-name">Diego Alves</div><span class="tag tag-hot">🔥</span></div><div class="k-prop">Casa 3q — Pampulha</div><div style="font-size:11.5px;color:#D97706;font-weight:700;margin-bottom:6px;">R$ 650.000 (pedindo 680k)</div><div class="k-ft"><div class="k-tm" style="color:#F59E0B;font-weight:600;">aguardando resposta</div></div></div>
+        </div>
+        <div class="k-col">
+          <div class="k-col-hd">Fechado ✓ <span class="k-cnt">2</span></div>
+          <div class="k-card" style="opacity:.7;"><div class="k-name">Maria Santos</div><div class="k-prop">Apt 2q — Sion</div><div class="closed-val">R$ 420.000 ✓</div><div class="k-ft"><div class="k-tm">28 Jun 2026</div></div></div>
+          <div class="k-card" style="opacity:.7;"><div class="k-name">Lucas Teixeira</div><div class="k-prop">Sala comercial — Centro</div><div class="closed-val">R$ 280.000 ✓</div><div class="k-ft"><div class="k-tm">15 Jun 2026</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ IMÓVEIS ══ -->
+    <div class="view" id="view-imoveis">
+      <div class="sec-hd">
+        <div class="sec-title">Portfólio de Imóveis</div>
+        <button class="btn btn-gold">+ Cadastrar Imóvel</button>
+      </div>
+      <div class="props-grid">
+        <div class="p-card">
+          <div class="p-img">🏢<div class="p-score high">📋 92%</div></div>
+          <div class="p-body"><div class="p-title">Apt. 3 quartos — Savassi</div><div class="p-price">R$ 680.000</div><div class="p-det">120m² · 3q · 2 vagas</div><div class="p-status"><div class="s-dot" style="background:#22C55E;"></div><span class="s-txt">Ativo · 8 leads · 3 visitas</span></div></div>
+        </div>
+        <div class="p-card">
+          <div class="p-img">🏠<div class="p-score mid">📋 78%</div></div>
+          <div class="p-body"><div class="p-title">Casa 4q — Belvedere</div><div class="p-price">R$ 1.200.000</div><div class="p-det">280m² · 4q · 3 vagas</div><div class="p-status"><div class="s-dot" style="background:#22C55E;"></div><span class="s-txt">Ativo · 5 leads · 2 visitas</span></div></div>
+        </div>
+        <div class="p-card">
+          <div class="p-img">🏢<div class="p-score low">📋 55%</div></div>
+          <div class="p-body"><div class="p-title">Studio — Funcionários</div><div class="p-price">R$ 380.000</div><div class="p-det">42m² · 1q · 1 vaga</div><div class="p-status"><div class="s-dot" style="background:#F59E0B;"></div><span class="s-txt">Parado há 18 dias · 12 leads sem visita</span></div><div class="ai-alert">🤖 IA: imóvel possivelmente acima do mercado. Considere reduzir para R$ 355.000</div></div>
+        </div>
+        <div class="p-card">
+          <div class="p-img">🏢<div class="p-score high">📋 95%</div></div>
+          <div class="p-body"><div class="p-title">Cobertura — Lourdes</div><div class="p-price">R$ 2.100.000</div><div class="p-det">350m² · 4q · 4 vagas</div><div class="p-status"><div class="s-dot" style="background:#22C55E;"></div><span class="s-txt">Ativo · 3 leads · 1 visita</span></div></div>
+        </div>
+        <div class="p-card">
+          <div class="p-img">🏠<div class="p-score mid">📋 70%</div></div>
+          <div class="p-body"><div class="p-title">Casa 3q — Pampulha</div><div class="p-price">R$ 680.000</div><div class="p-det">180m² · 3q · 2 vagas</div><div class="p-status"><div class="s-dot" style="background:#EF4444;"></div><span class="s-txt">⚠️ Proposta em andamento</span></div></div>
+        </div>
+        <div class="p-card">
+          <div class="p-img">🏢<div class="p-score high">📋 88%</div></div>
+          <div class="p-body"><div class="p-title">Apt. 2q — Sion</div><div class="p-price">R$ 490.000</div><div class="p-det">85m² · 2q · 1 vaga</div><div class="p-status"><div class="s-dot" style="background:#22C55E;"></div><span class="s-txt">Ativo · 6 leads · 4 visitas</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ IA CHAT ══ -->
+    <div class="view" id="view-chat">
+      <div class="sec-hd" style="margin-bottom:14px;">
+        <div class="sec-title">IA Atendimento 24/7</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:12px;background:#D1FAE5;color:#065F46;padding:5px 12px;border-radius:99px;font-weight:600;">● Online agora</span>
+          <button class="btn btn-navy" style="font-size:12px;padding:7px 14px;" onclick="loadDemo()">▶ Ver demo ao vivo</button>
+        </div>
+      </div>
+      <div class="chat-layout">
+        <div class="chat-wrap">
+          <div class="chat-hd">
+            <div class="chat-hd-av">🤖</div>
+            <div><div class="chat-hd-nm">IA VN Prime · Atendimento Ativo</div><div class="chat-hd-st">● Respondendo automaticamente</div></div>
+          </div>
+          <div class="chat-msgs" id="chat-msgs">
+            <div id="chat-placeholder" style="text-align:center;padding:30px 20px;">
+              <div style="font-size:44px;margin-bottom:10px;">🤖</div>
+              <div style="font-size:14px;color:#64748B;line-height:1.7;max-width:300px;margin:0 auto;">
+                Clique em <strong>▶ Ver demo ao vivo</strong> para assistir a IA atendendo um lead em tempo real.<br><br>
+                Ou <strong>simule um comprador</strong> digitando uma mensagem abaixo.
+              </div>
+            </div>
+          </div>
+          <div class="chat-input-row">
+            <textarea class="chat-inp" id="chat-inp" placeholder="Simule um comprador — ex: 'Ainda tem o apartamento no Savassi?'" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"></textarea>
+            <button class="chat-send" onclick="send()">Enviar</button>
+          </div>
+        </div>
+
+        <!-- Profile -->
+        <div class="profile-card">
+          <div class="profile-hd">
+            <div class="profile-av" id="pr-av">?</div>
+            <div class="profile-nm" id="pr-nm">Aguardando lead...</div>
+            <div class="profile-tm" id="pr-tm">Nenhuma conversa ativa</div>
+          </div>
+          <div class="profile-body">
+            <div class="temp-box cold" id="temp-box">
+              <div class="temp-em" id="temp-em">❓</div>
+              <div class="temp-nm" id="temp-nm">—</div>
+              <div class="temp-why" id="temp-why">Inicie uma conversa para classificar o lead</div>
+            </div>
+            <div id="profile-details" style="display:none;">
+              <div class="info-row"><span class="info-ic">🏠</span><div><div class="info-lbl">Interesse</div><div class="info-val" id="inf-int">—</div></div></div>
+              <div class="info-row"><span class="info-ic">💰</span><div><div class="info-lbl">Orçamento</div><div class="info-val" id="inf-orc">—</div></div></div>
+              <div class="info-row"><span class="info-ic">⚡</span><div><div class="info-lbl">Urgência</div><div class="info-val" id="inf-urg">—</div></div></div>
+              <div class="info-row"><span class="info-ic">🏦</span><div><div class="info-lbl">Financiamento</div><div class="info-val" id="inf-fin">—</div></div></div>
+              <div class="divider"></div>
+              <div class="ai-sug" id="ai-sug"><div class="ai-sug-lbl">🤖 Próxima ação sugerida</div><span id="ai-sug-txt">—</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MÓDULOS ══ -->
+    <div class="view" id="view-config">
+      <div class="sec-hd">
+        <div class="sec-title">Módulos da Plataforma</div>
+        <span style="font-size:12px;color:#64748B;">Ative ou desative conforme seu negócio</span>
+      </div>
+      <div class="mod-grid">
+        <div class="mod-card"><div class="mod-ic">🤖</div><div class="mod-info"><div class="mod-nm">IA Atendimento 24/7</div><div class="mod-desc">Qualifica leads, responde dúvidas e agenda visitas automaticamente fora do horário comercial</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="mod-card"><div class="mod-ic">🌡️</div><div class="mod-info"><div class="mod-nm">Lead Temperature</div><div class="mod-desc">Classifica leads automaticamente em Quente, Morno ou Frio com base nas mensagens</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="mod-card"><div class="mod-ic">👥</div><div class="mod-info"><div class="mod-nm">CRM Pro</div><div class="mod-desc">Pipeline Kanban, follow-up automático, histórico de contatos e tarefas</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="mod-card"><div class="mod-ic">📅</div><div class="mod-info"><div class="mod-nm">Agendamento de Visitas</div><div class="mod-desc">Calendário integrado, confirmação e lembretes automáticos</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="mod-card"><div class="mod-ic">🔑</div><div class="mod-info"><div class="mod-nm">Controle de Chaves</div><div class="mod-desc">Rastreio de retirada e devolução por imóvel, histórico completo</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="mod-card"><div class="mod-ic">💰</div><div class="mod-info"><div class="mod-nm">Gestão Financeira</div><div class="mod-desc">Comissões, repasses, split automático e relatório financeiro</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="mod-card"><div class="mod-ic">🧑‍💼</div><div class="mod-info"><div class="mod-nm">Portal do Corretor</div><div class="mod-desc">Acesso a leads, pipeline, calculadora e comissões para corretores parceiros</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="mod-card"><div class="mod-ic">🏠</div><div class="mod-info"><div class="mod-nm">Portal do Proprietário</div><div class="mod-desc">Acompanhamento de visitas, leads e status do imóvel em tempo real</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="mod-card"><div class="mod-ic">📸</div><div class="mod-info"><div class="mod-nm">Portal do Fotógrafo</div><div class="mod-desc">Agenda de sessões, entrega de arquivos e controle de pagamentos</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+        <div class="mod-card"><div class="mod-ic">📱</div><div class="mod-info"><div class="mod-nm">WhatsApp Integrado</div><div class="mod-desc">IA atende e qualifica leads diretamente no WhatsApp Business da empresa</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="mod-card"><div class="mod-ic">🏗️</div><div class="mod-info"><div class="mod-nm">Lançamentos</div><div class="mod-desc">Espelho de vendas interativo, tabela de preços e gestão de reservas</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+        <div class="mod-card"><div class="mod-ic">🗺️</div><div class="mod-info"><div class="mod-nm">Loteamentos</div><div class="mod-desc">Mapa de quadras e lotes, disponibilidade e gestão de vendas de terrenos</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+        <div class="mod-card"><div class="mod-ic">🌐</div><div class="mod-info"><div class="mod-nm">Vitrine Pública</div><div class="mod-desc">Portal de busca para compradores com agendamento de visita online</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="mod-card"><div class="mod-ic">📊</div><div class="mod-info"><div class="mod-nm">Relatório de Mercado</div><div class="mod-desc">Comparativos de preço, tempo médio de venda e demanda por bairro</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="mod-card"><div class="mod-ic">📋</div><div class="mod-info"><div class="mod-nm">Score de Documentação</div><div class="mod-desc">Indicador de completude documental por imóvel, com alertas de pendência</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const TITLES = { dashboard:'Dashboard', crm:'CRM — Pipeline de Leads', imoveis:'Portfólio de Imóveis', chat:'IA Atendimento 24/7', config:'Módulos da Plataforma' };
+
+function go(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('pg-title').textContent = TITLES[id] || id;
+}
+
+// ── AI CHAT ENGINE ──
+let busy = false;
+
+const AI = {
+  classify(txt) {
+    const t = txt.toLowerCase();
+    if (/visita|agendar|quando posso|esta semana|amanhã|carta de crédito|aprovad|proposta|fechar|urgente|permuta|assinar|contrato/.test(t)) return 'hot';
+    if (/foto|imagem|mais info|comparar|pesquisando|orçamento|bairro|detalhes|planta|metragem|condomínio/.test(t)) return 'warm';
+    return 'cold';
+  },
+  respond(txt) {
+    const t = txt.toLowerCase();
+    if (/oi|olá|boa|bom dia|boa tarde|boa noite|tudo/.test(t))
+      return 'Olá! 👋 Bem-vindo à Imobiliária Demo. Posso te ajudar a encontrar o imóvel ideal. Me conta: o que você está procurando?';
+    if (/preço|valor|quanto custa|preço/.test(t))
+      return 'Temos imóveis a partir de R$ 280.000 até R$ 2,1 milhões. Me diz sua faixa de orçamento e bairro preferido para eu te mostrar as melhores opções! 🏠';
+    if (/visita|agendar|conhecer|ver o apê|ver o imovel/.test(t))
+      return '📅 Ótimo! Vou verificar a agenda. Tenho disponibilidade hoje às 16h, amanhã às 9h ou 14h. Qual horário funciona melhor para você?';
+    if (/carta de crédito|financiamento aprovado|crédito aprovado/.test(t))
+      return '🏦 Perfeito! Com carta aprovada o processo é muito mais ágil. Qual o valor aprovado? Assim consigo já separar as melhores opções para o seu perfil.';
+    if (/financiamento|caixa|banco|parcela|entrada/.test(t))
+      return '🏦 Trabalhamos com todos os bancos! Posso te ajudar a simular também. Me conta: qual é sua renda familiar aproximada? Assim vejo as melhores condições para você.';
+    if (/foto|imagem|ver mais|mostrar/.test(t))
+      return '📸 Claro! Me diz qual imóvel te interessou que eu mando o álbum completo agora mesmo — fotos, planta e tour virtual.';
+    if (/permuta|troca/.test(t))
+      return '🔄 Trabalhamos com permuta sim! Me conta sobre o seu imóvel (tipo, bairro, valor estimado) para eu verificar as possibilidades com nossa equipe.';
+    if (/disponível|ainda tem|ainda disponível/.test(t))
+      return 'Sim, ainda está disponível! 😊 Quer que eu agende uma visita ou prefere mais informações antes?';
+    if (/savassi|funcionários|belvedere|buritis|pampulha|lourdes|sion/.test(t))
+      return '📍 Excelente escolha de bairro! Temos opções ótimas nessa região. Qual o tipo de imóvel que você procura (casa, apartamento, studio) e quantos quartos?';
+    if (/obrigad|valeu|ok|entendi/.test(t))
+      return 'Por nada! 😊 Fico à disposição 24h. Qualquer dúvida é só mandar mensagem — respondemos na hora!';
+    return 'Entendi! Para te indicar as melhores opções: qual bairro prefere e qual é o seu orçamento aproximado? 🏠';
+  }
+};
+
+const profileData = {
+  hot: { em:'🔥', nm:'QUENTE', why:'Sinais de compra imediata detectados pela IA', int:'Apt. 3q — Savassi / Belvedere', orc:'Até R$ 750.000', urg:'Alta — quer decidir rápido', fin:'Verificando...', sug:'Entre em contato agora — alta probabilidade de fechar hoje!' },
+  warm: { em:'🌡️', nm:'MORNO', why:'Interesse real, ainda avaliando opções', int:'Apartamento 2-3 quartos', orc:'Até R$ 600.000', urg:'Média — pesquisando opções', fin:'Não informado', sug:'Envie mais fotos e um comparativo. Nutra com informações relevantes.' },
+  cold: { em:'❄️', nm:'FRIO', why:'Início de jornada, sem urgência clara', int:'Não definido ainda', orc:'Não informado', urg:'Baixa — só pesquisando', fin:'Não informado', sug:'Adicionar ao fluxo de nutrição. IA fará follow-up em 7 dias.' }
+};
+
+function setProfile(temp, name) {
+  const d = profileData[temp];
+  const box = document.getElementById('temp-box');
+  box.className = 'temp-box ' + temp;
+  document.getElementById('temp-em').textContent = d.em;
+  document.getElementById('temp-nm').textContent = d.nm;
+  document.getElementById('temp-why').textContent = d.why;
+  if (name) {
+    document.getElementById('pr-av').textContent = name[0].toUpperCase();
+    document.getElementById('pr-nm').textContent = name;
+    document.getElementById('pr-tm').textContent = 'Conversa ativa agora';
+    document.getElementById('profile-details').style.display = 'block';
+    document.getElementById('inf-int').textContent = d.int;
+    document.getElementById('inf-orc').textContent = d.orc;
+    document.getElementById('inf-urg').textContent = d.urg;
+    document.getElementById('inf-fin').textContent = d.fin;
+    document.getElementById('ai-sug-txt').textContent = d.sug;
+  }
+}
+
+function addMsg(text, type, sender, time) {
+  const ph = document.getElementById('chat-placeholder');
+  if (ph) ph.remove();
+  const c = document.getElementById('chat-msgs');
+  const now = time || (() => { const d=new Date(); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); })();
+  const div = document.createElement('div');
+  div.className = 'msg ' + type;
+  div.innerHTML = `<div class="msg-sndr">${sender}</div><div class="bubble">${text}</div><div class="msg-tm">${now}</div>`;
+  c.appendChild(div);
+  c.scrollTop = c.scrollHeight;
+}
+
+function showTyping() {
+  const ph = document.getElementById('chat-placeholder');
+  if (ph) ph.remove();
+  const c = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = 'msg ai'; div.id = 'typing-wrap';
+  div.innerHTML = '<div class="msg-sndr">IA VN Prime</div><div class="typing"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>';
+  c.appendChild(div); c.scrollTop = c.scrollHeight;
+}
+
+function removeTyping() { const el=document.getElementById('typing-wrap'); if(el) el.remove(); }
+
+function send() {
+  if (busy) return;
+  const inp = document.getElementById('chat-inp');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  addMsg(txt, 'user', 'Comprador');
+  inp.value = '';
+  const temp = AI.classify(txt);
+  setProfile(temp, 'Comprador');
+  busy = true; showTyping();
+  setTimeout(() => { removeTyping(); addMsg(AI.respond(txt), 'ai', 'IA VN Prime'); busy = false; }, 900 + Math.random() * 700);
+}
+
+// Demo conversation
+function loadDemo() {
+  document.getElementById('chat-msgs').innerHTML = '';
+  setProfile('cold', null);
+  document.getElementById('pr-nm').textContent = 'Marcos Oliveira';
+  document.getElementById('pr-av').textContent = 'M';
+  document.getElementById('pr-tm').textContent = 'Conversa iniciada às 22h43';
+  document.getElementById('profile-details').style.display = 'block';
+
+  const conv = [
+    { type:'ai',  text:'Olá! 👋 Sou a assistente virtual da Imobiliária Demo. Como posso te ajudar hoje?', sndr:'IA VN Prime', time:'22:43', d:0 },
+    { type:'user',text:'Oi! Vi o apartamento de 3 quartos no Savassi. Ainda está disponível?', sndr:'Marcos Oliveira', time:'22:43', d:700 },
+    { type:'ai',  text:'Sim, está disponível! 😊 São 120m², 3 quartos, 2 vagas, por R$ 680.000. Quer mais fotos ou informações?', sndr:'IA VN Prime', time:'22:44', d:1800 },
+    { type:'user',text:'Tenho carta de crédito aprovada na Caixa. Quero visitar ainda essa semana se possível', sndr:'Marcos Oliveira', time:'22:44', d:3200, temp:'hot' },
+    { type:'ai',  text:'🔥 Ótima notícia! Com carta aprovada o processo é muito mais rápido. Tenho disponibilidade amanhã às 14h ou quinta às 10h — qual você prefere?', sndr:'IA VN Prime', time:'22:44', d:4600 },
+    { type:'user',text:'Amanhã às 14h está perfeito!', sndr:'Marcos Oliveira', time:'22:45', d:5800 },
+    { type:'ai',  text:'📅 Confirmado! Visita marcada para amanhã às 14h no Apt. Savassi. Vou te enviar o endereço e o nome do corretor. Alguma dúvida antes?', sndr:'IA VN Prime', time:'22:45', d:7200 },
+  ];
+
+  conv.forEach(msg => {
+    if (msg.type === 'ai' && msg.d > 0) {
+      setTimeout(() => { showTyping(); }, msg.d);
+      setTimeout(() => { removeTyping(); addMsg(msg.text, msg.type, msg.sndr, msg.time); }, msg.d + 900);
+    } else {
+      setTimeout(() => {
+        addMsg(msg.text, msg.type, msg.sndr, msg.time);
+        if (msg.temp) setProfile(msg.temp, 'Marcos Oliveira');
+      }, msg.d);
+    }
+  });
+
+  // Update profile after card of credit mention
+  setTimeout(() => {
+    document.getElementById('inf-int').textContent = 'Apt. 3q — Savassi';
+    document.getElementById('inf-orc').textContent = 'R$ 680.000 (carta aprovada)';
+    document.getElementById('inf-urg').textContent = 'Alta — quer visitar essa semana';
+    document.getElementById('inf-fin').textContent = 'Carta aprovada — Caixa Econômica';
+    document.getElementById('ai-sug-txt').textContent = 'Ligue para Marcos logo pela manhã — lead com carta aprovada e visita confirmada.';
+  }, 4000);
+}
+</script>
+</body>
+</html>

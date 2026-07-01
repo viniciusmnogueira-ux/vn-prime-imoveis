@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 import Btn from '@/components/ui/Btn'
+import { MODULES } from '@/lib/config'
 
 function ShieldMark({ size = 32 }: { size?: number }) {
   return (
@@ -38,26 +39,32 @@ function BrandLockup({ onNavy = false }: { onNavy?: boolean }) {
   )
 }
 
-const NAV = [
-  { label: 'Início',        href: '/' },
-  { label: 'Comprar',       href: '/busca' },
-  { label: 'Anuncie',       href: '/vender' },
-  { label: 'Como funciona', href: '/como-funciona' },
-  { label: 'Lançamentos',   href: '/lancamentos' },
-  { label: 'Sobre',         href: '/sobre' },
-  {
-    label: 'Serviços', href: '/sobre',
-    dropdown: [
-      { label: 'Para Proprietários',   href: '/proprietarios',  desc: 'Três planos — direto, assistido ou completo' },
-      { label: 'Para Corretores',      href: '/corretores',     desc: 'Carteira, CRM e pipeline sem imobiliária' },
-      { label: 'Consórcio',            href: '/consorcio',      desc: 'Compre seu imóvel com parcelas acessíveis' },
-      { label: 'Due Diligence',        href: '/due-diligence',  desc: 'Análise jurídica e técnica antes de comprar' },
-      { label: 'Avaliação de Imóveis', href: '/avaliacao',      desc: 'Laudo judicial, extrajudicial ou estimativa IA' },
-      { label: 'Calculadora ITBI',     href: '/calculadora',    desc: 'Calcule ITBI, escritura e registro em segundos' },
-      { label: 'Relatório de Mercado', href: '/relatorio',      desc: 'Dados ao vivo do mercado imobiliário de BH' },
-    ],
-  },
+const ALL_DROPDOWN = [
+  { label: 'Para Proprietários',   href: '/proprietarios',  desc: 'Três planos — direto, assistido ou completo', module: 'portalProprietario' as const },
+  { label: 'Para Corretores',      href: '/corretores',     desc: 'Carteira, CRM e pipeline sem imobiliária',    module: 'portalCorretor' as const },
+  { label: 'Consórcio',            href: '/consorcio',      desc: 'Compre seu imóvel com parcelas acessíveis',   module: 'consorcio' as const },
+  { label: 'Due Diligence',        href: '/due-diligence',  desc: 'Análise jurídica e técnica antes de comprar', module: 'dueDiligence' as const },
+  { label: 'Avaliação de Imóveis', href: '/avaliacao',      desc: 'Laudo judicial, extrajudicial ou estimativa IA', module: 'avaliacao' as const },
+  { label: 'Calculadora ITBI',     href: '/calculadora',    desc: 'Calcule ITBI, escritura e registro em segundos', module: 'calculadora' as const },
+  { label: 'Relatório de Mercado', href: '/relatorio',      desc: 'Dados ao vivo do mercado imobiliário de BH',  module: 'relatorio' as const },
 ]
+
+const activeDropdown = ALL_DROPDOWN.filter(d => MODULES[d.module])
+
+const ALL_NAV = [
+  { label: 'Início',        href: '/',             module: null },
+  { label: 'Comprar',       href: '/busca',        module: null },
+  { label: 'Anuncie',       href: '/vender',       module: 'vender' as const },
+  { label: 'Como funciona', href: '/como-funciona', module: 'comoFunciona' as const },
+  { label: 'Lançamentos',   href: '/lancamentos',  module: 'lancamentos' as const },
+  { label: 'Sobre',         href: '/sobre',        module: 'sobre' as const },
+  ...(activeDropdown.length > 0 ? [{
+    label: 'Serviços', href: '/sobre', module: null as null,
+    dropdown: activeDropdown,
+  }] : []),
+]
+
+const NAV = ALL_NAV.filter(item => item.module === null || MODULES[item.module])
 
 export default function SiteHeader() {
   const pathname = usePathname()
