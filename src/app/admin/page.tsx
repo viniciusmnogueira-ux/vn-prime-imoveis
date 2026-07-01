@@ -4,11 +4,12 @@ import { createClient } from '@/lib/supabase/client'
 import Btn from '@/components/ui/Btn'
 import Link from 'next/link'
 import FinanceiroTab from './FinanceiroTab'
+import CRMTab from './CRMTab'
 
 const fmt = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
 const fmtDate = (s: string) => new Date(s).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })
 
-type Tab = 'dashboard' | 'curadoria' | 'imoveis' | 'leads' | 'crm' | 'pipeline' | 'usuarios' | 'financeiro'
+type Tab = 'dashboard' | 'curadoria' | 'imoveis' | 'leads' | 'crm' | 'usuarios' | 'financeiro'
 
 const STATUS_COLORS: Record<string, string> = {
   pendente: '#D97706', ativo: '#059669', pausado: '#6B7280', vendido: '#7C3AED', rascunho: '#94A3B8',
@@ -134,7 +135,6 @@ export default function AdminPage() {
     { key: 'imoveis', label: 'Imóveis' },
     { key: 'leads', label: 'Leads', badge: stats.leads || undefined },
     { key: 'crm', label: 'CRM' },
-    { key: 'pipeline', label: 'Pipeline' },
     { key: 'usuarios', label: 'Usuários' },
     { key: 'financeiro', label: 'Financeiro' },
   ]
@@ -787,124 +787,7 @@ export default function AdminPage() {
         )}
 
         {/* CRM */}
-        {tab === 'crm' && (() => {
-          const CRM_OPTS = ['novo','contatado','qualificado','proposta','fechado','sem interesse']
-          const ST_COLOR: Record<string, string> = {
-            novo: '#6366F1', contatado: '#D97706', qualificado: '#0369A1',
-            proposta: '#7C3AED', fechado: '#059669', 'sem interesse': '#94A3B8',
-          }
-          const saveSt = (id: string, val: string) => {
-            const ns = { ...leadStatus, [id]: val }
-            setLeadStatus(ns)
-            localStorage.setItem('vnp_admin_leadstatus', JSON.stringify(ns))
-          }
-          const saveNota = (id: string, val: string) => {
-            const nn = { ...leadNota, [id]: val }
-            setLeadNota(nn)
-            localStorage.setItem('vnp_admin_leadnota', JSON.stringify(nn))
-          }
-          return (
-            <div>
-              <div style={{ marginBottom: 20 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>CRM de Leads — {leads.length} contatos</div>
-                <div style={{ fontSize: 12, color: '#64748B' }}>Gerencie o status e notas de cada lead. Dados salvos localmente.</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {leads.map(l => {
-                  const st = leadStatus[l.id] ?? 'novo'
-                  const nota = leadNota[l.id] ?? ''
-                  return (
-                    <div key={l.id} style={{ background: '#fff', borderRadius: 12, border: '1px solid #E2E8F0', padding: '14px 18px' }}>
-                      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                        <div style={{ flex: 1, minWidth: 200 }}>
-                          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 2 }}>{l.nome}</div>
-                          <div style={{ fontSize: 12, color: '#64748B' }}>{l.email}{l.telefone ? ` · ${l.telefone}` : ''}</div>
-                          <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{l.origem ?? '—'} · {fmtDate(l.criado_em)}</div>
-                          {l.mensagem && <div style={{ fontSize: 12, color: '#64748B', marginTop: 4, fontStyle: 'italic' }}>"{l.mensagem.slice(0, 120)}{l.mensagem.length > 120 ? '…' : ''}"</div>}
-                        </div>
-                        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0, flexWrap: 'wrap' }}>
-                          <span style={{ padding: '3px 10px', borderRadius: 99, fontSize: 11, fontWeight: 700, background: `${ST_COLOR[st]}18`, color: ST_COLOR[st] }}>{st}</span>
-                          <select value={st} onChange={e => saveSt(l.id, e.target.value)}
-                            style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid #E2E8F0', fontSize: 12, fontFamily: 'inherit', cursor: 'pointer', color: 'var(--navy)' }}>
-                            {CRM_OPTS.map(o => <option key={o} value={o}>{o}</option>)}
-                          </select>
-                          {l.telefone && (
-                            <a href={`https://wa.me/55${l.telefone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer"
-                              style={{ padding: '4px 12px', borderRadius: 6, background: '#DCFCE7', color: '#166534', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>WhatsApp</a>
-                          )}
-                        </div>
-                      </div>
-                      <div style={{ marginTop: 10 }}>
-                        <textarea value={nota} rows={1} placeholder="Notas sobre este lead..."
-                          onChange={e => saveNota(l.id, e.target.value)}
-                          style={{ width: '100%', padding: '6px 10px', borderRadius: 7, border: '1px solid #E2E8F0', fontSize: 12, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box', color: 'var(--navy)' }} />
-                      </div>
-                    </div>
-                  )
-                })}
-                {leads.length === 0 && (
-                  <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E2E8F0', padding: '60px 24px', textAlign: 'center' }}>
-                    <div style={{ fontSize: 12, color: '#94A3B8' }}>Nenhum lead ainda.</div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-        })()}
-
-        {/* PIPELINE */}
-        {tab === 'pipeline' && (() => {
-          const COLS = ['novo', 'contatado', 'qualificado', 'proposta', 'fechado']
-          const COL_LABELS: Record<string, string> = { novo: 'Novos', contatado: 'Contatados', qualificado: 'Qualificados', proposta: 'Proposta', fechado: 'Fechados' }
-          const COL_COLORS: Record<string, string> = { novo: '#6366F1', contatado: '#D97706', qualificado: '#0369A1', proposta: '#7C3AED', fechado: '#059669' }
-          return (
-            <div>
-              <div style={{ marginBottom: 20 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>Pipeline de Leads</div>
-                <div style={{ fontSize: 12, color: '#64748B' }}>Visualização kanban dos leads por status. Altere o status no CRM para mover os cards.</div>
-              </div>
-              <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 12, alignItems: 'flex-start' }}>
-                {COLS.map(col => {
-                  const colLeads = leads.filter(l => (leadStatus[l.id] ?? 'novo') === col)
-                  return (
-                    <div key={col} style={{ minWidth: 210, flex: '1 0 210px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, padding: '0 4px' }}>
-                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: COL_COLORS[col], flexShrink: 0 }} />
-                        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--navy)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{COL_LABELS[col]}</span>
-                        <span style={{ marginLeft: 'auto', fontSize: 11, background: `${COL_COLORS[col]}18`, color: COL_COLORS[col], padding: '2px 7px', borderRadius: 99, fontWeight: 700 }}>{colLeads.length}</span>
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        {colLeads.map(l => (
-                          <div key={l.id} style={{ background: '#fff', borderRadius: 10, border: '1px solid #E2E8F0', padding: '12px 14px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)', marginBottom: 2 }}>{l.nome}</div>
-                            <div style={{ fontSize: 11, color: '#64748B', marginBottom: 6 }}>{l.origem ?? '—'} · {fmtDate(l.criado_em)}</div>
-                            {leadNota[l.id] && <div style={{ fontSize: 11, color: '#64748B', fontStyle: 'italic', marginBottom: 6 }}>"{leadNota[l.id].slice(0, 60)}{leadNota[l.id].length > 60 ? '…' : ''}"</div>}
-                            <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6, flexWrap: 'wrap' }}>
-                              {l.telefone && (
-                                <a href={`https://wa.me/55${l.telefone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer"
-                                  style={{ fontSize: 11, color: '#25D366', textDecoration: 'none', fontWeight: 700 }}>WhatsApp →</a>
-                              )}
-                              <select value={leadStatus[l.id] ?? 'novo'} onChange={e => {
-                                const ns = { ...leadStatus, [l.id]: e.target.value }
-                                setLeadStatus(ns)
-                                localStorage.setItem('vnp_admin_leadstatus', JSON.stringify(ns))
-                              }} style={{ marginLeft: 'auto', padding: '2px 6px', borderRadius: 5, border: '1px solid #E2E8F0', fontSize: 10, fontFamily: 'inherit', cursor: 'pointer', color: COL_COLORS[leadStatus[l.id] ?? 'novo'] ?? '#64748B', fontWeight: 700 }}>
-                                {COLS.map(c => <option key={c} value={c}>{COL_LABELS[c]}</option>)}
-                              </select>
-                            </div>
-                          </div>
-                        ))}
-                        {colLeads.length === 0 && (
-                          <div style={{ background: '#F8FAFC', borderRadius: 10, border: '1px dashed #E2E8F0', padding: '20px 14px', textAlign: 'center', fontSize: 12, color: '#94A3B8' }}>Sem leads</div>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )
-        })()}
+        {tab === 'crm' && <CRMTab initialLeads={leads} />}
 
         {tab === 'financeiro' && <FinanceiroTab imoveis={imoveis} leads={leads} />}
 
