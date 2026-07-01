@@ -5,7 +5,9 @@ import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 import Btn from '@/components/ui/Btn'
-import { MODULES } from '@/lib/config'
+import { MODULES, SITE_CONFIG } from '@/lib/config'
+
+const { brand } = SITE_CONFIG
 
 function ShieldMark({ size = 32 }: { size?: number }) {
   return (
@@ -22,18 +24,26 @@ function ShieldMark({ size = 32 }: { size?: number }) {
         stroke="url(#goldShield)" strokeWidth="2.2" fill="rgba(212,168,87,0.05)"/>
       <text x="22" y="32" textAnchor="middle"
         fontFamily="Cinzel, serif" fontSize="18" fontWeight="700"
-        fill="url(#goldShield)" letterSpacing="0.03em">VN</text>
+        fill="url(#goldShield)" letterSpacing="0.03em">{brand.initials}</text>
     </svg>
   )
 }
 
 function BrandLockup({ onNavy = false }: { onNavy?: boolean }) {
+  if (brand.logoUrl) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={brand.logoUrl} alt={brand.name} style={{ height: 38, width: 'auto', objectFit: 'contain' }} />
+      </div>
+    )
+  }
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
       <ShieldMark size={32} />
       <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
-        <span style={{ fontFamily: "'Cinzel', serif", fontSize: 17, fontWeight: 700, letterSpacing: '0.16em', color: onNavy ? '#F5F8FA' : 'var(--navy)' }}>VN PRIME</span>
-        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 8.5, letterSpacing: '0.42em', background: 'linear-gradient(90deg,#B8862E,#D4A857,#B8862E)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', marginTop: 4 }}>IMÓVEIS</span>
+        <span style={{ fontFamily: "'Cinzel', serif", fontSize: 17, fontWeight: 700, letterSpacing: '0.16em', color: onNavy ? '#F5F8FA' : 'var(--navy)' }}>{brand.display1}</span>
+        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 8.5, letterSpacing: '0.42em', background: 'linear-gradient(90deg,#B8862E,#D4A857,#B8862E)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', marginTop: 4 }}>{brand.display2}</span>
       </div>
     </div>
   )
@@ -306,7 +316,7 @@ export default function SiteHeader() {
       {/* Floating WhatsApp button */}
       {pathname !== '/admin' && (
         <a
-          href="https://wa.me/5531984144250?text=Olá! Tenho interesse em imóveis VN Prime."
+          href={`https://wa.me/${brand.phone}?text=Olá! Tenho interesse em imóveis ${brand.name}.`}
           target="_blank" rel="noopener noreferrer"
           aria-label="Falar pelo WhatsApp"
           style={{ position: 'fixed', bottom: 28, right: 24, zIndex: 9990, width: 52, height: 52, borderRadius: '50%', background: '#25D366', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 24px rgba(37,211,102,0.5)', textDecoration: 'none', transition: 'transform 0.18s, box-shadow 0.18s', fontSize: 26 }}

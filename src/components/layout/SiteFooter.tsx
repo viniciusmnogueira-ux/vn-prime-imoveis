@@ -3,8 +3,19 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { SITE_CONFIG } from '@/lib/config'
+
+const { brand } = SITE_CONFIG
 
 function BrandLockup() {
+  if (brand.logoUrl) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={brand.logoUrl} alt={brand.name} style={{ height: 38, width: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+      </div>
+    )
+  }
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
       <svg width={32} height={32 * 1.13} viewBox="0 0 44 50" fill="none" aria-hidden="true">
@@ -20,15 +31,15 @@ function BrandLockup() {
           stroke="url(#goldShieldFt)" strokeWidth="2.2" fill="rgba(212,168,87,0.05)"/>
         <text x="22" y="32" textAnchor="middle"
           fontFamily="Cinzel, serif" fontSize="18" fontWeight="700"
-          fill="url(#goldShieldFt)" letterSpacing="0.03em">VN</text>
+          fill="url(#goldShieldFt)" letterSpacing="0.03em">{brand.initials}</text>
       </svg>
       <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
-        <span style={{ fontFamily: "'Cinzel', serif", fontSize: 17, fontWeight: 700, letterSpacing: '0.16em', color: '#F5F8FA' }}>VN PRIME</span>
+        <span style={{ fontFamily: "'Cinzel', serif", fontSize: 17, fontWeight: 700, letterSpacing: '0.16em', color: '#F5F8FA' }}>{brand.display1}</span>
         <span style={{
           fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 8.5, letterSpacing: '0.42em',
           background: 'linear-gradient(90deg,#B8862E,#D4A857,#B8862E)',
           WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', marginTop: 4,
-        }}>IMÓVEIS</span>
+        }}>{brand.display2}</span>
       </div>
     </div>
   )
@@ -134,7 +145,7 @@ export default function SiteFooter() {
           <div>
             <BrandLockup />
             <p style={{ fontSize: 13.5, lineHeight: 1.7, marginTop: 18, color: 'rgba(245,248,250,0.62)', fontWeight: 300, maxWidth: 280 }}>
-              Curadoria de imóveis premium em Belo Horizonte, Nova Lima e região metropolitana.
+              {brand.description}
             </p>
           </div>
           <FootCol title="Comprar" links={[
@@ -163,10 +174,10 @@ export default function SiteFooter() {
         </div>
 
         <div style={{ borderTop: '1px solid rgba(245,248,250,0.10)', paddingTop: 22, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12, fontSize: 12 }}>
-          <span>© {new Date().getFullYear()} VN Prime Imóveis</span>
+          <span>© {new Date().getFullYear()} {brand.name}</span>
           <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
             <span style={{ fontStyle: 'italic', color: 'var(--gold-soft)', fontSize: 14, letterSpacing: '0.04em' }}>
-              Curadoria silenciosa
+              {brand.slogan}
             </span>
             <Link href="/politica" style={{ fontSize: 11, color: 'rgba(245,248,250,0.35)', textDecoration: 'none' }}>Privacidade</Link>
             <Link href="/termos" style={{ fontSize: 11, color: 'rgba(245,248,250,0.35)', textDecoration: 'none' }}>Termos</Link>
