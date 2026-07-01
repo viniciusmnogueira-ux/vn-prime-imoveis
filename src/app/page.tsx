@@ -1,4 +1,7 @@
 'use client'
+import { SITE_CONFIG } from '@/lib/config'
+import HomeVitrine from '@/components/templates/HomeVitrine'
+import HomeEmpreendimentos from '@/components/templates/HomeEmpreendimentos'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Btn from '@/components/ui/Btn'
@@ -145,6 +148,9 @@ function ArrowBtn({ dir, onClick }: { dir: 'left' | 'right'; onClick: () => void
 }
 
 export default function HomePage() {
+  if (SITE_CONFIG.template === 'vitrine')         return <HomeVitrine />
+  if (SITE_CONFIG.template === 'empreendimentos') return <HomeEmpreendimentos />
+  // template === 'completa' → continua abaixo (homepage atual)
   const [slide, setSlide] = useState(0)
   const [titleIdx, setTitleIdx] = useState(0)
   const [serviceIdx, setServiceIdx] = useState(0)
